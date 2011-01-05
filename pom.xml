@@ -1,0 +1,171 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>eu.tinasoft</groupId>
+    <packaging>jar</packaging>
+    <artifactId>tinaviz</artifactId>
+    <version>2.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.daizoru</groupId>
+            <artifactId>node</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>liveconnect</groupId> 
+            <artifactId>plugin</artifactId> 
+            <version>1.0.0</version> 
+        </dependency>
+        <dependency>
+            <groupId>org.processing</groupId>
+            <artifactId>core</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${lib.org.scala-lang.scala.version}</version>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <lib.org.scala-lang.scala.version>2.8.0</lib.org.scala-lang.scala.version>
+        <maven.scala.version>${lib.org.scala-lang.scala.version}</maven.scala.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-5</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>eu.tinasoft.tinaviz.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                        <!-- signed jars-->
+                                <excludes>
+                                    <!-- liveconnect:plugin was included for 
+                                    Netbeans, but browsers already have it -->
+                                    <exclude>liveconnect:plugin</exclude>
+                                </excludes>
+                            </artifactSet>
+
+                            <transformers>
+                                <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <!-- Main class -->
+                                    <mainClass>eu.tinasoft.app.tinaviz.Main</mainClass>
+                                </transformer>
+                            <!-- Use resource transformers to prevent file overwrites -->
+                                <transformer
+                           implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>properties.properties</resource>
+                                </transformer>
+                                <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                    <resource>applicationContext.xml</resource>
+                                </transformer>
+                                <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/cxf/cxf.extension</resource>
+                                </transformer>
+                                <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                    <resource>META-INF/cxf/bus-extensions.xml</resource>
+                                </transformer>
+                            </transformers>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <name>${project.artifactId} ${project.version}</name>
+
+    <repositories>
+        <repository>
+            <id>maven.iscpif.fr</id>
+            <name>ISCPIF repository</name>
+            <url>http://maven.iscpif.fr/public/</url>
+        </repository>
+        <repository>
+            <id>maven.iscpif.fr.snapshots</id>
+            <name>ISCPIF snapshots repository</name>
+            <url>http://maven.iscpif.fr/snapshots/</url>
+        </repository>
+        <repository>
+            <id>org.wokalab.cytoscape.releases</id>
+            <name>CytoScape Releases</name>
+            <url>http://cytoscape.wodaklab.org/nexus/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>org.wokalab.cytoscape.snapshots</id>
+            <name>CytoScape Snapshots</name>
+            <url>http://cytoscape.wodaklab.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>scala-tools.org</id>
+            <name>Scala repository</name>
+            <url>http://scala-tools.org/repo-releases/</url>
+        </repository>
+        <repository>
+            <id>developer.k-int.com</id>
+            <name>k-int repository</name>
+            <url>http://developer.k-int.com/maven2/</url>
+        </repository>
+        <repository>
+            <id>tinaviz-repository</id>
+            <name>tinaviz repository</name>
+            <url>file://${basedir}/repository</url>
+        </repository>
+    </repositories>
+</project>
