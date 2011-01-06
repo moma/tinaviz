@@ -21,11 +21,13 @@ class MainController extends node.util.Actor {
     loop {
       react {
         case 'update => 
-           model = new Model()
+           //model = new Model()
            // TODO modify model here
         
         case 'model =>
-          reply(model)
+          reply(new Model(
+            background=(255,255,255)
+          ))
           
         case msg => println("unknow msg: "+msg)
       }
