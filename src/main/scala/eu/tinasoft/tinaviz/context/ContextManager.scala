@@ -8,8 +8,8 @@ package eu.tinasoft.tinaviz.context
 import org.daizoru._
 import eu.tinasoft._
 
-import tinaviz.graph._
-import tinaviz.drawing._
+import tinaviz.Scene
+import tinaviz.graph.Graph
 
 import actors._
 import Actor._
@@ -28,7 +28,7 @@ class ContextManager (val graph : Graph = new Graph()) extends node.util.Actor {
 
         // generate a new drawing model as background task..
         case 'model =>
-          reply(new Model (
+          reply(new Scene (
               background=(255,255,255)
             ))
 

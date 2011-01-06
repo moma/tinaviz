@@ -21,23 +21,22 @@ class Stats (
 
 }
 
-object Main extends PApplet {
-  
-  val tinaviz : scala.actors.Actor = new Tinaviz()
-  val fonts = new Fonts(this)
-  val browser = new Browser(JSObject.getWindow(this), getParameter("js_context"))
-
+object Main {
   def main(args: Array[String]): Unit = {
-
     var frame = new javax.swing.JFrame("TinaViz")
-    //var applet = Main
-    frame.getContentPane().add(Main)
-    //applet.init
-    init
+    var applet = new Main()
+    frame.getContentPane().add(applet)
+    applet.init
+    //init
     frame.pack
     frame.setVisible(true)
   }
+}
+class Main extends PApplet {
   
+  val tinaviz : scala.actors.Actor = new Tinaviz()
+  val fonts = new Fonts(this)
+
   override def setup(): Unit = {
     size(screenWidth - 200, screenHeight - 400, PConstants.P2D)
     frameRate(4)
@@ -46,10 +45,19 @@ object Main extends PApplet {
     rectMode(PConstants.CENTER)
     bezierDetail(16)
 
-    val __jsContext = getParameter("js_context")
-    val __rootPrefix = getParameter("root_prefix")
-    val __brandingIcon = getParameter("branding_icon")
-    val __engine = getParameter("engine")
+    try {
+      Browser.config(JSObject.getWindow(this), getParameter("js_context"))
+    } catch {
+      case exc:java.lang.NullPointerException =>
+        println("Null pointer exception: "+exc)
+        
+      case exc:netscape.javascript.JSException =>
+        println("Javascript exception: "+exc)
+
+    }
+    
+    //val __brandingIcon = getParameter("branding_icon")
+    //val __engine = getParameter("engine")
     
   }
 
