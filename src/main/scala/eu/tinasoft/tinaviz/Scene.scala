@@ -3,30 +3,31 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz.drawing
+package eu.tinasoft.tinaviz
 
 class NodeDrawing (val position:(Double,Double)=(0,0),
-                   val radius:Double=1,
+                   val size:Double=1,
                    val color:(Int,Int,Int)=(0,0,0),
-val shape:Symbol='Disk) {
+                   val shape:Symbol='Disk) {
 
 }
 
-class EdgeDrawing (val sourcePosition:(Double,Double)=(0,0),
-                   val targetPosition:(Double,Double)=(0,0),
+class EdgeDrawing (val source:(Double,Double)=(0,0),
+                   val target:(Double,Double)=(0,0),
                    val weight:Double=1,
-                   val color:(Int,Int,Int)=(0,0,0)) {
+                   val thickness:Double=1,
+                   val color:(Int,Int,Int)=(0,0,0),
+                   val lod:Int=16) {
 
 
 }
 
-class LabelDrawing (val labelShort:String="N",
-                    val labelFull:String="Node",
+class LabelDrawing (val text:String="Node",
                     val size:Int=14) {
 
 }
 
-case class Model (
+case class Scene (
   val background : (Int,Int,Int) = (0,0,0),
   val debug : Boolean = true
 ) {

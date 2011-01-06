@@ -5,11 +5,14 @@
 
 package eu.tinasoft.tinaviz.graph
 
-class Node(
+class Node (
   val uuid : String,
-  val x : Double = 0.0,
-  val y : Double = 0.0
+  val label : String = "Node",
+  val position : (Double,Double) = (0,0),
+  val color : (Int,Int,Int) = (0,0,0),
+  val size : (Double) = 1
   ) {
 
-  
+
+  override val toString = "<Node "+uuid+":"+label+":"+position._1+","+position._2+">"
 }

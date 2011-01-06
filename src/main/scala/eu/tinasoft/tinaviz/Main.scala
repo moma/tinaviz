@@ -3,6 +3,8 @@ package eu.tinasoft.tinaviz
 
 import processing.core._
 
+import netscape.javascript.JSObject
+
 import org.daizoru._
 import eu.tinasoft._
 
@@ -21,9 +23,10 @@ class Stats (
 
 object Main extends PApplet {
   
-  val viz : scala.actors.Actor = new MainController()
+  val tinaviz : scala.actors.Actor = new Tinaviz()
   val fonts = new Fonts(this)
-   
+  val browser = new Browser(JSObject.getWindow(this), getParameter("js_context"))
+
   def main(args: Array[String]): Unit = {
 
     var frame = new javax.swing.JFrame("TinaViz")
@@ -36,46 +39,64 @@ object Main extends PApplet {
   }
   
   override def setup(): Unit = {
-    size(screenWidth - 200, screenHeight - 400, PConstants.P2D);
+    size(screenWidth - 200, screenHeight - 400, PConstants.P2D)
     frameRate(4)
     noSmooth
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
     bezierDetail(16)
-    //noLoop
 
+    val __jsContext = getParameter("js_context")
+    val __rootPrefix = getParameter("root_prefix")
+    val __brandingIcon = getParameter("branding_icon")
+    val __engine = getParameter("engine")
+    
   }
 
   override def draw(): Unit = {
     
-    val model : Model = (viz !? 'model) match { case m:Model => m }
-    
-    setBackground(model.background)
+    tinaviz ! new Externals(frameRate.toInt)
 
-    if (model.debug) {
+    val scene : Scene = (tinaviz !? 'getScene) match { case s:Scene => s }
+    
+    setBackground(scene.background)
+
+    if (scene.debug) {
       text("" + frameRate.toInt + " img/sec", 10f, 13f)
     }
 
-    model.edges.foreach{ case e =>
-
+    /*
+     * EDGE DRAWING
+     */
+    scene.edges.foreach{ case e =>
+        setLod(e.lod)
+        setColor(e.color)
+        setThickness(e.thickness)
+        drawCurve(e.source, e.target)
     }
-    
-    model.nodes.foreach{ case n =>
-        
-        n.shape match {
-          case 'Disk => drawDisk(n.position, n.radius)
-          case x => drawSquare(n.position, n.radius)
+
+    /*
+     * NODE DRAWING
+     */
+    bezierDetail(16)
+    setThickness(1)
+    scene.nodes.foreach{ case e =>
+        setColor(e.color)
+        e.shape match {
+          case 'Disk => drawDisk(e.position, e.size)
+          case x => drawSquare(e.position, e.size)
         }
     }
 
-    setColor(model.labelColor)
-    model.labels.foreach{ case l =>
-        setFontSize(12)
-
-        //float rad = n.getRadius()
-        //text((n.isHighlighted()) ? n.label : n.shortLabel, screenX(nx + tmprad, ny + (tmprad / PI)), screenY(nx + tmprad, ny + (tmprad / PI)));
-        //text((n.isHighlighted()) ? n.label : n.shortLabel, screenX(nx + rad, ny + (rad / PI)), screenY(nx + rad, ny + (rad / PI)));
-        
+    /*
+     * LABEL DRAWING
+     */
+    bezierDetail(16)
+    setThickness(1)
+    setColor(scene.labelColor)
+    scene.labels.foreach{ case e =>
+        setFontSize(e.size)
+        text(e.text)
     }
   }
 
@@ -86,7 +107,11 @@ object Main extends PApplet {
     ellipse(position._1.toFloat,position._2.toFloat,radius.toFloat,radius.toFloat)
   }
 
-  def drawCurve(n1x:Float, n1y:Float, n2x:Float, n2y:Float) = {
+  def drawCurve(n1:(Double,Double), n2:(Double,Double)) = {
+    drawCurve4(n1._1.toFloat,n1._2.toFloat,n2._1.toFloat,n2._2.toFloat)
+  }
+
+  def drawCurve4(n1x:Float, n1y:Float, n2x:Float, n2y:Float) = {
 
     val xa0 = (6 * n1x + n2x) / 7
     val ya0 = (6 * n1y + n2y) / 7
@@ -102,7 +127,7 @@ object Main extends PApplet {
     bezier(n1x, n1y,
            xya1a.toFloat, xya1b.toFloat,
            xyb1a.toFloat, xyb1b.toFloat,
-           n2x, n2y);
+           n2x, n2y)
     //} else {
     //    line(n1x, n1y, n2x, n2y);
     //}
@@ -117,5 +142,13 @@ object Main extends PApplet {
 
   def setColor (c:(Int,Int,Int)) = {
     fill(c._1,c._2,c._3)
+  }
+
+  def setLod (v:Int) = {
+    bezierDetail(v)
+  }
+
+  def setThickness(t:Double) = {
+    strokeWeight(t.toFloat)
   }
 }
