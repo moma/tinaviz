@@ -15,9 +15,10 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>liveconnect</groupId> 
-            <artifactId>plugin</artifactId> 
-            <version>1.0.0</version> 
+          <groupId>netscape</groupId>
+          <artifactId>javascript</artifactId>
+          <version>1.6.0_22</version>
+          <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.processing</groupId>
