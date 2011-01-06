@@ -46,7 +46,7 @@ class Main extends PApplet {
     bezierDetail(16)
 
     try {
-      Browser.config(JSObject.getWindow(this), getParameter("js_context"))
+      Browser.init(JSObject.getWindow(this), getParameter("js_context"))
     } catch {
       case exc:java.lang.NullPointerException =>
         println("Null pointer exception: "+exc)
@@ -63,16 +63,23 @@ class Main extends PApplet {
 
   override def draw(): Unit = {
     
-    tinaviz ! new Externals(frameRate.toInt)
+    tinaviz ! 'frameRate -> frameRate.toInt
 
     val scene : Scene = (tinaviz !? 'getScene) match { case s:Scene => s }
-    
     setBackground(scene.background)
 
-    if (scene.debug) {
-      text("" + frameRate.toInt + " img/sec", 10f, 13f)
+    (tinaviz !? 'debug) match {
+      case true =>
+        setColor(scene.foreground)
+        text("" + frameRate.toInt + " img/sec", 10f, 13f)
     }
 
+    val pause : Boolean = (tinaviz !? 'pause) match {
+      case true => true
+      case x => false
+    }
+    if (pause) return
+    
     /*
      * EDGE DRAWING
      */
@@ -108,18 +115,18 @@ class Main extends PApplet {
     }
   }
 
-  def drawSquare(position:(Double,Double),radius:Double) = {
+  private def drawSquare(position:(Double,Double),radius:Double) = {
     rect(position._1.toFloat,position._2.toFloat,radius.toFloat,radius.toFloat)
   }
-  def drawDisk(position:(Double,Double),radius:Double) = {
+  private def drawDisk(position:(Double,Double),radius:Double) = {
     ellipse(position._1.toFloat,position._2.toFloat,radius.toFloat,radius.toFloat)
   }
 
-  def drawCurve(n1:(Double,Double), n2:(Double,Double)) = {
+  private def drawCurve(n1:(Double,Double), n2:(Double,Double)) = {
     drawCurve4(n1._1.toFloat,n1._2.toFloat,n2._1.toFloat,n2._2.toFloat)
   }
 
-  def drawCurve4(n1x:Float, n1y:Float, n2x:Float, n2y:Float) = {
+  private def drawCurve4(n1x:Float, n1y:Float, n2x:Float, n2y:Float) = {
 
     val xa0 = (6 * n1x + n2x) / 7
     val ya0 = (6 * n1y + n2y) / 7
@@ -140,23 +147,91 @@ class Main extends PApplet {
     //    line(n1x, n1y, n2x, n2y);
     //}
   }
-  def setBackground (c:(Int,Int,Int)) = {
+  private def setBackground (c:(Int,Int,Int)) = {
     background(c._1, c._2, c._3)
   }
 
-  def setFontSize(size:Int) = {
+  private def setFontSize(size:Int) = {
     textFont(fonts.get(size))
   }
 
-  def setColor (c:(Int,Int,Int)) = {
+  private def setColor (c:(Int,Int,Int)) = {
     fill(c._1,c._2,c._3)
   }
 
-  def setLod (v:Int) = {
+  private def setLod (v:Int) = {
     bezierDetail(v)
   }
 
-  def setThickness(t:Double) = {
+  private def setThickness(t:Double) = {
     strokeWeight(t.toFloat)
+  }
+
+
+
+
+  // Called by Javascript
+
+  def setPause(b:Boolean) = {
+    true
+  }
+  
+  def setView(s:String) = {
+    s match {
+      case "macro" =>
+      case "meso" =>
+    }
+    true
+  }
+
+  def togglePause = {
+    (tinaviz !? 'pause -> 'toggle) match {
+      case b:Boolean => b
+      case x => false
+    }
+  }
+  /**
+   * Deprecated
+   */
+  def toggleNodes = {
+    true
+  }
+  /**
+   * Deprecated
+   */
+  def toggleEdges = {
+    true
+  }
+  /**
+   * Deprecated
+   */
+  def toggleLabels = {
+    true
+  }
+  /**
+   * Deprecated
+   */
+  def toggleHD = {
+    
+  }
+
+  def unselect = {
+
+  }
+
+  /**
+   * Set a param
+   * TODO: boolean sync?
+   */
+  def setParam(key:String,value:String,sync:Boolean) = {
+    tinaviz ! key -> value
+    println("ignoring sync: "+sync)
+  }
+
+  /**
+   * 
+   */
+  def getNeighbourhood(view:String, rawJSONList:String) : Unit = {
+    
   }
 }
