@@ -30,12 +30,11 @@ class LabelDrawing (val text:String="Node",
 case class Scene (
   val background : (Int,Int,Int) =  (255,255,255),
   val foreground : (Int,Int,Int) = (0,0,0),
-  val debug : Boolean = true,
-  val paused : Boolean = false
-) {
-
-  val nodes : List[NodeDrawing] = List.empty
-  val edges : List[EdgeDrawing] = List.empty
-  val labels : List[LabelDrawing] = List.empty
+  val nodes : List[NodeDrawing] = List[NodeDrawing](),
+  val edges : List[EdgeDrawing]  = List[EdgeDrawing](),
+  val labels : List[LabelDrawing] = List[LabelDrawing](),
   val labelColor : (Int,Int,Int) = (0,0,0)
+) {
+  
 }
+
