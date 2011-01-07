@@ -5,110 +5,98 @@
 
 package eu.tinasoft.tinaviz
 
-import org.daizoru._
-import eu.tinasoft._
-
-import tinaviz.drawing._
-import tinaviz.data._
-import tinaviz.graph._
-import tinaviz.context._
-
 import actors._
-import Actor._
+import eu.tinasoft.tinaviz.data.json.JsonParser
 
-class Tinaviz extends node.util.Actor {
+trait Tinaviz {
   
-  var context : Actor = new ContextManager()
-
-  // scene cache
-  var scene : Scene = new Scene()
-
-  var properties : Map[String,Any] = Map(
-    "profiler.fps" -> 0,
-    "scene.pause" -> false,
-    "scene.debug" -> true
-  )
-  start
+  val tinaviz : Actor = new TinavizActor()
   
-  def act() {
+  // Called by Javascript
 
-
-    
-    // we could eventually keep a
-    //var model = new Model()
-    
-    loop {
-      react {
-
-        // called when we have to load a new graph
-        case 'load =>
-          // kill the previous
-          context ! 'exit
-          context = new ContextManager()
-
-        case ('updateNode,value) =>
-          context ! 'updateNode -> value
-
-          // scene builder update the scene!
-        case newScene:Scene => scene = newScene
-
-          // main want the scene!
-        case 'getScene => reply(scene)
-
-        case ('updated,'frameRate,value:Any,previous:Any) =>
-          // don't care about frameRate updates
-
-        case ('updated,'pause,value:Any,previous:Any) =>
-          // don't care about pause updates
-
-        case ('updated,key:Symbol,value:Any,previous:Any) =>
-          log("ignoring update of "+key)
-              
-
-        case 'updateScene =>
-          
-         
-        case key:String =>
-          //if (properties.contains(k))
-          reply(properties(key))
-        
-        case (key:String,value:Any) =>
-          //if (properties.contains(k)) {
-          val previous = properties(key)
-          value match {
-            // special case for booleans
-            case 'toggle =>
-              previous match {
-                case b:Boolean =>
-                  properties += key -> !b
-                case x =>
-                  throw new Exception("")
-              }
-              // default case
-            case x => properties += key -> value
-          }
-          reply(previous)
-          if (!previous.equals(value)) {
-            self ! ('updated,key,value,previous)
-          }
-
-        case msg => println("unknow msg: "+msg)
-      }
+  def setPause(b:Boolean) = {
+    true
+  }
+  
+  def setView(s:String) = {
+    s match {
+      case "macro" =>
+      case "meso" =>
     }
+    true
+  }
+
+  def togglePause = {
+    (tinaviz !? "pause" -> 'toggle) match {
+      case b:Boolean => b
+      case x => false
+    }
+  }
+  /**
+   * Deprecated
+   */
+  def toggleNodes = {
+    true
+  }
+  /**
+   * Deprecated
+   */
+  def toggleEdges = {
+    true
+  }
+  /**
+   * Deprecated
+   */
+  def toggleLabels = {
+    true
+  }
+  /**
+   * Deprecated
+   */
+  def toggleHD = {
+    
+  }
+
+  def unselect = {
+
+  }
+
+  /**
+   * Set a param
+   * TODO: boolean sync?
+   */
+  def setParam(key:String,value:String,sync:Boolean) = {
+    tinaviz ! key -> value
+    println("ignoring sync: "+sync)
+  }
+
+  /**
+   * 
+   */
+  def getNeighbourhood(view:String, rawJSONList:String) : Unit = {
     
   }
   
   /**
-   * The most important function, that does everything
+   * Update a Node in the current view, from it's UUID
    */
-  def buildScene() = {
-    val view = properties("scene.view") 
-    var s = new MutableScene()
-    view match {
-      case "macro" =>
-      case "meso" =>
-    }
-    self ! s.toScene
+  def updateNode(str:String) = {
+    // we help the JS developer by telling him if the JSON is valid or not
+    val res = JsonParser.parse(str)
+    
+    if (!res.isDefined) throw new IllegalArgumentException("Error, invalid JSON!")
+    tinaviz ! 'updateNode -> res.get
+    
   }
   
+  /**
+   * TODO since this is blocking, we should move it elsewhere
+   */
+  def openURI(url:String) = {
+    tinaviz ! 'openURL -> url
+  }
+  
+  def openString(str:String) = {
+    tinaviz ! 'openString -> str
+  }
 }
