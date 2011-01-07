@@ -5,6 +5,8 @@
 
 package eu.tinasoft.tinaviz
 
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseWheelListener
 import processing.core._
 
 class Fonts(val p : PApplet,
@@ -21,10 +23,11 @@ class Fonts(val p : PApplet,
 }
 
 
-class TApplet extends PApplet {
+class TApplet extends PApplet with MouseWheelListener {
   
-  private val fonts = new Fonts(this)
-
+  private val _fonts = new Fonts(this)
+  private val _camera = new Camera()
+  
   protected def drawSquare(position:(Double,Double),radius:Double) = {
     rect(position._1.toFloat,position._2.toFloat,radius.toFloat,radius.toFloat)
   }
@@ -62,7 +65,7 @@ class TApplet extends PApplet {
   }
 
   protected def setFontSize(size:Int) = {
-    textFont(fonts.get(size))
+    textFont(_fonts.get(size))
   }
 
   protected def setColor (c:(Int,Int,Int)) = {
@@ -72,9 +75,53 @@ class TApplet extends PApplet {
   protected def setLod (v:Int) = {
     bezierDetail(v)
   }
-
+  protected def lineColor(c:(Int,Int,Int)) = {
+    stroke(c._1,c._2,c._3)
+  }
   protected def setThickness(t:Double) = {
     strokeWeight(t.toFloat)
   }
+  
+  def zoom(zoomIn:Boolean,ratio:Double=1.2) {
+    _camera.lastMousePosition = (mouseX, mouseY)
+    _camera.center = _camera.lastMousePosition
+    _camera.zRatio = if (zoomIn) (1.0 + ratio) else (1.0 - ratio)
+  }
+  
+  def zoomAt(zoomIn:Boolean, position:(Double,Double), ratio:Double=1.2) {
+    _camera.lastMousePosition = (mouseX, mouseY)
+    _camera.center = position
+    _camera.zRatio = if (zoomIn) (1.0 + ratio) else (1.0 - ratio)
+  }
 
+    
+  def stopAutoCentering {
+    
+  }
+  
+  override def mouseDragged {
+    stopAutoCentering
+    /*
+     View v = Application.session.getView();
+     PVector oldTranslation = new PVector(v.translation.x, v.translation.y, 0.0f);
+     v.translation.sub(Camera.lastMousePosition);
+     Camera.lastMousePosition.set(mouseX, mouseY, 0);
+     v.translation.add(Camera.lastMousePosition);
+     Camera.cameraDelta.set(PVector.sub(oldTranslation, v.translation));
+     Camera.dragged = true;
+     */
+  }
+
+  override def mouseReleased {
+    //Camera.lastMousePosition.set(mouseX, mouseY, 0)
+    //Camera.dragged = false
+  }
+
+  override def mouseWheelMoved(e:MouseWheelEvent) {
+    if (!(mouseX < 0 | mouseX > width | mouseY < 0 | mouseY > height)) {
+      if (e.getUnitsToScroll != 0) {
+        zoom(e.getWheelRotation < 0)
+      }
+    }
+  }
 }

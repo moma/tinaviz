@@ -5,9 +5,11 @@
 
 package eu.tinasoft.tinaviz.data
 
+
 import org.daizoru._
 import eu.tinasoft._
 
+import tinaviz.Maths
 import tinaviz.graph._
 
 import actors._
@@ -31,7 +33,8 @@ class GEXFImporter extends node.util.Actor {
             val pos = n \\ "viz:position"
             g.nodes ::= new MutableNode(n \ "@id" text,
                                         n \ "@label" text,
-                                        try { ((pos \ "@x").text.toDouble, (pos \ "@y").text.toDouble) } catch { case x => (0,0)})
+                                        try { ((pos \ "@x").text.toDouble, (pos \ "@y").text.toDouble) } catch { 
+                case x => (Maths.random(0,900), Maths.random(0,500))})
           }
           for (e <- (root \\ "edge")) 
             g.node(e \ "@source" text).addNeighbour(g.id(e \ "@target" text), ((e \ "@weight").text.toDouble))

@@ -6,24 +6,25 @@
 package eu.tinasoft.tinaviz
 
 case class NodeDrawing (val position:(Double,Double)=(0,0),
-                   val size:Double=1,
-                   val color:(Int,Int,Int)=(50,50,50),
-                   val shape:Symbol='Disk) {
+                        val size:Double=1,
+                        val color:(Int,Int,Int)=(50,50,50),
+                        val shape:Symbol='Disk) {
 
 }
 
 case class EdgeDrawing (val source:(Double,Double)=(0,0),
-                   val target:(Double,Double)=(0,0),
-                   val weight:Double=1,
-                   val thickness:Double=1,
-                   val color:(Int,Int,Int)=(150,150,150),
-                   val lod:Int=16) {
+                        val target:(Double,Double)=(0,0),
+                        val weight:Double=1,
+                        val thickness:Double=1,
+                        val color:(Int,Int,Int)=(150,150,150),
+                        val lod:Int=16) {
 
 
 }
 
-case class LabelDrawing (val text:String="Node",
-                    val size:Int=14) {
+case class LabelDrawing (val position:(Double,Double)=(0,0),
+                         val text:String="Node",
+                         val size:Int=14) {
 
 }
 

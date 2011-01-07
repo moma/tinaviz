@@ -96,6 +96,7 @@ class TinavizActor extends node.util.Actor {
     }
     
   }
+
   
   /**
    * The most important function, that does everything
@@ -110,8 +111,8 @@ class TinavizActor extends node.util.Actor {
       case "macro" =>
         g.nodes.foreach { 
           case n =>
-            println("drawing node "+n)
             s.nodes ::= new NodeDrawing(n.position, n.size, n.color, 'Disk)
+            s.labels ::= new LabelDrawing(n.position, n.label, n.size.toInt)
             n.links.foreach { case (id,weight) =>
                 val m = g.node(id)
                 s.edges ::= new EdgeDrawing(n.position,
@@ -122,6 +123,7 @@ class TinavizActor extends node.util.Actor {
                    16) // depend on the distance relative to screen (use p:PApplet to compute it?)
             }
         }
+        println("put "+s.nodes.size+" nodes, "+s.edges.size+" edges into scene")
     
       case "meso" =>
     }

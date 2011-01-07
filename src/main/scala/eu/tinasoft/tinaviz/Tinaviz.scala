@@ -7,6 +7,7 @@ package eu.tinasoft.tinaviz
 
 import actors._
 import eu.tinasoft.tinaviz.data.json.JsonParser
+import scala.util.parsing.json.JSONObject
 
 trait Tinaviz {
   
@@ -70,12 +71,6 @@ trait Tinaviz {
     println("ignoring sync: "+sync)
   }
 
-  /**
-   * 
-   */
-  def getNeighbourhood(view:String, rawJSONList:String) : Unit = {
-    
-  }
   
   /**
    * Update a Node in the current view, from it's UUID
@@ -98,5 +93,75 @@ trait Tinaviz {
   
   def openString(str:String) = {
     tinaviz ! 'openString -> str
+  }
+  
+  
+  def selectNodesByLabel(matchLabel:String, matchCategory:String, matchMode:String, viewToSearch:String, center:Boolean) : Unit = {
+    if (viewToSearch == null || matchLabel == null || matchCategory == null || matchMode == null) {
+      System.out.println("selectNodesByLabel(" + matchLabel + ", " + matchCategory + ", " + matchMode + ", " + viewToSearch + ", " + center + ")");
+      return;
+    }
+    // shutdown the "center on visualization" mode
+
+    if (matchLabel.isEmpty()) {
+      return;
+    }
+
+    if (viewToSearch.equalsIgnoreCase("visualization") || viewToSearch.isEmpty()) {
+      System.out.println("calling selectFromNodes on output graph..");
+      //selectFromNodes(
+      //        getView().getOutputGraph().getNodesByLabel(
+      //        matchLabel, matchMode));
+    } else {
+      System.out.println("calling selectFromNodes on any graph..");
+      //selectFromNodes(
+      //        getView(viewToSearch).getNodesByLabel(
+      //        matchLabel, matchCategory, matchMode));
+    }
+
+    //Visualization.centerOnSelection = center;
+    //redrawLater();
+
+
+  }
+    
+
+  /**
+   * TODO fix it (blocking call!)
+   */
+  def getNodeAttributes(view:String, uuid:String) : String = {
+    //System.out.println("getting node by UUID: " + uuid)
+    val node = (tinaviz !? 'getNodeAttributes -> uuid) match {
+      case m:Map[Any,Any] => return new JSONObject(m).toString
+    }
+    throw new Exception("couldn't find node attributes "+uuid)
+  }
+
+  def getNeighbourhood(view:String, rawJSONList:String) : Unit = {
+    var neighbourList = "{}"
+    if (view == null) {
+      //Console.log("getNeighbourhood: view is null");
+      return;
+    }
+    if (rawJSONList == null) {
+      //Console.log("getNeighbourhood: id is null");
+      return;
+    }
+    //Console.log("getNeighbourhood(" + view + ", " + rawJSONList + ")");
+    try {
+      // neighbourList = (view.isEmpty() | view.equalsIgnoreCase("current"))
+      //   ? getView().getOutputGraph().getNeighbourhoodAsJSON(rawJSONList)
+      //   : getView(view).getInputGraph().getNeighbourhoodAsJSON(rawJSONList);
+    } catch  {
+      case ex:Exception =>
+        throw new Exception(ex)
+        // Console.error("getNeighbourhood error: " + ex)
+    }
+    if (neighbourList == null | neighbourList.isEmpty() | neighbourList.equals("{}")) {
+      //Console.log("getNeighbourhood: ERROR, json export failed: " + neighbourList);
+      return;
+    }
+
+    // Browser ! "_callbackGetNeighbourhood" -> "'" + getSelectedNodesJSON(view) + "','" + neighbourList + "'"
   }
 }

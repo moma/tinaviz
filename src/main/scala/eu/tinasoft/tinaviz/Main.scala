@@ -68,10 +68,13 @@ class Main extends TApplet with Tinaviz {
     /*
      * EDGE DRAWING
      */
+    bezierDetail(16)
+   // lineColor()
+    setThickness(1)
     scene.edges.foreach{ case e =>
         setLod(e.lod)
         setColor(e.color)
-        setThickness(e.thickness)
+        //setThickness(e.thickness)
         drawCurve(e.source, e.target)
     }
 
@@ -79,7 +82,7 @@ class Main extends TApplet with Tinaviz {
      * NODE DRAWING
      */
     bezierDetail(16)
-    setThickness(1)
+    setThickness(0)
     scene.nodes.foreach{ case e =>
         setColor(e.color)
         e.shape match {
@@ -95,7 +98,7 @@ class Main extends TApplet with Tinaviz {
     setThickness(1)
     setColor(scene.labelColor)
     scene.labels.foreach{ case e =>
-        setFontSize(e.size)
+        //setFontSize(e.size)
         text(e.text)
     }
   }

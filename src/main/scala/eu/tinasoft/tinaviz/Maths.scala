@@ -5,8 +5,12 @@
 
 package eu.tinasoft.tinaviz
 
+import util.Random
+
 object Maths {
   
+  val rnd = new Random(4565)
+
   def distance (p1: (Int, Int), p2: (Int, Int)) = {
     val (p1x, p1y) = p1
     val (p2x, p2y) = p2
@@ -24,4 +28,11 @@ object Maths {
   val SIN_PI_ON_TWO = math.sin(Maths.PI_ON_TWO)
   val COS_MINUS_PI_ON_TWO = math.cos(-Maths.PI_ON_TWO)
   val SIN_MINUS_PI_ON_TWO = math.sin(-Maths.PI_ON_TWO)
+  
+    
+
+  def nextInt = rnd.nextInt
+  
+  def nextDouble(max:Double) = max * rnd.nextDouble
+  def random(min:Double,max:Double) = ((max-min) * rnd.nextDouble) - min
 }
