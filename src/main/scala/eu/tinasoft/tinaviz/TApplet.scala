@@ -78,7 +78,7 @@ class TApplet extends PApplet with MouseWheelListener {
   protected def lineColor(c:(Int,Int,Int)) = {
     stroke(c._1,c._2,c._3)
   }
-  protected def setThickness(t:Double) = {
+  protected def lineThickness(t:Double) = {
     strokeWeight(t.toFloat)
   }
   
