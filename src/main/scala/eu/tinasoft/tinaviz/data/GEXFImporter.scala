@@ -16,40 +16,33 @@ import Actor._
 import xml._
 
 class GEXFImporter extends node.util.Actor {
-
   start
-  
   def act() {
-    
     while (true) {
       receive {
         case rawXML:String =>
-          log("parsing XML..")
-          val graph = new MutableGraph()
+          println("parsing XML..")
+          val g = new MutableGraph()
           val ns = "tina"
 
-          val g = xml.XML.loadString(rawXML)
+          val root = xml.XML.loadString(rawXML)
         
-          for (n <- (g \\ "node")) {
-            val node = new tinaviz.graph.Node (
-              n \ "@uuid" text,
-              n \ "@label" text
-            )
+          for (n <- (root \\ "node")) {
+            val pos = n \\ "viz:position"
+            g.nodes ::= new MutableNode(n \ "@id" text,
+                                        n \ "@label" text,
+                                        try { ((pos \ "@x").text.toDouble, (pos \ "@y").text.toDouble) } catch { case x => (0,0)})
           }
-          for (e <- (g \\ "edge")) {
-            //if ((node \ "@expired").text == "true")
-            //  println("the " + node.text + " has expired!")
-            log("parsing edge..")
-            //g.getNode(e.)
-          }
-          log("done parsing. sending to import controller..")
-          sender ! 'gexfImport -> graph.toGraph
+          for (e <- (root \\ "edge")) 
+            g.node(e \ "@source" text).addNeighbour(g.id(e \ "@target" text), ((e \ "@weight").text.toDouble))
+
+          println("loaded "+g.nbNodes+" nodes, "+g.nbEdges+" edges.")
+          sender ! "graph" -> g.toGraph
           exit
 
         case graph:Graph =>
           val xml = ""
           /*
-
            <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
            <graph type="static">
            <attributes class="node" type="dynamic">
@@ -77,12 +70,11 @@ class GEXFImporter extends node.util.Actor {
            <edge></edge>
            </edges>
            </graph>
-           </gexf>*/
-
+           </gexf>
+           */
           sender ! 'gexfExport -> xml
           exit
       }
     }
   }
-
 }

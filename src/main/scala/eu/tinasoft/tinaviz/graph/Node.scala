@@ -10,9 +10,12 @@ class Node (
   val label : String = "Node",
   val position : (Double,Double) = (0,0),
   val color : (Int,Int,Int) = (0,0,0),
-  val size : (Double) = 1
-  ) {
+  val size : (Double) = 1,
+  val links : List[(Int,Double)] = List.empty[(Int,Double)]
+) {
 
 
   override val toString = "<Node "+uuid+":"+label+":"+position._1+","+position._2+">"
+  
+  def toNode = { new Node ( uuid,label,position, color, size, links) }
 }

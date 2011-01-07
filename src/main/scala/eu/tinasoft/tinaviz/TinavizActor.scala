@@ -23,6 +23,8 @@ class TinavizActor extends node.util.Actor {
 
   var properties : Map[String,Any] = Map(
     "profiler.fps" -> 0,
+    "graph" -> new Graph(),
+    "scene.view" -> "macro",
     "scene.pause" -> false,
     "scene.debug" -> true
   )
@@ -47,18 +49,21 @@ class TinavizActor extends node.util.Actor {
           // main want the scene!
         case 'getScene => reply(scene)
 
-
+        case ('updated,"graph",value:Any,previous:Any) =>
+          // log("ignoring update of "+key)
+          buildScene
+          
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
               
-
+          
+        case ('openString,str:String) => (new GEXFImporter) ! str
         case ('openURL,url:String) =>
           val buf = new StringBuilder
           io.Source.fromURL(new java.net.URL(url)).foreach(buf.append)
           self ! 'openString -> buf.toString
           
-        case ('openString,str:String) => (new GEXFImporter) ! str
-                 
+  
         case 'updateScene =>
           
          
@@ -95,17 +100,35 @@ class TinavizActor extends node.util.Actor {
   /**
    * The most important function, that does everything
    */
-  def buildScene() = {
-    val view = properties("scene.view") 
+  def buildScene = {
     var s = new MutableScene()
-    view match {
+    val g = get[Graph]("graph")
+    //properties("graph")//.asInstance[Graph]
+    //val view : String = properties("scene.view") match { case s:String => s }
+    
+    get[String]("scene.view") match {
       case "macro" =>
-        
+        g.nodes.foreach { 
+          case n =>
+            println("drawing node "+n)
+            s.nodes ::= new NodeDrawing(n.position, n.size, n.color, 'Disk)
+            n.links.foreach { case (id,weight) =>
+                val m = g.node(id)
+                s.edges ::= new EdgeDrawing(n.position,
+                   m.position,
+                   1,
+                   1,
+                   (150,150,150), // 
+                   16) // depend on the distance relative to screen (use p:PApplet to compute it?)
+            }
+        }
+    
       case "meso" =>
-        // construct a subview of macro
-        val view = properties("scene.view")
     }
+    // send to spatializer
     self ! s.toScene
   }
   
+  def get[T](key:String) : T = properties.get(key).get.asInstanceOf[T]
+
 }

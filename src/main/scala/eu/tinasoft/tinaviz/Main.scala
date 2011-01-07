@@ -6,17 +6,6 @@ import processing.core._
 import org.daizoru._
 import eu.tinasoft._
 
-class Stats (
-  val nbVisibleNodes:Int=0,
-  val nbVisibleEdges:Int=0,
-  val nbFilteredNodes:Int=0,
-  val nbFilteredEdges:Int=0,
-  val nbTotalNodes:Int=0,
-  val nbTotalEdges:Int=0) {
-
-
-}
-
 object Main {
   def main(args: Array[String]): Unit = {
     var frame = new javax.swing.JFrame("TinaViz")
@@ -47,7 +36,8 @@ class Main extends TApplet with Tinaviz {
         
       case exc:netscape.javascript.JSException =>
         println("Javascript exception: "+exc)
-
+        tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+   
     }
     
     //val __brandingIcon = getParameter("branding_icon")
@@ -66,6 +56,7 @@ class Main extends TApplet with Tinaviz {
       case true =>
         setColor(scene.foreground)
         text("" + frameRate.toInt + " img/sec", 10f, 13f)
+        text("drawing " + scene.nodes.size + " nodes, "+scene.edges.size+" edges", 10f, 32f)
     }
 
     val pause : Boolean = (tinaviz !? "scene.pause") match {
@@ -108,6 +99,4 @@ class Main extends TApplet with Tinaviz {
         text(e.text)
     }
   }
-
-
 }
