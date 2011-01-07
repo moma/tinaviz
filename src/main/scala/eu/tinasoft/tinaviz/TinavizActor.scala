@@ -18,15 +18,14 @@ import Actor._
 class TinavizActor extends node.util.Actor {
   
 
-  // scene cache
-  var scene : Scene = new Scene()
-
   var properties : Map[String,Any] = Map(
-    "profiler.fps" -> 0,
+    "frameRate" -> 0,
     "graph" -> new Graph(),
-    "scene.view" -> "macro",
-    "scene.pause" -> false,
-    "scene.debug" -> true
+    "view" -> "macro",
+    "pause" -> false,
+    "debug" -> true,
+    "selectionRadius" -> 10,
+    "scene" -> new Scene()
   )
   start
   
@@ -43,11 +42,8 @@ class TinavizActor extends node.util.Actor {
         case ('updateNode,value) =>
           //context ! 'updateNode -> value
 
-          // scene builder update the scene!
-        case newScene:Scene => scene = newScene
-
           // main want the scene!
-        case 'getScene => reply(scene)
+        case "scene" => reply(scene)
 
         case ('updated,"graph",value:Any,previous:Any) =>
           // log("ignoring update of "+key)
@@ -107,7 +103,7 @@ class TinavizActor extends node.util.Actor {
     //properties("graph")//.asInstance[Graph]
     //val view : String = properties("scene.view") match { case s:String => s }
     
-    get[String]("scene.view") match {
+    get[String]("view") match {
       case "macro" =>
         g.nodes.foreach { 
           case n =>
@@ -128,7 +124,7 @@ class TinavizActor extends node.util.Actor {
       case "meso" =>
     }
     // send to spatializer
-    self ! s.toScene
+    self ! "scene" -> s.toScene
   }
   
   def get[T](key:String) : T = properties.get(key).get.asInstanceOf[T]

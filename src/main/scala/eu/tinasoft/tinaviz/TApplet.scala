@@ -60,6 +60,13 @@ class TApplet extends PApplet with MouseWheelListener {
     //    line(n1x, n1y, n2x, n2y);
     //}
   }
+  
+  protected def moveCameraAt(v:(Double,Double,Double)) {
+    translate(v._1.toFloat, v._2.toFloat)
+    scale(v._3.toFloat)
+  }
+  protected def moveCamera = moveCameraAt(_camera.position)
+ 
   protected def setBackground (c:(Int,Int,Int)) = {
     background(c._1, c._2, c._3)
   }
@@ -94,6 +101,19 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.zRatio = if (zoomIn) (1.0 + ratio) else (1.0 - ratio)
   }
 
+  def showSelectionCircle(radius:Double) {
+
+    if (radius < 1) return
+    
+    scale(1.0f/_camera.position._3.toFloat)
+    translate(-_camera.position._1.toFloat, -_camera.position._2.toFloat)
+    stroke(0, 0, 0, 40)
+    strokeWeight(1.0f)
+    fill(00, 100, 200, 29)
+    drawDisk((mouseX, mouseY),radius)
+    moveCamera
+   
+  }
     
   def stopAutoCentering {
     
