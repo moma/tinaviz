@@ -3,6 +3,7 @@ package eu.tinasoft.tinaviz
 
 import processing.core._
 
+import eu.tinasoft.tinaviz.data.json.JsonParser
 import netscape.javascript.JSObject
 
 import org.daizoru._
@@ -63,12 +64,12 @@ class Main extends PApplet {
 
   override def draw(): Unit = {
     
-    tinaviz ! 'frameRate -> frameRate.toInt
+    tinaviz ! "profiler.fps" -> frameRate.toInt
 
     val scene : Scene = (tinaviz !? 'getScene) match { case s:Scene => s }
     setBackground(scene.background)
 
-    (tinaviz !? 'debug) match {
+    (tinaviz !? "scene.debug") match {
       case true =>
         setColor(scene.foreground)
         text("" + frameRate.toInt + " img/sec", 10f, 13f)
@@ -185,7 +186,7 @@ class Main extends PApplet {
   }
 
   def togglePause = {
-    (tinaviz !? 'pause -> 'toggle) match {
+    (tinaviz !? "pause" -> 'toggle) match {
       case b:Boolean => b
       case x => false
     }
@@ -232,6 +233,18 @@ class Main extends PApplet {
    * 
    */
   def getNeighbourhood(view:String, rawJSONList:String) : Unit = {
+    
+  }
+  
+  /**
+   * Update a Node in the current view, from it's UUID
+   */
+  def updateNode(str:String) = {
+    // we help the JS developer by telling him if the JSON is valid or not
+    val res = JsonParser.parse(str)
+    
+    if (!res.isDefined) throw new IllegalArgumentException("Error, invalid JSON!")
+    tinaviz ! 'updateNode -> res.get
     
   }
 }
