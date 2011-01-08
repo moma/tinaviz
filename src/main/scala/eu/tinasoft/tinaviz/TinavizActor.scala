@@ -24,7 +24,7 @@ class TinavizActor extends node.util.Actor {
     "view" -> "macro",
     "pause" -> false,
     "debug" -> true,
-    "selectionRadius" -> 10,
+    "selectionRadius" -> 10.0,
     "scene" -> new Scene()
   )
   start
@@ -42,8 +42,6 @@ class TinavizActor extends node.util.Actor {
         case ('updateNode,value) =>
           //context ! 'updateNode -> value
 
-          // main want the scene!
-        case "scene" => reply(scene)
 
         case ('updated,"graph",value:Any,previous:Any) =>
           // log("ignoring update of "+key)
@@ -52,15 +50,12 @@ class TinavizActor extends node.util.Actor {
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
               
-          
+
         case ('openString,str:String) => (new GEXFImporter) ! str
         case ('openURL,url:String) =>
           val buf = new StringBuilder
           io.Source.fromURL(new java.net.URL(url)).foreach(buf.append)
           self ! 'openString -> buf.toString
-          
-  
-        case 'updateScene =>
           
          
         case key:String =>

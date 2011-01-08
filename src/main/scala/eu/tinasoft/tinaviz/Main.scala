@@ -25,6 +25,13 @@ object Main {
 class Main extends TApplet with Tinaviz {
   
   override def setup(): Unit = {
+
+    // set some defaults
+    setDefault("scene", new Scene())
+    setDefault("debug", false)
+    setDefault("pause", true)
+    setDefault("selectionRadius", 10.0)
+
     size(screenWidth - 200, screenHeight - 400, PConstants.P2D)
     frameRate(4)
     noSmooth
@@ -40,7 +47,8 @@ class Main extends TApplet with Tinaviz {
         
       case exc:JSException =>
         println("Javascript exception: "+exc)
-        tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+        //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+        tinaviz ! 'openURL -> "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
    
     }
     
@@ -49,27 +57,29 @@ class Main extends TApplet with Tinaviz {
     
   }
 
+
   override def draw(): Unit = {
-    
+
+    // send some values
     tinaviz ! "frameRate" -> frameRate.toInt
 
-    val scene : Scene = (tinaviz !? "scene") match { case s:Scene => s }
+    // get some values
+    val scene = getIfPossible[Scene]("scene")
+    val debug = getIfPossible[Boolean]("debug")
+    val pause = getIfPossible[Boolean]("pause")
+    val selectionRadius = getIfPossible[Double]("selectionRadius")
+
+    // drawing
+
     setBackground(scene.background)
-
-    (tinaviz !? "debug") match {
-      case true =>
-        setColor(scene.foreground)
-        text("" + frameRate.toInt + " img/sec", 10f, 13f)
-        text("drawing " + scene.nodes.size + " nodes, "+scene.edges.size+" edges", 10f, 32f)
-    }
-
-    val pause : Boolean = (tinaviz !? "pause") match {
-      case true => true
-      case x => false
+    if (debug) {
+      setColor(scene.foreground)
+      text("" + frameRate.toInt + " img/sec", 10f, 13f)
+      text("drawing " + scene.nodes.size + " nodes, "+scene.edges.size+" edges", 10f, 32f)
     }
     if (pause) return
     
-    moveCamera
+    setupCamera
 
     setLod(16)
     lineThickness(1)
@@ -99,11 +109,7 @@ class Main extends TApplet with Tinaviz {
         //setFontSize(e.size)
         text(e.text)
     }
-    
-    (tinaviz !? "selectionRadius") match {
-      case d:Double => showSelectionCircle(d)
-      case d:Float => showSelectionCircle(d.toDouble)
-      case d:Int => showSelectionCircle(d.toDouble)
-    } 
+
+    showSelectionCircle(selectionRadius)
   }
 }

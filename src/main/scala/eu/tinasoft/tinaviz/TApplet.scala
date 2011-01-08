@@ -65,7 +65,7 @@ class TApplet extends PApplet with MouseWheelListener {
     translate(v._1.toFloat, v._2.toFloat)
     scale(v._3.toFloat)
   }
-  protected def moveCamera = moveCameraAt(_camera.position)
+  protected def setupCamera = moveCameraAt(_camera.position)
  
   protected def setBackground (c:(Int,Int,Int)) = {
     background(c._1, c._2, c._3)
@@ -111,7 +111,7 @@ class TApplet extends PApplet with MouseWheelListener {
     strokeWeight(1.0f)
     fill(00, 100, 200, 29)
     drawDisk((mouseX, mouseY),radius)
-    moveCamera
+    setupCamera
    
   }
     
@@ -144,4 +144,5 @@ class TApplet extends PApplet with MouseWheelListener {
       }
     }
   }
+
 }

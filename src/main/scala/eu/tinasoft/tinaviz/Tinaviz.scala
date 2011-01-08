@@ -12,7 +12,38 @@ import scala.util.parsing.json.JSONObject
 trait Tinaviz {
   
   val tinaviz : Actor = new TinavizActor()
-  
+
+
+  private var cached : Map[String,(Any,Future[Any])] = Map.empty
+
+  /**
+   * Regularly get a param using future
+   *
+   */
+  protected def getIfPossible[T](key:String) : T = {
+    val tp = cached(key)
+    var value : T = tp._1 match {
+      case t:T => return t
+      case err => throw new Exception("error, key "+key+" has no default")
+    }
+
+    var future : Future[T] = null
+    // if a future is already on the rails, don't send a message, just wait
+    tp._2 match {
+      case null => (tinaviz !! key) match { case f:Future[T] => future = f }
+      case f:Future[T] => future = f
+    }
+
+    if (future.isSet) {
+      value = future()
+      cached += key -> (value,null)
+    }
+    value
+  }
+
+  protected def setDefault(key:String,value:Any) = {
+    cached += key -> (value,null)
+  }
   // Called by Javascript
 
   def setPause(b:Boolean) = {
