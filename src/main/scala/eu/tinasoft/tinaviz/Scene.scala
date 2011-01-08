@@ -15,7 +15,6 @@ case class NodeDrawing (val position:(Double,Double)=(0,0),
 case class EdgeDrawing (val source:(Double,Double)=(0,0),
                         val target:(Double,Double)=(0,0),
                         val weight:Double=1,
-                        val thickness:Double=1,
                         val color:(Int,Int,Int)=(150,150,150),
                         val lod:Int=16) {
 

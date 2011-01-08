@@ -28,9 +28,34 @@ class GEXFImporter extends node.util.Actor {
           val ns = "tina"
 
           val root = xml.XML.loadString(rawXML)
-        
+
+          var attributes : Map[String, (String,Any)] = Map.empty
+
+          for (a <- (root \\ "attribute")) {
+            attributes += (a \ "@id" text) -> ((a \ "@title" text),
+                                               (a \ "@type" text) match {
+                case "string" => ""
+                case "float" => 0.0
+                case "double" => 0.0
+                case "integer" => 0.0
+                case "boolean" => false
+                case x => ""
+              })
+          }
+
           for (n <- (root \\ "node")) {
             val pos = n \\ "viz:position"
+            var attribs : Map[String,Any] = Map.empty
+            for (a <-  (n \\ "attvalue")) {
+              val attr = attributes(a \ "id" text)
+              val value =  (a \ "value" text)
+              attribs += attr._1 -> (attr._2 match {
+                case Double => value.toDouble
+                case Float => value.toFloat
+                case Int => value.toInt
+                case x => value
+                })
+            }
             g.nodes ::= new MutableNode(n \ "@id" text,
                                         n \ "@label" text,
                                         try { ((pos \ "@x").text.toDouble, (pos \ "@y").text.toDouble) } catch { 

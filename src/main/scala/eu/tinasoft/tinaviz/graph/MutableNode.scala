@@ -15,6 +15,7 @@ case class MutableNode (
   var position : (Double,Double) = (0,0),
   var color : (Int,Int,Int) = (0,0,0),
   var size : (Double) = 1,
+  var category : String = "NGram",
   var links : List[(Int,Double)] = List.empty[(Int,Double)]
 ) {
 

@@ -33,7 +33,7 @@ class Main extends TApplet with Tinaviz {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 100, screenHeight - 100, PConstants.P2D)
-    frameRate(4)
+    frameRate(20)
     noSmooth
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
@@ -71,7 +71,8 @@ class Main extends TApplet with Tinaviz {
     val selectionRadius = getIfPossible[Double]("selectionRadius")
 
     // drawing
-
+    //smooth()
+    
     setBackground(scene.background)
     if (debug) {
       setColor(scene.foreground)
@@ -80,15 +81,20 @@ class Main extends TApplet with Tinaviz {
     }
     if (pause) return
     
+
+    // TODO use an immutable Camera (this is the reason for the selection disk bug)
     setupCamera
 
-    setLod(16)
+
+    setLod(32)
     lineThickness(1)
     noFill
     scene.edges.foreach{ case e =>
-        setLod(e.lod)
+        //val powd = distance(e.source.screenPosition, e.target.screenPosition)
+        //val modulator = if (width >= 10) limit(PApplet.map(powd.toFloat, 10, width, 1, 90), 1, 90) else 1
+        //setLod(modulator.toInt)
         lineColor(e.color)
-        //lineThickness(e.thickness)
+        lineThickness(e.weight)
         drawCurve(e.source, e.target)
     }
 

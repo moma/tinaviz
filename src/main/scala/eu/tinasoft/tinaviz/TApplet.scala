@@ -125,6 +125,9 @@ class TApplet extends PApplet with MouseWheelListener {
   protected def lineThickness(t:Double) = {
     strokeWeight(t.toFloat)
   }
+  protected def distance(a:(Double,Double),b:(Double,Double)) : Double = {
+    PApplet.dist(a._1.toFloat,a._2.toFloat, b._1.toFloat, b._2.toFloat)
+  }
 
   /*
    //println("Moving camera at: "+v)
@@ -182,22 +185,18 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.lastMousePosition = (mouseX, mouseY)
     _camera.center = (mouseX, mouseY)
 
-    val c : PVector = _camera.center
-    val p : PVector = _camera.position
-
-    // the basic roomRatio
     val zoomRatio = if (zoomIn) 1.3 else 0.7
 
     val oldZoom = _camera.zoom
     _camera.zoom = limit(_camera.zoom * zoomRatio, minZoom, maxZoom)
     zoomUpdated(_camera.zoom)
 
-    p.sub(c)
+    val p : PVector = _camera.position
+    p.sub(_camera.center)
     p.mult(zoomRatio.toFloat)
-    p.add(c)
+    p.add(_camera.center)
     _camera.position = p
     positionUpdated(_camera.position)
-    println("camera position: "+_camera.position+" zoom: "+_camera.zoom)
   }
 
   /*
@@ -231,24 +230,27 @@ class TApplet extends PApplet with MouseWheelListener {
   
   override def mouseDragged {
     stopAutoCentering
-    
-     val p : PVector = _camera.position
-     val t : PVector = _camera.position
-     t.sub(_camera.lastMousePosition)
-     _camera.lastMousePosition = (mouseX,mouseY)
-     t.add(_camera.lastMousePosition)
-     _camera.positionDelta = PVector.sub(p,t)
-     _camera.dragged = true
+    val p : PVector = _camera.position
+    val t : PVector = _camera.position
+    t.sub(_camera.lastMousePosition)
+    _camera.lastMousePosition = (mouseX,mouseY)
+    t.add(_camera.lastMousePosition)
+    _camera.positionDelta = PVector.sub(p,t)
+    _camera.position = t
+    _camera.dragged = true
      
   }
 
+  override def mouseMoved {
+    _camera.lastMousePosition = (mouseX, mouseY)
+
+  }
   override def mouseReleased {
-   _camera.lastMousePosition = (mouseX, mouseY)
-   _camera.dragged = false
+    _camera.lastMousePosition = (mouseX, mouseY)
+    _camera.dragged = false
   }
 
   override def mouseWheelMoved(e:MouseWheelEvent) {
-    //println("got mouseWheelMoved")
     if (!(mouseX < 0
           | mouseX > width
           | mouseY < 0

@@ -19,13 +19,22 @@ class TinavizActor extends node.util.Actor {
   
 
   var properties : Map[String,Any] = Map(
+    // global real FPS
     "frameRate" -> 0,
-    "graph" -> new Graph(),
+
+    // current view settings
     "view" -> "macro",
+    "category" -> "NGram",
     "pause" -> false,
     "debug" -> true,
+
+    // global selection disk settings
     "selectionRadius" -> 10.0,
+
     "scene" -> new Scene(),
+    "graph" -> new Graph(),
+
+    // camera
     "zoom" -> 0.0,
     "position" -> (0.0,0.0)
   )
@@ -40,6 +49,9 @@ class TinavizActor extends node.util.Actor {
     
     while(true) {
       receive {
+
+        case valeur:Float =>
+          reply(valeur * 2)
 
         case ('updateNode,value) =>
           //context ! 'updateNode -> value
@@ -110,8 +122,7 @@ class TinavizActor extends node.util.Actor {
                 val m = g.node(id)
                 s.edges ::= new EdgeDrawing(n.position,
                    m.position,
-                   1,
-                   1,
+                   Maths.random(0.2,4.0),
                    (150,150,150), // 
                    16) // depend on the distance relative to screen (use p:PApplet to compute it?)
             }
