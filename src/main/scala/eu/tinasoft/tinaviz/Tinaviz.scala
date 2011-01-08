@@ -23,19 +23,35 @@ trait Tinaviz {
   protected def getIfPossible[T](key:String) : T = {
     val tp = cached(key)
     var value : T = tp._1 match {
-      case t:T => return t
+      case t:T =>  if (t!=null) t else throw new Exception("error, "+key+" default is null")
       case err => throw new Exception("error, key "+key+" has no default")
     }
 
     var future : Future[T] = null
     // if a future is already on the rails, don't send a message, just wait
     tp._2 match {
-      case null => (tinaviz !! key) match { case f:Future[T] => future = f }
-      case f:Future[T] => future = f
+      case null =>
+        //println("asking for future!")
+        (tinaviz !! key) match {
+          case f:Future[T] =>
+            //println("got future! storing it..")
+            future = f
+            cached += key -> (value,future)
+        }
+      case f:Future[T] =>
+        future = f
     }
 
     if (future.isSet) {
-      value = future()
+      //println("future has new value!")
+      val x = future()
+      // we never want nulls
+      if (x!=null) {
+        value = x
+      } 
+      // else no luck.. maybe more next time!
+      
+      //println("reseting future value")
       cached += key -> (value,null)
     }
     value
@@ -44,7 +60,7 @@ trait Tinaviz {
   protected def setDefault(key:String,value:Any) = {
     cached += key -> (value,null)
   }
-  // Called by Javascript
+// Called by Javascript
 
   def setPause(b:Boolean) = {
     true

@@ -23,7 +23,7 @@ class GEXFImporter extends node.util.Actor {
     while (true) {
       receive {
         case rawXML:String =>
-          println("parsing XML..")
+          println("GEXFImporter: parsing XML..")
           val g = new MutableGraph()
           val ns = "tina"
 
@@ -39,7 +39,7 @@ class GEXFImporter extends node.util.Actor {
           for (e <- (root \\ "edge")) 
             g.node(e \ "@source" text).addNeighbour(g.id(e \ "@target" text), ((e \ "@weight").text.toDouble))
 
-          println("loaded "+g.nbNodes+" nodes, "+g.nbEdges+" edges.")
+          println("GEXFImporter: loaded "+g.nbNodes+" nodes, "+g.nbEdges+" edges.")
           sender ! "graph" -> g.toGraph
           exit
 

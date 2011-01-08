@@ -77,12 +77,12 @@ class TinavizActor extends node.util.Actor {
               // default case
             case x => properties += key -> value
           }
-          reply(previous)
+          //reply(previous)
           if (!previous.equals(value)) {
             self ! ('updated,key,value,previous)
           }
 
-        case msg => println("unknow msg: "+msg)
+        case msg => println("TinavizActor: unknow msg: "+msg)
       }
     }
     
@@ -114,11 +114,13 @@ class TinavizActor extends node.util.Actor {
                    16) // depend on the distance relative to screen (use p:PApplet to compute it?)
             }
         }
-        println("put "+s.nodes.size+" nodes, "+s.edges.size+" edges into scene")
+        println("TinavizActor: put "+s.nodes.size+" nodes, "+s.edges.size+" edges into scene")
     
       case "meso" =>
     }
-    // send to spatializer
+    // TODO send to spatializer
+
+    // save the scene
     self ! "scene" -> s.toScene
   }
   

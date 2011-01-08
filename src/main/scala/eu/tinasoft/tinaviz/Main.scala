@@ -32,7 +32,7 @@ class Main extends TApplet with Tinaviz {
     setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
 
-    size(screenWidth - 200, screenHeight - 400, PConstants.P2D)
+    size(screenWidth - 100, screenHeight - 100, PConstants.P2D)
     frameRate(4)
     noSmooth
     textMode(PConstants.SCREEN)
@@ -63,7 +63,7 @@ class Main extends TApplet with Tinaviz {
     // send some values
     tinaviz ! "frameRate" -> frameRate.toInt
 
-    // get some values
+    // get some values in a non-blocking way (using futures)
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
     val pause = getIfPossible[Boolean]("pause")
