@@ -38,7 +38,8 @@ class Main extends TApplet with Tinaviz {
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
     bezierDetail(16)
-
+    addMouseWheelListener(this)
+    
     try {
       Browser.init(JSObject.getWindow(this), getParameter("js_context"))
     } catch {
@@ -111,5 +112,13 @@ class Main extends TApplet with Tinaviz {
     }
 
     showSelectionCircle(selectionRadius)
+
+  }
+
+  override def zoomUpdated(value:Double) {
+    tinaviz ! "zoom" -> value
+  }
+  override def positionUpdated(value:(Double,Double)) {
+    tinaviz ! "position" -> value
   }
 }

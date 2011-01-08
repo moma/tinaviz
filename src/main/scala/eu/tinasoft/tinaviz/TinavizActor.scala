@@ -25,7 +25,9 @@ class TinavizActor extends node.util.Actor {
     "pause" -> false,
     "debug" -> true,
     "selectionRadius" -> 10.0,
-    "scene" -> new Scene()
+    "scene" -> new Scene(),
+    "zoom" -> 0.0,
+    "position" -> (0.0,0.0)
   )
   start
   
