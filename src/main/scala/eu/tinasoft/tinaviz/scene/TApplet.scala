@@ -169,7 +169,7 @@ class TApplet extends PApplet with MouseWheelListener {
   protected def lineThickness(t:Double) = {
     strokeWeight(t.toFloat)
   }
-  protected def distance(a:(Double,Double),b:(Double,Double)) : Double = {
+  protected def distance(a:(Int,Int),b:(Int,Int)) : Double = {
     PApplet.dist(a._1.toFloat,a._2.toFloat, b._1.toFloat, b._2.toFloat)
   }
 
@@ -246,7 +246,7 @@ class TApplet extends PApplet with MouseWheelListener {
   /**
    * Are the given coordinate invisible?
    */
-  def isVisible (p:(Double,Double)) = {
+  def isVisible (p:(Int,Int)) = {
     val w = width / 4.
     val h = height / 4.
     ((p._1 > -w) && (p._1 < (width + w))
@@ -256,7 +256,7 @@ class TApplet extends PApplet with MouseWheelListener {
   /**
    * Are the given coordinate visible?
    */
-  def isInvisible (p:(Double,Double)) = ! isVisible (p)
+  def isInvisible (p:(Int,Int)) = ! isVisible (p)
 
   /**
    * TODO could be optimized, by using the reverse action (translate, zoom)

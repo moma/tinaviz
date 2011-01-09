@@ -61,8 +61,9 @@ class Main extends TApplet with Client {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 100, screenHeight - 100, PConstants.P2D)
-    frameRate(10)
+    frameRate(15)
     //noSmooth
+    smooth
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
@@ -116,12 +117,16 @@ class Main extends TApplet with Client {
     var i = 0
     scene.edgePositionLayer.foreach{
       case (source,target) =>
-        //val powd = distance(e.source.screenPosition, e.target.screenPosition)
-        //val modulator = if (width >= 10) limit(PApplet.map(powd.toFloat, 10, width, 1, 90), 1, 90) else 1
-        //setLod(modulator.toInt)
-        lineColor(scene.edgeColorLayer(i))
-        //lineThickness(e.weight)
-        drawCurve(source, target)
+        val psource = screenPosition(source)
+        val ptarget = screenPosition(target)
+        if (isVisible(psource) || isVisible(ptarget)) {
+          val powd = distance(psource, ptarget)
+          val modulator = if (width >= 10) limit(PApplet.map(powd.toFloat, 10, width, 1, 90), 1, 90) else 1
+          setLod(modulator.toInt)
+          lineColor(scene.edgeColorLayer(i))
+          //lineThickness(e.weight)
+          drawCurve(source, target)
+        }
         i += 1
     }
 
@@ -141,7 +146,7 @@ class Main extends TApplet with Client {
             drawDisk(position, size * 0.8)
           case x =>
             drawSquare(position, size)
-             setColor(scene.nodeColorLayer(i))
+            setColor(scene.nodeColorLayer(i))
             drawSquare(position, size * 0.8)
         }
         i += 1
