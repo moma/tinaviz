@@ -71,12 +71,12 @@ class Main extends TApplet with Client {
     try {
       Browser.init(this, getParameter("js_context"))
     } catch {
-      case exc:NullPointerException =>
-        println("Null pointer exception: "+exc)
-        
-      case exc:JSException =>
-        println("Javascript exception: "+exc)
-        //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+      //case exc:NullPointerException =>
+      // println("Null pointer exception: "+exc)
+      //case exc:JSException =>
+      //println("Javascript exception: "+exc)
+      //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+      case e:Exception =>
         tinaviz ! 'open -> new java.net.URL("file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf")
     }
   }

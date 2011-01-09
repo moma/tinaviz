@@ -30,15 +30,16 @@ class Sketcher extends node.util.Actor {
       receive {
 
         case ('position, graph:Graph) =>
-          println("Sketcher: updating positions..")
-          cache = cache
+          cache = graph
           sketch.updateNodePositions(graph)
+          // println("  Renderer: done partial compilation of scene (position layer)..")
           reply(sketch:Scene)
 
         case graph:Graph =>
-          println("Sketcher: overwriting..")
+
           cache = graph
           sketch.overwrite(graph)
+          // println("  Renderer: done complete compilation of scene..")
           reply(sketch:Scene)
       }
     }

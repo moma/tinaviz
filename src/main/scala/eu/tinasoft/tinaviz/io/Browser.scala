@@ -21,7 +21,7 @@ object Browser extends node.util.Actor {
 
   def init(applet:Applet=null, jsContext:String=null) = {
     println("jsContext: "+jsContext)
-    this._window = if (applet != null) JSObject.getWindow(applet) else null
+    this._window = try { JSObject.getWindow(applet) } catch { case x => null }
     val _subPrefix = if (jsContext!=null) jsContext else ""
     val _apiPrefix = "tinaviz."
     self ! "_initCallback"
