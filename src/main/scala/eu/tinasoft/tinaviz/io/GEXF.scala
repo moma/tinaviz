@@ -140,6 +140,7 @@ class GEXF extends node.util.Actor {
         "uuid" -> uuid,
         "label" -> label,
         "color" -> color,
+        "rating" -> 1,
         "category" -> "default",
         "weight" -> 1.0
       ) ++ (for (a <- (n \\ "attvalue")) yield attribute(a))

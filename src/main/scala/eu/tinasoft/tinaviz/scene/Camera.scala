@@ -16,7 +16,7 @@ class Camera (
   var position : (Double,Double) = (0,0),
   var positionDelta : (Double, Double) = (0, 0),
 
-  var zoom : Double = 0,
+  var zoom : Double = 50.0,
   var zoomDelta : Double = 0,
   
   // CAMERA CENTER

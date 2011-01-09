@@ -133,7 +133,15 @@ case class Sketch (
    */
   def updateNodeColors(graph:Graph) {
     nodeColorLayer = graph.nodes.map {
-      case n => n.color
+      case n =>
+        try {
+          n.attributes("category") match {
+            case "Document" => new Color (150, 100, 110)
+            case "NGram" => new Color (110, 100, 150)
+          }
+        } catch {
+          case x => new Color (110, 150, 90)
+        }
     }.toArray
     updateEdgeColors(graph)
   }
