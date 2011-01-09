@@ -24,42 +24,50 @@ class GEXFImporter extends node.util.Actor {
       receive {
         case rawXML:String =>
           println("GEXFImporter: parsing XML..")
-          val g = new MutableGraph()
+
           val ns = "tina"
 
           val root = xml.XML.loadString(rawXML)
 
-          var _attributes = Map[String, (String,Any)]()
+          var nodeAttributes = Map[String, (String,Any)]()
+          var edgeAttributes = Map[String, (String,Any)]()
 
-          for (a <- (root \\ "attribute")) {
-            _attributes += (a \ "@id" text) -> ((a \ "@title" text),
-                                                (a \ "@type" text) match {
-                case "float" => 1f
-                case "double" => 1.0
-                case "integer" => 1
-                case "boolean" => false
-                case x => ""
-              })
-          }
+          for (as <- (root \\ "attributes")) {
+            (as \\ "@class" text) match {
+              case "node" =>
+                for (a <- (as \\ "attribute")) {
 
-
-
-          def getColor(e:xml.Node) = {
-            try {
-              val c =  e \\ "viz:color"
-              ((c \ "@r" text).toInt,
-               (c \ "@g" text).toInt,
-               (c \ "@b" text).toInt)
-            } catch {
-              case x =>
-                (0,0,0)
+                  nodeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
+                                                         (a \ "@type" text) match {
+                      case "float" => 1f
+                      case "double" => 1.0
+                      case "integer" => 1
+                      case "boolean" => false
+                      case x => ""
+                    })
+                }
+              case "edge" =>
+                for (a <- (as \\ "attribute")) {
+                  edgeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
+                                                         (a \ "@type" text) match {
+                      case "float" => 1f
+                      case "double" => 1.0
+                      case "integer" => 1
+                      case "boolean" => false
+                      case x => ""
+                    })
+                }
             }
           }
 
+          nodeAttributes.foreach{ case x=> println("foudn attribute: "+x)}
 
           def attribute(e:xml.Node) = {
-            val attr = _attributes(e \ "id" text)
-            val value =  (e \ "value" text)
+            println("  - searching attribute value for \""+(e \ "@for" text)+"\", \""+(e \ "@value" text)+"\"")
+
+            val attr = nodeAttributes(e \ "@for" text)
+            val value =  (e \ "@value" text)
+            println("   '- found it: "+attr)
             attr._1 -> (attr._2 match {
                 case Double => value.toDouble
                 case Float => value.toFloat
@@ -68,6 +76,7 @@ class GEXFImporter extends node.util.Actor {
               })
           }
 
+          val g = new MutableGraph()
           for (n <- (root \\ "node")) {
             var attributes = Map[String,Any]()
 
