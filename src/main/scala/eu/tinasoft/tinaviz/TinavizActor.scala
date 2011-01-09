@@ -60,10 +60,7 @@ class TinavizActor extends node.util.Actor {
 
 
   def act() {
-    
-    // we could eventually keep a
-    //var model = new Model()
-    
+   
     while(true) {
       receive {
 
@@ -74,18 +71,25 @@ class TinavizActor extends node.util.Actor {
           //context ! 'updateNode -> value
 
 
+          // receive a new graph
         case graph:Graph =>
-          val sketch = new Sketch()
+          // reset global settings
           properties = defaultProperties
-          pipeline = pipeline.map { case (k,v) => ( k,new Graph() ) }
-          pipeline += "global" -> (graph,sketch)
+          pipeline = pipeline.map { case (k,v) => ( k,(new Graph(),new Sketch()) ) }
+
+          // create a new global sketch from the global graph
+          val sketch = new Sketch()
           sketch.nodePositionLayer = graph.nodes.map {
             case n => n.position
           }.toArray
-
           val tmp = for (node <- graph.nodes; link <- node.links)
             yield (node.position,graph.node(link._1).position)
           sketch.edgePositionLayer = tmp.toArray
+
+          // save the global sketch
+          pipeline += "global" -> (graph,sketch)
+
+          // export the sketch to a scene for final rendering
           self ! "scene" -> sketch.toScene
 
         case ('updated,key:String,value:Any,previous:Any) =>
