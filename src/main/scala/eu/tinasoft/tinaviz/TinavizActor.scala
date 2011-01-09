@@ -16,6 +16,8 @@ import Sketch._
 import actors._
 import Actor._
 
+case class Step(val step:Symbol)
+
 class TinavizActor extends node.util.Actor {
 
   val defaultProperties : Map[String,Any] = Map(
@@ -36,7 +38,7 @@ class TinavizActor extends node.util.Actor {
     "position" -> (0.0,0.0),
 
     //  workflow
-    "pipeline" -> List ("viewFilter", "nodeWeightFilter", "edgeWeightFilter"),
+    //"pipeline" -> List ("viewFilter", "nodeWeightFilter", "edgeWeightFilter"),
 
     // final scene
     "scene" -> new Scene()
@@ -44,70 +46,50 @@ class TinavizActor extends node.util.Actor {
 
   var properties : Map[String,Any] = defaultProperties
 
-  // internal states: 'needUpdate 'updating  'upToDate
-  //var state = 'upToDate
-
-  // pipeline data
-  var pipeline : Map[String,(Graph,Sketch)] = Map(
-    "global" -> (new Graph(),new Sketch()),
-    "viewFilter" -> (new Graph(),new Sketch()),
-    "nodeWeightFilter" -> (new Graph(),new Sketch()),
-    "edgeWeightFilter" -> (new Graph(),new Sketch())
-  )
 
   start
 
   def act() {
+    
+    // internal states: 'needUpdate 'updating  'upToDate
+    //var state = 'upToDate
+
+    // pipeline data
+    var input = new Graph()
+    var output = new Graph()
+
+    val sketcher : Actor = new Sketcher()
 
     while(true) {
       receive {
 
-        case valeur:Float =>
-          reply(valeur * 2)
-
         case ('updateNode,value) =>
           //context ! 'updateNode -> value
 
-          // receive a branch new graph
+          // receive a brand new graph
         case graph:Graph =>
-          println("TinavizActo: got a new graph, resetting settings..")
+          println("TinavizActor: loading a new graph..")
           properties = defaultProperties
-          pipeline = pipeline.map { case (k,v) => ( k,(new Graph(),new Sketch()) ) }
-          val m = self
-          val a = actor {
-            while(true) {
-              self.receive { 
-                case graph:Graph =>
-                  println("anonymous: Born to compile..")
-                  val sketch = graph:Sketch
-                  val scene = sketch:Scene
-                  println("anonymous: veni vdi compili")
-                  m ! ("global",graph,sketch,scene)
-                  exit
-              }
-            }
-          }
-          a ! graph
+          input = graph
+          self ! 'process
 
+        case 'process =>
+          println("TinavizActor: do some filtering here..")
+          output = input
+          sketcher ! output
 
-        case (step:String, graph:Graph, sketch:Sketch, scene:Scene) =>
-          println("step "+step+" of the pipeline has been updated")
-          pipeline += step -> (graph,sketch)
-          self ! "scene" -> (scene)
+        case scene:Scene =>
+          println("TinavizActor: finished loading scene")
+          properties += "scene" -> scene
+
 
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
               
 
-        case ('openString,str:String) => (new GEXFImporter) ! str
-        case ('openURL,url:String) =>
-          val buf = new StringBuilder
-          io.Source.fromURL(new java.net.URL(url)).foreach(buf.append)
-          self ! 'openString -> buf.toString
-
+        case ('open, any:Any) => (new GEXFImporter) ! any
 
         case key:String =>
-          //if (properties.contains(k))
           reply(properties(key))
         
         case (key:String,value:Any) =>

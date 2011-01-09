@@ -31,10 +31,10 @@ trait Tinaviz {
     // if a future is already on the rails, don't send a message, just wait
     tp._2 match {
       case null =>
-        //println("asking for future!")
+        //if (key.equals("scene")) println("asking for future!")
         (tinaviz !! key) match {
           case f:Future[T] =>
-            //println("got future! storing it..")
+            //if (key.equals("scene")) println("got future! storing it..")
             future = f
             cached += key -> (value,future)
         }
@@ -43,7 +43,7 @@ trait Tinaviz {
     }
 
     if (future.isSet) {
-      //println("future has new value!")
+      //if (key.equals("scene")) println("future has new value!")
       val x = future()
       // we never want nulls
       if (x!=null) {
@@ -51,7 +51,7 @@ trait Tinaviz {
       } 
       // else no luck.. maybe more next time!
       
-      //println("reseting future value")
+      //if (key.equals("scene")) println("reseting future value")
       cached += key -> (value,null)
     }
     value
@@ -131,17 +131,20 @@ trait Tinaviz {
     
   }
   
+
   /**
-   * TODO since this is blocking, we should move it elsewhere
+   * Asynchronously load a GEXF from an URL
    */
   def openURI(url:String) = {
-    tinaviz ! 'openURL -> url
+    tinaviz ! 'open -> new java.net.URL(url)
   }
-  
+
+  /**
+   * Asynchronously load a GEXF from a String
+   */
   def openString(str:String) = {
-    tinaviz ! 'openString -> str
+    tinaviz ! 'open -> str
   }
-  
   
   def selectNodesByLabel(matchLabel:String, matchCategory:String, matchMode:String, viewToSearch:String, center:Boolean) : Unit = {
     if (viewToSearch == null || matchLabel == null || matchCategory == null || matchMode == null) {

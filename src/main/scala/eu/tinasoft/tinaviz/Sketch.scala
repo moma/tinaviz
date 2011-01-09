@@ -11,7 +11,7 @@ import eu.tinasoft.tinaviz.graph.Graph
 object Sketch {
   implicit def graphToSketch (graph:Graph) : Sketch = {
     val sketch = new Sketch
-    sketch.updateAll(graph)
+    sketch.overwrite(graph)
     sketch
   }
   implicit def sketchToScene (sketch:Sketch) : Scene = {
@@ -64,12 +64,49 @@ case class Sketch (
    * Update all layers
    * 
    */
-  def updateAll(graph:Graph) {
+  def overwrite(graph:Graph) {
+    reset
     updateNodePositions(graph)
     updateNodeColors(graph)
     updateNodeLabels(graph)
     updateNodeShapes(graph)
     updateNodeSizes(graph)
+  }
+
+  /*
+  def applyPatch(graph:Graph,changes:Set[Symbol]) {
+    // changed allow us to know if we already recompiled a field
+    var changed = changes.map{ (_,false) }.toMap
+
+    changes.foreach {
+      case c =>
+        if (!changed(c)) {
+          changed += c -> true
+          c match {
+            case 'position => updateNodePositions(graph)
+            case 'color => updateNodeColorss(graph)
+            case err => throw new Exception("unknow symbol "+err)
+          }
+        }
+    }
+  }
+*/
+  def reset() {
+    background =  new Color(255,255,255)
+    foreground =  new Color(0,0,0)
+    labelColor  = new Color (0,0,0)
+
+    // nodes
+    nodePositionLayer  = Array.empty[(Double,Double)]
+    nodeColorLayer  = Array.empty[Color]
+    nodeShapeLayer  = Array.empty[Symbol]
+    nodeSizeLayer  = Array.empty[Double]
+
+    nodeLabelLayer  = Array.empty[String]
+    // edges
+    edgePositionLayer  = Array.empty[((Double,Double),(Double,Double))]
+    edgeColorLayer  = Array.empty[Color]
+    edgeWeightLayer = Array.empty[Double]
   }
 
   /**
@@ -152,7 +189,7 @@ case class Sketch (
 
   /**
    * Update the edges' positions layer
-   * 
+   *
    */
   private def updateEdgePositions(graph:Graph) {
     var t = for (node <- graph.nodes; link <- node.links)
@@ -162,7 +199,7 @@ case class Sketch (
 
   /**
    * Update the edges' colors layer
-   * 
+   *
    */
   def updateEdgeColors(graph:Graph) {
     var t = for (node <- graph.nodes; link <- node.links)

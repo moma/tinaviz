@@ -25,6 +25,12 @@ class GEXFImporter extends node.util.Actor {
   def act() {
     while (true) {
       receive {
+
+        case url:java.net.URL =>
+          val buf = new StringBuilder
+          io.Source.fromURL(url).foreach(buf.append)
+          self ! 'open -> buf.toString
+
         case rawXML:String =>
           println("GEXFImporter: parsing XML..")
 

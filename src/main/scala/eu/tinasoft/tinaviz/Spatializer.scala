@@ -12,12 +12,16 @@ object Spatializer extends node.util.Actor {
   start
   
   def act() {
-    
-    loop {
-      react {
-        case msg => println("unknow msg: "+msg)
+
+    while(true) {
+      loop {
+        react {
+          //case
+          case msg => println("unknow msg: "+msg)
+        }
       }
     }
+
     
   }
 }
