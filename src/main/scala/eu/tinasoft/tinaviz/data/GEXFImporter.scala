@@ -39,7 +39,6 @@ class GEXFImporter extends node.util.Actor {
             (as \\ "@class" text) match {
               case "node" =>
                 for (a <- (as \\ "attribute")) {
-
                   nodeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
                                                          (a \ "@type" text) match {
                       case "float" => 1f
@@ -63,14 +62,9 @@ class GEXFImporter extends node.util.Actor {
             }
           }
 
-          nodeAttributes.foreach{ case x=> println("foudn attribute: "+x)}
-
           def attribute(e:xml.Node) = {
-            //println("  - searching attribute value for \""+(e \ "@for" text)+"\", \""+(e \ "@value" text)+"\"")
-
             val attr = nodeAttributes(e \ "@for" text)
             val value =  (e \ "@value" text)
-            //println("   '- found it: "+attr)
             attr._1 -> (attr._2 match {
                 case Double => value.toDouble
                 case Float => value.toFloat
@@ -78,11 +72,9 @@ class GEXFImporter extends node.util.Actor {
                 case x => value
               })
           }
-
           val g = new MutableGraph()
           for (n <- (root \\ "node")) {
             var attributes = Map[String,Any]()
-
             val uuid = n \ "@id" text
             val label =  try {
               n \ "@label" text
@@ -105,8 +97,7 @@ class GEXFImporter extends node.util.Actor {
               case x => (0,0,0)
             }
 
-            // add attributes
-
+            // add some attributes
             attributes += "uuid" -> uuid
             attributes += "label" -> label
             attributes += "color" -> color
@@ -116,15 +107,11 @@ class GEXFImporter extends node.util.Actor {
             // overload attributes
             for (a <-  (n \\ "attvalue"))
               attributes += attribute(a)
-
-
             g.nodes ::= new MutableNode(uuid,
                                         label,
                                         position,
                                         color,
-                                        // (0,0,0),
-                                        attributes
-            )
+                                        attributes)
           }
           for (e <- (root \\ "edge")) 
             g.node(e \ "@source" text).addNeighbour(g.id(e \ "@target" text),

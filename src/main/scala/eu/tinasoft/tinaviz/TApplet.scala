@@ -23,23 +23,57 @@ class Fonts(val p : PApplet,
   def get(s:Int) = fonts (if (s > 1) (if (s < size) s else size) else 1)
 }
 
-
+/**
+ * Main class
+ *
+ * TApplet inherits from PApplet, the Processing way of doing applets. I didn't
+ * reinvented the wheel here. I just added some additional functions, altough
+ * not perfect yet : I created new functions names, but it could be done by
+ * override each single function, to be more elegant.
+ *
+ * @param
+ * @return
+ * @throws
+ */
 class TApplet extends PApplet with MouseWheelListener {
   
   private val _fonts = new Fonts(this)
   private val _camera = new Camera()
-  
-  protected def drawSquare(position:(Double,Double),radius:Double) = {
-    rect(position._1.toFloat,position._2.toFloat,radius.toFloat,radius.toFloat)
+
+  /**
+   * Draw a square-like shape from a Double Tuple, which represents the position.
+   * You must also give a side length.
+   *
+   */
+  protected def drawSquare(position:(Double,Double),side:Double) = {
+    rect(position._1.toFloat,position._2.toFloat,side.toFloat,side.toFloat)
   }
+
+  /**
+   * Draw a disk-like shape from a Double Tuple, which represents the position.
+   * You must also give a radius.
+   *
+   */
   protected def drawDisk(position:(Double,Double),radius:Double) = {
     ellipse(position._1.toFloat,position._2.toFloat,radius.toFloat,radius.toFloat)
   }
 
+  /**
+   * Draw a curve-like shape from two Double Tuples, which represent the source
+   * and target positions.
+   *
+   */
   protected def drawCurve(n1:(Double,Double), n2:(Double,Double)) = {
     drawCurve4(n1._1.toFloat,n1._2.toFloat,n2._1.toFloat,n2._2.toFloat)
   }
 
+  /**
+   * Draw a Bezier curve from two Double Tuples, which represent the source
+   * and target positions. The curve "height" is fixed.
+   *
+   * Original code is not from me, but the original prototype of graphviz
+   *
+   */
   private def drawCurve4(n1x:Float, n1y:Float, n2x:Float, n2y:Float) = {
 
     val xa0 = (6 * n1x + n2x) / 7
@@ -63,22 +97,37 @@ class TApplet extends PApplet with MouseWheelListener {
   }
 
 
-
+  /**
+   * Convert a Tuple2 of Double to a PVector
+   */
   implicit def tuple2ToPVector(v:(Double,Double)) : PVector = {
     new PVector(v._1.toFloat,v._2.toFloat,0.0f)
   }
+
+  /**
+   * Convert a Tuple3 of Double to a PVector
+   */
   implicit def tuple3ToPVector(v:(Double,Double,Double)) : PVector = {
     new PVector(v._1.toFloat,v._2.toFloat,v._3.toFloat)
   }
-  
+
+  /**
+   * Convert a PVector to a Tuple2 of Double
+   */
   implicit def pvectorToTuple2(v:PVector) : (Double,Double) = {
     (v.x.toDouble,v.y.toDouble)
   }
 
+  /**
+   * Convert a PVector to a Tuple3 of Double
+   */
   implicit def pvectorToTuple3(v:PVector) : (Double,Double,Double) = {
     (v.x.toDouble,v.y.toDouble,v.z.toDouble)
   }
 
+  /**
+   * Move the Camera at a given position
+   */
   protected def moveCameraAt(x:Double,y:Double,z:Double) {
     translate(x.toFloat, y.toFloat)
     scale(z.toFloat)
@@ -87,24 +136,27 @@ class TApplet extends PApplet with MouseWheelListener {
   protected def setupCamera = moveCameraAt(_camera.position._1,
                                            _camera.position._2,
                                            _camera.zoom)
- 
-  protected def setBackground (c:(Int,Int,Int)) = {
-    background(c._1, c._2, c._3)
+
+  /**
+   * Set the Background color
+   */
+  protected def setBackground (c:Color) = {
+    background(c.r,c.g,c.b)
   }
 
   protected def setFontSize(size:Int) = {
     textFont(_fonts.get(size))
   }
 
-  protected def setColor (c:(Int,Int,Int)) = {
-    fill(c._1,c._2,c._3)
+  protected def setColor (c:Color) = {
+    fill(c.r,c.g,c.b)
   }
 
   protected def setLod (v:Int) = {
     bezierDetail(v)
   }
-  protected def lineColor(c:(Int,Int,Int)) = {
-    stroke(c._1,c._2,c._3)
+  protected def lineColor(c:Color) = {
+    stroke(c.r,c.g,c.b)
   }
   protected def lineThickness(t:Double) = {
     strokeWeight(t.toFloat)

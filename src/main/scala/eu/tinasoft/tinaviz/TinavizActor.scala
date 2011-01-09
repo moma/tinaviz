@@ -17,7 +17,6 @@ import actors._
 import Actor._
 
 class TinavizActor extends node.util.Actor {
-  
 
   val defaultProperties : Map[String,Any] = Map(
     // global real FPS
@@ -45,10 +44,8 @@ class TinavizActor extends node.util.Actor {
 
   var properties : Map[String,Any] = defaultProperties
 
-
   // internal states: 'needUpdate 'updating  'upToDate
   //var state = 'upToDate
-
 
   // pipeline data
   var pipeline : Map[String,(Graph,Sketch)] = Map(
@@ -60,8 +57,6 @@ class TinavizActor extends node.util.Actor {
 
   start
 
-
-
   def act() {
    
     while(true) {
@@ -72,7 +67,6 @@ class TinavizActor extends node.util.Actor {
 
         case ('updateNode,value) =>
           //context ! 'updateNode -> value
-
 
           // receive a new graph
         case graph:Graph =>
@@ -91,7 +85,6 @@ class TinavizActor extends node.util.Actor {
           val buf = new StringBuilder
           io.Source.fromURL(new java.net.URL(url)).foreach(buf.append)
           self ! 'openString -> buf.toString
-          
 
 
         case key:String =>
@@ -123,8 +116,6 @@ class TinavizActor extends node.util.Actor {
     }
     
   }
-
   
   def get[T](key:String) : T = properties.get(key).get.asInstanceOf[T]
-
 }
