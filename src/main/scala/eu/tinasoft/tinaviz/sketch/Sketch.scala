@@ -44,9 +44,9 @@ object Sketch {
 
 }
 case class Sketch (
-  var background : Color =  new Color(255,255,255),
-  var foreground : Color =  new Color(0,0,0),
-  var labelColor : Color = new Color (0,0,0),
+  var background : Color =  new Color(0.0,0.0,1.0),
+  var foreground : Color =  new Color(0.0,1.0,0.0),
+  var labelColor : Color = new Color (0.0,1.0,0.0),
 
   // nodes
   var nodePositionLayer : Array[(Double,Double)] = Array.empty[(Double,Double)],
@@ -77,27 +77,27 @@ case class Sketch (
   }
 
   /*
-  def applyPatch(graph:Graph,changes:Set[Symbol]) {
-    // changed allow us to know if we already recompiled a field
-    var changed = changes.map{ (_,false) }.toMap
+   def applyPatch(graph:Graph,changes:Set[Symbol]) {
+   // changed allow us to know if we already recompiled a field
+   var changed = changes.map{ (_,false) }.toMap
 
-    changes.foreach {
-      case c =>
-        if (!changed(c)) {
-          changed += c -> true
-          c match {
-            case 'position => updateNodePositions(graph)
-            case 'color => updateNodeColorss(graph)
-            case err => throw new Exception("unknow symbol "+err)
-          }
-        }
-    }
-  }
-*/
+   changes.foreach {
+   case c =>
+   if (!changed(c)) {
+   changed += c -> true
+   c match {
+   case 'position => updateNodePositions(graph)
+   case 'color => updateNodeColorss(graph)
+   case err => throw new Exception("unknow symbol "+err)
+   }
+   }
+   }
+   }
+   */
   def reset() {
-    background =  new Color(255,255,255)
-    foreground =  new Color(0,0,0)
-    labelColor  = new Color (0,0,0)
+    background = new Color (0.0,0.0,1.0)
+    foreground = new Color (0.0,1.0,0.0)
+    labelColor = new Color (0.0,1.0,0.0)
 
     // nodes
     nodePositionLayer  = Array.empty[(Double,Double)]
@@ -132,17 +132,7 @@ case class Sketch (
    *
    */
   def updateNodeColors(graph:Graph) {
-    nodeColorLayer = graph.nodes.map {
-      case n =>
-        try {
-          n.attributes("category") match {
-            case "Document" => new Color (150, 100, 110)
-            case "NGram" => new Color (110, 100, 150)
-          }
-        } catch {
-          case x => new Color (110, 150, 90)
-        }
-    }.toArray
+    nodeColorLayer = graph.nodes.map { case n => computeColor(n) }.toArray
     updateEdgeColors(graph)
   }
 
@@ -208,13 +198,26 @@ case class Sketch (
     edgePositionLayer = t.toArray
   }
 
+
   /**
    * Update the edges' colors layer
    *
    */
   def updateEdgeColors(graph:Graph) {
     var t = for (node <- graph.nodes; link <- node.links)
-      yield node.color.blend(graph.node(link._1).color)
+      yield computeColor(node).blend(computeColor(graph.node(link._1)))
     edgeColorLayer = t.toArray
   }
+
+  def computeColor(node:Node) : Color = {
+    try {
+      node.attributes("category") match {
+        case "Document" => new Color (0.3, 0.6, 0.7)
+        case "NGram" => new Color (0.5, 0.6, 0.7)
+      }
+    } catch {
+      case x => new Color (0.2, 0.6, 0.7)
+    }
+  }
+
 }

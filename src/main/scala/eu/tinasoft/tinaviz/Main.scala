@@ -61,8 +61,9 @@ class Main extends TApplet with Client {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 100, screenHeight - 100, PConstants.P2D)
-    frameRate(14)
+    frameRate(4)
     noSmooth
+    colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
     bezierDetail(16)

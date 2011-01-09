@@ -128,14 +128,18 @@ class GEXF extends node.util.Actor {
         case x => (Maths.random(0,900), Maths.random(0,500))
       }
 
-      val color : Color = try {
-        (((n \\ "viz:color") \ "@r" text).toInt,
-         ((n \\ "viz:color") \ "@g" text).toInt,
-         ((n \\ "viz:color") \ "@b" text).toInt)
-      } catch {
-        case x => (0,0,0)
-      }
-
+      /*
+       val color : Color = try {
+       (((n \\ "viz:color") \ "@r" text).toInt,
+       ((n \\ "viz:color") \ "@g" text).toInt,
+       ((n \\ "viz:color") \ "@b" text).toInt)
+       } catch {
+       case x => (0,0,0)
+       }*/
+      val color = new Color(Maths.random(0.0,1.0),
+                            Maths.random(0.8,1.0),
+                            Maths.random(0.8,1.0))
+    
       attributes ++= Map (
         "uuid" -> uuid,
         "label" -> label,

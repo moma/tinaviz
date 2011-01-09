@@ -7,23 +7,30 @@ package eu.tinasoft.tinaviz.util
 
 
 object Color {
-  implicit def fromTuple3(c:(Int,Int,Int)) : Color  = {
+  
+  def fromRGBTuple3(c:(Double,Double,Double)) : Color  = {
     new Color(c._1,c._2,c._2)
   }
-  implicit def fromTuple4(c:(Int,Int,Int,Int)) : Color  = {
+  def fromRGBTuple4(c:(Double,Double,Double,Double)) : Color  = {
     new Color(c._1,c._2,c._2,c._4)
   }
-  implicit def toTuple3(c:Color) : (Int,Int,Int) = {
-    (c.r,c.g,c.b)
+  def toRGBTuple3(c:Color) : (Double,Double,Double) = {
+    (c.h,c.s,c.b)
   }
-  implicit def toTuple4(c:Color) : (Int,Int,Int,Int) = {
-    (c.r,c.g,c.b,c.a)
+  def toRGBTuple4(c:Color) : (Double,Double,Double,Double) = {
+    (c.h,c.s,c.b,c.a)
   }
 }
-class Color(val r:Int=0,val g:Int=0,val b:Int=0, val a:Int=0) {
+class Color(val h:Double=0.0,
+            val s:Double=1.0,
+            val b:Double=1.0,
+            val a:Double=1.0) {
 
   def blend(c:Color) : Color = {
-    new Color((r+c.r)/2,(g+c.g)/2,(b+c.b)/2,(a+c.a)/2)
+    new Color((h+c.h)/2,
+              (s+c.s)/2,
+              (b+c.b)/2,
+              (a+c.a)/2)
   }
 
 }

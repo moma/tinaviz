@@ -13,10 +13,10 @@ package eu.tinasoft.tinaviz.scene
  */
 class Camera (
   
-  var position : (Double,Double) = (0,0),
+  var position : (Double,Double) = (150,150),
   var positionDelta : (Double, Double) = (0, 0),
 
-  var zoom : Double = 50.0,
+  var zoom : Double = 1.15,
   var zoomDelta : Double = 0,
   
   // CAMERA CENTER

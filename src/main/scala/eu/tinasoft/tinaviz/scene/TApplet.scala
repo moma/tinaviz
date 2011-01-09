@@ -45,6 +45,9 @@ class TApplet extends PApplet with MouseWheelListener {
   private val _fonts = new Fonts(this)
   private val _camera = new Camera()
 
+  def getZoom = _camera.zoom
+  def getPosition = _camera.position
+  def getCamera = (_camera.position,_camera.zoom)
   /**
    * Draw a square-like shape from a Double Tuple, which represents the position.
    * You must also give a side length.
@@ -138,15 +141,15 @@ class TApplet extends PApplet with MouseWheelListener {
     scale(z.toFloat)
   }
 
-  protected def setupCamera = moveCameraAt(_camera.position._1,
-                                           _camera.position._2,
-                                           _camera.zoom)
+  protected def setupCamera = {
+    moveCameraAt(_camera.position._1, _camera.position._2,  _camera.zoom)
+  }
 
   /**
    * Set the Background color
    */
   protected def setBackground (c:Color) = {
-    background(c.r,c.g,c.b)
+    background(c.h.toFloat,c.s.toFloat,c.b.toFloat,c.a.toFloat)
   }
 
   protected def setFontSize(size:Int) = {
@@ -154,14 +157,14 @@ class TApplet extends PApplet with MouseWheelListener {
   }
 
   protected def setColor (c:Color) = {
-    fill(c.r,c.g,c.b)
+    fill(c.h.toFloat,c.s.toFloat,c.b.toFloat,c.a.toFloat)
   }
 
   protected def setLod (v:Int) = {
     bezierDetail(v)
   }
   protected def lineColor(c:Color) = {
-    stroke(c.r,c.g,c.b)
+    stroke(c.h.toFloat,c.s.toFloat,c.b.toFloat,c.a.toFloat)
   }
   protected def lineThickness(t:Double) = {
     strokeWeight(t.toFloat)
@@ -240,6 +243,37 @@ class TApplet extends PApplet with MouseWheelListener {
     positionUpdated(_camera.position)
   }
 
+  /**
+   * Are the given coordinate invisible?
+   */
+  def isVisible (p:(Double,Double)) = {
+    val w = width / 4.
+    val h = height / 4.
+    ((p._1 > -w) && (p._1 < (width + w))
+     && (p._2 > -h) && (p._2 < (height + h)))
+  }
+  
+  /**
+   * Are the given coordinate visible?
+   */
+  def isInvisible (p:(Double,Double)) = ! isVisible (p)
+
+  /**
+   * TODO could be optimized, by using the reverse action (translate, zoom)
+   * Thus we could use this function anywhere, if we have access to camera value
+   */
+  def screenPosition (p:(Double,Double)) : (Int,Int) = {
+    (screenX(p._1.toFloat, p._2.toFloat).toInt,
+     screenY(p._1.toFloat, p._2.toFloat).toInt)
+  }
+
+  /**
+   * Get the size to the screen
+   */
+  def screenSize (s:Double) : Int = {
+    (s * _camera.zoom).toInt
+  }
+
   /*
    def zoomAt(zoomIn:Boolean, position:(Double,Double), ratio:Double=1.2) {
    _camera.lastMousePosition = (mouseX, mouseY)
@@ -279,7 +313,7 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.positionDelta = PVector.sub(p,t)
     _camera.position = t
     _camera.dragged = true
-     
+         positionUpdated(_camera.position)
   }
 
   override def mouseMoved {

@@ -11,9 +11,9 @@ import util.Color
 import util.Color._
 
 case class Scene (
-  val background : Color =  new Color(255,255,255),
-  val foreground : Color =  new Color(0,0,0),
-  val labelColor : Color = new Color (0,0,0),
+  val background : Color =  new Color(0.0,0.0,1.0),
+  val foreground : Color =  new Color(0.0,1.0,0.0),
+  val labelColor : Color = new Color (0.0,1.0,0.0),
 
   val nbNodes : Int = 0,
   val nbEdges : Int = 0,

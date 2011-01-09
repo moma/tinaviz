@@ -34,7 +34,7 @@ class Server extends node.util.Actor {
     // global selection disk settings
     "selectionRadius" -> 10.0,
 
-    // camera
+    // TODO real-time camera settings
     "zoom" -> 0.0,
     "position" -> (0.0,0.0),
 
@@ -82,8 +82,7 @@ class Server extends node.util.Actor {
         case scene:Scene =>
           println("Tinaviz: sending to screen..")
           properties += "scene" -> scene
-
-
+          
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
               
