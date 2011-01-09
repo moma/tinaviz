@@ -13,6 +13,9 @@ case class Scene (
   val foreground : Color =  new Color(0,0,0),
   val labelColor : Color = new Color (0,0,0),
 
+  val nbNodes : Int = 0,
+  val nbEdges : Int = 0,
+
   // nodes
   val nodePositionLayer : Array[(Double,Double)] = Array.empty[(Double,Double)],
   val nodeColorLayer : Array[Color] = Array.empty[Color],

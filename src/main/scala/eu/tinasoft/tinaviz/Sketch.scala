@@ -36,6 +36,9 @@ case class Sketch (
     foreground,
     labelColor,
 
+    nodePositionLayer.size,
+    edgePositionLayer.size,
+    
     // nodes
     nodePositionLayer,
     nodeColorLayer,

@@ -79,7 +79,7 @@ class Main extends TApplet with Tinaviz {
     if (debug) {
       setColor(scene.foreground)
       text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + scene.nodes.size + " nodes, "+scene.edges.size+" edges", 10f, 32f)
+      text("drawing " + scene.nbNodes + " nodes, "+scene.nbEdges+" edges", 10f, 32f)
     }
     if (pause) return
     
@@ -91,15 +91,18 @@ class Main extends TApplet with Tinaviz {
     setLod(32)
     lineThickness(1)
     noFill
-    scene.edges.foreach{ case e =>
+    var i = 0
+    scene.edgePositionLayer.foreach{
+      case (source,target) =>
         //val powd = distance(e.source.screenPosition, e.target.screenPosition)
         //val modulator = if (width >= 10) limit(PApplet.map(powd.toFloat, 10, width, 1, 90), 1, 90) else 1
         //setLod(modulator.toInt)
-        lineColor(e.color)
-        lineThickness(e.weight)
-        drawCurve(e.source, e.target)
+        lineColor(scene.edgeColorLayer(i))
+        //lineThickness(e.weight)
+        drawCurve(source, target)
+        i += 1
     }
-
+/*
     setLod(16)
     lineThickness(0)
     noStroke
@@ -118,7 +121,7 @@ class Main extends TApplet with Tinaviz {
         //setFontSize(e.size)
         text(e.text)
     }
-
+*/
     showSelectionCircle(selectionRadius)
 
   }

@@ -64,23 +64,6 @@ class TApplet extends PApplet with MouseWheelListener {
 
 
 
-  /*
-   private def tryZoom(v:Double) : Boolean = {
-   val futureValue = ratio
-   if ((v >= CEIL) && (v <= FLOOR)) {
-   //sceneScale = newValue;
-   return true;
-   }
-   if (((v <= CEIL) && (v >= sceneScale))
-   | ((v >= ZOOM_FLOOR) && (v <= sceneScale))) {
-   //sceneScale = newValue;
-   return true
-   }
-   false
-   }
-   */
-
-
   implicit def tuple2ToPVector(v:(Double,Double)) : PVector = {
     new PVector(v._1.toFloat,v._2.toFloat,0.0f)
   }
