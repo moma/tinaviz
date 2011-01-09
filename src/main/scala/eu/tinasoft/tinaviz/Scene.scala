@@ -22,18 +22,16 @@ case class Scene (
   val nodeShapeLayer : Array[Symbol] = Array.empty[Symbol],
   val nodeSizeLayer : Array[Double] = Array.empty[Double],
 
+  val nodeLabelLayer : Array[String] = Array.empty[String],
+
   // edges
   val edgePositionLayer : Array[((Double,Double),
                                  (Double,Double))] = Array.empty[((Double,Double),
                                                                   (Double,Double))],
   val edgeColorLayer : Array[Color] = Array.empty[Color],
-  val edgeWeightLayer : Array[Double] = Array.empty[Double],
+  val edgeWeightLayer : Array[Double] = Array.empty[Double]
 
 
-  // labels
-  val labelPosition : Array[(Double,Double)] = Array.empty[(Double,Double)],
-  val labelTextLayer : Array[String] = Array.empty[String],
-  val labelColorLayer : Array[Color] = Array.empty[Color]
 ) {
   
 }

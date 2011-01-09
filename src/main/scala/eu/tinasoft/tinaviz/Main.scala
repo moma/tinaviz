@@ -102,26 +102,38 @@ class Main extends TApplet with Tinaviz {
         drawCurve(source, target)
         i += 1
     }
-/*
+
     setLod(16)
     lineThickness(0)
     noStroke
-    scene.nodes.foreach{ case e =>
-        setColor(e.color)
-        e.shape match {
-          case 'Disk => drawDisk(e.position, e.size)
-          case x => drawSquare(e.position, e.size)
+
+    i = 0
+    scene.nodePositionLayer.foreach{
+      case position =>
+        val size = scene.nodeSizeLayer(i)
+        setColor(scene.nodeColorLayer(i))
+        scene.nodeShapeLayer(i) match {
+          case 'Disk => drawDisk(position, size)
+          case x => drawSquare(position, size)
         }
+        i += 1
     }
+
 
     setLod(16)
     lineThickness(1)
     setColor(scene.labelColor)
-    scene.labels.foreach{ case e =>
-        //setFontSize(e.size)
-        text(e.text)
+        i = 0
+    scene.nodePositionLayer.foreach{
+      case position =>
+        val size = scene.nodeSizeLayer(i)
+        setColor(scene.nodeColorLayer(i))
+        text(scene.nodeLabelLayer(i))
+        i += 1
     }
-*/
+
+
+ 
     showSelectionCircle(selectionRadius)
 
   }

@@ -11,6 +11,7 @@ import eu.tinasoft._
 import tinaviz.data._
 import tinaviz.graph._
 import tinaviz.context._
+import Sketch._
 
 import actors._
 import Actor._
@@ -48,6 +49,7 @@ class TinavizActor extends node.util.Actor {
   // internal states: 'needUpdate 'updating  'upToDate
   //var state = 'upToDate
 
+
   // pipeline data
   var pipeline : Map[String,(Graph,Sketch)] = Map(
     "global" -> (new Graph(),new Sketch()),
@@ -57,6 +59,7 @@ class TinavizActor extends node.util.Actor {
   )
 
   start
+
 
 
   def act() {
@@ -73,30 +76,12 @@ class TinavizActor extends node.util.Actor {
 
           // receive a new graph
         case graph:Graph =>
-          // reset global settings
           properties = defaultProperties
           pipeline = pipeline.map { case (k,v) => ( k,(new Graph(),new Sketch()) ) }
-
-          // create a new global sketch from the global graph
-          val sketch = new Sketch()
-          sketch.nodePositionLayer = graph.nodes.map {
-            case n => n.position
-          }.toArray
-          var tmp = for (node <- graph.nodes; link <- node.links)
-            yield (node.position,graph.node(link._1).position)
-          sketch.edgePositionLayer = tmp.toArray
-
-          var tmp2 = for (node <- graph.nodes; link <- node.links)
-            yield node.color.blend(graph.node(link._1).color)
-          sketch.edgeColorLayer = tmp2.toArray
-
-          println("checking.. "+sketch.nodePositionLayer.size+" nodes and "+sketch.edgePositionLayer.size+ " edges")
-          // save the global sketch
+          val sketch = graph:Sketch
           pipeline += "global" -> (graph,sketch)
-
-          // export the sketch to a scene for final rendering
-          self ! "scene" -> sketch.toScene
-
+          self ! "scene" -> (sketch:Scene)
+          
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
               
