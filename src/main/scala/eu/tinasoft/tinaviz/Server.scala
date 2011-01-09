@@ -8,9 +8,10 @@ package eu.tinasoft.tinaviz
 import org.daizoru._
 import eu.tinasoft._
 
-import tinaviz.data._
+import tinaviz.io._
 import tinaviz.graph._
-import tinaviz.context._
+import tinaviz.scene._
+import tinaviz.sketch._
 import Sketch._
 
 import actors._
@@ -18,7 +19,7 @@ import Actor._
 
 case class Step(val step:Symbol)
 
-class TinavizActor extends node.util.Actor {
+class Server extends node.util.Actor {
 
   val defaultProperties : Map[String,Any] = Map(
     // global real FPS
@@ -87,9 +88,7 @@ class TinavizActor extends node.util.Actor {
           // log("ignoring update of "+key)
               
 
-        case ('open, any:Any) => 
-          println("Loading "+any)
-          (new GEXFImporter) ! any
+        case ('open, any:Any) => (new GEXF) ! any
 
         case key:String =>
           reply(properties(key))

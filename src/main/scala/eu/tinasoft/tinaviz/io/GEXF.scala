@@ -3,15 +3,13 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz.data
+package eu.tinasoft.tinaviz.io
 
 import org.daizoru._
+
 import eu.tinasoft._
-
-import tinaviz.Color
+import tinaviz.util._
 import Color._
-
-import tinaviz.Maths
 
 import tinaviz.graph._
 import MutableGraph._
@@ -24,13 +22,13 @@ import io.Source
 import xml._
 import java.net.URL
 
-class GEXFImporter extends node.util.Actor {
+class GEXF extends node.util.Actor {
   start
 
   def act() {
     while (true) {
       receive {
-        case url:URL => reply(load(url))
+        case url:URL =>  println("Loading "+url); reply(load(url))
         case xml:String => reply(load(xml))
 
         case graph:Graph =>

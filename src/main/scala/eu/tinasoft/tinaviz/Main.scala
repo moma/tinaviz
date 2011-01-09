@@ -4,14 +4,16 @@ package eu.tinasoft.tinaviz
 import javax.swing.JFrame
 
 import netscape.javascript.JSException
-import netscape.javascript.JSObject
 
 import processing.core._
 
 import org.daizoru._
 import eu.tinasoft._
 
-import Color._
+import tinaviz.io.Browser
+import tinaviz.scene._
+import tinaviz.util._
+import tinaviz.util.Color._
 
 /**
  * The Main object
@@ -48,7 +50,7 @@ object Main {
  * @return
  * @throws
  */
-class Main extends TApplet with Tinaviz {
+class Main extends TApplet with Client {
   
   override def setup(): Unit = {
 
@@ -67,7 +69,7 @@ class Main extends TApplet with Tinaviz {
     addMouseWheelListener(this)
     
     try {
-      Browser.init(JSObject.getWindow(this), getParameter("js_context"))
+      Browser.init(this, getParameter("js_context"))
     } catch {
       case exc:NullPointerException =>
         println("Null pointer exception: "+exc)

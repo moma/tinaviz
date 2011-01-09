@@ -3,7 +3,8 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.tinaviz.util
+
 
 object Color {
   implicit def fromTuple3(c:(Int,Int,Int)) : Color  = {

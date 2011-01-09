@@ -3,12 +3,17 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.tinaviz.scene
+
+import processing.core._
+
+import eu.tinasoft._
 
 import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
-import processing.core._
-import Color._
+
+import tinaviz.util._
+import tinaviz.util.Color._
 
 class Fonts(val p : PApplet,
             val fontName : String = "Arial",

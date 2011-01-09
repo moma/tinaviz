@@ -5,7 +5,10 @@
 
 package eu.tinasoft.tinaviz.graph
 
-import eu.tinasoft.tinaviz.Color
+import eu.tinasoft._
+
+import tinaviz.util.Color
+import tinaviz.util.Color._
 
 class Node (
   val uuid : String,

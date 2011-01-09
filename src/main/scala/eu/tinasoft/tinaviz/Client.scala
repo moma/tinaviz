@@ -6,12 +6,13 @@
 package eu.tinasoft.tinaviz
 
 import actors._
-import eu.tinasoft.tinaviz.data.json.JsonParser
+import eu.tinasoft._
+import tinaviz.io.JsonParser
 import scala.util.parsing.json.JSONObject
 
-trait Tinaviz {
+trait Client {
   
-  val tinaviz : Actor = new TinavizActor()
+  val tinaviz : Actor = new Server()
 
 
   private var cached : Map[String,(Any,Future[Any])] = Map.empty

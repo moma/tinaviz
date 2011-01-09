@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz.data.json
+package eu.tinasoft.tinaviz.io
 
 import util.parsing.json.JSON
 import util.parsing.json.JSONObject

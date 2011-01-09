@@ -3,13 +3,15 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.tinaviz.sketch
 
 import org.daizoru._
 import eu.tinasoft._
 
-import tinaviz.graph._
-import Sketch._
+import tinaviz.graph.Graph
+import tinaviz.scene.Scene
+
+import tinaviz.sketch.Sketch._
 
 import actors._
 import Actor._

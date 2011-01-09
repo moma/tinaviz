@@ -3,10 +3,12 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.tinaviz.io
 
 import org.daizoru._
+import eu.tinasoft.tinaviz._
 
+import java.applet.Applet
 import netscape.javascript.JSObject
 
 object Browser extends node.util.Actor {
@@ -17,9 +19,9 @@ object Browser extends node.util.Actor {
   private var _subPrefix = ""
   private var _apiPrefix = "tinaviz."
 
-  def init(window:JSObject=null, jsContext:String=null) = {
+  def init(applet:Applet=null, jsContext:String=null) = {
     println("jsContext: "+jsContext)
-    this._window = window
+    this._window = if (applet != null) JSObject.getWindow(applet) else null
     val _subPrefix = if (jsContext!=null) jsContext else ""
     val _apiPrefix = "tinaviz."
     self ! "_initCallback"

@@ -3,10 +3,13 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.tinaviz.sketch
 
+import eu.tinasoft._
 
-import eu.tinasoft.tinaviz.graph.Graph
+import tinaviz.util._
+import tinaviz.scene._
+import tinaviz.graph._
 
 object Sketch {
   implicit def graphToSketch (graph:Graph) : Sketch = {

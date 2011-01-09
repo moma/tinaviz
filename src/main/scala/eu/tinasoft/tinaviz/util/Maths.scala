@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.tinaviz.util
 
 import util.Random
 

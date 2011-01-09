@@ -3,10 +3,12 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.tinaviz.scene
 
-import Color._
+import eu.tinasoft.tinaviz._
 
+import util.Color
+import util.Color._
 
 case class Scene (
   val background : Color =  new Color(255,255,255),
