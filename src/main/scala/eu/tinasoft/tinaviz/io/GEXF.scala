@@ -125,7 +125,7 @@ class GEXF extends node.util.Actor {
         (((n \\ "viz:position") \ "@x" text).toDouble,
          ((n \\ "viz:position") \ "@y" text).toDouble)
       } catch {
-        case x => (Maths.random(0,900), Maths.random(0,500))
+        case x => (Maths.random(0,200), Maths.random(0,200))
       }
 
       /*

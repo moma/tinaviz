@@ -8,6 +8,7 @@ package eu.tinasoft.tinaviz.sketch
 import eu.tinasoft._
 
 import tinaviz.util._
+import tinaviz.util.Color._
 import tinaviz.scene._
 import tinaviz.graph._
 
@@ -29,6 +30,7 @@ object Sketch {
       // nodes
       sketch.nodePositionLayer,
       sketch.nodeColorLayer,
+      sketch.nodeBorderColorLayer,
       sketch.nodeShapeLayer,
       sketch.nodeSizeLayer,
 
@@ -47,10 +49,12 @@ case class Sketch (
   var background : Color =  new Color(0.0,0.0,1.0),
   var foreground : Color =  new Color(0.0,1.0,0.0),
   var labelColor : Color = new Color (0.0,1.0,0.0),
+  var selectionZoneColor : Color = new Color (0.0,1.0,0.0),
 
   // nodes
   var nodePositionLayer : Array[(Double,Double)] = Array.empty[(Double,Double)],
   var nodeColorLayer : Array[Color] = Array.empty[Color],
+  var nodeBorderColorLayer : Array[Color] = Array.empty[Color],
   var nodeShapeLayer : Array[Symbol] = Array.empty[Symbol],
   var nodeSizeLayer : Array[Double] = Array.empty[Double],
 
@@ -102,6 +106,7 @@ case class Sketch (
     // nodes
     nodePositionLayer  = Array.empty[(Double,Double)]
     nodeColorLayer  = Array.empty[Color]
+    nodeBorderColorLayer  = Array.empty[Color]
     nodeShapeLayer  = Array.empty[Symbol]
     nodeSizeLayer  = Array.empty[Double]
 
@@ -133,6 +138,7 @@ case class Sketch (
    */
   def updateNodeColors(graph:Graph) {
     nodeColorLayer = graph.nodes.map { case n => computeColor(n) }.toArray
+    nodeBorderColorLayer = graph.nodes.map { case n => computeBorderColor(n) }.toArray
     updateEdgeColors(graph)
   }
 
@@ -212,12 +218,22 @@ case class Sketch (
   def computeColor(node:Node) : Color = {
     try {
       node.attributes("category") match {
-        case "Document" => new Color (0.3, 0.6, 0.7)
-        case "NGram" => new Color (0.5, 0.6, 0.7)
+        case "Document" => Samba.primary.standard
+        case "NGram" => Samba.secondary.standard
       }
     } catch {
-      case x => new Color (0.2, 0.6, 0.7)
+      case x => Samba.tertiary.standard
     }
   }
 
+  def computeBorderColor(node:Node) : Color = {
+    try {
+      node.attributes("category") match {
+        case "Document" => Samba.primary.darker
+        case "NGram" => Samba.secondary.darker
+      }
+    } catch {
+      case x => Samba.tertiary.darker
+    }
+  }
 }

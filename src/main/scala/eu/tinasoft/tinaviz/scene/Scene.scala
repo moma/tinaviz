@@ -21,6 +21,7 @@ case class Scene (
   // nodes
   val nodePositionLayer : Array[(Double,Double)] = Array.empty[(Double,Double)],
   val nodeColorLayer : Array[Color] = Array.empty[Color],
+  val nodeBorderColorLayer : Array[Color] = Array.empty[Color],
   val nodeShapeLayer : Array[Symbol] = Array.empty[Symbol],
   val nodeSizeLayer : Array[Double] = Array.empty[Double],
 

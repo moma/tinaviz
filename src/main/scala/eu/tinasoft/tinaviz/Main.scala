@@ -14,7 +14,7 @@ import tinaviz.io.Browser
 import tinaviz.scene._
 import tinaviz.util._
 import tinaviz.util.Color._
-
+import math.Pi
 /**
  * The Main object
  *
@@ -61,8 +61,8 @@ class Main extends TApplet with Client {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 100, screenHeight - 100, PConstants.P2D)
-    frameRate(4)
-    noSmooth
+    frameRate(10)
+    //noSmooth
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
@@ -133,10 +133,16 @@ class Main extends TApplet with Client {
     scene.nodePositionLayer.foreach{
       case position =>
         val size = scene.nodeSizeLayer(i)
-        setColor(scene.nodeColorLayer(i))
+        setColor(scene.nodeBorderColorLayer(i))
         scene.nodeShapeLayer(i) match {
-          case 'Disk => drawDisk(position, size)
-          case x => drawSquare(position, size)
+          case 'Disk => 
+            drawDisk(position, size)
+            setColor(scene.nodeColorLayer(i))
+            drawDisk(position, size * 0.8)
+          case x =>
+            drawSquare(position, size)
+             setColor(scene.nodeColorLayer(i))
+            drawSquare(position, size * 0.8)
         }
         i += 1
     }
@@ -150,7 +156,9 @@ class Main extends TApplet with Client {
       case position =>
         val size = scene.nodeSizeLayer(i)
         setColor(scene.nodeColorLayer(i))
-        text(scene.nodeLabelLayer(i))
+        val np = screenPosition(position._1 + size,
+                                position._2 + size / Pi)
+        text(scene.nodeLabelLayer(i), np._1,np._2)
         i += 1
     }
 

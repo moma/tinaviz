@@ -214,8 +214,8 @@ class TApplet extends PApplet with MouseWheelListener {
    _camera.position = (v._1,v._2,zr)
    */
 
-  val minZoom = 0.02
-  val maxZoom = 180.0
+  val minZoom = 0.1
+  val maxZoom = 100.0
 
   def limit(v:Double,min:Double,max:Double) : Double = {
     if (v < min) min else if (v > max) max else v
@@ -263,10 +263,16 @@ class TApplet extends PApplet with MouseWheelListener {
    * Thus we could use this function anywhere, if we have access to camera value
    */
   def screenPosition (p:(Double,Double)) : (Int,Int) = {
-    (screenX(p._1.toFloat, p._2.toFloat).toInt,
-     screenY(p._1.toFloat, p._2.toFloat).toInt)
+    screenPosition(p._1,p._2)
   }
-
+  /**
+   * TODO could be optimized, by using the reverse action (translate, zoom)
+   * Thus we could use this function anywhere, if we have access to camera value
+   */
+  def screenPosition (x:Double,y:Double) : (Int,Int) = {
+    (screenX(x.toFloat, y.toFloat).toInt,
+     screenY(x.toFloat, y.toFloat).toInt)
+  }
   /**
    * Get the size to the screen
    */
@@ -290,9 +296,9 @@ class TApplet extends PApplet with MouseWheelListener {
     
     scale((1.0/_camera.zoom).toFloat)
     translate(-_camera.position._1.toFloat, -_camera.position._2.toFloat)
-    stroke(0, 0, 0, 40)
+    stroke(0.0f, 1.0f, 0.0f, 0.6f)
     strokeWeight(1.0f)
-    fill(00, 100, 200, 29)
+    fill(.3f, 1.0f, 1.0f, 0.3f)
     drawDisk((mouseX, mouseY),radius)
     translate(_camera.position._1.toFloat, _camera.position._2.toFloat)
     scale(_camera.zoom.toFloat)
@@ -313,7 +319,7 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.positionDelta = PVector.sub(p,t)
     _camera.position = t
     _camera.dragged = true
-         positionUpdated(_camera.position)
+    positionUpdated(_camera.position)
   }
 
   override def mouseMoved {
