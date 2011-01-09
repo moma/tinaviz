@@ -5,6 +5,12 @@
 
 package eu.tinasoft.tinaviz.graph
 
+object MutableGraph {
+
+  implicit def mutableGraphToGraph (m:MutableGraph) : Graph = {
+    m.toGraph
+  }
+}
 class MutableGraph(
   var nodes : List[MutableNode] = List.empty[MutableNode],
   var properties : Map[String,Any] = Map.empty[String,Any]

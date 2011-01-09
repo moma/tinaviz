@@ -68,18 +68,18 @@ class TinavizActor extends node.util.Actor {
 
           // receive a brand new graph
         case graph:Graph =>
-          println("TinavizActor: loading a new graph..")
+          println("Tinaviz: loaded "+graph.nbNodes+" nodes, "+graph.nbEdges+" edges.")
           properties = defaultProperties
           input = graph
           self ! 'process
 
         case 'process =>
-          println("TinavizActor: do some filtering here..")
+          println("Tinaviz: doing some thread-blocking processing..")
           output = input
           sketcher ! output
 
         case scene:Scene =>
-          println("TinavizActor: finished loading scene")
+          println("Tinaviz: sending to screen..")
           properties += "scene" -> scene
 
 
@@ -87,7 +87,9 @@ class TinavizActor extends node.util.Actor {
           // log("ignoring update of "+key)
               
 
-        case ('open, any:Any) => (new GEXFImporter) ! any
+        case ('open, any:Any) => 
+          println("Loading "+any)
+          (new GEXFImporter) ! any
 
         case key:String =>
           reply(properties(key))
@@ -112,7 +114,7 @@ class TinavizActor extends node.util.Actor {
             self ! ('updated,key,value,previous)
           }
 
-        case msg => println("TinavizActor: unknow msg: "+msg)
+        case msg => println("Tinaviz: error, unknow msg: "+msg)
       }
     }
     

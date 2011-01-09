@@ -75,13 +75,8 @@ class Main extends TApplet with Tinaviz {
       case exc:JSException =>
         println("Javascript exception: "+exc)
         //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
-        tinaviz ! 'openURL -> "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-   
+        tinaviz ! 'open -> new java.net.URL("file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf")
     }
-    
-    //val __brandingIcon = getParameter("branding_icon")
-    //val __engine = getParameter("engine")
-    
   }
 
 
