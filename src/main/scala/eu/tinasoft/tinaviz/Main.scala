@@ -59,7 +59,7 @@ class Main extends TApplet with Tinaviz {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 100, screenHeight - 100, PConstants.P2D)
-    frameRate(20)
+    frameRate(14)
     noSmooth
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)

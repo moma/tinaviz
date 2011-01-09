@@ -58,7 +58,7 @@ class TinavizActor extends node.util.Actor {
   start
 
   def act() {
-   
+
     while(true) {
       receive {
 
@@ -68,14 +68,33 @@ class TinavizActor extends node.util.Actor {
         case ('updateNode,value) =>
           //context ! 'updateNode -> value
 
-          // receive a new graph
+          // receive a branch new graph
         case graph:Graph =>
+          println("TinavizActo: got a new graph, resetting settings..")
           properties = defaultProperties
           pipeline = pipeline.map { case (k,v) => ( k,(new Graph(),new Sketch()) ) }
-          val sketch = graph:Sketch
-          pipeline += "global" -> (graph,sketch)
-          self ! "scene" -> (sketch:Scene)
-          
+          val m = self
+          val a = actor {
+            while(true) {
+              self.receive { 
+                case graph:Graph =>
+                  println("anonymous: Born to compile..")
+                  val sketch = graph:Sketch
+                  val scene = sketch:Scene
+                  println("anonymous: veni vdi compili")
+                  m ! ("global",graph,sketch,scene)
+                  exit
+              }
+            }
+          }
+          a ! graph
+
+
+        case (step:String, graph:Graph, sketch:Sketch, scene:Scene) =>
+          println("step "+step+" of the pipeline has been updated")
+          pipeline += step -> (graph,sketch)
+          self ! "scene" -> (scene)
+
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
               
