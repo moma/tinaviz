@@ -11,6 +11,8 @@ import processing.core._
 import org.daizoru._
 import eu.tinasoft._
 
+import Color._
+
 object Main {
   def main(args: Array[String]): Unit = {
     var frame = new JFrame("TinaViz")

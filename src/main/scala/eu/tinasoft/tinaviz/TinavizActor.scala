@@ -18,7 +18,7 @@ import Actor._
 class TinavizActor extends node.util.Actor {
   
 
-  var properties : Map[String,Any] = Map(
+  val defaultProperties : Map[String,Any] = Map(
     // global real FPS
     "frameRate" -> 0,
 
@@ -31,18 +31,35 @@ class TinavizActor extends node.util.Actor {
     // global selection disk settings
     "selectionRadius" -> 10.0,
 
-    "scene" -> new Scene(),
-    "graph" -> new Graph(),
-
     // camera
     "zoom" -> 0.0,
-    "position" -> (0.0,0.0)
+    "position" -> (0.0,0.0),
+
+    //  workflow
+    "pipeline" -> List ("viewFilter", "nodeWeightFilter", "edgeWeightFilter"),
+
+    // final scene
+    "scene" -> new Scene()
   )
+
+  var properties : Map[String,Any] = defaultProperties
+
+
+  // internal states: 'needUpdate 'updating  'upToDate
+  //var state = 'upToDate
+
+  // pipeline data
+  var pipeline : Map[String,(Graph,Sketch)] = Map(
+    "global" -> (new Graph(),new Sketch()),
+    "viewFilter" -> (new Graph(),new Sketch()),
+    "nodeWeightFilter" -> (new Graph(),new Sketch()),
+    "edgeWeightFilter" -> (new Graph(),new Sketch())
+  )
+
   start
-  
+
+
   def act() {
-
-
     
     // we could eventually keep a
     //var model = new Model()
@@ -57,10 +74,20 @@ class TinavizActor extends node.util.Actor {
           //context ! 'updateNode -> value
 
 
-        case ('updated,"graph",value:Any,previous:Any) =>
-          // log("ignoring update of "+key)
-          buildScene
-          
+        case graph:Graph =>
+          val sketch = new Sketch()
+          properties = defaultProperties
+          pipeline = pipeline.map { case (k,v) => ( k,new Graph() ) }
+          pipeline += "global" -> (graph,sketch)
+          sketch.nodePositionLayer = graph.nodes.map {
+            case n => n.position
+          }.toArray
+
+          val tmp = for (node <- graph.nodes; link <- node.links)
+            yield (node.position,graph.node(link._1).position)
+          sketch.edgePositionLayer = tmp.toArray
+          self ! "scene" -> sketch.toScene
+
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
               
@@ -71,7 +98,8 @@ class TinavizActor extends node.util.Actor {
           io.Source.fromURL(new java.net.URL(url)).foreach(buf.append)
           self ! 'openString -> buf.toString
           
-         
+
+
         case key:String =>
           //if (properties.contains(k))
           reply(properties(key))
@@ -102,40 +130,6 @@ class TinavizActor extends node.util.Actor {
     
   }
 
-  
-  /**
-   * The most important function, that does everything
-   */
-  def buildScene = {
-    var s = new MutableScene()
-    val g = get[Graph]("graph")
-    //properties("graph")//.asInstance[Graph]
-    //val view : String = properties("scene.view") match { case s:String => s }
-    
-    get[String]("view") match {
-      case "macro" =>
-        g.nodes.foreach { 
-          case n =>
-            s.nodes ::= new NodeDrawing(n.position, n.size, n.color, 'Disk)
-            s.labels ::= new LabelDrawing(n.position, n.label, n.size.toInt)
-            n.links.foreach { case (id,weight) =>
-                val m = g.node(id)
-                s.edges ::= new EdgeDrawing(n.position,
-                   m.position,
-                   Maths.random(0.2,4.0),
-                   (150,150,150), // 
-                   16) // depend on the distance relative to screen (use p:PApplet to compute it?)
-            }
-        }
-        println("TinavizActor: put "+s.nodes.size+" nodes, "+s.edges.size+" edges into scene")
-    
-      case "meso" =>
-    }
-    // TODO send to spatializer
-
-    // save the scene
-    self ! "scene" -> s.toScene
-  }
   
   def get[T](key:String) : T = properties.get(key).get.asInstanceOf[T]
 

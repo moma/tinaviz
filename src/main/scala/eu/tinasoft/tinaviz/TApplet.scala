@@ -8,6 +8,7 @@ package eu.tinasoft.tinaviz
 import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 import processing.core._
+import Color._
 
 class Fonts(val p : PApplet,
             val fontName : String = "Arial",

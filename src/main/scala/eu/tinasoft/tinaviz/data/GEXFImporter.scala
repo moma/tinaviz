@@ -29,43 +29,96 @@ class GEXFImporter extends node.util.Actor {
 
           val root = xml.XML.loadString(rawXML)
 
-          var attributes : Map[String, (String,Any)] = Map.empty
+          var _attributes = Map[String, (String,Any)]()
 
           for (a <- (root \\ "attribute")) {
-            attributes += (a \ "@id" text) -> ((a \ "@title" text),
-                                               (a \ "@type" text) match {
-                case "string" => ""
-                case "float" => 0.0
-                case "double" => 0.0
-                case "integer" => 0.0
+            _attributes += (a \ "@id" text) -> ((a \ "@title" text),
+                                                (a \ "@type" text) match {
+                case "float" => 1f
+                case "double" => 1.0
+                case "integer" => 1
                 case "boolean" => false
                 case x => ""
               })
           }
 
-          for (n <- (root \\ "node")) {
-            val pos = n \\ "viz:position"
-            var attribs : Map[String,Any] = Map.empty
-            for (a <-  (n \\ "attvalue")) {
-              val attr = attributes(a \ "id" text)
-              val value =  (a \ "value" text)
-              attribs += attr._1 -> (attr._2 match {
+
+
+          def getColor(e:xml.Node) = {
+            try {
+              val c =  e \\ "viz:color"
+              ((c \ "@r" text).toInt,
+               (c \ "@g" text).toInt,
+               (c \ "@b" text).toInt)
+            } catch {
+              case x =>
+                (0,0,0)
+            }
+          }
+
+
+          def attribute(e:xml.Node) = {
+            val attr = _attributes(e \ "id" text)
+            val value =  (e \ "value" text)
+            attr._1 -> (attr._2 match {
                 case Double => value.toDouble
                 case Float => value.toFloat
                 case Int => value.toInt
                 case x => value
-                })
+              })
+          }
+
+          for (n <- (root \\ "node")) {
+            var attributes = Map[String,Any]()
+
+            val uuid = n \ "@id" text
+            val label =  try {
+              n \ "@label" text
+            } catch {
+              case x => "Node "+uuid
             }
-            g.nodes ::= new MutableNode(n \ "@id" text,
-                                        n \ "@label" text,
-                                        try { ((pos \ "@x").text.toDouble, (pos \ "@y").text.toDouble) } catch { 
-                case x => (Maths.random(0,900), Maths.random(0,500))})
+
+            val position = try {
+              (((n \\ "viz:position") \ "@x" text).toDouble,
+               ((n \\ "viz:position") \ "@y" text).toDouble)
+            } catch {
+              case x => (Maths.random(0,900), Maths.random(0,500))
+            }
+
+            val color = try {
+              (((n \\ "viz:color") \ "@r" text).toInt,
+               ((n \\ "viz:color") \ "@g" text).toInt,
+               ((n \\ "viz:color") \ "@b" text).toInt)
+            } catch {
+              case x => (0,0,0)
+            }
+
+            // add attributes
+
+            attributes += "uuid" -> uuid
+            attributes += "label" -> label
+            attributes += "color" -> color
+            attributes += "category" -> "default"
+            attributes += "weight" -> 1.0
+
+            // overload attributes
+            for (a <-  (n \\ "attvalue"))
+              attributes += attribute(a)
+
+
+            g.nodes ::= new MutableNode(uuid,
+                                        label,
+                                        position,
+                                        // (0,0,0),
+                                        attributes
+            )
           }
           for (e <- (root \\ "edge")) 
-            g.node(e \ "@source" text).addNeighbour(g.id(e \ "@target" text), ((e \ "@weight").text.toDouble))
+            g.node(e \ "@source" text).addNeighbour(g.id(e \ "@target" text),
+                                                    ((e \ "@weight").text.toDouble))
 
           println("GEXFImporter: loaded "+g.nbNodes+" nodes, "+g.nbEdges+" edges.")
-          sender ! "graph" -> g.toGraph
+          sender ! g.toGraph
           exit
 
         case graph:Graph =>
