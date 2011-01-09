@@ -5,6 +5,8 @@
 
 package eu.tinasoft.tinaviz.graph
 
+import eu.tinasoft.tinaviz.Color
+
 object MutableNode {
 
 }
@@ -13,7 +15,7 @@ case class MutableNode (
   var uuid : String,
   var label : String = "Node",
   var position : (Double,Double) = (0,0),
-  //var color : (Int,Int,Int) = (0,0,0),
+  var color : Color = new Color(0,0,0),
   //var size : (Double) = 1,
   //var category : String = "NGram",
   var attributes : Map[String,Any] =  Map.empty[String,Any],
@@ -25,7 +27,7 @@ case class MutableNode (
   def toNode = { new Node ( uuid,
                            label,
                            position,
-                           //color,
+                           color,
                            //size,
                            attributes,
                            links) }

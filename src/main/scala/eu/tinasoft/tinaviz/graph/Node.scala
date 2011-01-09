@@ -5,11 +5,13 @@
 
 package eu.tinasoft.tinaviz.graph
 
+import eu.tinasoft.tinaviz.Color
+
 class Node (
   val uuid : String,
   val label : String = "Node",
   val position : (Double,Double) = (0,0),
-  //val color : (Int,Int,Int) = (0,0,0),
+  val color : Color =  new Color(0,0,0),
   //val size : (Double) = 1,
   //val category : String = "NGram",
   val attributes : Map[String,Any] =  Map.empty[String,Any],
@@ -22,7 +24,7 @@ class Node (
   def toNode = { new Node ( uuid,
                            label,
                            position,
-                           //color,
+                           color,
                            //size,
                            attributes,
                            links) }

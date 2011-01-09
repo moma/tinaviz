@@ -82,10 +82,15 @@ class TinavizActor extends node.util.Actor {
           sketch.nodePositionLayer = graph.nodes.map {
             case n => n.position
           }.toArray
-          val tmp = for (node <- graph.nodes; link <- node.links)
+          var tmp = for (node <- graph.nodes; link <- node.links)
             yield (node.position,graph.node(link._1).position)
           sketch.edgePositionLayer = tmp.toArray
 
+          var tmp2 = for (node <- graph.nodes; link <- node.links)
+            yield node.color.blend(graph.node(link._1).color)
+          sketch.edgeColorLayer = tmp2.toArray
+
+          println("checking.. "+sketch.nodePositionLayer.size+" nodes and "+sketch.edgePositionLayer.size+ " edges")
           // save the global sketch
           pipeline += "global" -> (graph,sketch)
 

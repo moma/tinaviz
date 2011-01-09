@@ -6,6 +6,9 @@
 package eu.tinasoft.tinaviz.data
 
 
+import eu.tinasoft.tinaviz.Color
+import eu.tinasoft.tinaviz.Color._
+
 import org.daizoru._
 import eu.tinasoft._
 
@@ -63,11 +66,11 @@ class GEXFImporter extends node.util.Actor {
           nodeAttributes.foreach{ case x=> println("foudn attribute: "+x)}
 
           def attribute(e:xml.Node) = {
-            println("  - searching attribute value for \""+(e \ "@for" text)+"\", \""+(e \ "@value" text)+"\"")
+            //println("  - searching attribute value for \""+(e \ "@for" text)+"\", \""+(e \ "@value" text)+"\"")
 
             val attr = nodeAttributes(e \ "@for" text)
             val value =  (e \ "@value" text)
-            println("   '- found it: "+attr)
+            //println("   '- found it: "+attr)
             attr._1 -> (attr._2 match {
                 case Double => value.toDouble
                 case Float => value.toFloat
@@ -94,7 +97,7 @@ class GEXFImporter extends node.util.Actor {
               case x => (Maths.random(0,900), Maths.random(0,500))
             }
 
-            val color = try {
+            val color : Color = try {
               (((n \\ "viz:color") \ "@r" text).toInt,
                ((n \\ "viz:color") \ "@g" text).toInt,
                ((n \\ "viz:color") \ "@b" text).toInt)
@@ -118,6 +121,7 @@ class GEXFImporter extends node.util.Actor {
             g.nodes ::= new MutableNode(uuid,
                                         label,
                                         position,
+                                        color,
                                         // (0,0,0),
                                         attributes
             )

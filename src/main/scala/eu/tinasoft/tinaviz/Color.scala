@@ -21,5 +21,8 @@ object Color {
 }
 class Color(val r:Int=0,val g:Int=0,val b:Int=0, val a:Int=0) {
 
+  def blend(c:Color) : Color = {
+    new Color((r+c.r)/2,(g+c.g)/2,(b+c.b)/2,(a+c.a)/2)
+  }
 
 }
