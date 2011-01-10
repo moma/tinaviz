@@ -78,7 +78,7 @@ class Spatializer extends node.util.Actor {
     
   }
   
-  val GRAVITY = 100.0
+  val GRAVITY = 10.0
   /**
    * apply a force vector algorithm on the graph
    */

@@ -61,9 +61,9 @@ class Main extends TApplet with Client {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 100, screenHeight - 100, PConstants.P2D)
-    frameRate(13)
-    //noSmooth
-    smooth
+    frameRate(12)
+    noSmooth
+    //smooth
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
@@ -80,8 +80,9 @@ class Main extends TApplet with Client {
       //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
       case e:Exception =>
         tinaviz ! 'open -> new java.net.URL(
-         // "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-        "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+        //  "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
+            "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+        // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
         )
     }
   }

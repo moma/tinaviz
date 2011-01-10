@@ -20,8 +20,8 @@ class GraphGenerator () {
   var properties = Map.empty[String,Any]
   
   println("TODO pass pre-computed metrics here")
-  override def nbNodes = nodes.size
-  override def nbEdges = { var s = 0;nodes.foreach(s+= _.links.size);s } // had to hack
+  def nbNodes = nodes.size
+  def nbEdges = { var s = 0;nodes.foreach(s+= _.links.size);s } // had to hack
   
   def addNode(node:Node) = {
     var i = nodes.size

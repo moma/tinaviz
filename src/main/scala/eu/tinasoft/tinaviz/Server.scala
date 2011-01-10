@@ -83,7 +83,7 @@ class Server extends node.util.Actor {
         case ('spatialized,graph:Graph) =>
           println("received spatialized Graph, sending to sketcher "+graph.nbNodes+" nodes, "+graph.nbEdges+" edges.")
           input = graph
-          sketcher ! input
+          sketcher ! graph
           
         case 'process =>
           println("Tinaviz: doing some thread-blocking processing..")
