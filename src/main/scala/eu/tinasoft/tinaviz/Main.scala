@@ -97,7 +97,7 @@ class Main extends TApplet with Client {
     val debug = getIfPossible[Boolean]("debug")
     val pause = getIfPossible[Boolean]("pause")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
-
+    
     // drawing
     //smooth()
     

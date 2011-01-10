@@ -18,10 +18,10 @@ import tinaviz.util.Vector._
  * A Node Wrapper, to directly apply forces
  */
 object NodeForce {   
-  implicit def fromMutableNode (n:MutableNode) = new NodeForce(n)
+  implicit def fromMutableNode (n:Node) = new NodeForce(n)
   implicit def toMutableNode (nf:NodeForce) = nf.node
 }
-class NodeForce (val node:MutableNode) {
+class NodeForce (val node:Node) {
 
   
   /*
@@ -33,11 +33,11 @@ class NodeForce (val node:MutableNode) {
    node
    }
    */
-  def computeForce(source:(Double,Double),f:Double) = {
+  def computeForce(source:(Double,Double),f:Double) : (Double,Double) = {
     val dx = source._1 - node.position._1
     val dy = source._2 - node.position._2
     val d = math.sqrt(dx*dx + dy*dy)
-    println("  d: "+d)
+    //println("  d: "+d)
     if (d!=0.0) ((dx / d) * f, (dy / d) * f) else (0.0,0.0)
   }
 
@@ -65,7 +65,7 @@ class Spatializer extends node.util.Actor {
         react {
           
           case graph:Graph =>
-            println("running layout algorithm..")
+            println("running layout algorithm on "+graph.nbNodes+" ("+graph.nodes.size+") nodes..")
             val g = forceVector(graph)
             println("layout finished step")
             reply(('spatialized,g))
@@ -85,13 +85,14 @@ class Spatializer extends node.util.Actor {
    * apply a force vector algorithm on the graph
    */
   def forceVector(graph:Graph) : Graph = {
-    val g = graph:MutableGraph
+    //val g = graph:MutableGraph
     var nid = 0
-    println("Spatializer: forceVector on "+graph.nodes.size+" /  "+g.nodes.size)
-    g.nodes = graph.nodes.map {
+    println("Spatializer: forceVector on "+graph.nbNodes+" nodes")
+    
+    val nodes = graph.nodes.map {
       case node => 
-        val n = node:MutableNode // node A (current)
-        var v = n.computeForce(graph.baryCenter, GRAVITY)
+        //val n = node:MutableNode // node A (current)
+        var force : (Double,Double) = node.computeForce(graph.baryCenter, GRAVITY)
         
         // node.links.foreach {
         //case (mid,weight) =>
@@ -102,11 +103,21 @@ class Spatializer extends node.util.Actor {
         //  }
         //  m
         //  
-        println("  - pos: "+n.position+" v: "+v)
-        n.position += v
-        n
+        // println("  - pos: "+n.position+" v: "+v)
+        val xxx = node.position += force
+        node
     }
-    g:Graph
+    
+    new Graph(nodes,
+              graph.properties,
+              graph.nbNodes,
+              graph.nbEdges,
+              graph.nbSingles,
+              graph.outDegree,
+              graph.inDegree,
+              graph.extremums,
+              graph.baryCenter)
+  
   }
 
 }

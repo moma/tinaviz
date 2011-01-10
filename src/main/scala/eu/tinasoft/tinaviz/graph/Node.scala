@@ -10,10 +10,11 @@ import eu.tinasoft._
 import tinaviz.util.Color
 import tinaviz.util.Color._
 
+
 class Node (
   val uuid : String,
   val label : String = "Node",
-  val position : (Double,Double) = (0,0),
+  val _position : (Double,Double) = (0,0),
   //val velocity : (Double,Double) = (0,0),
   val color : Color =  new Color(0,0,0),
   //val size : (Double) = 1,
@@ -34,4 +35,24 @@ class Node (
     return false
   }
   
+  def position = _position
+  
+  def position_=(p:(Double,Double)) = new Node(uuid,
+             label,
+             p,
+             color,
+             attributes,
+             links,
+             inDegree,
+             outDegree)
+
+  def position_+=(p:(Double,Double)) = new Node(uuid,
+             label,
+             (position._1+p._1,position._2+p._2),
+             color,
+             attributes,
+             links,
+             inDegree,
+             outDegree)
+
 }
