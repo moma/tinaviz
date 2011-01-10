@@ -12,7 +12,6 @@ import tinaviz.util._
 import Color._
 
 import tinaviz.graph._
-import MutableGraph._
 
 import actors._
 import Actor._
@@ -72,6 +71,9 @@ class GEXF extends node.util.Actor {
 
   def load (rawXML:String) = {
     val root = xml.XML.loadString(rawXML)
+    var properties = Map(
+      "url" -> ""
+    )
     var nodeAttributes = Map[String, (String,Any)]()
     var edgeAttributes = Map[String, (String,Any)]()
     for (as <- (root \\ "attributes")) {
@@ -101,6 +103,35 @@ class GEXF extends node.util.Actor {
       }
     }
 
+    def getNode (array:Array[tinaviz.graph.Node],uuid:String) : tinaviz.graph.Node = {
+      var i = 0
+      array.foreach{
+        case node =>
+          if (node.uuid.equals(uuid)) 
+            return node
+          i += 1
+      }
+      throw new Exception("cannot find id of node "+uuid)
+    }
+    def getNodeId (array:Array[tinaviz.graph.Node],uuid:String) : Int = {
+      var i = 0
+      array.foreach{
+        case node =>
+          if (node.uuid.equals(uuid)) return i
+          i += 1
+      }
+      throw new Exception("cannot find id of node "+uuid)
+    }
+    /*
+     def getNode (array:Array[tinaviz.graph.Node],uuid:String) : Node = {
+     array.foreach { 
+     case node => 
+     if (node.uuid.equals(uuid)) return node
+     }
+     throw new Exception("cannot find node "+uuid)
+     }*/
+  
+  
     def attribute(e:xml.Node) = {
       val attr = nodeAttributes(e \ "@for" text)
       val value =  (e \ "@value" text)
@@ -111,55 +142,59 @@ class GEXF extends node.util.Actor {
           case x => value
         })
     }
-    val g = new MutableGraph()
-    for (n <- (root \\ "node")) {
-      var attributes = Map[String,Any]()
-      val uuid = n \ "@id" text
-      val label =  try {
-        n \ "@label" text
-      } catch {
-        case x => "Node "+uuid
-      }
+                    
+    var nodes = (for (n <- (root \\ "node")) yield {
+        var attributes = Map[String,Any]()
+        val uuid = n \ "@id" text
+        val label =  try {
+          n \ "@label" text
+        } catch {
+          case x => "Node "+uuid
+        }
 
-      val position = try {
-        (((n \\ "viz:position") \ "@x" text).toDouble,
-         ((n \\ "viz:position") \ "@y" text).toDouble)
-      } catch {
-        case x => (Maths.random(0,200), Maths.random(0,200))
-      }
+        val position = try {
+          (((n \\ "viz:position") \ "@x" text).toDouble,
+           ((n \\ "viz:position") \ "@y" text).toDouble)
+        } catch {
+          case x => (Maths.random(0,200), Maths.random(0,200))
+        }
 
-      /*
-       val color : Color = try {
-       (((n \\ "viz:color") \ "@r" text).toInt,
-       ((n \\ "viz:color") \ "@g" text).toInt,
-       ((n \\ "viz:color") \ "@b" text).toInt)
-       } catch {
-       case x => (0,0,0)
-       }*/
-      val color = new Color(Maths.random(0.0,1.0),
-                            Maths.random(0.8,1.0),
-                            Maths.random(0.8,1.0))
+        /*
+         val color : Color = try {
+         (((n \\ "viz:color") \ "@r" text).toInt,
+         ((n \\ "viz:color") \ "@g" text).toInt,
+         ((n \\ "viz:color") \ "@b" text).toInt)
+         } catch {
+         case x => (0,0,0)
+         }*/
+        val color = new Color(Maths.random(0.0,1.0),
+                              Maths.random(0.8,1.0),
+                              Maths.random(0.8,1.0))
     
-      attributes ++= Map (
-        "uuid" -> uuid,
-        "label" -> label,
-        "color" -> color,
-        "rating" -> 1,
-        "category" -> "default",
-        "weight" -> 1.0
-      ) ++ (for (a <- (n \\ "attvalue")) yield attribute(a))
-
-      g.nodes ::= new MutableNode(uuid,
-                                  label,
-                                  position,
-                                  color,
-                                  attributes)
+        attributes ++= Map (
+          "uuid" -> uuid,
+          "label" -> label,
+          "color" -> color,
+          "rating" -> 1,
+          "category" -> "default",
+          "weight" -> 1.0
+        ) ++ (for (a <- (n \\ "attvalue")) yield attribute(a))
+      
+        new tinaviz.graph.Node(uuid,
+                               label,
+                               position,
+                               color,
+                               attributes)
+      }).toArray
+    
+   
+    for (e <- (root \\ "edge")) {
+      val node = getNode(nodes,e \ "@source" text)
+      val nodeId = getNodeId(nodes,e \ "@source" text)
+      val node2id = getNodeId(nodes,e \ "@target" text)
+      nodes(nodeId) = node.addNeighbour(node2id,(e \ "@weight").text.toDouble)
     }
-    for (e <- (root \\ "edge"))
-      g.node(e \ "@source" text).addNeighbour(g.id(e \ "@target" text),
-                                              ((e \ "@weight").text.toDouble))
-
-    g:Graph
+    Graph.make(nodes, properties)
   }
 
   implicit def urlToString(url:java.net.URL) : String = {

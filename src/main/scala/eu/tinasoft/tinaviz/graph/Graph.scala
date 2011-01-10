@@ -10,8 +10,8 @@ import tinaviz.util.Vector
 
 object Graph {
   
-  def make(nodes:List[Node],properties:Map[String,Any]) = {
-    new Graph (nodes.toList,
+  def make(nodes:Seq[Node],properties:Map[String,Any]) = {
+    new Graph (nodes,
                properties,
                nbNodes(nodes),
                nbEdges(nodes),
@@ -22,7 +22,7 @@ object Graph {
                baryCenter(nodes))
   }
   
-  def nbSingles(nodes:List[Node]) = {
+  def nbSingles(nodes:Seq[Node]) = {
     var s = 0
     nodes.foreach { 
       case n =>
@@ -32,11 +32,11 @@ object Graph {
     s 
   }
   
-  def nbNodes(nodes:List[Node]) = nodes.size
-  def nbEdges(nodes:List[Node]) = {var s = 0;nodes.foreach(s+= _.links.size);s }
+  def nbNodes(nodes:Seq[Node]) = nodes.size
+  def nbEdges(nodes:Seq[Node]) = {var s = 0;nodes.foreach(s+= _.links.size);s }
 
 
-  def computeNodeDegree (nodes:List[Node],i:Int) : Int = {
+  def computeNodeDegree (nodes:Seq[Node],i:Int) : Int = {
     var d = 0
     nodes.foreach { case m => 
         if (m.hasLink(i)) d += 1
@@ -44,7 +44,7 @@ object Graph {
     d
   }
   
-  def outDegree(nodes:List[Node]) : (Int,Int) = {
+  def outDegree(nodes:Seq[Node]) : (Int,Int) = {
     if (nodes.size == 0) return (0,0)
     var max = Int.MinValue 
     var min = Int.MaxValue
@@ -56,7 +56,7 @@ object Graph {
     }
     (min,max)
   }
-  def inDegree(nodes:List[Node]) : (Int,Int) = {
+  def inDegree(nodes:Seq[Node]) : (Int,Int) = {
     if (nodes.size == 0) return (0,0)
     var max = Int.MinValue 
     var min = Int.MaxValue
@@ -75,9 +75,9 @@ object Graph {
     (min,max)
   }
   
-  def extremums(nodes:List[Node]) = Vector.extremums( nodes.map{case n => n.position } )
+  def extremums(nodes:Seq[Node]) = Vector.extremums( nodes.map{case n => n.position } )
 
-  def baryCenter(nodes:List[Node]) : (Double,Double) = {
+  def baryCenter(nodes:Seq[Node]) : (Double,Double) = {
     var p = (0.0,0.0)
     var N = nodes.size.toDouble
     nodes.foreach { case n => p = (p._1+n.position._1, p._2+n.position._2)}
@@ -86,7 +86,7 @@ object Graph {
   
 }
 
-class Graph (val nodes : List[Node] = List[Node](),
+class Graph (val nodes : Seq[Node] = Seq[Node](),
              val properties : Map[String,Any] = Map[String,Any](),
              val nbNodes : Int = 0,
              val nbEdges : Int = 0,

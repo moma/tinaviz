@@ -30,7 +30,9 @@ object Vector {
 
 }
 
-class Vector (val x:Double,val y:Double) {
+case class Vector (val x:Double,val y:Double) {
   def += (p:(Double,Double)) = (x+p._1,y+p._2)
   def *= (p:(Double,Double)) = (x*p._1,y*p._2)
+  def + (p:(Double,Double)) = (x+p._1,y+p._2)
+  def * (p:(Double,Double)) = (x*p._1,y*p._2)
 }

@@ -10,7 +10,6 @@ import org.daizoru._
 import eu.tinasoft._
 import tinaviz.graph._
 
-import tinaviz.graph.GraphGenerator._
 import tinaviz.util.Vector._
   
 /**
@@ -85,13 +84,13 @@ class Spatializer extends node.util.Actor {
    */
   def forceVector(graph:Graph) : Graph = {
     //val g = graph:MutableGraph
-    var nid = 0
+
     println("Spatializer: forceVector on "+graph.nbNodes+" nodes")
     
     val nodes = graph.nodes.map {
       case node => 
         //val n = node:MutableNode // node A (current)
-        var force : (Double,Double) = node.computeForce(graph.baryCenter, GRAVITY)
+        val force : (Double,Double) = node.computeForce(graph.baryCenter, GRAVITY)
         
         // node.links.foreach {
         //case (mid,weight) =>
@@ -105,7 +104,7 @@ class Spatializer extends node.util.Actor {
         // println("  - pos: "+n.position+" v: "+v)
         new Node(node.uuid,
              node.label,
-             node.position + force,
+             force + node.position,
              node.color,
              node.attributes,
              node.links,

@@ -35,4 +35,13 @@ class Node (
     return false
   }
 
+  def addNeighbour(id:Int,weight:Double) = new Node(uuid,
+                                                    label,
+                                                    position,
+                                                    color,
+                                                    attributes,
+                                                    (id,weight) :: links,
+                                                    inDegree,
+                                                    outDegree)
+
 }
