@@ -46,6 +46,7 @@ object Sketch {
 
 }
 case class Sketch (
+  var colors : Scheme = Rio,
   var background : Color =  new Color(0.0,0.0,1.0),
   var foreground : Color =  new Color(0.0,1.0,0.0),
   var labelColor : Color = new Color (0.0,1.0,0.0),
@@ -218,22 +219,22 @@ case class Sketch (
   def computeColor(node:Node) : Color = {
     try {
       node.attributes("category") match {
-        case "Document" => Samba.primary.standard
-        case "NGram" => Samba.secondary.standard
+        case "Document" => colors.primary.standard
+        case "NGram" => colors.secondary.standard
       }
     } catch {
-      case x => Samba.tertiary.standard
+      case x => colors.tertiary.standard
     }
   }
 
   def computeBorderColor(node:Node) : Color = {
     try {
       node.attributes("category") match {
-        case "Document" => Samba.primary.darker
-        case "NGram" => Samba.secondary.darker
+        case "Document" => colors.primary.darker
+        case "NGram" => colors.secondary.darker
       }
     } catch {
-      case x => Samba.tertiary.darker
+      case x => colors.tertiary.darker
     }
   }
 }

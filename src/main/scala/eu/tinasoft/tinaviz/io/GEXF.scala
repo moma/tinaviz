@@ -152,6 +152,7 @@ class GEXF extends node.util.Actor {
       g.nodes ::= new MutableNode(uuid,
                                   label,
                                   position,
+                                  (0.0,0.0),
                                   color,
                                   attributes)
     }

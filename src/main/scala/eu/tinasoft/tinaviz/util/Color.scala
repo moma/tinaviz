@@ -5,22 +5,22 @@
 
 package eu.tinasoft.tinaviz.util
 
-class ColorSet(val standard:Color,
-               val dark:Color,
-               val darker:Color,
-               val light:Color,
-               val lighter:Color) {
+class Palette(val standard:Color,
+              val dark:Color,
+              val darker:Color,
+              val light:Color,
+              val lighter:Color) {
 
 }
-class Palette(val primary:ColorSet,
-              val secondary:ColorSet,
-              val tertiary:ColorSet) {
+class Scheme(val primary:Palette,
+             val secondary:Palette,
+             val tertiary:Palette) {
   
 }
 
-object Samba extends Palette (
+object Samba extends Scheme (
   // blue
-  new ColorSet(
+  new Palette(
     new Color(.5472, .65, .78),
     new Color(.5472, .66, .60),
     new Color(.5472, .96, .52),
@@ -28,7 +28,7 @@ object Samba extends Palette (
     new Color(.5472, .48, .89)
   ),
   // yellow
-  new ColorSet(
+  new Palette(
     new Color(.13055, .91, .99),
     new Color(.13055, .68, .76),
     new Color(.13055, .97, .66),
@@ -36,7 +36,7 @@ object Samba extends Palette (
     new Color(.13055, .49, .99)
   ),
   // red
-  new ColorSet(
+  new Palette(
     new Color(.9749, .91, .97),
     new Color(.9749, .69, .74),
     new Color(.9749, .97, .64),
@@ -44,9 +44,33 @@ object Samba extends Palette (
     new Color(.9749, .50, .98)
   )
 )
+
+object Rio extends Scheme (
+  // blue
+  new Palette(
+    new Color (0.54722, 0.86, 0.79),
+    new Color (0.54722, 0.65, 0.60),
+    new Color (0.54722, 0.92, 0.52),
+    new Color (0.54722, 0.64, 0.89),
+    new Color (0.54722, 0.47, 0.89)),
+
+// yellow
+  new Palette(
+    new Color (0.13055, 0.90, 1.00),
+    new Color (0.13055, 0.68, 0.76),
+    new Color (0.13055, 0.95, 0.67),
+    new Color (0.13055, 0.67, 1.00),
+    new Color (0.13055, 0.49, 1.00)),
+  // red
+  new Palette(
+    new Color (1.0, 0.89, 97),
+    new Color (1.0, 0.68, 0.74),
+    new Color (1.0, 0.95, 0.65),
+    new Color (1.0, 0.67, 0.98),
+    new Color (1.0, 0.49, 0.98))
+)
 object Color {
-
-
+  
   // val samba = new Palette
   
   def fromRGBTuple3(c:(Double,Double,Double)) : Color  = {

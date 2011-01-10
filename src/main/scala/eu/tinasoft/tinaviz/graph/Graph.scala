@@ -6,11 +6,20 @@
 package eu.tinasoft.tinaviz.graph
 
 class Graph (val nodes : List[Node] = List[Node](),
-             val properties : Map[String,Any] = Map[String,Any]()) {
-  
-  val nbNodes = nodes.size
-  val nbEdges = { var s = 0;nodes.foreach(s+= _.links.size);s } // had to hack
-
+             val properties : Map[String,Any] = Map[String,Any](),
+             val nbNodes : Int = 0,
+             val nbEdges : Int = 0,
+             val nbSingles : Int = 0,
+             val maxNodeOutDegree : Int = 0,
+             val minNodeOutDegree : Int = 0,
+             val maxNodeInDegree : Int = 0,
+             val minNodeInDegree : Int = 0,
+             val minX : Double = 0.0,
+             val minY : Double = 0.0,
+             val maxX :Double = 0.0,
+             val maxY : Double = 0.0,
+             val baryCenter : (Double, Double) = (0.0,0.0)
+) {
   
   /**
    * Used for export to GEXF
@@ -24,7 +33,6 @@ class Graph (val nodes : List[Node] = List[Node](),
     }
     throw new Exception("cannot find id of node "+node)
   }
-  
     
   /**
    * Used for export to GEXF
@@ -41,7 +49,8 @@ class Graph (val nodes : List[Node] = List[Node](),
   
   
   def node (uuid:String) : Node = {
-    nodes.foreach { case node => 
+    nodes.foreach { 
+      case node => 
         if (node.uuid.equals(uuid)) return node
     }
     throw new Exception("cannot find node "+uuid)
@@ -52,7 +61,5 @@ class Graph (val nodes : List[Node] = List[Node](),
     if (id > nodes.size )  throw new Exception("error, cannot found node id "+id)
     return nodes(id)
   }
-  
 
-  def toGraph = new Graph(nodes, properties)
 }

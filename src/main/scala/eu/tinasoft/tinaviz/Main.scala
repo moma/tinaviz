@@ -79,7 +79,10 @@ class Main extends TApplet with Client {
       //println("Javascript exception: "+exc)
       //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
       case e:Exception =>
-        tinaviz ! 'open -> new java.net.URL("file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf")
+        tinaviz ! 'open -> new java.net.URL(
+         // "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
+        "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+        )
     }
   }
 
