@@ -10,16 +10,15 @@ import org.daizoru._
 import eu.tinasoft._
 import tinaviz.graph._
 
-import tinaviz.graph.MutableGraph._
-import tinaviz.graph.MutableNode._
+import tinaviz.graph.GraphGenerator._
 import tinaviz.util.Vector._
   
 /**
  * A Node Wrapper, to directly apply forces
  */
 object NodeForce {   
-  implicit def fromMutableNode (n:Node) = new NodeForce(n)
-  implicit def toMutableNode (nf:NodeForce) = nf.node
+  implicit def fromNode (n:Node) = new NodeForce(n)
+  implicit def toNode (nf:NodeForce) = nf.node
 }
 class NodeForce (val node:Node) {
 
@@ -104,20 +103,17 @@ class Spatializer extends node.util.Actor {
         //  m
         //  
         // println("  - pos: "+n.position+" v: "+v)
-        val xxx = node.position += force
-        node
+        new Node(node.uuid,
+             node.label,
+             node.position + force,
+             node.color,
+             node.attributes,
+             node.links,
+             node.inDegree,
+             node.outDegree)
     }
     
-    new Graph(nodes,
-              graph.properties,
-              graph.nbNodes,
-              graph.nbEdges,
-              graph.nbSingles,
-              graph.outDegree,
-              graph.inDegree,
-              graph.extremums,
-              graph.baryCenter)
-  
+     Graph.make(nodes, graph.properties)
   }
 
 }
