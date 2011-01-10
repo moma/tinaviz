@@ -14,7 +14,7 @@ class Node (
   val uuid : String,
   val label : String = "Node",
   val position : (Double,Double) = (0,0),
-  val velocity : (Double,Double) = (0,0),
+  //val velocity : (Double,Double) = (0,0),
   val color : Color =  new Color(0,0,0),
   //val size : (Double) = 1,
   //val category : String = "NGram",

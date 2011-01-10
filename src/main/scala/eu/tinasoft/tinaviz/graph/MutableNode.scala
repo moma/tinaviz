@@ -15,19 +15,19 @@ object MutableNode {
     new Node ( mn.uuid,
               mn.label,
               mn.position,
-              mn.velocity,
+              //mn.velocity,
               mn.color,
               //size,
               mn.attributes,
               mn.links,
               mn.inDegree,
-              mn.links.size) 
+              mn.outDegree) 
   }
   implicit def fromNode (n:Node) : MutableNode = {
     new MutableNode ( n.uuid,
               n.label,
               n.position,
-              n.velocity,
+              //n.velocity,
               n.color,
               //size,
               n.attributes,
@@ -40,7 +40,7 @@ case class MutableNode (
   var uuid : String,
   var label : String = "Node",
   var position : (Double,Double) = (0,0),
-  var velocity : (Double,Double) = (0,0),
+  //var velocity : (Double,Double) = (0,0),
   var color : Color = new Color(0,0,0),
   //var size : (Double) = 1,
   //var category : String = "NGram",
@@ -54,6 +54,7 @@ case class MutableNode (
   
   def addNeighbour(id:Int,weight:Double) = links ::= (id,weight)
   
+  def outDegree = links.size
   def hasLink(id:Int) : Boolean = { 
     links.foreach { 
       case (i,w) => 
