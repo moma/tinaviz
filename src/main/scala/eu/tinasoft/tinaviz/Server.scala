@@ -25,6 +25,7 @@ class Server extends node.util.Actor {
   val defaultProperties : Map[String,Any] = Map(
     // global real FPS
     "frameRate" -> 0,
+    "filter.selection" -> List.empty[String],
 
     // current view settings
     "filter.view" -> "macro",

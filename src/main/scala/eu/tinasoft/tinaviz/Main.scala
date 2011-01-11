@@ -61,7 +61,7 @@ class Main extends TApplet with Client {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 400, screenHeight - 400, PConstants.P2D)
-    frameRate(10)
+    frameRate(5)
     noSmooth
     //smooth
     colorMode(PConstants.HSB, 1.0f)

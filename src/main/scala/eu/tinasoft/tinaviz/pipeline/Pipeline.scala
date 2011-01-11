@@ -53,88 +53,79 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
 
   start
 
-  var nextState = 'layout
+  var nextState = 'output
   var cache = Map('input -> new Graph(),
-                  'category -> new Graph(),
+                  'body -> new Graph(),
                   'layout -> new Graph())
-  
   def act() {
-
-
     while(true) {
       loop {
         react {
-
           // reset
           case graph:Graph =>
             println("we can run the full graph..")
             cache += 'input -> graph
-            self ! 'category
-            
-          case 'category =>
-            nextState = 'category
-            runCategory
+            self ! 'body
+          
+          case 'body =>
+            nextState = 'body
+            cache += 'layout -> runBody
+            self ! 'layout
 
           case 'layout =>
             nextState = 'layout
-            runLayout
+            val output = runLayout
+            cache += 'layout -> output
+            actor ! 'pipelined -> output
            
             //case
           case msg => println("unknow msg: "+msg)
         }
       }
     }
-
   }
 
-  def runCategory {
-    val graph = cache('input)
-    println("running Category on "+graph.nbNodes+" nodes")
-    val CATEGORY = graph.get[String]("filter.category")
-
-    val tmp1 = (graph.nodes.filter {_.attributes("category").equals(CATEGORY)})
-    val tmp2 = tmp1.map{ 
-      case node => 
-        val links = node.links.map{case (id,weight) => (tmp1.indexOf(graph.node(id)),weight)}
-        new Node(node.uuid,
-                 node.label,
-                 node.position,
-                 node.color,
-                 node.attributes,
-                 links,
-                 node.inDegree,
-                 links.size)
-    }
+  def runMeso(graph:Graph) = {
+    val category = graph.get[String]("filter.category")
+    val selection = graph.get[List[String]]("filter.selection")
+    println("running meso on "+graph.nbNodes+" nodes")
     var i = -1
-    val tmp3 = tmp2.map{ 
-      case node => 
+    val tmp = graph.nodes.filter { 
+      case n => 
         i += 1
-        var inDegree = 0
-        tmp2.foreach { case m => 
-            if (m.hasLink(i)) inDegree += 1
+        var connected = false
+        graph.nodes.foreach {
+          case m =>
+            if (m.attributes("category").equals(category)) 
+              if (selection.contains(m.uuid)) connected = true
         }
-        inDegree
-        new Node(node.uuid,
-                 node.label,
-                 node.position,
-                 node.color,
-                 node.attributes,
-                 node.links,
-                 inDegree,
-                 node.outDegree)
+        (selection.contains(n.uuid) || connected)
     }
+    val newGraph = Graph.make(tmp, graph.properties)
+    repair(newGraph, graph)
+  }
 
-    
-    val out = Graph.make(tmp3, graph.properties)
-    cache += 'layout -> out
-    self ! 'layout
+  
+  def runMacro(graph:Graph) = {
+    val category = graph.get[String]("filter.category")
+    println("running macro on "+graph.nbNodes+" nodes")
+
+    repair(filterBy(graph,"category",category), graph)
+  }
+  
+  def runBody = {
+    val graph = cache('input)
+    graph.get[String]("filter.view") match {
+      case "macro" => runMacro(graph)
+      case any => runMeso(graph)
+    }
   }
   
 
   /**
    * apply a force vector algorithm on the graph
    */
-  def runLayout {
+  def runLayout = {
   
     val graph = cache('layout)
 
@@ -184,9 +175,48 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
                  node.outDegree)
     }
     
-    val out = Graph.make(nodes, graph.properties)
-    cache += 'layout -> out
-    actor ! 'pipelined -> out
+    Graph.make(nodes, graph.properties)
   }
 
+    
+  def repair(graph:Graph,reference:Graph) = {
+    val tmp1 = graph.nodes
+    val tmp2 = tmp1.map{ 
+      case node => 
+        val links = node.links.map{case (id,weight) => (tmp1.indexOf(reference.node(id)),weight)}
+        new Node(node.uuid,
+                 node.label,
+                 node.position,
+                 node.color,
+                 node.attributes,
+                 links,
+                 node.inDegree,
+                 links.size)
+    }
+    var i = -1
+    val tmp3 = tmp2.map{ 
+      case node => 
+        i += 1
+        var inDegree = 0
+        tmp2.foreach { case m => 
+            if (m.hasLink(i)) inDegree += 1
+        }
+        inDegree
+        new Node(node.uuid,
+                 node.label,
+                 node.position,
+                 node.color,
+                 node.attributes,
+                 node.links,
+                 inDegree,
+                 node.outDegree)
+    }
+    Graph.make(tmp3, graph.properties)
+  }
+  
+  def filterBy(graph:Graph,key:String,value:String) = {
+    repair(new Graph(graph.nodes.filter {_.attributes(key).equals(value)},
+                     graph.properties), 
+           graph)
+  }
 }
