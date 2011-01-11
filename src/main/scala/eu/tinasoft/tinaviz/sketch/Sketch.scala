@@ -221,16 +221,16 @@ case class Sketch (
     var tmpWeight = List.empty[Double]
 
     var i = -1
-    val tmpNodes = graph.get[Array[Int]]("linkIdArray") map {
+    val tmpNodes = graph.linkIdArray map {
       case links =>
         i += 1
         var _j = -1
         links foreach {
           case j =>
             _j += 1
-            val src = graph.get[(Double,Double)]("position")(i)
-            val trg = graph.get[(Double,Double)]("position")(j)
-            val weight = graph.get[Array[Double]]("weightArray")(i)(_j)
+            val src = graph position i
+            val trg = graph position j
+            val weight = graph.linkWeightArray(i)(_j)
             val color = nodeColorLayer(i).blend(nodeColorLayer(j))
             tmpPosition ::= (src,trg)
             tmpColor ::= color
