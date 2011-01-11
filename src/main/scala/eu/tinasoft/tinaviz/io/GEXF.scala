@@ -195,7 +195,8 @@ class GEXF extends node.util.Actor {
       val node2id = getNodeId(nodes,e \ "@target" text)
       nodes(nodeId) = node.addNeighbour(node2id,(e \ "@weight").text.toDouble)
     }
-    Graph.make(nodes, properties)
+    val gg = new GraphGenerator(nodes.toList, properties)
+    gg.toGraph
   }
 
   implicit def urlToString(url:java.net.URL) : String = {

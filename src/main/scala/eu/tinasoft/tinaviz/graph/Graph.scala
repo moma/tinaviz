@@ -6,6 +6,7 @@
 package eu.tinasoft.tinaviz.graph
 
 import eu.tinasoft._
+import eu.tinasoft.tinaviz.util.Color
 import tinaviz.util.Vector
 
 object Graph {
@@ -107,8 +108,23 @@ class Graph (val elements : Map[String,Array[Any]] = Map[String,Array[Any]](),
    */
   def id (uuid:String) : Int = get[String]("uuid").indexOf(uuid)
 
-  def uuid (i:Int) : String = get[String]("uuid")(i)
+  def uuid = get[String]("uuid")
+  def getUuuid (i:Int) = uuid(i)
 
   def get[T](key:String) : Array[T] = elements.get(key).get.asInstanceOf[Array[T]]
  
+  // some built-in functions
+  def linkIdArray = get[Array[Int]]("linkIdArray")
+  def linkIdSet = get[Set[Int]]("linkIdSet")
+  def linkWeightArray = get[Array[Double]]("linkWeightArray")
+  def position = get[(Double,Double)]("position")
+  def color = get[Color]("color")
+  def weight = get[Double]("weight")
+  def category = get[String]("category")
+  def selected = get[Boolean]("selected")
+  def label = get[String]("label")
+  def rate = get[Int]("rate")
+
+  def hasAnyLink(i:Int,j:Int) = hasThisLink(i,j) | hasThisLink(j,i)
+  def hasThisLink(i:Int,j:Int) = linkIdSet(i).contains(j)
 }

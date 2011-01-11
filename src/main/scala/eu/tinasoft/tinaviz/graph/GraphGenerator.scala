@@ -14,10 +14,10 @@ object GraphGenerator  {
   implicit def toGraph (g:GraphGenerator) : Graph = g.toGraph
 }
 
-class GraphGenerator () {
-  
-  var nodes = List.empty[Node]
-  var properties = Map.empty[String,Any]
+class GraphGenerator (
+  var nodes : List[Node] = List.empty[Node],
+  var properties : Map[String,Any] = Map.empty[String,Any]
+  ) {
   
   println("TODO pass pre-computed metrics here")
   def nbNodes = nodes.size
@@ -82,6 +82,20 @@ class GraphGenerator () {
 
   def toGraph = {
     //m.nodes.map { case n => Graph.computeNodeDegree(n) }
-     Graph.make(nodes, properties)
+    var elements = Map.empty[String,List[Any]]
+    nodes.foreach{
+      case n => 
+        elements("uuid") ::= n.uuid
+        elements("label") ::= n.label
+        elements("position") ::= n.position
+        elements("color") ::= n.color
+        elements("size") ::= 1.0
+        n.attributes.foreach{ case (key,value) => elements(key) ::= value }
+        elements("linkIdArray") ::= n.links.map(_._1).toArray
+        elements("linkWeightArray") ::= n.links.map(_._2).toArray
+        elements("linkSet") ::= n.links.map(_._1).toSet
+
+    }
+    Graph.make(elements.map{case (key,values) => (key,values.toArray) })
   }
 }

@@ -35,4 +35,12 @@ case class Vector (val x:Double,val y:Double) {
   def *= (p:(Double,Double)) = (x*p._1,y*p._2)
   def + (p:(Double,Double)) = (x+p._1,y+p._2)
   def * (p:(Double,Double)) = (x*p._1,y*p._2)
+
+ def computeForce(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    val d = math.sqrt(dx*dx + dy*dy)
+    //println("  d: "+d)
+    if (d!=0.0) ((dx / d) * f, (dy / d) * f) else (0.0,0.0)
+  }
 }

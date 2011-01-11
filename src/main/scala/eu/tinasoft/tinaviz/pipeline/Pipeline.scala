@@ -57,37 +57,35 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   start
 
   var nextState = 'output
-  var cache = Map('input -> new Graph(),
-                  'colors -> new Graph(),
-                  'size -> new Graph(), // size magnifier
-                  'body -> new Graph(),
-                  // TODO add colors here (this is a filter)
-                  'layout -> new Graph())
+  var graph = new Graph()
+
   def act() {
     while(true) {
       loop {
         react {
           // reset
-          case graph:Graph =>
+          case g:Graph =>
             println("we can run the full graph..")
-            cache += 'input -> graph
-            self ! 'colors
+            graph = g
+            //cache += 'input -> graph
+            //self ! 'colors
             
           case 'colors =>
-            nextState = 'colors
-            cache += 'body -> runColors
-            self ! 'body
+            //nextState = 'colors
+            //cache += 'body -> runColors
+            //self ! 'body
             
           case 'body =>
-            nextState = 'body
-            cache += 'layout -> runBody
-            self ! 'layout
+            //nextState = 'body
+            //cache += 'layout -> runBody
+            //self ! 'layout
 
           case 'layout =>
-            nextState = 'layout
-            val output = runLayout
-            cache += 'layout -> output
-            actor ! 'pipelined -> output
+            runLayout
+            //nextState = 'layout
+            //val output = runLayout
+            //cache += 'layout -> output
+            //actor ! 'pipelined -> output
            
             //case
           case msg => println("unknow msg: "+msg)
@@ -146,52 +144,27 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    * apply a force vector algorithm on the graph
    */
   def runLayout = {
-  
-    val graph = cache('layout)
-     
+
     val GRAVITY = graph.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = graph.get[Double]("layout.attraction")
     val REPULSION = graph.get[Double]("layout.repulsion")
 
-
     println("running forceVector on "+graph.nbNodes+" nodes")
     
-    var id = -1
-    val nodes = graph.nodes.map {
-      case node => 
-        id += 1
-        //val n = node:MutableNode // node A (current)
-        var force = node.computeForce(graph.baryCenter, GRAVITY)
-        
-        // for all other nodes
-        graph.nodes.foreach { 
-          case pair =>
-
-            //(1.2, 4.5) + (4.0, 1.0)
-            // link between them
-            if (pair.hasLink(id) | node.hasLink(id)) {
-              force += node.computeForce(pair.position, ATTRACTION)
+    var i = -1
+    val nodes = graph.get[(Double,Double)]("position").map {
+      case position =>
+        i += 1
+        var force = position.computeForce(GRAVITY -> graph.baryCenter)
+        graph.getLinkIdArray(i) map {
+          case j =>
+            if (graph.hasAnyLink(i,j)) {
+              force += node.computeForce(ATTRACTION -> pair.position)
             } else {
-              force += node.computeForce(pair.position, REPULSION)
+              force += node.computeForce(REPULSION -> pair.position)
             }
-             
         }
-        // val m = graph.node(mid) // node B (neighbour)
-        //  if (nid != mid) {
-            
-        //  m.force = (n.force._1,n.force._2)
-        //  }
-        //  m
-        //  
-        // println("  - pos: "+n.position+" v: "+v)
-        new Node(node.uuid,
-                 node.label,
-                 force + node.position,
-                 node.color,
-                 node.attributes,
-                 node.links,
-                 node.inDegree,
-                 node.outDegree)
+        position + force
     }
     
     Graph.make(nodes, graph.properties)

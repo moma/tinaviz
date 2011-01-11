@@ -125,7 +125,7 @@ case class Sketch (
    *
    */
   def updateNodePositions(graph:Graph) {
-    nodePositionLayer = graph.get[(Double,Double)]("position")
+    nodePositionLayer = graph.position
     updateEdgePositions(graph)
   }
 
@@ -138,8 +138,9 @@ case class Sketch (
   def updateNodeColors(graph:Graph) {
 
     var i = -1
-    nodeColorLayer = graph.get[Boolean]("selected").map { case s => i += 1
-        graph.get[String]("category")(i) match {
+    nodeColorLayer = graph.selected map {
+      case s => i += 1
+        graph category i match {
           case "Document" => 
             s match {
               case true => colors.primary.dark
@@ -154,8 +155,10 @@ case class Sketch (
     }
 
     i = -1
-    nodeBorderColorLayer = graph.get[Boolean]("selected").map{ case s => i += 1
-        graph.get[String]("category")(i) match {
+    nodeBorderColorLayer = graph.selected map {
+      case s =>
+        i += 1
+        graph category i match {
           case "Document" => 
             s match {
               case true => new Color(1.0,1.0,0.0)
@@ -178,17 +181,11 @@ case class Sketch (
    * By default, we take the node category and try to map it to
    */
   def updateNodeShapes(graph:Graph) {
-    nodeShapeLayer = graph.nodes.map {
-      case n =>
-        try {
-          n.attributes("category") match {
-            case "Document" => 'Square
-            case "NGram" => 'Disk
-          }
-        } catch {
-          case x => 'Disk
-        }
-    }.toArray
+    nodeShapeLayer = graph.category map {
+      case "Document" => 'Square
+      case "NGram" => 'Disk
+      case any => 'Square
+    }
     updateEdgeColors(graph)
   }
 
@@ -198,18 +195,7 @@ case class Sketch (
    * By default, we take the node weight and try to map it to
    */
   def updateNodeSizes(graph:Graph) {
-    nodeSizeLayer = graph.nodes.map {
-      case n =>
-        try {
-          n.attributes("weight") match {
-            case f:Float => f.toDouble
-            case i:Int => i.toDouble
-            case d:Double => d
-          }
-        } catch {
-          case x => 1.0
-        }
-    }.toArray
+    nodeSizeLayer = graph.weight
     updateEdgeColors(graph)
   }
 
@@ -219,9 +205,7 @@ case class Sketch (
    *
    */
   def updateNodeLabels(graph:Graph) {
-    nodeLabelLayer = graph.nodes.map {
-      case n => n.label
-    }.toArray
+    nodeLabelLayer = graph.label
   }
 
   /**
@@ -229,46 +213,34 @@ case class Sketch (
    *
    */
   private def updateEdgePositions(graph:Graph) {
-    var i = -1
-    val tmpNodes = graph.nodes.map{
-      case n =>
-        i += 1
-        val j = i
-        (n,j)
-    }
-    var colorTmp = List.empty[Color]
-    var t = for (nodeAndId <- tmpNodes;link <- nodeAndId._1.links)
-      yield {
-        val node = nodeAndId._1
-        val nodeId = nodeAndId._2
-        val neighbourId = link._1
-        val neighbour = graph.node(neighbourId)
-   
-        val edgeAB = (node, neighbour)
-        val edgeBA = (neighbour, node)
-        
-        val edge = {
-          // neighbour has a link in our direction
-          if (neighbour.hasLink(nodeId)) {
-            val nodeWeight = node.get[Double]("weight") 
-            val neighbourWeight = neighbour.get[Double]("weight")
-            if (nodeWeight == neighbourWeight) {
-              if (node.label > neighbour.label) edgeAB else edgeBA
-            } else {
-              if (nodeWeight > neighbourWeight) edgeAB else edgeBA
-            }
-          } else {
-            edgeAB
-          }
-        }
+    var source = -1
 
-        colorTmp ::= computeColor(node).blend(computeColor(neighbour))
-                                              
-        (edge._1.position, edge._2.position)
-      }
-     
-    edgePositionLayer = t.toArray
-    edgeColorLayer = colorTmp.toArray
+    //var tmpEdges = List.empty[((Double,Double),(Double,Double),Double,Color)]
+    var tmpPosition = List.empty[((Double,Double),(Double,Double))]
+    var tmpColor = List.empty[Color]
+    var tmpWeight = List.empty[Double]
+
+    var i = -1
+    val tmpNodes = graph.get[Array[Int]]("linkIdArray") map {
+      case links =>
+        i += 1
+        var _j = -1
+        links foreach {
+          case j =>
+            _j += 1
+            val src = graph.get[(Double,Double)]("position")(i)
+            val trg = graph.get[(Double,Double)]("position")(j)
+            val weight = graph.get[Array[Double]]("weightArray")(i)(_j)
+            val color = nodeColorLayer(i).blend(nodeColorLayer(j))
+            tmpPosition ::= (src,trg)
+            tmpColor ::= color
+            tmpWeight ::= weight
+        }
+    }
+
+    edgePositionLayer = tmpPosition.toArray
+    edgeWeightLayer = tmpWeight.toArray
+    edgeColorLayer = tmpColor.toArray
   }
 
 
@@ -277,10 +249,24 @@ case class Sketch (
    *
    */
   def updateEdgeColors(graph:Graph) {
-    var t = for (node <- graph.nodes; link <- node.links)
-      yield computeColor(node).blend(computeColor(graph.node(link._1)))
-    edgeColorLayer = t.toArray
+    var tmpColor = List.empty[Color]
+    var from = -1
+    graph.linkIdArray map {
+      case links =>
+        from += 1
+        links foreach {
+          case to => tmpColor ::= nodeColorLayer(from).blend(nodeColorLayer(to))
+        }
+    }
+    edgeColorLayer = tmpColor.toArray
   }
 
+  /**
+   * Update the edges' colors layer
+   *
+   */
+  def updateEdgeSizes(graph:Graph) {
+    edgeWeightLayer = (for (weights <- graph.linkWeightArray; weight <- weights) yield weight).toArray
+  }
 
 }
