@@ -125,9 +125,7 @@ case class Sketch (
    *
    */
   def updateNodePositions(graph:Graph) {
-    nodePositionLayer = graph.nodes.map {
-      case n => n.position
-    }.toArray
+    nodePositionLayer = graph.get[(Double,Double)]("position")
     updateEdgePositions(graph)
   }
 
@@ -138,8 +136,39 @@ case class Sketch (
    *
    */
   def updateNodeColors(graph:Graph) {
-    nodeColorLayer = graph.nodes.map { case n => computeColor(n) }.toArray
-    nodeBorderColorLayer = graph.nodes.map { case n => computeBorderColor(n) }.toArray
+
+    var i = -1
+    nodeColorLayer = graph.get[Boolean]("selected").map { case s => i += 1
+        graph.get[String]("category")(i) match {
+          case "Document" => 
+            s match {
+              case true => colors.primary.dark
+              case false => colors.primary.standard
+            }
+          case "NGram" => 
+            s match {
+              case true => colors.secondary.dark
+              case false => colors.secondary.standard
+            }
+        }
+    }
+
+    i = -1
+    nodeBorderColorLayer = graph.get[Boolean]("selected").map{ case s => i += 1
+        graph.get[String]("category")(i) match {
+          case "Document" => 
+            s match {
+              case true => new Color(1.0,1.0,0.0)
+              case false => colors.primary.darker
+            }
+          case "NGram" => 
+            s match {
+              case true => new Color(1.0,1.0,0.0)
+              case false => colors.primary.darker
+            }
+        }
+       
+    }
     updateEdgeColors(graph)
   }
 
@@ -200,12 +229,46 @@ case class Sketch (
    *
    */
   private def updateEdgePositions(graph:Graph) {
-    var t = for (node <- graph.nodes; link <- node.links)
+    var i = -1
+    val tmpNodes = graph.nodes.map{
+      case n =>
+        i += 1
+        val j = i
+        (n,j)
+    }
+    var colorTmp = List.empty[Color]
+    var t = for (nodeAndId <- tmpNodes;link <- nodeAndId._1.links)
       yield {
-        if (node)
-        (node.position,graph.node(link._1).position)
+        val node = nodeAndId._1
+        val nodeId = nodeAndId._2
+        val neighbourId = link._1
+        val neighbour = graph.node(neighbourId)
+   
+        val edgeAB = (node, neighbour)
+        val edgeBA = (neighbour, node)
+        
+        val edge = {
+          // neighbour has a link in our direction
+          if (neighbour.hasLink(nodeId)) {
+            val nodeWeight = node.get[Double]("weight") 
+            val neighbourWeight = neighbour.get[Double]("weight")
+            if (nodeWeight == neighbourWeight) {
+              if (node.label > neighbour.label) edgeAB else edgeBA
+            } else {
+              if (nodeWeight > neighbourWeight) edgeAB else edgeBA
+            }
+          } else {
+            edgeAB
+          }
+        }
+
+        colorTmp ::= computeColor(node).blend(computeColor(neighbour))
+                                              
+        (edge._1.position, edge._2.position)
       }
+     
     edgePositionLayer = t.toArray
+    edgeColorLayer = colorTmp.toArray
   }
 
 
@@ -219,40 +282,5 @@ case class Sketch (
     edgeColorLayer = t.toArray
   }
 
-  def computeColor(node:Node) : Color = {
-   // try {
-      val sel = node.get[Boolean]("selected")
-      node.get[String]("category") match {
-        case "Document" => 
-          sel match {
-            case true => colors.primary.dark
-            case false => colors.primary.standard
-          }
-        case "NGram" => 
-          sel match {
-            case true => colors.secondary.dark
-            case false => colors.secondary.standard
-          }
-      }
-    //} catch {
-    //  case x => colors.tertiary.standard
-   // }
-  }
 
-  def computeBorderColor(node:Node) : Color = {
-   // try {
-      node.get[Boolean]("selected") match {
-        case true => new Color(1.0,1.0,0.0)
-        case false => 
-          node.get[String]("category") match {
-            case "Document" => 
-              colors.primary.darker
-            case "NGram" => 
-              colors.secondary.darker
-          }
-      }
-   // } catch {
-    //  case x => colors.tertiary.darker
-   // }
-  }
 }

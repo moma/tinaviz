@@ -131,6 +131,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   }
   
   def runColors = {
+    val graph = cache('input)
     val palette = graph.get[String]("filter.palette")
     println("running meso on "+graph.nbNodes+" nodes")
     val tmp = graph.nodes.map { 

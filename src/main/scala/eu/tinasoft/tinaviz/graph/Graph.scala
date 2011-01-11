@@ -10,64 +10,66 @@ import tinaviz.util.Vector
 
 object Graph {
   
-  def make(nodes:Seq[Node],properties:Map[String,Any]) = {
-    new Graph (nodes,
-               properties,
-               nbNodes(nodes),
-               nbEdges(nodes),
-               nbSingles(nodes),
-               outDegree(nodes),
-               inDegree(nodes),
-               extremums(nodes),
-               baryCenter(nodes))
+  def get[T](elements:Map[String,Array[Any]], key:String) : T = elements.get(key).get.asInstanceOf[T]
+  
+  def make(elements:Map[String,Array[Any]]) = {
+    new Graph (elements,
+               nbNodes(elements),
+               nbEdges(elements),
+               nbSingles(elements),
+               outDegree(elements),
+               inDegree(elements),
+               extremums(elements),
+               baryCenter(elements))
   }
   
-  def nbSingles(nodes:Seq[Node]) = {
+
+  def nbSingles(elements:Map[String,Array[Any]]) = {
+    val links = elements("links").asInstanceOf[Array[List[Int]]]
     var s = 0
-    nodes.foreach { 
-      case n =>
-        if (n.links.size ==0) 
-          s += 1
-    }
+    links.foreach {  case n => if (n.size ==0) s += 1 }
     s 
   }
   
-  def nbNodes(nodes:Seq[Node]) = nodes.size
-  def nbEdges(nodes:Seq[Node]) = {var s = 0;nodes.foreach(s+= _.links.size);s }
+  def nbNodes(elements:Map[String,Array[Any]]) = elements("uuid").size
+  def nbEdges(elements:Map[String,Array[Any]]) = {
+    val links = elements("links").asInstanceOf[Array[Set[Int]]]
+    var s = 0;
+    links.foreach {  case n => s+=n.size }
+    s 
+  }
 
 
-  def computeNodeDegree (nodes:Seq[Node],i:Int) : Int = {
+  def computeNodeDegree (elements:Map[String,Array[Any]],i:Int) : Int = {
+
+    val links = elements("links").asInstanceOf[Array[Set[Int]]]
     var d = 0
-    nodes.foreach { case m => 
-        if (m.hasLink(i)) d += 1
-    }
+    links.foreach { case m => if (m.contains(i)) d+= 1 }
     d
   }
   
-  def outDegree(nodes:Seq[Node]) : (Int,Int) = {
-    if (nodes.size == 0) return (0,0)
+  def outDegree(elements:Map[String,Array[Any]]) : (Int,Int) = {
+    val links = elements("links").asInstanceOf[Array[Set[Int]]]
+    if (links.size == 0) return (0,0)
     var max = Int.MinValue 
     var min = Int.MaxValue
-    nodes.foreach { 
+    links.foreach { 
       case n =>
-        val d = n.links.size
+        val d = n.size
         if (d < min) min = d
         if (d < max) max = d
     }
     (min,max)
   }
-  def inDegree(nodes:Seq[Node]) : (Int,Int) = {
-    if (nodes.size == 0) return (0,0)
+  def inDegree(elements:Map[String,Array[Any]]) : (Int,Int) = {
+    val links = elements("links").asInstanceOf[Array[Set[Int]]]
+    if (links.size == 0) return (0,0)
     var max = Int.MinValue 
     var min = Int.MaxValue
     var i = 0
-    nodes.foreach { 
+    links.foreach { 
       case n =>
-        var d = 0
-        nodes.foreach { case m => 
-            if (m.hasLink(i)) d += 1
-        }
-        d
+        val d = computeNodeDegree(elements, i)
         if (d < min) min = d
         if (d < max) max = d
         i += 1
@@ -75,72 +77,38 @@ object Graph {
     (min,max)
   }
   
-  def extremums(nodes:Seq[Node]) = Vector.extremums( nodes.map{case n => n.position } )
+  def extremums(elements:Map[String,Array[Any]]) = Vector.extremums(
+    elements("position").asInstanceOf[Array[(Double,Double)]]
+  )
 
-  def baryCenter(nodes:Seq[Node]) : (Double,Double) = {
+  def baryCenter(elements:Map[String,Array[Any]]) : (Double,Double) = {
+    val nodes = elements("position").asInstanceOf[Array[(Double,Double)]]
     var p = (0.0,0.0)
     var N = nodes.size.toDouble
-    nodes.foreach { case n => p = (p._1+n.position._1, p._2+n.position._2)}
+    nodes.foreach { case n =>  p = (p._1+n._1, p._2+n._2) }
     if (N != 0) (p._1/N,p._2/N) else (0.0,0.0)
   }
   
 }
 
-class Graph (val nodes : Seq[Node] = Seq[Node](),
-             val properties : Map[String,Any] = Map[String,Any](),
+class Graph (val elements : Map[String,Array[Any]] = Map[String,Array[Any]](),
              val nbNodes : Int = 0,
              val nbEdges : Int = 0,
              val nbSingles : Int = 0,
              val outDegree : (Int,Int) = (0,0),
              val inDegree : (Int,Int) = (0,0),
              val extremums : ((Double,Double),(Double,Double)) = ((.0,.0),(.0,.0)),
-             val baryCenter : (Double, Double) = (0.0,0.0),
-             val revision : Int = 0
+             val baryCenter : (Double, Double) = (0.0,0.0)
 ) {
   
   
   /**
    * Used for export to GEXF
    */
-  def id (node:Node) : Int = {
-    var i = 0
-    nodes.foreach{
-      case n =>
-        if (n==node) return i
-        i += 1
-    }
-    throw new Exception("cannot find id of node "+node)
-  }
-    
-  /**
-   * Used for export to GEXF
-   */
-  def id (uuid:String) : Int = {
-    var i = 0
-    nodes.foreach{
-      case node =>
-        if (node.uuid.equals(uuid)) return i
-        i += 1
-    }
-    throw new Exception("cannot find id of node "+uuid)
-  }
-  
-  
-  def node (uuid:String) : Node = {
-    nodes.foreach { 
-      case node => 
-        if (node.uuid.equals(uuid)) return node
-    }
-    throw new Exception("cannot find node "+uuid)
-  }
-  
-  def node (id:Int) : Node = {
-    if (id < 0 )  throw new Exception("error, cannot found node id "+id)
-    if (id > nodes.size )  throw new Exception("error, cannot found node id "+id)
-    return nodes(id)
-  }
+  def id (uuid:String) : Int = get[String]("uuid").indexOf(uuid)
 
-  def get[T](key:String) : T = properties.get(key).get.asInstanceOf[T]
-  
+  def uuid (i:Int) : String = get[String]("uuid")(i)
+
+  def get[T](key:String) : Array[T] = elements.get(key).get.asInstanceOf[Array[T]]
  
 }
