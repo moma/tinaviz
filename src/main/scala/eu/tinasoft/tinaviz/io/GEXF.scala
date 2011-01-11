@@ -200,4 +200,5 @@ class GEXF extends node.util.Actor {
   implicit def urlToString(url:java.net.URL) : String = {
     val b = new StringBuilder; Source.fromURL(url).foreach(b.append); b.toString
   }
+  
 }

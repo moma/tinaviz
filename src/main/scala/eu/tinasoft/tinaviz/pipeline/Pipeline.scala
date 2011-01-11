@@ -47,28 +47,28 @@ class NodeForce (val node:Node) {
 }
 import NodeForce._
 
-object Spatializer {
-    
 
-}
-
-class Spatializer extends node.util.Actor {
+class Pipeline extends node.util.Actor {
 
   start
-  
+
+  var g = Graph()
+
   def act() {
+
 
     while(true) {
       loop {
         react {
-          
-          case graph:Graph =>
-            //println("running layout algorithm on "+graph.nbNodes+" ("+graph.nodes.size+") nodes..")
-            val g = forceVector(graph)
-            //println("layout finished step")
-            reply(('spatialized,g))
-           
 
+
+
+          case graph:Graph =>
+            g = graph
+            category
+            layout
+            reply('spatialized -> g)
+           
             //case
           case msg => println("unknow msg: "+msg)
         }
@@ -77,16 +77,20 @@ class Spatializer extends node.util.Actor {
 
     
   }
+
+  def category {
+
+  }
   
-  val GRAVITY = 1.2 // stronger means faster!
-  val ATTRACTION = 100
-  val REPULSION = - 1.4
-  
+
   /**
    * apply a force vector algorithm on the graph
    */
-  def forceVector(graph:Graph) : Graph = {
-    //val g = graph:MutableGraph
+  def layout {
+    val GRAVITY = 1.2 // stronger means faster!
+    val ATTRACTION = 100
+    val REPULSION = - 1.4
+
 
     println("running forceVector on "+graph.nbNodes+" nodes")
     
@@ -95,20 +99,19 @@ class Spatializer extends node.util.Actor {
       case node => 
         id += 1
         //val n = node:MutableNode // node A (current)
-        var force = (0.0,0.0)
-        force += node.computeForce(graph.baryCenter, GRAVITY)
+        var force = node.computeForce(graph.baryCenter, GRAVITY)
         
         // for all other nodes
         graph.nodes.foreach { 
           case pair =>
-            
+
+            //(1.2, 4.5) + (4.0, 1.0)
             // link between them
-            //if (pair.hasLink(id) | node.hasLink(id)) {
+            if (pair.hasLink(id) | node.hasLink(id)) {
               force += node.computeForce(pair.position, ATTRACTION)
-           // } else {
-              //force += node.computeForce(pair.position, REPULSION)
-           // }
-             
+            } else {
+              force += node.computeForce(pair.position, REPULSION)
+            }
              
         }
         // val m = graph.node(mid) // node B (neighbour)
@@ -120,16 +123,16 @@ class Spatializer extends node.util.Actor {
         //  
         // println("  - pos: "+n.position+" v: "+v)
         new Node(node.uuid,
-             node.label,
-             force + node.position,
-             node.color,
-             node.attributes,
-             node.links,
-             node.inDegree,
-             node.outDegree)
+                 node.label,
+                 force + node.position,
+                 node.color,
+                 node.attributes,
+                 node.links,
+                 node.inDegree,
+                 node.outDegree)
     }
     
-     Graph.make(nodes, graph.properties)
+    g = Graph.make(nodes, graph.properties)
   }
 
 }

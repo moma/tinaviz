@@ -48,7 +48,15 @@ class Server extends node.util.Actor {
 
   var properties : Map[String,Any] = defaultProperties
 
+  val sketcher = new Sketcher()
+  val spatializer  = new Spatializer()
 
+
+  var pipeline = List('category,'layout)
+  var pipelineData = List(new Graph())
+  var sync = true
+
+    
   start
 
   def act() {
@@ -56,14 +64,6 @@ class Server extends node.util.Actor {
     // internal states: 'needUpdate 'updating  'upToDate
     //var state = 'upToDate
 
-    // pipeline data
-    var input = new Graph()
-    var output = new Graph()
-
-    val sketcher = new Sketcher()
-    val spatializer  = new Spatializer()
-    
-    var doLayout = false
 
     while(true) {
       receive {
@@ -72,29 +72,36 @@ class Server extends node.util.Actor {
           //context ! 'updateNode -> value
 
           // receive a brand new graph
-        case graph:Graph =>
+        case graph:Graph => 
           //if (sender.receiver == sketcher) {
-          println("Tinaviz: loaded "+graph.nbNodes+" nodes, "+graph.nbEdges+" edges.")
+          println("PipelineOriginal "+graph.nbNodes+" nodes, "+graph.nbEdges+" edges.")
           properties = defaultProperties
-          input = graph
-          output = input
-          doLayout = true
+          pipelineData = List(graph)
+          pipeline = List('category,'layout)
+          sync = false
 
-        case ('spatialized,graph:Graph) =>
-          output = graph
-          sketcher ! output
-          doLayout = true
+        case (p:List[Symbol],graph) =>
+
+          if (point == pipeline.size) {
+            sketcher ! graph
+          }
+
+            
+
+
+        case ("frameRate", value:Any) =>
+          if (doPipeline) {
+            doPipeline = false
+            pipeline ! output
+          }
 
         case scene:Scene =>
           //println("Tinaviz: sending to screen..")
           properties += "scene" -> scene
+
+
+        case ('updated, 'nodeWeight, value:Any, previous:Any) =>
           
-        case ("frameRate", value:Any) =>
-          if (doLayout) {
-            doLayout = false
-            spatializer ! output
-          } 
-            
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
               
