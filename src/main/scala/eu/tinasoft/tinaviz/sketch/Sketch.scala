@@ -201,7 +201,10 @@ case class Sketch (
    */
   private def updateEdgePositions(graph:Graph) {
     var t = for (node <- graph.nodes; link <- node.links)
-      yield (node.position,graph.node(link._1).position)
+      yield {
+        if (node)
+        (node.position,graph.node(link._1).position)
+      }
     edgePositionLayer = t.toArray
   }
 
@@ -217,24 +220,39 @@ case class Sketch (
   }
 
   def computeColor(node:Node) : Color = {
-    try {
-      node.attributes("category") match {
-        case "Document" => colors.primary.standard
-        case "NGram" => colors.secondary.standard
+   // try {
+      val sel = node.get[Boolean]("selected")
+      node.get[String]("category") match {
+        case "Document" => 
+          sel match {
+            case true => colors.primary.dark
+            case false => colors.primary.standard
+          }
+        case "NGram" => 
+          sel match {
+            case true => colors.secondary.dark
+            case false => colors.secondary.standard
+          }
       }
-    } catch {
-      case x => colors.tertiary.standard
-    }
+    //} catch {
+    //  case x => colors.tertiary.standard
+   // }
   }
 
   def computeBorderColor(node:Node) : Color = {
-    try {
-      node.attributes("category") match {
-        case "Document" => colors.primary.darker
-        case "NGram" => colors.secondary.darker
+   // try {
+      node.get[Boolean]("selected") match {
+        case true => new Color(1.0,1.0,0.0)
+        case false => 
+          node.get[String]("category") match {
+            case "Document" => 
+              colors.primary.darker
+            case "NGram" => 
+              colors.secondary.darker
+          }
       }
-    } catch {
-      case x => colors.tertiary.darker
-    }
+   // } catch {
+    //  case x => colors.tertiary.darker
+   // }
   }
 }

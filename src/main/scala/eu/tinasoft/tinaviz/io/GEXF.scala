@@ -175,6 +175,7 @@ class GEXF extends node.util.Actor {
           "uuid" -> uuid,
           "label" -> label,
           "color" -> color,
+          "selected" -> Maths.randomBool,
           "rating" -> 1,
           "category" -> "default",
           "weight" -> 1.0

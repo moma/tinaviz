@@ -29,7 +29,7 @@ class Server extends node.util.Actor {
 
     // current view settings
     "filter.view" -> "macro",
-    "filter.category" -> "NGram",
+    "filter.category" -> "Document",
     "layout.gravity" ->  1.2, // stronger means faster!
     "layout.attraction" -> 10.0,
     "layout.repulsion" -> -1.4,

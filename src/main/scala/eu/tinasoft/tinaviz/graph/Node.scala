@@ -37,5 +37,6 @@ class Node (
                                                     Map(id->weight) ++ links,
                                                     inDegree,
                                                     outDegree)
-
+  def get[T](key:String) : T = attributes.get(key).get.asInstanceOf[T]
+  
 }

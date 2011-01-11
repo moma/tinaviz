@@ -49,13 +49,19 @@ class NodeForce (val node:Node) {
 import NodeForce._
 
 
+/**
+ * 
+ */
 class Pipeline(val actor:Actor) extends node.util.Actor {
 
   start
 
   var nextState = 'output
   var cache = Map('input -> new Graph(),
+                  'colors -> new Graph(),
+                  'size -> new Graph(), // size magnifier
                   'body -> new Graph(),
+                  // TODO add colors here (this is a filter)
                   'layout -> new Graph())
   def act() {
     while(true) {
@@ -65,8 +71,13 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
           case graph:Graph =>
             println("we can run the full graph..")
             cache += 'input -> graph
+            self ! 'colors
+            
+          case 'colors =>
+            nextState = 'colors
+            cache += 'body -> runColors
             self ! 'body
-          
+            
           case 'body =>
             nextState = 'body
             cache += 'layout -> runBody
@@ -89,10 +100,8 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     val category = graph.get[String]("filter.category")
     val selection = graph.get[List[String]]("filter.selection")
     println("running meso on "+graph.nbNodes+" nodes")
-    var i = -1
     val tmp = graph.nodes.filter { 
       case n => 
-        i += 1
         var connected = false
         graph.nodes.foreach {
           case m =>
@@ -101,8 +110,8 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
         }
         (selection.contains(n.uuid) || connected)
     }
-    val newGraph = Graph.make(tmp, graph.properties)
-    repair(newGraph, graph)
+
+    repair(Graph.make(tmp, graph.properties), graph)
   }
 
   
@@ -110,7 +119,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     val category = graph.get[String]("filter.category")
     println("running macro on "+graph.nbNodes+" nodes")
 
-    repair(filterBy(graph,"category",category), graph)
+    filterBy(graph,"category",category)
   }
   
   def runBody = {
@@ -121,6 +130,16 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     }
   }
   
+  def runColors = {
+    val palette = graph.get[String]("filter.palette")
+    println("running meso on "+graph.nbNodes+" nodes")
+    val tmp = graph.nodes.map { 
+      case n => 
+        
+    }
+
+    repair(Graph.make(tmp, graph.properties), graph)
+  }
 
   /**
    * apply a force vector algorithm on the graph
@@ -128,8 +147,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   def runLayout = {
   
     val graph = cache('layout)
-
-                      
+     
     val GRAVITY = graph.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = graph.get[Double]("layout.attraction")
     val REPULSION = graph.get[Double]("layout.repulsion")
