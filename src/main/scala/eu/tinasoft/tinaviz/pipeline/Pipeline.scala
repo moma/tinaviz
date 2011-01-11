@@ -11,7 +11,8 @@ import eu.tinasoft._
 import tinaviz.graph._
 
 import tinaviz.util.Vector._
-  
+import actors.Actor
+
 /**
  * A Node Wrapper, to directly apply forces
  */
@@ -48,12 +49,15 @@ class NodeForce (val node:Node) {
 import NodeForce._
 
 
-class Pipeline extends node.util.Actor {
+class Pipeline(val actor:Actor) extends node.util.Actor {
 
   start
 
-  var g = Graph()
-
+  var nextState = 'layout
+  var cache = Map('input -> new Graph(),
+                  'category -> new Graph(),
+                  'layout -> new Graph())
+  
   def act() {
 
 
@@ -61,13 +65,19 @@ class Pipeline extends node.util.Actor {
       loop {
         react {
 
-
-
+          // reset
           case graph:Graph =>
-            g = graph
-            category
-            layout
-            reply('spatialized -> g)
+            println("we can run the full graph..")
+            cache += 'input -> graph
+            self ! 'category
+            
+          case 'category =>
+            nextState = 'category
+            runCategory
+
+          case 'layout =>
+            nextState = 'layout
+            runLayout
            
             //case
           case msg => println("unknow msg: "+msg)
@@ -75,18 +85,24 @@ class Pipeline extends node.util.Actor {
       }
     }
 
-    
   }
 
-  def category {
-
+  def runCategory {
+    val graph = cache('input)
+    
+    cache += 'layout -> graph
+    self ! 'layout
   }
   
 
   /**
    * apply a force vector algorithm on the graph
    */
-  def layout {
+  def runLayout {
+  
+    val graph = cache('layout)
+
+                      
     val GRAVITY = 1.2 // stronger means faster!
     val ATTRACTION = 100
     val REPULSION = - 1.4
@@ -132,7 +148,9 @@ class Pipeline extends node.util.Actor {
                  node.outDegree)
     }
     
-    g = Graph.make(nodes, graph.properties)
+    val out = Graph.make(nodes, graph.properties)
+    cache += 'layout -> out
+    actor ! 'pipelined -> out
   }
 
 }

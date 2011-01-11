@@ -49,16 +49,19 @@ class Server extends node.util.Actor {
   var properties : Map[String,Any] = defaultProperties
 
   val sketcher = new Sketcher()
-  val spatializer  = new Spatializer()
+  val pipeline  = new Pipeline(this)
+  
+  var graph = new Graph()
+  var busy = true
 
-
-  var pipeline = List('category,'layout)
-  var pipelineData = List(new Graph())
-  var sync = true
-
-    
   start
 
+  def run(s:Symbol) = {
+    if (!busy) {
+      busy = true
+      pipeline ! s
+    }
+  }
   def act() {
     
     // internal states: 'needUpdate 'updating  'upToDate
@@ -72,35 +75,26 @@ class Server extends node.util.Actor {
           //context ! 'updateNode -> value
 
           // receive a brand new graph
-        case graph:Graph => 
+        case g:Graph => 
           //if (sender.receiver == sketcher) {
           println("PipelineOriginal "+graph.nbNodes+" nodes, "+graph.nbEdges+" edges.")
           properties = defaultProperties
-          pipelineData = List(graph)
-          pipeline = List('category,'layout)
-          sync = false
-
-        case (p:List[Symbol],graph) =>
-
-          if (point == pipeline.size) {
-            sketcher ! graph
-          }
-
-            
-
+          graph = g
+          pipeline ! graph
+          
 
         case ("frameRate", value:Any) =>
-          if (doPipeline) {
-            doPipeline = false
-            pipeline ! output
-          }
+          properties += "frameRate" -> value
+          run('layout)
+          
+        case ('pipelined,graph:Graph) =>
+          sketcher ! graph
 
         case scene:Scene =>
+          busy = false
           //println("Tinaviz: sending to screen..")
           properties += "scene" -> scene
 
-
-        case ('updated, 'nodeWeight, value:Any, previous:Any) =>
           
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
