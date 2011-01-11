@@ -69,8 +69,11 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             graph = g
             //cache += 'input -> graph
             //self ! 'colors
-            
+            // self
+
+
           case 'colors =>
+            // only update the color layour, not touching positions!
             //nextState = 'colors
             //cache += 'body -> runColors
             //self ! 'body
@@ -85,7 +88,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             //nextState = 'layout
             //val output = runLayout
             //cache += 'layout -> output
-            //actor ! 'pipelined -> output
+            actor ! 'pipelined -> graph
            
             //case
           case msg => println("unknow msg: "+msg)
@@ -94,121 +97,131 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     }
   }
 
-  def runMeso(graph:Graph) = {
-    val category = graph.get[String]("filter.category")
-    val selection = graph.get[List[String]]("filter.selection")
-    println("running meso on "+graph.nbNodes+" nodes")
-    val tmp = graph.nodes.filter { 
-      case n => 
-        var connected = false
-        graph.nodes.foreach {
-          case m =>
-            if (m.attributes("category").equals(category)) 
-              if (selection.contains(m.uuid)) connected = true
-        }
-        (selection.contains(n.uuid) || connected)
-    }
+  /*
+   def runMeso(graph:Graph) = {
+   val category = graph.get[String]("filter.category")
+   val selection = graph.get[List[String]]("filter.selection")
+   println("running meso on "+graph.nbNodes+" nodes")
+   val tmp = graph.nodes.filter {
+   case n =>
+   var connected = false
+   graph.nodes.foreach {
+   case m =>
+   if (m.attributes("category").equals(category))
+   if (selection.contains(m.uuid)) connected = true
+   }
+   (selection.contains(n.uuid) || connected)
+   }
 
-    repair(Graph.make(tmp, graph.properties), graph)
-  }
+   repair(Graph.make(tmp, graph.properties), graph)
+   }
+   */
 
-  
-  def runMacro(graph:Graph) = {
-    val category = graph.get[String]("filter.category")
-    println("running macro on "+graph.nbNodes+" nodes")
+  /*
+   def runMacro(graph:Graph) = {
+   val category = graph.get[String]("filter.category")
+   println("running macro on "+graph.nbNodes+" nodes")
 
-    filterBy(graph,"category",category)
-  }
+   filterBy(graph,"category",category)
+   }*/
+
+  /*
   
-  def runBody = {
-    val graph = cache('input)
-    graph.get[String]("filter.view") match {
-      case "macro" => runMacro(graph)
-      case any => runMeso(graph)
-    }
-  }
-  
-  def runColors = {
-    val graph = cache('input)
-    val palette = graph.get[String]("filter.palette")
-    println("running meso on "+graph.nbNodes+" nodes")
-    val tmp = graph.nodes.map { 
-      case n => 
+   def runBody = {
+   val graph = cache('input)
+   graph.get[String]("filter.view") match {
+   case "macro" => runMacro(graph)
+   case any => runMeso(graph)
+   }
+   }
+   */
+  /*
+   def runColors = {
+   val graph = cache('input)
+   val palette = graph.get[String]("filter.palette")
+   println("running meso on "+graph.nbNodes+" nodes")
+   val tmp = graph.nodes.map {
+   case n =>
         
-    }
+   }
 
-    repair(Graph.make(tmp, graph.properties), graph)
-  }
+   repair(Graph.make(tmp, graph.properties), graph)
+   }
+   */
+
+
 
   /**
    * apply a force vector algorithm on the graph
    */
   def runLayout = {
-
     val GRAVITY = graph.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = graph.get[Double]("layout.attraction")
     val REPULSION = graph.get[Double]("layout.repulsion")
-
     println("running forceVector on "+graph.nbNodes+" nodes")
-    
     var i = -1
-    val nodes = graph.get[(Double,Double)]("position").map {
+    val positions = graph.position map {
       case position =>
         i += 1
-        var force = position.computeForce(GRAVITY -> graph.baryCenter)
-        graph.getLinkIdArray(i) map {
+        var force = position.computeForce(GRAVITY, graph.baryCenter)
+        graph linkIdArray i map {
           case j =>
             if (graph.hasAnyLink(i,j)) {
-              force += node.computeForce(ATTRACTION -> pair.position)
+              force += position.computeForce(ATTRACTION, graph.position(j))
             } else {
-              force += node.computeForce(REPULSION -> pair.position)
+              force += position.computeForce(REPULSION, graph.position(j))
             }
         }
         position + force
     }
-    
-    Graph.make(nodes, graph.properties)
+
+    // TODO possible optimization: give some metrics
+    graph = new Graph(graph.elements + ("position" -> (positions.toArray[Any])))
   }
 
-    
-  def repair(graph:Graph,reference:Graph) = {
-    val tmp1 = graph.nodes
-    val tmp2 = tmp1.map{ 
-      case node => 
-        val links = node.links.map{case (id,weight) => (tmp1.indexOf(reference.node(id)),weight)}
-        new Node(node.uuid,
-                 node.label,
-                 node.position,
-                 node.color,
-                 node.attributes,
-                 links,
-                 node.inDegree,
-                 links.size)
-    }
-    var i = -1
-    val tmp3 = tmp2.map{ 
-      case node => 
-        i += 1
-        var inDegree = 0
-        tmp2.foreach { case m => 
-            if (m.hasLink(i)) inDegree += 1
-        }
-        inDegree
-        new Node(node.uuid,
-                 node.label,
-                 node.position,
-                 node.color,
-                 node.attributes,
-                 node.links,
-                 inDegree,
-                 node.outDegree)
-    }
-    Graph.make(tmp3, graph.properties)
-  }
-  
-  def filterBy(graph:Graph,key:String,value:String) = {
-    repair(new Graph(graph.nodes.filter {_.attributes(key).equals(value)},
-                     graph.properties), 
-           graph)
-  }
+
+  /*
+   def repair(graph:Graph,reference:Graph) = {
+   val tmp1 = graph.nodes
+   val tmp2 = tmp1.map{
+   case node =>
+   val links = node.links.map{case (id,weight) => (tmp1.indexOf(reference.node(id)),weight)}
+   new Node(node.uuid,
+   node.label,
+   node.position,
+   node.color,
+   node.attributes,
+   links,
+   node.inDegree,
+   links.size)
+   }
+   var i = -1
+   val tmp3 = tmp2.map{
+   case node =>
+   i += 1
+   var inDegree = 0
+   tmp2.foreach { case m =>
+   if (m.hasLink(i)) inDegree += 1
+   }
+   inDegree
+   new Node(node.uuid,
+   node.label,
+   node.position,
+   node.color,
+   node.attributes,
+   node.links,
+   inDegree,
+   node.outDegree)
+   }
+   Graph.make(tmp3, graph.properties)
+   }
+   */
+
+  /*
+   def filterBy(graph:Graph,key:String,value:String) = {
+   repair(new Graph(graph.nodes.filter {_.attributes(key).equals(value)},
+   graph.properties),
+   graph)
+   }
+   */
 }

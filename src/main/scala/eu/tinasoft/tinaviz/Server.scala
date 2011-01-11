@@ -83,7 +83,7 @@ class Server extends node.util.Actor {
           //if (sender.receiver == sketcher) {
           properties = defaultProperties
           graph = g
-          pipeline ! new Graph(graph.nodes, properties)
+          pipeline ! g
           
         case ("frameRate", value:Any) =>
           properties += "frameRate" -> value

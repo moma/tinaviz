@@ -106,24 +106,25 @@ class Graph (val elements : Map[String,Array[Any]] = Map[String,Array[Any]](),
   /**
    * Used for export to GEXF
    */
-  def id (uuid:String) : Int = get[String]("uuid").indexOf(uuid)
+  def id (uuid:String) : Int = uuid.indexOf(uuid)
 
-  def uuid = get[String]("uuid")
   def getUuuid (i:Int) = uuid(i)
 
-  def get[T](key:String) : Array[T] = elements.get(key).get.asInstanceOf[Array[T]]
+  def get[T](key:String) : T = elements.get(key).asInstanceOf[T]
+  def getArray[T](key:String) : Array[T] = get[Array[T]](key)
  
   // some built-in functions
-  def linkIdArray = get[Array[Int]]("linkIdArray")
-  def linkIdSet = get[Set[Int]]("linkIdSet")
-  def linkWeightArray = get[Array[Double]]("linkWeightArray")
-  def position = get[(Double,Double)]("position")
-  def color = get[Color]("color")
-  def weight = get[Double]("weight")
-  def category = get[String]("category")
-  def selected = get[Boolean]("selected")
-  def label = get[String]("label")
-  def rate = get[Int]("rate")
+  def linkIdArray = getArray[Array[Int]]("linkIdArray")
+  def linkIdSet = getArray[Set[Int]]("linkIdSet")
+  def linkWeightArray = getArray[Array[Double]]("linkWeightArray")
+  def position = getArray[(Double,Double)]("position")
+  def color = getArray[Color]("color")
+  def weight = getArray[Double]("weight")
+  def category = getArray[String]("category")
+  def selected = getArray[Boolean]("selected")
+  def label = getArray[String]("label")
+  def rate = getArray[Int]("rate")
+  def uuid = getArray[String]("uuid")
 
   def hasAnyLink(i:Int,j:Int) = hasThisLink(i,j) | hasThisLink(j,i)
   def hasThisLink(i:Int,j:Int) = linkIdSet(i).contains(j)
