@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.tinaviz.pipeline
 
 import org.daizoru._
 
@@ -63,9 +63,9 @@ class Spatializer extends node.util.Actor {
         react {
           
           case graph:Graph =>
-            println("running layout algorithm on "+graph.nbNodes+" ("+graph.nodes.size+") nodes..")
+            //println("running layout algorithm on "+graph.nbNodes+" ("+graph.nodes.size+") nodes..")
             val g = forceVector(graph)
-            println("layout finished step")
+            //println("layout finished step")
             reply(('spatialized,g))
            
 
@@ -78,22 +78,39 @@ class Spatializer extends node.util.Actor {
     
   }
   
-  val GRAVITY = 10.0
+  val GRAVITY = 1.2 // stronger means faster!
+  val ATTRACTION = 100
+  val REPULSION = - 1.4
+  
   /**
    * apply a force vector algorithm on the graph
    */
   def forceVector(graph:Graph) : Graph = {
     //val g = graph:MutableGraph
 
-    println("Spatializer: forceVector on "+graph.nbNodes+" nodes")
+    println("running forceVector on "+graph.nbNodes+" nodes")
     
+    var id = -1
     val nodes = graph.nodes.map {
       case node => 
+        id += 1
         //val n = node:MutableNode // node A (current)
-        val force : (Double,Double) = node.computeForce(graph.baryCenter, GRAVITY)
+        var force = (0.0,0.0)
+        force += node.computeForce(graph.baryCenter, GRAVITY)
         
-        // node.links.foreach {
-        //case (mid,weight) =>
+        // for all other nodes
+        graph.nodes.foreach { 
+          case pair =>
+            
+            // link between them
+            //if (pair.hasLink(id) | node.hasLink(id)) {
+              force += node.computeForce(pair.position, ATTRACTION)
+           // } else {
+              //force += node.computeForce(pair.position, REPULSION)
+           // }
+             
+             
+        }
         // val m = graph.node(mid) // node B (neighbour)
         //  if (nid != mid) {
             

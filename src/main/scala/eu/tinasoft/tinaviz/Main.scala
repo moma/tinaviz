@@ -61,7 +61,7 @@ class Main extends TApplet with Client {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 100, screenHeight - 100, PConstants.P2D)
-    frameRate(12)
+    frameRate(10)
     noSmooth
     //smooth
     colorMode(PConstants.HSB, 1.0f)
@@ -80,9 +80,10 @@ class Main extends TApplet with Client {
       //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
       case e:Exception =>
         tinaviz ! 'open -> new java.net.URL(
-        //  "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-            "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
-        // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+          //  "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
+          //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
         )
     }
   }
@@ -125,7 +126,12 @@ class Main extends TApplet with Client {
         val ptarget = screenPosition(target)
         if (isVisible(psource) || isVisible(ptarget)) {
           val powd = distance(psource, ptarget)
-          val modulator = if (width >= 10) limit(PApplet.map(powd.toFloat, 10, width, 1, 90), 1, 90) else 1
+          val modulator = 
+            if (powd >= 10 && width >= 11)
+              limit(PApplet.map(powd.toFloat, 10, width, 1, 70), 1, 70)
+          else 
+            1
+          
           setLod(modulator.toInt)
           lineColor(scene.edgeColorLayer(i))
           //lineThickness(e.weight)
@@ -157,14 +163,13 @@ class Main extends TApplet with Client {
     }
 
 
-    setLod(16)
-    lineThickness(1)
+    //setLod(16)
+    //lineThickness(0)
     setColor(scene.labelColor)
     i = 0
     scene.nodePositionLayer.foreach{
       case position =>
         val size = scene.nodeSizeLayer(i)
-        setColor(scene.nodeColorLayer(i))
         val np = screenPosition(position._1 + size,
                                 position._2 + size / Pi)
         text(scene.nodeLabelLayer(i), np._1,np._2)

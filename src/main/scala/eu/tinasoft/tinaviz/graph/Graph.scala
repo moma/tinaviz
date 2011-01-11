@@ -94,7 +94,8 @@ class Graph (val nodes : Seq[Node] = Seq[Node](),
              val outDegree : (Int,Int) = (0,0),
              val inDegree : (Int,Int) = (0,0),
              val extremums : ((Double,Double),(Double,Double)) = ((.0,.0),(.0,.0)),
-             val baryCenter : (Double, Double) = (0.0,0.0)
+             val baryCenter : (Double, Double) = (0.0,0.0),
+             val revision : Int = 0
 ) {
   
   

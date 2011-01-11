@@ -12,6 +12,7 @@ import tinaviz.io._
 import tinaviz.graph._
 import tinaviz.scene._
 import tinaviz.sketch._
+import tinaviz.pipeline._
 import Sketch._
 
 import actors._
@@ -61,6 +62,8 @@ class Server extends node.util.Actor {
 
     val sketcher = new Sketcher()
     val spatializer  = new Spatializer()
+    
+    var doLayout = false
 
     while(true) {
       receive {
@@ -74,30 +77,23 @@ class Server extends node.util.Actor {
           println("Tinaviz: loaded "+graph.nbNodes+" nodes, "+graph.nbEdges+" edges.")
           properties = defaultProperties
           input = graph
-          //self ! 'process
-          //spatializer ! graph
-            
-          //} else if (sender.receiver  == spatializer) {
-          //}
+          output = input
+          doLayout = true
 
         case ('spatialized,graph:Graph) =>
-          println("received spatialized Graph, sending to sketcher "+graph.nbNodes+" nodes, "+graph.nbEdges+" edges.")
-          input = graph
-          sketcher ! graph
-          
-        case 'process =>
-          println("Tinaviz: doing some thread-blocking processing..")
-          //output = input
-          //sketcher ! output
+          output = graph
+          sketcher ! output
+          doLayout = true
 
         case scene:Scene =>
-          println("Tinaviz: sending to screen..")
+          //println("Tinaviz: sending to screen..")
           properties += "scene" -> scene
           
-          
         case ("frameRate", value:Any) =>
-          println("received an update for frameRate "+input.nbNodes+" input nodes, "+input.nbEdges+" input edges.")
-          spatializer ! input
+          if (doLayout) {
+            doLayout = false
+            spatializer ! output
+          } 
             
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
