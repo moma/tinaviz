@@ -27,8 +27,11 @@ class Server extends node.util.Actor {
     "frameRate" -> 0,
 
     // current view settings
-    "view" -> "macro",
-    "category" -> "NGram",
+    "filter.view" -> "macro",
+    "filter.category" -> "NGram",
+    "layout.gravity" ->  1.2, // stronger means faster!
+    "layout.attraction" -> 10.0,
+    "layout.repulsion" -> -1.4,
     "pause" -> false,
     "debug" -> true,
 
@@ -51,7 +54,7 @@ class Server extends node.util.Actor {
   val sketcher = new Sketcher()
   val pipeline  = new Pipeline(this)
   
-  var graph = new Graph()
+  var graph = new Graph() // used for some stats
   var busy = true
 
   start
@@ -77,12 +80,10 @@ class Server extends node.util.Actor {
           // receive a brand new graph
         case g:Graph => 
           //if (sender.receiver == sketcher) {
-          println("PipelineOriginal "+graph.nbNodes+" nodes, "+graph.nbEdges+" edges.")
           properties = defaultProperties
           graph = g
-          pipeline ! graph
+          pipeline ! new Graph(graph.nodes, properties)
           
-
         case ("frameRate", value:Any) =>
           properties += "frameRate" -> value
           run('layout)

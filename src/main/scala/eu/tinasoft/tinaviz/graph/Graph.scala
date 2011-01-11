@@ -140,4 +140,5 @@ class Graph (val nodes : Seq[Node] = Seq[Node](),
     return nodes(id)
   }
 
+  def get[T](key:String) : T = properties.get(key).get.asInstanceOf[T]
 }
