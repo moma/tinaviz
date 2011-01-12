@@ -28,43 +28,26 @@ object Graph {
   def make(elements:Map[String,Any]) = {
     elements.foreach{case (key,value) => println(" Entry: "+key+" ("+value+")")}
     // TODO: put nbNodes, nbEdges etc.. directly inside elements
-    new Graph (elements,
-               nbNodes(elements),
-               nbEdges(elements),
-               nbSingles(elements),
-               outDegree(elements),
-               inDegree(elements),
-               extremums(elements),
-               baryCenter(elements))
+    var g = new Graph(elements)
+    g = g.computeNbSingles
+    g = g.computeNbEdges
+    g
   }
   
 
-  def nbSingles(elements:Map[String,Any]) = {
-    val links = elements("links").asInstanceOf[Array[List[Int]]]
-    var s = 0
-    links.foreach {  case n => if (n.size ==0) s += 1 }
-    s 
-  }
-  
   def nbNodes(elements:Map[String,Any]) = elements("uuid").asInstanceOf[Array[String]].size
-  def nbEdges(elements:Map[String,Any]) = {
-    val links = elements("links").asInstanceOf[Array[Set[Int]]]
-    var s = 0;
-    links.foreach {  case n => s+=n.size }
-    s 
-  }
 
 
   def computeNodeDegree (elements:Map[String,Any],i:Int) : Int = {
 
-    val links = elements("links").asInstanceOf[Array[Set[Int]]]
+    val links = elements("linkIdSet").asInstanceOf[Array[Set[Int]]]
     var d = 0
     links.foreach { case m => if (m.contains(i)) d+= 1 }
     d
   }
   
   def outDegree(elements:Map[String,Any]) : (Int,Int) = {
-    val links = elements("links").asInstanceOf[Array[Set[Int]]]
+    val links = elements("linkIdSet").asInstanceOf[Array[Set[Int]]]
     if (links.size == 0) return (0,0)
     var max = Int.MinValue 
     var min = Int.MaxValue
@@ -106,15 +89,7 @@ object Graph {
   
 }
 
-class Graph (val elements : Map[String,Any] = Map[String,Any](),
-             val nbNodes : Int = 0,
-             val nbEdges : Int = 0,
-             val nbSingles : Int = 0,
-             val outDegree : (Int,Int) = (0,0),
-             val inDegree : (Int,Int) = (0,0),
-             val extremums : ((Double,Double),(Double,Double)) = ((.0,.0),(.0,.0)),
-             val baryCenter : (Double, Double) = (0.0,0.0)
-) {
+class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   
   
   /**
@@ -185,12 +160,22 @@ class Graph (val elements : Map[String,Any] = Map[String,Any](),
         }
       }
     }
-    Graph.make(newElements)
+    new Graph (newElements)
   }
 
-  def set(kv:(String,Any)) {
-    var newElements = elements
-    newElements += kv
-    Graph.make(newElements)
+  def set(kv:(String,Any)) = new Graph (elements + kv)
+ 
+
+  def computeNbSingles = {
+    var s = 0 ; linkIdArray.foreach{ case links => if (links.size ==0) s += 1 }
+    new Graph (elements + ("nbSingles" -> s))
   }
+
+  def computeNbEdges = {
+    var s = 0 ; linkIdArray.foreach{ case links => s+= links.size }
+    new Graph (elements + ("nbEdges" -> s))
+  }
+  def computeNbNodes = new Graph (elements + ("nbNodes" -> uuid.size))
+ 
+
 }
