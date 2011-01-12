@@ -102,19 +102,6 @@ class GEXF extends node.util.Actor {
           }
       }
     }
-
-
-    
-    def getId (nodes:Seq[Map[String,Any]],uuid:String) : Int = {
-      var i = -1
-      nodes.foreach {
-        case node =>
-          i += 1
-          if (node("uuid").equals(uuid)) return i
-      }
-      throw new Exception("cannot find node "+uuid)
-    }
-  
   
     def attribute(e:xml.Node) : (String,Any) = {
       val attr = nodeAttributes(e \ "@for" text)
@@ -167,44 +154,26 @@ class GEXF extends node.util.Actor {
       for (a <- (n \\ "attvalue")) yield graph.set(id,attribute(a))
     }
 
-    val newElements = elements.map{
-      case values:Map[String,Any] =>
+    id = -1
+    for (n <- (root \\ "node")) {
+      id += 1
         var links = List.empty[Int]
         var weights = List.empty[Double]
         var set = Set.empty[Int]
-        for (e <- (root \\ "edge") if values("uuid").equals(e \ "@source" text)) {
-          val node2id = getId(elements,(e \ "@target").text)
-
+        for (e <- (root \\ "edge") if (n \ "@id" text).equals(e \ "@source" text)) {
+          val node2id = graph.id(e \ "@target" text)
           links = links ::: List(node2id)
           set = set + node2id
           weights = weights ::: List((e \ "@weight").text.toDouble)
         }
-        var newMap = values
-        newMap += "linkIdSet" -> set
-        newMap += "linkIdArray" -> links.toArray
-        newMap += "linkWeightArray" -> weights
-        newMap
+        graph.set(id, "linkIdSet" -> set.toArray)
+        graph.set(id, "linkIdArray" -> links.toArray)
+        graph.set(id, "linkWeightArray" -> weights.toArray)
     }
-    var transform = Map.empty[String,List[Any]]
-    newElements.foreach{
-      case map =>
-        map.foreach{
-          case (key,value) =>
-            if (!transform.contains(key))
-              transform += key -> List(value)
-            else
-              transform += key -> (transform(key) ::: List(value))
-        }
-    }
-    Graph.make(transform.map{
-        case (key,values) =>
-          println("transformed "+key+ " ("+values.size+" entries)")
-          (key,values.toArray)
-      })
+    graph
   }
 
   implicit def urlToString(url:java.net.URL) : String = {
     val b = new StringBuilder; Source.fromURL(url).foreach(b.append); b.toString
   }
-  
 }

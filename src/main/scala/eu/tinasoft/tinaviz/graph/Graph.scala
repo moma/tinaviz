@@ -27,6 +27,7 @@ object Graph {
    */
   def make(elements:Map[String,Any]) = {
     elements.foreach{case (key,value) => println(" Entry: "+key+" ("+value+")")}
+    // TODO: put nbNodes, nbEdges etc.. directly inside elements
     new Graph (elements,
                nbNodes(elements),
                nbEdges(elements),
@@ -45,7 +46,7 @@ object Graph {
     s 
   }
   
-  def nbNodes(elements:Map[String,Any]) = elements("uuid").size
+  def nbNodes(elements:Map[String,Any]) = elements("uuid").asInstanceOf[Array[String]].size
   def nbEdges(elements:Map[String,Any]) = {
     val links = elements("links").asInstanceOf[Array[Set[Int]]]
     var s = 0;
