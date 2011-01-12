@@ -126,8 +126,11 @@ class GEXF extends node.util.Actor {
           case x => value
         })
     }
-               
-    val elements = for (n <- (root \\ "node")) yield {
+
+    val graph = new Graph()
+    var id = -1
+    for (n <- (root \\ "node")) {
+      id += 1
 
       val uuid = n \ "@id" text
       val label =  try { n \ "@label" text } catch { case x => "Node "+uuid}
@@ -148,55 +151,56 @@ class GEXF extends node.util.Actor {
       val color = new Color(Maths.random(0.0,1.0),
                             Maths.random(0.8,1.0),
                             Maths.random(0.8,1.0))
-      val map = Map (
-        "uuid" -> uuid,
-        "label" -> label,
-        "color" -> color,
-        "selected" -> Maths.randomBool,
-        "rating" -> 1,
-        "category" -> "default",
-        "weight" -> 1.0,
-        "size" -> 1.0,
-        "position" -> position,
-        "linkIdArray" -> List.empty[Int],
-        "linkWeightArray" -> List.empty[Double],
-        "linkSet" -> Set.empty[Int]
-      ) ++ (for (a <- (n \\ "attvalue")) yield attribute(a))
-
-      map
+      graph.set(id, "uuid" -> uuid)
+      graph.set(id, "label" -> label)
+      graph.set(id, "color" -> color)
+      graph.set(id, "selected" -> Maths.randomBool)
+      graph.set(id, "rating" -> 1)
+      graph.set(id, "size" -> 1.0)
+      graph.set(id, "weight" -> 1.0)
+      graph.set(id, "category" -> "Default")
+      graph.set(id, "position" -> position)
+      graph.set(id, "position" -> position)
+      graph.set(id, "linkIdArray" -> List.empty[Int])
+      graph.set(id,"linkWeightArray" -> List.empty[Double])
+      graph.set(id, "linkSet" -> Set.empty[Int])
+      for (a <- (n \\ "attvalue")) yield graph.set(id,attribute(a))
     }
 
     val newElements = elements.map{
-        case values:Map[String,Any] =>
-          var links = List.empty[Int]
-          var weights = List.empty[Double]
-          var set = Set.empty[Int]
-          for (e <- (root \\ "edge") if values("uuid").equals(e \ "@source" text)) {
-            val node2id = getId(elements,(e \ "@target").text)
-            links = links ::: List(node2id)
-            set = set + node2id
-            weights = weights ::: List((e \ "@weight").text.toDouble)
-          }
-          var newMap = values
-          newMap += "linkIdSet" -> set
-          newMap += "linkIdArray" -> links.toArray
-          newMap += "linkWeightArray" -> weights
-          newMap
-      }
-     var transform = Map.empty[String,List[Any]]
-     newElements.foreach{
-       case map =>
-         map.foreach{
-           case (key,value) =>
-             if (!transform.contains(key))
-               transform += key -> List(value)
-             else
-               transform += key -> (transform(key) ::: List(value))
-         }
-     }
+      case values:Map[String,Any] =>
+        var links = List.empty[Int]
+        var weights = List.empty[Double]
+        var set = Set.empty[Int]
+        for (e <- (root \\ "edge") if values("uuid").equals(e \ "@source" text)) {
+          val node2id = getId(elements,(e \ "@target").text)
+
+          links = links ::: List(node2id)
+          set = set + node2id
+          weights = weights ::: List((e \ "@weight").text.toDouble)
+        }
+        var newMap = values
+        newMap += "linkIdSet" -> set
+        newMap += "linkIdArray" -> links.toArray
+        newMap += "linkWeightArray" -> weights
+        newMap
+    }
+    var transform = Map.empty[String,List[Any]]
+    newElements.foreach{
+      case map =>
+        map.foreach{
+          case (key,value) =>
+            if (!transform.contains(key))
+              transform += key -> List(value)
+            else
+              transform += key -> (transform(key) ::: List(value))
+        }
+    }
     Graph.make(transform.map{
-        case (key,values) => (key,values.toArray)
-    })
+        case (key,values) =>
+          println("transformed "+key+ " ("+values.size+" entries)")
+          (key,values.toArray)
+      })
   }
 
   implicit def urlToString(url:java.net.URL) : String = {

@@ -7,11 +7,12 @@ package eu.tinasoft.tinaviz.graph
 
 import eu.tinasoft._
 import eu.tinasoft.tinaviz.util.Color
+import scala.collection.mutable.LinkedList
 import tinaviz.util.Vector
 
 object Graph {
   
-  def get[T](elements:Map[String,Array[Any]], key:String) : T = elements.get(key).get.asInstanceOf[T]
+  def get[T](elements:Map[String,Any], key:String) : T = elements.get(key).get.asInstanceOf[T]
   
   /**
    * Should be an optimized factory
@@ -21,11 +22,11 @@ object Graph {
 
   }
 
-   /**
-    * Default, dumb factory
-    */
-  def make(elements:Map[String,Array[Any]]) = {
-    elements.foreach{case (key,value) => println(" Entry: "+key+" ("+value.size+")")}
+  /**
+   * Default, dumb factory
+   */
+  def make(elements:Map[String,Any]) = {
+    elements.foreach{case (key,value) => println(" Entry: "+key+" ("+value+")")}
     new Graph (elements,
                nbNodes(elements),
                nbEdges(elements),
@@ -37,15 +38,15 @@ object Graph {
   }
   
 
-  def nbSingles(elements:Map[String,Array[Any]]) = {
+  def nbSingles(elements:Map[String,Any]) = {
     val links = elements("links").asInstanceOf[Array[List[Int]]]
     var s = 0
     links.foreach {  case n => if (n.size ==0) s += 1 }
     s 
   }
   
-  def nbNodes(elements:Map[String,Array[Any]]) = elements("uuid").size
-  def nbEdges(elements:Map[String,Array[Any]]) = {
+  def nbNodes(elements:Map[String,Any]) = elements("uuid").size
+  def nbEdges(elements:Map[String,Any]) = {
     val links = elements("links").asInstanceOf[Array[Set[Int]]]
     var s = 0;
     links.foreach {  case n => s+=n.size }
@@ -53,7 +54,7 @@ object Graph {
   }
 
 
-  def computeNodeDegree (elements:Map[String,Array[Any]],i:Int) : Int = {
+  def computeNodeDegree (elements:Map[String,Any],i:Int) : Int = {
 
     val links = elements("links").asInstanceOf[Array[Set[Int]]]
     var d = 0
@@ -61,7 +62,7 @@ object Graph {
     d
   }
   
-  def outDegree(elements:Map[String,Array[Any]]) : (Int,Int) = {
+  def outDegree(elements:Map[String,Any]) : (Int,Int) = {
     val links = elements("links").asInstanceOf[Array[Set[Int]]]
     if (links.size == 0) return (0,0)
     var max = Int.MinValue 
@@ -74,7 +75,7 @@ object Graph {
     }
     (min,max)
   }
-  def inDegree(elements:Map[String,Array[Any]]) : (Int,Int) = {
+  def inDegree(elements:Map[String,Any]) : (Int,Int) = {
     val links = elements("links").asInstanceOf[Array[Set[Int]]]
     if (links.size == 0) return (0,0)
     var max = Int.MinValue 
@@ -90,11 +91,11 @@ object Graph {
     (min,max)
   }
   
-  def extremums(elements:Map[String,Array[Any]]) = Vector.extremums(
+  def extremums(elements:Map[String,Any]) = Vector.extremums(
     elements("position").asInstanceOf[Array[(Double,Double)]]
   )
 
-  def baryCenter(elements:Map[String,Array[Any]]) : (Double,Double) = {
+  def baryCenter(elements:Map[String,Any]) : (Double,Double) = {
     val nodes = elements("position").asInstanceOf[Array[(Double,Double)]]
     var p = (0.0,0.0)
     var N = nodes.size.toDouble
@@ -104,7 +105,7 @@ object Graph {
   
 }
 
-class Graph (val elements : Map[String,Array[Any]] = Map[String,Array[Any]](),
+class Graph (val elements : Map[String,Any] = Map[String,Any](),
              val nbNodes : Int = 0,
              val nbEdges : Int = 0,
              val nbSingles : Int = 0,
@@ -122,7 +123,7 @@ class Graph (val elements : Map[String,Array[Any]] = Map[String,Array[Any]](),
 
   def getUuuid (i:Int) = uuid(i)
 
-  def get[T](key:String) : T = elements.get(key).asInstanceOf[T]
+  def get[T](key:String) : T = elements(key).asInstanceOf[T]
   def getArray[T](key:String) : Array[T] = get[Array[T]](key)
  
   // some built-in functions
@@ -140,4 +141,55 @@ class Graph (val elements : Map[String,Array[Any]] = Map[String,Array[Any]](),
 
   def hasAnyLink(i:Int,j:Int) = hasThisLink(i,j) | hasThisLink(j,i)
   def hasThisLink(i:Int,j:Int) = linkIdSet(i).contains(j)
+
+
+  def set(id:Int,kv:(String,Any)) {
+    val k = kv._1
+
+    var newElements = elements
+    newElements += k -> {
+      if (!elements.contains(k)) {
+        kv._2 match {
+          case v:Boolean => List[Boolean](v).toArray
+          case v:Int => List[Int](v).toArray
+          case v:Double => List[Double](v).toArray
+          case v:Float => List[Float](v).toArray
+          case v:String => List[String](v).toArray
+          case v => List(v).toArray
+        }
+      }
+      else {
+        kv._2 match {
+          case v:Boolean =>
+            var m = getArray[Boolean](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List(v)).toArray
+            m
+          case v:Int =>
+            var m = getArray[Int](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List(v)).toArray
+            m
+          case v:Double =>
+            var m = getArray[Double](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List(v)).toArray
+            m
+          case v:Float =>
+            var m = getArray[Float](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List(v)).toArray
+            m
+          case v:String =>
+            var m = getArray[String](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List(v)).toArray
+            m
+          case x => throw new Exception("not implemented")
+        }
+      }
+    }
+    Graph.make(newElements)
+  }
+
+  def set(kv:(String,Any)) {
+    var newElements = elements
+    newElements += kv
+    Graph.make(newElements)
+  }
 }
