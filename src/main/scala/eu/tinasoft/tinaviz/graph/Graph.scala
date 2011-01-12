@@ -25,6 +25,7 @@ object Graph {
     * Default, dumb factory
     */
   def make(elements:Map[String,Array[Any]]) = {
+    elements.foreach{case (key,value) => println(" Entry: "+key+" ("+value.size+")")}
     new Graph (elements,
                nbNodes(elements),
                nbEdges(elements),

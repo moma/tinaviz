@@ -103,36 +103,20 @@ class GEXF extends node.util.Actor {
       }
     }
 
-    def getNode (array:Array[tinaviz.graph.Node],uuid:String) : tinaviz.graph.Node = {
-      var i = 0
-      array.foreach{
+
+    
+    def getId (nodes:Seq[Map[String,Any]],uuid:String) : Int = {
+      var i = -1
+      nodes.foreach {
         case node =>
-          if (node.uuid.equals(uuid)) 
-            return node
           i += 1
+          if (node("uuid").equals(uuid)) return i
       }
-      throw new Exception("cannot find id of node "+uuid)
+      throw new Exception("cannot find node "+uuid)
     }
-    def getNodeId (array:Array[tinaviz.graph.Node],uuid:String) : Int = {
-      var i = 0
-      array.foreach{
-        case node =>
-          if (node.uuid.equals(uuid)) return i
-          i += 1
-      }
-      throw new Exception("cannot find id of node "+uuid)
-    }
-    /*
-     def getNode (array:Array[tinaviz.graph.Node],uuid:String) : Node = {
-     array.foreach { 
-     case node => 
-     if (node.uuid.equals(uuid)) return node
-     }
-     throw new Exception("cannot find node "+uuid)
-     }*/
   
   
-    def attribute(e:xml.Node) = {
+    def attribute(e:xml.Node) : (String,Any) = {
       val attr = nodeAttributes(e \ "@for" text)
       val value =  (e \ "@value" text)
       attr._1 -> (attr._2 match {
@@ -142,61 +126,77 @@ class GEXF extends node.util.Actor {
           case x => value
         })
     }
-                    
-    var nodes = (for (n <- (root \\ "node")) yield {
-        var attributes = Map[String,Any]()
-        val uuid = n \ "@id" text
-        val label =  try {
-          n \ "@label" text
-        } catch {
-          case x => "Node "+uuid
-        }
+               
+    val elements = for (n <- (root \\ "node")) yield {
 
-        val position = try {
-          (((n \\ "viz:position") \ "@x" text).toDouble,
-           ((n \\ "viz:position") \ "@y" text).toDouble)
-        } catch {
-          case x => (Maths.random(0,200), Maths.random(0,200))
-        }
+      val uuid = n \ "@id" text
+      val label =  try { n \ "@label" text } catch { case x => "Node "+uuid}
+      val position = try {
+        (((n \\ "viz:position") \ "@x" text).toDouble,
+         ((n \\ "viz:position") \ "@y" text).toDouble)
+      } catch {
+        case x => (Maths.random(0,200), Maths.random(0,200))
+      }
+      /*
+       val color : Color = try {
+       (((n \\ "viz:color") \ "@r" text).toInt,
+       ((n \\ "viz:color") \ "@g" text).toInt,
+       ((n \\ "viz:color") \ "@b" text).toInt)
+       } catch {
+       case x => (0,0,0)
+       }*/
+      val color = new Color(Maths.random(0.0,1.0),
+                            Maths.random(0.8,1.0),
+                            Maths.random(0.8,1.0))
+      val map = Map (
+        "uuid" -> uuid,
+        "label" -> label,
+        "color" -> color,
+        "selected" -> Maths.randomBool,
+        "rating" -> 1,
+        "category" -> "default",
+        "weight" -> 1.0,
+        "size" -> 1.0,
+        "position" -> position,
+        "linkIdArray" -> List.empty[Int],
+        "linkWeightArray" -> List.empty[Double],
+        "linkSet" -> Set.empty[Int]
+      ) ++ (for (a <- (n \\ "attvalue")) yield attribute(a))
 
-        /*
-         val color : Color = try {
-         (((n \\ "viz:color") \ "@r" text).toInt,
-         ((n \\ "viz:color") \ "@g" text).toInt,
-         ((n \\ "viz:color") \ "@b" text).toInt)
-         } catch {
-         case x => (0,0,0)
-         }*/
-        val color = new Color(Maths.random(0.0,1.0),
-                              Maths.random(0.8,1.0),
-                              Maths.random(0.8,1.0))
-    
-        attributes ++= Map (
-          "uuid" -> uuid,
-          "label" -> label,
-          "color" -> color,
-          "selected" -> Maths.randomBool,
-          "rating" -> 1,
-          "category" -> "default",
-          "weight" -> 1.0
-        ) ++ (for (a <- (n \\ "attvalue")) yield attribute(a))
-      
-        new tinaviz.graph.Node(uuid,
-                               label,
-                               position,
-                               color,
-                               attributes)
-      }).toArray
-    
-   
-    for (e <- (root \\ "edge")) {
-      val node = getNode(nodes,e \ "@source" text)
-      val nodeId = getNodeId(nodes,e \ "@source" text)
-      val node2id = getNodeId(nodes,e \ "@target" text)
-      nodes(nodeId) = node.addNeighbour(node2id,(e \ "@weight").text.toDouble)
+      map
     }
-    val gg = new GraphGenerator(nodes.toList, properties)
-    gg.toGraph
+
+    val newElements = elements.map{
+        case values:Map[String,Any] =>
+          var links = List.empty[Int]
+          var weights = List.empty[Double]
+          var set = Set.empty[Int]
+          for (e <- (root \\ "edge") if values("uuid").equals(e \ "@source" text)) {
+            val node2id = getId(elements,(e \ "@target").text)
+            links = links ::: List(node2id)
+            set = set + node2id
+            weights = weights ::: List((e \ "@weight").text.toDouble)
+          }
+          var newMap = values
+          newMap += "linkIdSet" -> set
+          newMap += "linkIdArray" -> links.toArray
+          newMap += "linkWeightArray" -> weights
+          newMap
+      }
+     var transform = Map.empty[String,List[Any]]
+     newElements.foreach{
+       case map =>
+         map.foreach{
+           case (key,value) =>
+             if (!transform.contains(key))
+               transform += key -> List(value)
+             else
+               transform += key -> (transform(key) ::: List(value))
+         }
+     }
+    Graph.make(transform.map{
+        case (key,values) => (key,values.toArray)
+    })
   }
 
   implicit def urlToString(url:java.net.URL) : String = {

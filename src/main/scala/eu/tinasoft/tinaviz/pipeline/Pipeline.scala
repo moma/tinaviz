@@ -14,42 +14,6 @@ import tinaviz.util.Vector._
 import actors.Actor
 
 /**
- * A Node Wrapper, to directly apply forces
- */
-object NodeForce {   
-  implicit def fromNode (n:Node) = new NodeForce(n)
-  implicit def toNode (nf:NodeForce) = nf.node
-}
-class NodeForce (val node:Node) {
-
-  
-  /*
-   def applyForce(source:(Double,Double),f:Double) = {
-   val dx = source._1 - node.position._1
-   val dy = source._2 - node.position._2
-   val d = math.sqrt(dx*dx + dy*dy)
-   if (d!=0.0) node.velocity +=  ((dx / d) * f, (dy / d) * f)
-   node
-   }
-   */
-  def computeForce(source:(Double,Double),f:Double) : (Double,Double) = {
-    val dx = source._1 - node.position._1
-    val dy = source._2 - node.position._2
-    val d = math.sqrt(dx*dx + dy*dy)
-    //println("  d: "+d)
-    if (d!=0.0) ((dx / d) * f, (dy / d) * f) else (0.0,0.0)
-  }
-
-  /*
-   def applyVelocity(vel:(Double,Double)) = {
-   node.velocity = vel
-   }
-   */
-}
-import NodeForce._
-
-
-/**
  * 
  */
 class Pipeline(val actor:Actor) extends node.util.Actor {
