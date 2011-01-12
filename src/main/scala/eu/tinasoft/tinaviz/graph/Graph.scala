@@ -13,6 +13,17 @@ object Graph {
   
   def get[T](elements:Map[String,Array[Any]], key:String) : T = elements.get(key).get.asInstanceOf[T]
   
+  /**
+   * Should be an optimized factory
+   */
+  def makeDiff(newElements:Map[String,Array[Any]],
+               oldElements:Map[String,Array[Any]]) = {
+
+  }
+
+   /**
+    * Default, dumb factory
+    */
   def make(elements:Map[String,Array[Any]]) = {
     new Graph (elements,
                nbNodes(elements),

@@ -17,12 +17,9 @@ object GraphGenerator  {
 class GraphGenerator (
   var nodes : List[Node] = List.empty[Node],
   var properties : Map[String,Any] = Map.empty[String,Any]
-  ) {
+) {
   
-  println("TODO pass pre-computed metrics here")
-  def nbNodes = nodes.size
-  def nbEdges = { var s = 0;nodes.foreach(s+= _.links.size);s } // had to hack
-  
+
   def addNode(node:Node) = {
     var i = nodes.size
     var inDegree = 0
@@ -83,18 +80,23 @@ class GraphGenerator (
   def toGraph = {
     //m.nodes.map { case n => Graph.computeNodeDegree(n) }
     var elements = Map.empty[String,List[Any]]
+    def add(kv:(String,Any)) = {
+      if (!elements.contains(kv._1))
+        elements(kv._1) = List(kv._2)
+      else
+        elements(kv._1) ::= kv._2
+    }
     nodes.foreach{
       case n => 
-        elements("uuid") ::= n.uuid
-        elements("label") ::= n.label
-        elements("position") ::= n.position
-        elements("color") ::= n.color
-        elements("size") ::= 1.0
-        n.attributes.foreach{ case (key,value) => elements(key) ::= value }
-        elements("linkIdArray") ::= n.links.map(_._1).toArray
-        elements("linkWeightArray") ::= n.links.map(_._2).toArray
-        elements("linkSet") ::= n.links.map(_._1).toSet
-
+        add("uuid" -> n.uuid)
+        add("label" -> n.label)
+        add("position" -> n.position)
+        add("color" -> n.color)
+        add("size" -> 1.0)
+        add("linkIdArray" -> n.links.map(_._1).toArray)
+        add("linkWeightArray"->  n.links.map(_._2).toArray)
+        add("linkSet" -> n.links.map(_._1).toSet)
+        n.attributes.foreach{case kv => add(kv)}
     }
     Graph.make(elements.map{case (key,values) => (key,values.toArray) })
   }
