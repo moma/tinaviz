@@ -103,18 +103,21 @@ class GEXF extends node.util.Actor {
       }
     }
   
-    def attribute(e:xml.Node) : (String,Any) = {
+    def attribute(id:Int,e:xml.Node) : (Int,String,Any) = {
       val attr = nodeAttributes(e \ "@for" text)
       val value =  (e \ "@value" text)
-      attr._1 -> (attr._2 match {
+      val r = (id,attr._1, attr._2 match {
           case Double => value.toDouble
           case Float => value.toFloat
           case Int => value.toInt
           case x => value
         })
+
+      println(" found ttribute: "+r)
+      r
     }
 
-    val graph = new Graph()
+    var g = new Graph()
     var id = -1
     for (n <- (root \\ "node")) {
       id += 1
@@ -138,20 +141,21 @@ class GEXF extends node.util.Actor {
       val color = new Color(Maths.random(0.0,1.0),
                             Maths.random(0.8,1.0),
                             Maths.random(0.8,1.0))
-      graph.set(id, "uuid" -> uuid)
-      graph.set(id, "label" -> label)
-      graph.set(id, "color" -> color)
-      graph.set(id, "selected" -> Maths.randomBool)
-      graph.set(id, "rating" -> 1)
-      graph.set(id, "size" -> 1.0)
-      graph.set(id, "weight" -> 1.0)
-      graph.set(id, "category" -> "Default")
-      graph.set(id, "position" -> position)
-      graph.set(id, "position" -> position)
-      graph.set(id, "linkIdArray" -> List.empty[Int])
-      graph.set(id,"linkWeightArray" -> List.empty[Double])
-      graph.set(id, "linkSet" -> Set.empty[Int])
-      for (a <- (n \\ "attvalue")) yield graph.set(id,attribute(a))
+      g += (id, "uuid", uuid)
+      g += (id, "label", label)
+      g += (id, "color", color)
+      g += (id, "selected", Maths.randomBool)
+      g += (id, "rating", 1)
+      g += (id, "size", 1.0)
+      g += (id, "weight", 1.0)
+      g += (id, "category", "Default")
+      g += (id, "position", position)
+      g += (id, "linkIdArray", List.empty[Int])
+      g += (id,"linkWeightArray", List.empty[Double])
+      g += (id, "linkSet", Set.empty[Int])
+       println("I")
+      //for (a <- (n \\ "attvalue")) yield { g += attribute(id,a) }
+       println("J")
     }
 
     id = -1
@@ -161,16 +165,16 @@ class GEXF extends node.util.Actor {
         var weights = List.empty[Double]
         var set = Set.empty[Int]
         for (e <- (root \\ "edge") if (n \ "@id" text).equals(e \ "@source" text)) {
-          val node2id = graph.id(e \ "@target" text)
+          val node2id = g.id(e \ "@target" text)
           links = links ::: List(node2id)
           set = set + node2id
           weights = weights ::: List((e \ "@weight").text.toDouble)
         }
-        graph.set(id, "linkIdSet" -> set.toArray)
-        graph.set(id, "linkIdArray" -> links.toArray)
-        graph.set(id, "linkWeightArray" -> weights.toArray)
+        g += (id, "linkIdSet",set.toArray)
+        g += (id, "linkIdArray", links.toArray)
+        g += (id, "linkWeightArray", weights.toArray)
     }
-    graph
+    g.computeAll
   }
 
   implicit def urlToString(url:java.net.URL) : String = {

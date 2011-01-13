@@ -21,7 +21,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   start
 
   var nextState = 'output
-  var graph = new Graph()
+  var data = new Graph()
 
   def act() {
     while(true) {
@@ -30,7 +30,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
           // reset
           case g:Graph =>
             println("we can run the full graph..")
-            graph = g
+            data = g
             //cache += 'input -> graph
             //self ! 'colors
             // self
@@ -52,7 +52,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             //nextState = 'layout
             //val output = runLayout
             //cache += 'layout -> output
-            actor ! 'pipelined -> graph
+            actor ! 'pipelined -> data
            
             //case
           case msg => println("unknow msg: "+msg)
@@ -119,28 +119,30 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    * apply a force vector algorithm on the graph
    */
   def runLayout = {
-    val GRAVITY = graph.get[Double]("layout.gravity") // stronger means faster!
-    val ATTRACTION = graph.get[Double]("layout.attraction")
-    val REPULSION = graph.get[Double]("layout.repulsion")
-    println("running forceVector on "+graph.nbNodes+" nodes")
+    val GRAVITY = data.get[Double]("layout.gravity") // stronger means faster!
+    val ATTRACTION = data.get[Double]("layout.attraction")
+    val REPULSION = data.get[Double]("layout.repulsion")
+    val barycenter = data.get[(Double,Double)]("baryCenter")
+    val nbNodes = data.get[Int]("nbNodes")
+    println("running forceVector on "+nbNodes+" nodes")
     var i = -1
-    val positions = graph.position map {
+    val positions = data.position map {
       case position =>
         i += 1
-        var force = position.computeForce(GRAVITY, graph.baryCenter)
-        graph linkIdArray i map {
+        var force = position.computeForce(GRAVITY, barycenter)
+        data linkIdArray i map {
           case j =>
-            if (graph.hasAnyLink(i,j)) {
-              force += position.computeForce(ATTRACTION, graph.position(j))
+            if (data.hasAnyLink(i,j)) {
+              force += position.computeForce(ATTRACTION, data position j)
             } else {
-              force += position.computeForce(REPULSION, graph.position(j))
+              force += position.computeForce(REPULSION, data position j)
             }
         }
         position + force
     }
 
     // TODO possible optimization: give some metrics
-    graph = new Graph(graph.elements + ("position" -> (positions.toArray[Any])))
+    data = new Graph(data.elements + ("position" -> (positions.toArray[Any])))
   }
 
 
