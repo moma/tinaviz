@@ -232,9 +232,11 @@ case class Sketch (
     var tmpColor = List.empty[Color]
     var tmpWeight = List.empty[Double]
 
+    println("updateEdgePositions of "+graph)
     var i = -1
     val tmpNodes = graph.linkIdArray map {
       case links =>
+        println("  '-- drawing ("+links.size+") links of "+graph)
         i += 1
         var _j = -1
         links foreach {
@@ -243,7 +245,9 @@ case class Sketch (
             val src = graph position i
             val trg = graph position j
             val weight = graph.linkWeightArray(i)(_j)
-            val color = nodeColorLayer(i).blend(nodeColorLayer(j))
+           // val color = nodeColorLayer(i).blend(nodeColorLayer(j))
+            val color = new Color(0.0,0.0,0.0)
+            println("ARC "+(src,trg))
             tmpPosition ::= (src,trg)
             tmpColor ::= color
             tmpWeight ::= weight

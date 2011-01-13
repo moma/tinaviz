@@ -82,10 +82,11 @@ class GEXF extends node.util.Actor {
           for (a <- (as \\ "attribute")) {
             nodeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
                                                    (a \ "@type" text) match {
-                case "float" => 1f
+                case "float" => 1.0
                 case "double" => 1.0
                 case "integer" => 1
                 case "boolean" => false
+                case "string" => ""
                 case x => ""
               })
           }
@@ -93,10 +94,11 @@ class GEXF extends node.util.Actor {
           for (a <- (as \\ "attribute")) {
             edgeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
                                                    (a \ "@type" text) match {
-                case "float" => 1f
+                case "float" => 1.0
                 case "double" => 1.0
                 case "integer" => 1
                 case "boolean" => false
+                case "string" => ""
                 case x => ""
               })
           }
@@ -108,7 +110,7 @@ class GEXF extends node.util.Actor {
       val value =  (e \ "@value" text)
       (attr._1, attr._2 match {
           case Double => value.toDouble
-          case Float => value.toFloat
+          case Float => value.toDouble
           case Int => value.toInt
           case x => value
         })
@@ -162,18 +164,26 @@ class GEXF extends node.util.Actor {
         //g += (id,res._1, res._2)
       }
     }
+   
+   // for
     for (e <- (root \\ "edge")) {
-      val node1id = g.id(e \ "@source" text)
-      val node2id = g.id(e \ "@target" text)
-      if (!g.uuid(node1id).equals(g.uuid(node2id))) {
+      val node1uuid = e \ "@source" text
+      val node2uuid = e \ "@target" text
+      
+      if (!node1uuid.equals(node2uuid)) {
+      val node1id = g.id(node1uuid)
+      val node2id = g.id(node2uuid)
         g += (id, "linkIdArray", g.getArray[List[Int]]("linkIdArray")(node1id) ::: List(node2id))
-        g += (id, "linkIdSet", g.getArray[Set[Int]]("linkIdSet")(node1id) + node2id)
+        g += (id, "linkIdSet", g.getArray[Set[Int]]("linkIdSet")(node1id) ++ Set(node2id))
         g += (id, "linkWeightArray", g.getArray[List[Double]]("linkWeightArray")(node1id) ::: List((e \ "@weight").text.toDouble))
       }
     }
+    println("added "+g.getArray[List[Int]]("linkIdArray").size+" nodes with edges")
+    g.getArray[List[Int]]("linkIdArray").foreach{ case links => println("x: "+links.size)}
     g += "linkIdArray" -> g.getArray[List[Int]]("linkIdArray").map(_.toArray)
     g += "linkWeightArray" -> g.getArray[List[Double]]("linkWeightArray").map(_.toArray)
     g.computeAll
+
   }
 
   implicit def urlToString(url:java.net.URL) : String = {

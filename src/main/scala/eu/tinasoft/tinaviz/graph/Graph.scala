@@ -47,7 +47,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   /**
    * Used for export to GEXF
    */
-  def id (uuid:String) : Int = uuid.indexOf(uuid)
+  def id (_uuid:String) : Int = uuid.indexOf(_uuid)
 
   def getUuuid (i:Int) = uuid(i)
 
