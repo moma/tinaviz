@@ -108,19 +108,25 @@ class GEXF extends node.util.Actor {
     def attribute(e:xml.Node) : (String,Any) = {
       val attr = nodeAttributes(e \ "@for" text)
       val value =  (e \ "@value" text)
-      (attr._1, attr._2 match {
-          case Double => value.toDouble
-          case Float => value.toDouble
-          case Int => value.toInt
+      val r = (attr._1, attr._2 match {
+          case x:Double => value.toDouble
+          case x:Float => value.toDouble
+          case x:Int => value.toInt
+          case x:Boolean => value.toBoolean
+          case x:String => value.toString
           case x => value
         })
+      
+     // println("ATTRIB ="+attr+" = "+r)
+
+      r
     }
 
     var g = new Graph(Map("filter.view" -> "macro",
                           "filter.category" -> "Document",
-                          "layout.gravity" ->  1.2, // stronger means faster!
-                          "layout.attraction" -> 10.0,
-                          "layout.repulsion" -> -1.4))
+                          "layout.gravity" ->  1.1, // stronger means faster!
+                          "layout.attraction" -> 1.01,
+                          "layout.repulsion" -> 1.5))
 
     var id = -1
     for (n <- (root \\ "node")) {
@@ -161,7 +167,7 @@ class GEXF extends node.util.Actor {
       for (a <- (n \\ "attvalue")) yield {
         val res = attribute(a)
         // g += attribute(id,a)
-        //g += (id,res._1, res._2)
+      g += (id, res._1, res._2)
       }
     }
    
@@ -178,7 +184,7 @@ class GEXF extends node.util.Actor {
         g += (node1id, "linkWeightArray", g.getArray[List[Double]]("linkWeightArray")(node1id) ::: List((e \ "@weight").text.toDouble))
       }
     }
-    println("added "+g.getArray[List[Int]]("linkIdArray").size+" nodes with edges")
+    //println("added "+g.getArray[List[Int]]("linkIdArray").size+" nodes with edges")
     g += "linkIdArray" -> g.getArray[List[Int]]("linkIdArray").map(_.toArray)
     g += "linkWeightArray" -> g.getArray[List[Double]]("linkWeightArray").map(_.toArray)
     g.computeAll

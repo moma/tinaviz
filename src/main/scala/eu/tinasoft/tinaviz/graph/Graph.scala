@@ -66,6 +66,8 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   def label = getArray[String]("label")
   def rate = getArray[Int]("rate")
   def uuid = getArray[String]("uuid")
+  def inDegree = getArray[Int]("inDegree")
+  def outDegree = getArray[Int]("outDegree")
 
   def hasAnyLink(i:Int,j:Int) = hasThisLink(i,j) | hasThisLink(j,i)
   def hasThisLink(i:Int,j:Int) = linkIdSet(i).contains(j)
@@ -197,6 +199,25 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
    }*/
 
   def computeOutDegree : Graph = {
+    val _outDegree = linkIdSet.map { case n => n.size }
+    new Graph(elements ++ Map[String,Any]("outDegree" -> _outDegree))
+  }
+
+  def computeInDegree : Graph = {
+
+    var i = -1
+    val _inDegree = uuid.map {
+      case n =>
+        i += 1
+        var d = 0
+        linkIdSet.foreach {
+          case m=> if (m.contains(i)) d+= 1
+        }
+        d
+    }
+    new Graph(elements ++ Map[String,Any]("inDegree" -> _inDegree))
+  }
+  def computeOutDegreeExtremums : Graph = {
     if (linkIdSet.size == 0) 
       return new Graph(elements ++ Map[String,Any]("minOutDegree" -> 0,
                                                    "maxOutDegree" -> 0))
@@ -211,7 +232,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
     new Graph(elements ++ Map[String,Any]("minOutDegree" -> min,
                                           "maxOutDegree" -> max))
   }
-  def computeInDegree : Graph = {
+  def computeInDegreeExtremums : Graph = {
     if (linkIdSet.size == 0)
       return new Graph(elements ++ Map[String,Any]("minOutDegree" -> 0,
                                                    "maxOutDegree" -> 0))

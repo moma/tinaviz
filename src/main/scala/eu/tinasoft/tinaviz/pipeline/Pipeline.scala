@@ -29,7 +29,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
         react {
           // reset
           case g:Graph =>
-            println("we can run the full graph..")
+            //println("we can run the full graph..")
             data = g
             //cache += 'input -> graph
             //self ! 'colors
@@ -48,12 +48,12 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             //self ! 'layout
 
           case 'layout =>
-            println("running layout")
+            // println("running layout")
             runLayout
             //nextState = 'layout
             //val output = runLayout
             //cache += 'layout -> output
-            println("sending data back to the actor")
+            //println("sending data back to the actor")
             actor ! 'pipelined -> data
            
             //case
@@ -121,26 +121,37 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    * apply a force vector algorithm on the graph
    */
   def runLayout = {
-    val GRAVITY = data.get[Double]("layout.gravity") // stronger means faster!
-    val ATTRACTION = data.get[Double]("layout.attraction")
-    val REPULSION = data.get[Double]("layout.repulsion")
-    val barycenter = data.get[(Double,Double)]("baryCenter")
     val nbNodes = data.get[Int]("nbNodes")
-    println("running forceVector on "+nbNodes+" nodes")
+    val barycenter = data.get[(Double,Double)]("baryCenter")
+
+    val GRAVITY = data.get[Double]("layout.gravity")// stronger means faster!
+    val ATTRACTION = data.get[Double]("layout.attraction")
+    val REPULSION = data.get[Double]("layout.repulsion")// (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
+
+
+    //println("running forceVector on "+nbNodes+" nodes")
     var i = -1
     val positions = data.position map {
-      case position =>
+      case p1 =>
         i += 1
-        var force = position.computeForce(GRAVITY, barycenter)
-        data linkIdArray i map {
-          case j =>
-            if (data.hasAnyLink(i,j)) {
-              force += position.computeForce(ATTRACTION, data position j)
+        var force = (0.0,0.0)
+        force = p1.computeForce(GRAVITY, barycenter)
+        var j = -1
+        data.position map {
+          case p2 =>
+            j += 1
+            val p2inDegree = data inDegree j
+            val p2outDegree = data outDegree j
+            // todo: attract less if too close (will work for both gravity and node attraction)
+
+             if (data.hasAnyLink(i,j)) {
+            force += p1.computeForce(ATTRACTION, p2)
             } else {
-              force += position.computeForce(REPULSION, data position j)
+              force -= p1.computeForceLimiter(REPULSION, p2)
             }
+
         }
-        position + force
+        p1 + force
     }
 
     // TODO possible optimization: give some metrics
@@ -165,31 +176,31 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    }
    var i = -1
    val tmp3 = tmp2.map{
-   case node =>
-   i += 1
-   var inDegree = 0
-   tmp2.foreach { case m =>
-   if (m.hasLink(i)) inDegree += 1
-   }
-   inDegree
-   new Node(node.uuid,
-   node.label,
-   node.position,
-   node.color,
-   node.attributes,
-   node.links,
-   inDegree,
-   node.outDegree)
-   }
+      case node =>
+        i += 1
+        var inDegree = 0
+        tmp2.foreach { case m =>
+            if (m.hasLink(i)) inDegree += 1
+        }
+        inDegree
+        new Node(node.uuid,
+                 node.label,
+                 node.position,
+                 node.color,
+                 node.attributes,
+                 node.links,
+                 inDegree,
+                 node.outDegree)
+    }
    Graph.make(tmp3, graph.properties)
    }
    */
 
-  /*
-   def filterBy(graph:Graph,key:String,value:String) = {
-   repair(new Graph(graph.nodes.filter {_.attributes(key).equals(value)},
-   graph.properties),
-   graph)
+   /*
+    def filterBy(graph:Graph,key:String,value:String) = {
+    repair(new Graph(graph.nodes.filter {_.attributes(key).equals(value)},
+    graph.properties),
+    graph)
+    }
+    */
    }
-   */
-}
