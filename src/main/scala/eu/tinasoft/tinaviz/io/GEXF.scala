@@ -103,21 +103,23 @@ class GEXF extends node.util.Actor {
       }
     }
   
-    def attribute(id:Int,e:xml.Node) : (Int,String,Any) = {
+    def attribute(e:xml.Node) : (String,Any) = {
       val attr = nodeAttributes(e \ "@for" text)
       val value =  (e \ "@value" text)
-      val r = (id,attr._1, attr._2 match {
+      (attr._1, attr._2 match {
           case Double => value.toDouble
           case Float => value.toFloat
           case Int => value.toInt
           case x => value
         })
-
-      println(" found ttribute: "+r)
-      r
     }
 
-    var g = new Graph()
+    var g = new Graph(Map("filter.view" -> "macro",
+                          "filter.category" -> "Document",
+                          "layout.gravity" ->  1.2, // stronger means faster!
+                          "layout.attraction" -> 10.0,
+                          "layout.repulsion" -> -1.4))
+
     var id = -1
     for (n <- (root \\ "node")) {
       id += 1
@@ -151,29 +153,26 @@ class GEXF extends node.util.Actor {
       g += (id, "category", "Default")
       g += (id, "position", position)
       g += (id, "linkIdArray", List.empty[Int])
-      g += (id,"linkWeightArray", List.empty[Double])
-      g += (id, "linkSet", Set.empty[Int])
-       println("I")
-      //for (a <- (n \\ "attvalue")) yield { g += attribute(id,a) }
-       println("J")
+      g += (id, "linkWeightArray", List.empty[Double])
+      g += (id, "linkIdSet", Set.empty[Int])
+      
+      for (a <- (n \\ "attvalue")) yield {
+        val res = attribute(a)
+        // g += attribute(id,a)
+        //g += (id,res._1, res._2)
+      }
     }
-
-    id = -1
-    for (n <- (root \\ "node")) {
-      id += 1
-        var links = List.empty[Int]
-        var weights = List.empty[Double]
-        var set = Set.empty[Int]
-        for (e <- (root \\ "edge") if (n \ "@id" text).equals(e \ "@source" text)) {
-          val node2id = g.id(e \ "@target" text)
-          links = links ::: List(node2id)
-          set = set + node2id
-          weights = weights ::: List((e \ "@weight").text.toDouble)
-        }
-        g += (id, "linkIdSet",set.toArray)
-        g += (id, "linkIdArray", links.toArray)
-        g += (id, "linkWeightArray", weights.toArray)
+    for (e <- (root \\ "edge")) {
+      val node1id = g.id(e \ "@source" text)
+      val node2id = g.id(e \ "@target" text)
+      if (!g.uuid(node1id).equals(g.uuid(node2id))) {
+        g += (id, "linkIdArray", g.getArray[List[Int]]("linkIdArray")(node1id) ::: List(node2id))
+        g += (id, "linkIdSet", g.getArray[Set[Int]]("linkIdSet")(node1id) + node2id)
+        g += (id, "linkWeightArray", g.getArray[List[Double]]("linkWeightArray")(node1id) ::: List((e \ "@weight").text.toDouble))
+      }
     }
+    g += "linkIdArray" -> g.getArray[List[Int]]("linkIdArray").map(_.toArray)
+    g += "linkWeightArray" -> g.getArray[List[Double]]("linkWeightArray").map(_.toArray)
     g.computeAll
   }
 

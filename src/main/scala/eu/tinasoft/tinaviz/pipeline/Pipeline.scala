@@ -48,10 +48,12 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             //self ! 'layout
 
           case 'layout =>
+            println("running layout")
             runLayout
             //nextState = 'layout
             //val output = runLayout
             //cache += 'layout -> output
+            println("sending data back to the actor")
             actor ! 'pipelined -> data
            
             //case
@@ -142,7 +144,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     }
 
     // TODO possible optimization: give some metrics
-    data = new Graph(data.elements + ("position" -> (positions.toArray[Any])))
+    data +="position" -> positions
   }
 
 

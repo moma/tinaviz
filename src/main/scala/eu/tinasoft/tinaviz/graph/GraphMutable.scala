@@ -7,10 +7,8 @@ package eu.tinasoft.tinaviz.graph
 
 import eu.tinasoft._
 import eu.tinasoft.tinaviz.util.Color
-import scala.collection.mutable.LinkedList
-import tinaviz.util.Vector
 
-object Graph {
+object MutableGraph {
   
   def get[T](elements:Map[String,Any], key:String) : T = elements.get(key).get.asInstanceOf[T]
   
@@ -37,13 +35,14 @@ object Graph {
     //g = g.compute
     g
   }
- 
+
+  implicit def toGraph(mg:MutableGraph) : Graph = new Graph(mg.elements)
   
 }
 
-class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
+class MutableGraph (val _elements : Map[String,Any] = Map[String,Any]()) {
   
-  
+  var elements = _elements
   /**
    * Used for export to GEXF
    */
@@ -70,19 +69,19 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   def hasAnyLink(i:Int,j:Int) = hasThisLink(i,j) | hasThisLink(j,i)
   def hasThisLink(i:Int,j:Int) = linkIdSet(i).contains(j)
 
-  def + (kv:(String,Any)) = {
-   new Graph(elements + kv)
+  def += (ikv:(String,Any)) : this.type = {
+    elements += ikv
+    this
   }
-
-  def + (id:Int,k:String,v:Any) = {
-    set(id,k,v)
+  def += (ikv:(Int,String,Any)) : this.type = {
+    set(ikv._1,(ikv._2,ikv._3))
   }
-  def set(id:Int,k:String,value:Any) = {
+  def set(id:Int,kv:(String,Any)) : this.type = {
+    val k = kv._1
     //println("id: "+id+" kv: "+kv)
-    var newElements = elements
-    newElements += k -> {
+    elements += k -> {
       if (!elements.contains(k)) {
-        value match {
+        kv._2 match {
           case v:Boolean => List[Boolean](v).toArray
           case v:Int => List[Int](v).toArray
           case v:Double => List[Double](v).toArray
@@ -104,7 +103,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
         val t = elements(k)
         //println("elements gave "+t+" ")
 
-        value match {
+        kv._2 match {
           case v:Boolean =>
             var m = getArray[Boolean](k)
             if (id < m.size) m(id) = v else m = (m.toList ::: List[Boolean](v)).toArray
@@ -160,32 +159,44 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
         }
       }
     }
-    new Graph (newElements)
+    this
   }
 
-  def set(kv:(String,Any)) = new Graph (elements + kv)
-
-  def computeAll = {
-    var g = this
-    g = g.computeNbNodes
-    g = g.computeNbEdges
-    g = g.computeNbSingles
-    g = g.computeOutDegree
-    g = g.computeInDegree
-    g = g.computeExtremums
-    g.computeBaryCenter
+  def set(kv:(String,Any)) : this.type = {
+    elements += kv
+    this
   }
 
-  def computeNbSingles = {
+  def computeAll : this.type = {
+    computeNbNodes
+    computeNbEdges
+    computeNbSingles
+    computeOutDegree
+    computeInDegree
+    computeExtremums
+    computeBaryCenter
+    this
+  }
+
+  def toGraph : Graph = {
+    new Graph(elements)
+  }
+  
+  def computeNbSingles : this.type = {
     var s = 0 ; linkIdArray.foreach{ case links => if (links.size ==0) s += 1 }
-    new Graph (elements + ("nbSingles" -> s))
+    elements += "nbSingles" -> s
+    this
   }
 
-  def computeNbEdges = {
+  def computeNbEdges : this.type = {
     var s = 0 ; linkIdArray.foreach{ case links => s+= links.size }
-    new Graph (elements + ("nbEdges" -> s))
+    elements += "nbEdges" -> s
+    this
   }
-  def computeNbNodes = new Graph (elements + ("nbNodes" -> uuid.size))
+  def computeNbNodes : this.type = {
+    elements += "nbNodes" -> uuid.size
+    this
+  }
 
   /*
    def computeNodeDegree (elements:Map[String,Any],i:Int) : Int = {
@@ -196,10 +207,12 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
    d
    }*/
 
-  def computeOutDegree : Graph = {
-    if (linkIdSet.size == 0) 
-      return new Graph(elements ++ Map[String,Any]("minOutDegree" -> 0,
-                                                   "maxOutDegree" -> 0))
+  def computeOutDegree : this.type = {
+    if (linkIdSet.size == 0) {
+      elements += "minOutDegree" -> 0
+      elements += "maxOutDegree" -> 0
+      return this
+    }
     var max = Int.MinValue
     var min = Int.MaxValue
     linkIdSet.foreach {
@@ -208,13 +221,17 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
         if (d < min) min = d
         if (d > max) max = d
     }
-    new Graph(elements ++ Map[String,Any]("minOutDegree" -> min,
-                                          "maxOutDegree" -> max))
+
+    elements += "minOutDegree" -> min
+    elements += "maxOutDegree" -> max
+    this
   }
-  def computeInDegree : Graph = {
-    if (linkIdSet.size == 0)
-      return new Graph(elements ++ Map[String,Any]("minOutDegree" -> 0,
-                                                   "maxOutDegree" -> 0))
+  def computeInDegree : this.type = {
+    if (linkIdSet.size == 0) {
+      elements += "minOutDegree" -> 0
+      elements += "maxOutDegree" -> 0
+      this
+    }
     var max = Int.MinValue
     var min = Int.MaxValue
     var i = -1
@@ -228,16 +245,20 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
         if (d < min) min = d
         if (d > max) max = d
     }
-    new Graph(elements ++ Map[String,Any]("minOutDegree" -> min,
-                                          "maxOutDegree" -> max))
+
+    elements += "minOutDegree" -> min
+    elements += "maxOutDegree" -> max
+    this
   }
 
-  def computeExtremums : Graph = {
-    if (position.size == 0)
-      return new Graph(elements ++ Map[String,Any]("xMax" -> 0.0,
-                                                   "xMin" -> 0.0,
-                                                   "yMax" -> 0.0,
-                                                   "yMin" -> 0.0))
+  def computeExtremums : this.type = {
+    if (position.size == 0) {
+      elements += "xMax" -> 0.0
+      elements += "xMin" -> 0.0
+      elements += "yMax" -> 0.0
+      elements += "yMin" -> 0.0
+      return this
+    }
     var xMax = Double.MinValue
     var xMin = Double.MaxValue
     var yMax = Double.MinValue
@@ -250,16 +271,18 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
         if (y < yMin) yMin = y
         if (y > yMax) yMax = y
     }
-    return new Graph(elements ++ Map[String,Any]("xMax" -> xMax,
-                                                 "xMin" -> xMin,
-                                                 "yMax" -> yMax,
-                                                 "yMin" -> yMin))
+    elements += "xMax" -> xMax
+    elements += "xMin" -> xMin
+    elements += "yMax" -> yMax
+    elements += "yMin" -> yMin
+    this
   }
-  def computeBaryCenter : Graph = {
+  def computeBaryCenter : this.type = {
     var p = (0.0,0.0)
     var N = position.size.toDouble
     position.foreach { case (x,y) =>  p = (p._1+x, p._2+y) }
-    new Graph(elements ++ Map[String,Any]("baryCenter" -> (if (N != 0) (p._1/N,p._2/N) else (0.0,0.0))))
+    elements += "baryCenter" -> (if (N != 0) (p._1/N,p._2/N) else (0.0,0.0))
+    this
   }
 
 }

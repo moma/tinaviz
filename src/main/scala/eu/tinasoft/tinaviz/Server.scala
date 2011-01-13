@@ -62,6 +62,7 @@ class Server extends node.util.Actor {
 
   def run(s:Symbol) = {
     if (!busy) {
+      // println("sending "+s+"to pipeline..")
       busy = true
       pipeline ! s
     }
@@ -84,12 +85,15 @@ class Server extends node.util.Actor {
           properties = defaultProperties
           graph = g
           pipeline ! g
-          
+          busy = false
+
         case ("frameRate", value:Any) =>
+          //println("frameRate")
           properties += "frameRate" -> value
           run('layout)
           
         case ('pipelined,graph:Graph) =>
+          //println("sending data to the sketcher..")
           sketcher ! graph
 
         case scene:Scene =>

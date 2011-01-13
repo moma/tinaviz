@@ -151,6 +151,12 @@ case class Sketch (
               case true => colors.secondary.dark
               case false => colors.secondary.standard
             }
+
+          case other =>
+            s match {
+              case true => colors.tertiary.dark
+              case false => colors.tertiary.standard
+            }
         }
     }
 
@@ -168,6 +174,12 @@ case class Sketch (
             s match {
               case true => new Color(1.0,1.0,0.0)
               case false => colors.primary.darker
+            }
+
+          case other =>
+            s match {
+              case true => new Color(1.0,1.0,0.0)
+              case false => colors.tertiary.darker
             }
         }
        
