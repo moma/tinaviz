@@ -173,13 +173,12 @@ class GEXF extends node.util.Actor {
       if (!node1uuid.equals(node2uuid)) {
       val node1id = g.id(node1uuid)
       val node2id = g.id(node2uuid)
-        g += (id, "linkIdArray", g.getArray[List[Int]]("linkIdArray")(node1id) ::: List(node2id))
-        g += (id, "linkIdSet", g.getArray[Set[Int]]("linkIdSet")(node1id) ++ Set(node2id))
-        g += (id, "linkWeightArray", g.getArray[List[Double]]("linkWeightArray")(node1id) ::: List((e \ "@weight").text.toDouble))
+        g += (node1id, "linkIdArray", g.getArray[List[Int]]("linkIdArray")(node1id) ::: List(node2id))
+        g += (node1id, "linkIdSet", g.getArray[Set[Int]]("linkIdSet")(node1id) ++ Set(node2id))
+        g += (node1id, "linkWeightArray", g.getArray[List[Double]]("linkWeightArray")(node1id) ::: List((e \ "@weight").text.toDouble))
       }
     }
     println("added "+g.getArray[List[Int]]("linkIdArray").size+" nodes with edges")
-    g.getArray[List[Int]]("linkIdArray").foreach{ case links => println("x: "+links.size)}
     g += "linkIdArray" -> g.getArray[List[Int]]("linkIdArray").map(_.toArray)
     g += "linkWeightArray" -> g.getArray[List[Double]]("linkWeightArray").map(_.toArray)
     g.computeAll
