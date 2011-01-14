@@ -205,10 +205,8 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
 
   def computeInDegree : Graph = {
 
-    var i = -1
-    val _inDegree = uuid.map {
-      case n =>
-        i += 1
+    val _inDegree = uuid.zipWithIndex.map {
+      case (n,i) =>
         var d = 0
         linkIdSet.foreach {
           case m=> if (m.contains(i)) d+= 1
@@ -238,10 +236,9 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
                                                    "maxOutDegree" -> 0))
     var max = Int.MinValue
     var min = Int.MaxValue
-    var i = -1
-    linkIdSet.foreach {
-      case n =>
-        i += 1
+
+    linkIdSet.zipWithIndex foreach {
+      case (n,i) =>
         var d = 0
         linkIdSet.foreach {
           case m=> if (m.contains(i)) d+= 1
@@ -263,7 +260,6 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
     var xMin = Double.MaxValue
     var yMax = Double.MinValue
     var yMin = Double.MaxValue
-    var i = -1
     position.foreach {
       case (x,y) =>
         if (x < xMin) xMin = x
@@ -282,5 +278,19 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
     position.foreach { case (x,y) =>  p = (p._1+x, p._2+y) }
     new Graph(elements ++ Map[String,Any]("baryCenter" -> (if (N != 0) (p._1/N,p._2/N) else (0.0,0.0))))
   }
-
+  def map[T](id:Int,column:String,filter: T => T) : Graph = {
+    set(id, column, filter(getArray[T](column)(id)))
+  }
+  /*
+  def pfilter[T](id:Int,column:String)(filter: PartialFunction[T, T]) = {
+  set(id, column, filter(getArray[T](column)(id)))
+  }
+*/
+  def map[T](column:String,filter: T => T) : Graph = {
+    new Graph(elements ++ Map[String,Any](
+        column -> getArray[T](column).map{
+          case f=>filter(f)
+        }
+    )
+  }
 }

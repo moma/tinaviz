@@ -10,6 +10,7 @@ import org.daizoru._
 import eu.tinasoft._
 import tinaviz.graph._
 import tinaviz.sketch.Sketch
+import tinaviz.sketch.Sketch._
 import tinaviz.scene.Scene
 import tinaviz.util.Vector._
 import actors.Actor
@@ -57,9 +58,9 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             //cache += 'layout -> output
             //println("sending data back to the actor")
 
-             sketch.overwrite(data)
-          // println("  Renderer: done complete compilation of scene..")
-            actor ! 'pipelined -> (sketch:Scene)
+            sketch.overwrite(data)
+            // println("  Renderer: done complete compilation of scene..")
+            actor ! (sketch:Scene)
            
             //case
           case msg => println("unknow msg: "+msg)
@@ -135,34 +136,27 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
 
 
     //println("running forceVector on "+nbNodes+" nodes")
-    var i = -1
-    val positions = data.position map {
-      case p1 =>
-        i += 1
-        var force = (0.0,0.0)
-        force = p1.computeForce(GRAVITY, barycenter)
-        var j = -1
-        data.position map {
-          case p2 =>
-            j += 1
+
+    val positions = data.position.zipWithIndex map {
+      case (p1,i) =>
+        var force = (0.0,0.0).computeForce(GRAVITY, barycenter)
+        data.position.zipWithIndex map {
+          case (p2,j)=>
             val p2inDegree = data inDegree j
             val p2outDegree = data outDegree j
             // todo: attract less if too close (will work for both gravity and node attraction)
 
-             if (data.hasAnyLink(i,j)) {
-            force += p1.computeForce(ATTRACTION, p2)
+            if (data.hasAnyLink(i,j)) {
+              force += p1.computeForce(ATTRACTION, p2)
             } else {
               force -= p1.computeForceLimiter(REPULSION, p2)
             }
-
         }
         p1 + force
     }
-
     // TODO possible optimization: give some metrics
     data +="position" -> positions
   }
-
 
   /*
    def repair(graph:Graph,reference:Graph) = {
@@ -181,31 +175,51 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    }
    var i = -1
    val tmp3 = tmp2.map{
-      case node =>
-        i += 1
-        var inDegree = 0
-        tmp2.foreach { case m =>
-            if (m.hasLink(i)) inDegree += 1
-        }
-        inDegree
-        new Node(node.uuid,
-                 node.label,
-                 node.position,
-                 node.color,
-                 node.attributes,
-                 node.links,
-                 inDegree,
-                 node.outDegree)
-    }
+   case node =>
+   i += 1
+   var inDegree = 0
+   tmp2.foreach { case m =>
+   if (m.hasLink(i)) inDegree += 1
+   }
+   inDegree
+   new Node(node.uuid,
+   node.label,
+   node.position,
+   node.color,
+   node.attributes,
+   node.links,
+   inDegree,
+   node.outDegree)
+   }
    Graph.make(tmp3, graph.properties)
    }
    */
 
-   /*
-    def filterBy(graph:Graph,key:String,value:String) = {
-    repair(new Graph(graph.nodes.filter {_.attributes(key).equals(value)},
-    graph.properties),
-    graph)
+
+
+  def transformColumn[T](column:String,filter: T => T) = {
+    var dataArray = data.getArray[T](column)
+    dataArray.foreach{
+      case entry =>
+        
+
     }
-    */
-   }
+  }
+  def filterNodesByColumn[T](column:String,filter: T => Boolean) = {
+
+    data.getArray[T](column).zipWithIndex foreach{
+      case (entry,i) =>
+        // if we need to keep the element,
+        if (filter(entry)) {
+          // we need to resize all arrays
+          // then update all links to use new IDs
+          var startingPoint = i
+        }
+    }
+    //g.
+    //new Graph(graph.nodes.filter {_.attributes(key).equals(value)},
+
+    // graph)
+  }
+    
+}

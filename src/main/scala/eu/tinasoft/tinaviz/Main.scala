@@ -61,7 +61,7 @@ class Main extends TApplet with Client {
     setDefault("selectionRadius", 10.0)
 
     size(screenWidth - 400, screenHeight - 400, PConstants.P2D)
-    frameRate(15)
+    frameRate(25)
     noSmooth
     //smooth
     colorMode(PConstants.HSB, 1.0f)
@@ -119,9 +119,9 @@ class Main extends TApplet with Client {
     setLod(32)
     lineThickness(1)
     noFill
-    var i = 0
-    scene.edgePositionLayer.foreach{
-      case (source,target) =>
+
+    scene.edgePositionLayer zipWithIndex foreach {
+      case ((source,target),i) =>
         val psource = screenPosition(source)
         val ptarget = screenPosition(target)
         if (isVisible(psource) || isVisible(ptarget)) {
@@ -137,16 +137,13 @@ class Main extends TApplet with Client {
           //lineThickness(e.weight)
           drawCurve(source, target)
         }
-        i += 1
     }
 
     setLod(16)
     lineThickness(0)
     noStroke
-
-    i = 0
-    scene.nodePositionLayer.foreach{
-      case position =>
+    scene.nodePositionLayer zipWithIndex foreach {
+      case (position,i) =>
         val size = scene.nodeSizeLayer(i)
         setColor(scene.nodeBorderColorLayer(i))
         scene.nodeShapeLayer(i) match {
@@ -159,25 +156,19 @@ class Main extends TApplet with Client {
             setColor(scene.nodeColorLayer(i))
             drawSquare(position, size * 0.8)
         }
-        i += 1
     }
 
-
-    //setLod(16)
-    //lineThickness(0)
     setColor(scene.labelColor)
-    i = 0
-    scene.nodePositionLayer.foreach{
-      case position =>
+    scene.nodePositionLayer zipWithIndex foreach {
+      case (position,i) =>
         val size = scene.nodeSizeLayer(i)
         val np = screenPosition(position._1 + size,
                                 position._2 + size / Pi)
         text(scene.nodeLabelLayer(i), np._1,np._2)
-        i += 1
+  
     }
 
 
- 
     showSelectionCircle(selectionRadius)
 
   }
