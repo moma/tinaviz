@@ -9,7 +9,8 @@ import org.daizoru._
 
 import eu.tinasoft._
 import tinaviz.graph._
-
+import tinaviz.sketch.Sketch
+import tinaviz.scene.Scene
 import tinaviz.util.Vector._
 import actors.Actor
 
@@ -22,7 +23,8 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
 
   var nextState = 'output
   var data = new Graph()
-
+  var sketch = new Sketch()
+  
   def act() {
     while(true) {
       loop {
@@ -54,7 +56,10 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             //val output = runLayout
             //cache += 'layout -> output
             //println("sending data back to the actor")
-            actor ! 'pipelined -> data
+
+             sketch.overwrite(data)
+          // println("  Renderer: done complete compilation of scene..")
+            actor ! 'pipelined -> (sketch:Scene)
            
             //case
           case msg => println("unknow msg: "+msg)

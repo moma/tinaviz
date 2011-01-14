@@ -52,7 +52,6 @@ class Server extends node.util.Actor {
 
   var properties : Map[String,Any] = defaultProperties
 
-  val sketcher = new Sketcher()
   val pipeline  = new Pipeline(this)
   
   var graph = new Graph() // used for some stats
@@ -91,10 +90,6 @@ class Server extends node.util.Actor {
           //println("frameRate")
           properties += "frameRate" -> value
           run('layout)
-          
-        case ('pipelined,graph:Graph) =>
-          //println("sending data to the sketcher..")
-          sketcher ! graph
 
         case scene:Scene =>
           busy = false
