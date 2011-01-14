@@ -102,27 +102,17 @@ class Server extends node.util.Actor {
           properties += "scene" -> scene
 
           
-        case ('updated,key:String,value:Any,previous:Any, cb:Actor) =>
+        case ('updated,"view",value:String,previous:Any) =>
           // log("ignoring update of "+key)
-              
+          pipeline ! "view" -> value
+          
+        case ('updated,key:String,value:Any,previous:Any) =>
+          // log("ignoring update of "+key)
+
+          
 
         case ('open, any:Any) => (new GEXF) ! any
           // cb ! true
-
-        case ('js, "setView", args) =>
-          args match {
-            case view:String =>
-              println("asked to change view..")
-          }
-          
-        case ('js, "setView", args) =>
-          args match {
-            case view:String =>
-              println("asked to change view..")
-          }
-
-        case ('js, "openURI", url:String) => (new GEXF) !  new java.net.URL(url)
-        case ('js, "openString", str:String) =>  (new GEXF) ! str
 
         case key:String =>
           reply(properties(key))

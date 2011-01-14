@@ -23,6 +23,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   start
 
   var nextState = 'output
+  var original = new Graph()
   var data = new Graph()
   var sketch = new Sketch()
   
@@ -33,11 +34,18 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
           // reset
           case g:Graph =>
             //println("we can run the full graph..")
+            original = g
             data = g
             //cache += 'input -> graph
             //self ! 'colors
             // self
-
+          case (key:String, value:Any) =>
+            println("updating graph attribute "+key+" -> "+value)
+            data += key -> value
+            key match {
+              case "category" => runCategory
+              case "view" => runView
+            }
 
           case 'colors =>
             // only update the color layour, not touching positions!

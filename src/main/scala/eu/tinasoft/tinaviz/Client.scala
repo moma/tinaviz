@@ -88,46 +88,46 @@ trait Client {
    * TODO: boolean sync?
    */
   /*
-  def getLater(cb:String,key:String) = {
-    //val subscriber = sender
-    println("getLater(cb: "+cb+", key: "+key)
-    val sessionUser = actor {
-      //loop {
-      receive {
-        case any =>
-          Browser ! "callCb" -> Map( "cb" -> cb, "data" -> (tinaviz !? key))
-      }
-      //}
-    }
-    sessionUser ! 'go
+   def getLater(cb:String,key:String) = {
+   //val subscriber = sender
+   println("getLater(cb: "+cb+", key: "+key)
+   val sessionUser = actor {
+   //loop {
+   receive {
+   case any =>
+   Browser ! "callCb" -> Map( "cb" -> cb, "data" -> (tinaviz !? key))
+   }
+   //}
+   }
+   sessionUser ! 'go
 
-  }
-*/
+   }
+   */
   // { action: unselect }
 
   def openURI(str:String) = {
-     tinaviz ! 'open -> str
+    tinaviz ! 'open -> str
   }
   def openString(url:String) = {
-     tinaviz ! 'open -> new java.net.URL(url)
+    tinaviz ! 'open -> new java.net.URL(url)
   }
   def set(key:String, value:Any) {
     tinaviz ! key -> value
   }
-    def get(key:String) = { 
-      (tinaviz !? key)
-    }
+  def get(key:String) = {
+    (tinaviz !? key)
+  }
   /*
-  def msgCb(action:String, args:String, cbId:Int) {
-    println("msgArgCb - action: "+action+" cbId:"+cbId+" args: "+args)
+   def msgCb(action:String, args:String, cbId:Int) {
+   println("msgArgCb - action: "+action+" cbId:"+cbId+" args: "+args)
 
-    val cb = actor {
-      receive {
-        case msg => Browser ! "callCb" -> Map( "cb" -> cbId, "data" -> msg)
-      }
-    }
-    tinaviz ! ('js, action, Json.parse(args), cb)
-  }*/
+   val cb = actor {
+   receive {
+   case msg => Browser ! "callCb" -> Map( "cb" -> cbId, "data" -> msg)
+   }
+   }
+   tinaviz ! ('js, action, Json.parse(args), cb)
+   }*/
 
   // warning: synchronous..
 
