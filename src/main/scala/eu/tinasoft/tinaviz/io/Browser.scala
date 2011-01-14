@@ -8,52 +8,33 @@ package eu.tinasoft.tinaviz.io
 import org.daizoru._
 import eu.tinasoft.tinaviz._
 
+import eu.tinasoft.tinaviz.io.json.Json
 import java.applet.Applet
 import netscape.javascript.JSObject
 
 object Browser extends node.util.Actor {
-
-  start
 
   private var _window:JSObject = null
   private var _subPrefix = ""
   private var _apiPrefix = "tinaviz."
 
   def init(applet:Applet=null, jsContext:String=null) = {
+    start
     println("jsContext: "+jsContext)
     this._window = try { JSObject.getWindow(applet) } catch { case x => null }
-    val _subPrefix = if (jsContext!=null) jsContext else ""
-    val _apiPrefix = "tinaviz."
-    self ! "_initCallback"
+    this._subPrefix = if (jsContext!=null) jsContext else ""
+    this._apiPrefix = "tinaviz."
+
+    this ! "_initCallback"
   }
-
-
-  private def call(fnc:String,args: Array[Object]=null) : Object = {
-    if (true) println("window: "+_window+"  call: "+fnc+" args: "+args)
-    if (_window!=null) _window.call(fnc, args) else null
-  }
-
-  private def setTimeout(message:Array[Object]) : Object = {
-    call("setTimeout", message)
-  }
-
-  private def callAndForget(func:String, args:String="") : Object = {
-    val message = Array[Object] (
-      _subPrefix + _apiPrefix + func + "( " + args + ")",
-      new java.lang.Integer(0)
-    )
-    setTimeout(message)
-  }
-
   private def buttonStateCallback(attr:String, state:Boolean) = {
-    callAndForget("_buttonStateCallback", "'" + attr + "'," +
-                  (if (state) "true" else "false"))
+    //callAndForget("_buttonStateCallback", "'" + attr + "'," +
+    //             (if (state) "true" else "false"))
   }
 
   private def graphImportedCallback(msg:String) = {
-    callAndForget("_graphImportedCallback", msg)
+    // callAndForget("_graphImportedCallback", msg)
   }
-
 
   def act() {
 
@@ -61,8 +42,28 @@ object Browser extends node.util.Actor {
 
     loop {
       react {
-        case func:String => callAndForget(func)
-        case (func:String,args:String) => callAndForget(func,args)
+        case func:String =>
+          println("window.call: "+_subPrefix + _apiPrefix + func+"")
+          if (_window!=null) {
+            _window.call("setTimeout", Array[Object] (_subPrefix + _apiPrefix + func+"()",new java.lang.Integer(0)))
+          }
+
+        case (func:String,any) =>
+          val json = Json.build(any).toString
+          val args = Array[Object] (Json.build(any).toString,new java.lang.Integer(0))
+          println("window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
+          if (_window!=null) {
+            _window.call(_subPrefix + _apiPrefix + func, args)
+          }
+          /*
+           case (func:String,any) =>
+           val json = Json.build(any).toString
+           val args = Array[Object] (Json.build(any).toString,new java.lang.Integer(0))
+           println("window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
+           if (_window!=null) {
+           _window.call(_subPrefix + _apiPrefix + func, args)
+           }
+           */
         case msg => log("unknow msg: "+msg)
       }
     }

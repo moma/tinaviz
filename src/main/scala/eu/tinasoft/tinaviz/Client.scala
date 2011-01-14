@@ -6,8 +6,11 @@
 package eu.tinasoft.tinaviz
 
 import actors._
+import Actor._
 import eu.tinasoft._
 import tinaviz.io.JsonParser
+import eu.tinasoft.tinaviz.io.Browser
+import eu.tinasoft.tinaviz.io.json.Json
 import scala.util.parsing.json.JSONObject
 
 trait Client {
@@ -63,88 +66,82 @@ trait Client {
   }
 // Called by Javascript
 
-  def setPause(b:Boolean) = {
-    true
-  }
-  
-  def setView(s:String) = {
-    s match {
-      case "macro" =>
-      case "meso" =>
-    }
-    true
-  }
-
   def togglePause = {
     (tinaviz !? "pause" -> 'toggle) match {
       case b:Boolean => b
       case x => false
     }
   }
-  /**
-   * Deprecated
-   */
-  def toggleNodes = {
-    true
-  }
-  /**
-   * Deprecated
-   */
-  def toggleEdges = {
-    true
-  }
-  /**
-   * Deprecated
-   */
-  def toggleLabels = {
-    true
-  }
-  /**
-   * Deprecated
-   */
-  def toggleHD = {
-    
-  }
 
+  def select(id:String) = {
+    tinaviz ! 'select -> id
+    true
+  }
   def unselect = {
-
+    tinaviz ! 'unselect
+    true
   }
 
+  // var Map[String]
   /**
    * Set a param
    * TODO: boolean sync?
    */
-  def setParam(key:String,value:String,sync:Boolean) = {
-    tinaviz ! key -> value
-    println("ignoring sync: "+sync)
-  }
+  /*
+  def getLater(cb:String,key:String) = {
+    //val subscriber = sender
+    println("getLater(cb: "+cb+", key: "+key)
+    val sessionUser = actor {
+      //loop {
+      receive {
+        case any =>
+          Browser ! "callCb" -> Map( "cb" -> cb, "data" -> (tinaviz !? key))
+      }
+      //}
+    }
+    sessionUser ! 'go
 
-  
+  }
+*/
+  // { action: unselect }
+
+  def openURI(str:String) = {
+     tinaviz ! 'open -> str
+  }
+  def openString(url:String) = {
+     tinaviz ! 'open -> new java.net.URL(url)
+  }
+  def set(key:String, value:Any) {
+    tinaviz ! key -> value
+  }
+    def get(key:String) = { 
+      (tinaviz !? key)
+    }
+  /*
+  def msgCb(action:String, args:String, cbId:Int) {
+    println("msgArgCb - action: "+action+" cbId:"+cbId+" args: "+args)
+
+    val cb = actor {
+      receive {
+        case msg => Browser ! "callCb" -> Map( "cb" -> cbId, "data" -> msg)
+      }
+    }
+    tinaviz ! ('js, action, Json.parse(args), cb)
+  }*/
+
+  // warning: synchronous..
+
+
   /**
    * Update a Node in the current view, from it's UUID
    */
-  def updateNode(str:String) = {
+  def updateNode(id:String, str:String) = {
     // we help the JS developer by telling him if the JSON is valid or not
     val res = JsonParser.parse(str)
     
     if (!res.isDefined) throw new IllegalArgumentException("Error, invalid JSON!")
     tinaviz ! 'updateNode -> res.get
     
-  }
-  
-
-  /**
-   * Asynchronously load a GEXF from an URL
-   */
-  def openURI(url:String) = {
-    tinaviz ! 'open -> new java.net.URL(url)
-  }
-
-  /**
-   * Asynchronously load a GEXF from a String
-   */
-  def openString(str:String) = {
-    tinaviz ! 'open -> str
   }
   
   def selectNodesByLabel(matchLabel:String, matchCategory:String, matchMode:String, viewToSearch:String, center:Boolean) : Unit = {

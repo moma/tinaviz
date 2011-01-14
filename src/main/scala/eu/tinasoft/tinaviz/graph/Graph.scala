@@ -73,7 +73,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   def hasThisLink(i:Int,j:Int) = linkIdSet(i).contains(j)
 
   def + (kv:(String,Any)) = {
-   new Graph(elements + kv)
+    new Graph(elements + kv)
   }
 
   def + (id:Int,k:String,v:Any) = {
@@ -282,15 +282,24 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
     set(id, column, filter(getArray[T](column)(id)))
   }
   /*
-  def pfilter[T](id:Int,column:String)(filter: PartialFunction[T, T]) = {
-  set(id, column, filter(getArray[T](column)(id)))
-  }
-*/
+   def pfilter[T](id:Int,column:String)(filter: PartialFunction[T, T]) = {
+   set(id, column, filter(getArray[T](column)(id)))
+   }
+   */
   def map[T](column:String,filter: T => T) : Graph = {
+    var newElements = getArray[T](column).map { case f => filter(f) }
+    new Graph(elements ++ Map[String,Any](column -> newElements))
+
+  }
+
+   def filterNodeVisible[T](column:String,filter: T => Boolean) = {
+
     new Graph(elements ++ Map[String,Any](
-        column -> getArray[T](column).map{
-          case f=>filter(f)
-        }
-    )
+        "visible" -> getArray[T](column).map { case x => filter(x) }))
+  }
+   def _filterNodeVisible[T](column:String,filter: T => Boolean) = {
+
+    new Graph(elements ++ Map[String,Any](
+        "visible" -> getArray[T](column).map { case x => filter(x) }))
   }
 }

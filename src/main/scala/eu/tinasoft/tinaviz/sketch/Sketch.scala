@@ -233,7 +233,7 @@ case class Sketch (
 
     val tmpNodes = graph.linkIdArray.zipWithIndex map {
       case (links,i) =>
-        links zipWithIndex foreach {
+        links.zipWithIndex foreach {
           case (j,_j) =>
             val src = graph position i
             val trg = graph position j

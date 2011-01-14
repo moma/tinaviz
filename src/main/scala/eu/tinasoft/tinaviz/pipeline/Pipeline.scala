@@ -199,27 +199,12 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
 
   def transformColumn[T](column:String,filter: T => T) = {
     var dataArray = data.getArray[T](column)
-    dataArray.foreach{
+    dataArray.foreach {
       case entry =>
         
 
     }
   }
-  def filterNodesByColumn[T](column:String,filter: T => Boolean) = {
-
-    data.getArray[T](column).zipWithIndex foreach{
-      case (entry,i) =>
-        // if we need to keep the element,
-        if (filter(entry)) {
-          // we need to resize all arrays
-          // then update all links to use new IDs
-          var startingPoint = i
-        }
-    }
-    //g.
-    //new Graph(graph.nodes.filter {_.attributes(key).equals(value)},
-
-    // graph)
-  }
-    
+ 
+  
 }

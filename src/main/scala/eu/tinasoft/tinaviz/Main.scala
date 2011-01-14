@@ -69,7 +69,8 @@ class Main extends TApplet with Client {
     rectMode(PConstants.CENTER)
     bezierDetail(16)
     addMouseWheelListener(this)
-    
+
+    Browser.start
     try {
       Browser.init(this, getParameter("js_context"))
     } catch {
@@ -120,7 +121,7 @@ class Main extends TApplet with Client {
     lineThickness(1)
     noFill
 
-    scene.edgePositionLayer zipWithIndex foreach {
+    scene.edgePositionLayer.zipWithIndex foreach {
       case ((source,target),i) =>
         val psource = screenPosition(source)
         val ptarget = screenPosition(target)
@@ -142,7 +143,7 @@ class Main extends TApplet with Client {
     setLod(16)
     lineThickness(0)
     noStroke
-    scene.nodePositionLayer zipWithIndex foreach {
+    scene.nodePositionLayer.zipWithIndex foreach {
       case (position,i) =>
         val size = scene.nodeSizeLayer(i)
         setColor(scene.nodeBorderColorLayer(i))
@@ -159,7 +160,7 @@ class Main extends TApplet with Client {
     }
 
     setColor(scene.labelColor)
-    scene.nodePositionLayer zipWithIndex foreach {
+    scene.nodePositionLayer.zipWithIndex foreach {
       case (position,i) =>
         val size = scene.nodeSizeLayer(i)
         val np = screenPosition(position._1 + size,
