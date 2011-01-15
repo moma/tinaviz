@@ -98,7 +98,6 @@ class Main extends TApplet with Client {
     // get some values in a non-blocking way (using futures)
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
-    val pause = getIfPossible[Boolean]("pause")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
     
     // drawing
@@ -110,7 +109,6 @@ class Main extends TApplet with Client {
       text("" + frameRate.toInt + " img/sec", 10f, 13f)
       text("drawing " + scene.nbNodes + " nodes, "+scene.nbEdges+" edges", 10f, 32f)
     }
-    if (pause) return
     
 
     // TODO use an immutable Camera (this is the reason for the selection disk bug)

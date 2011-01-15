@@ -68,8 +68,9 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
               // and self-generating
               sketch.update(layoutCache)
               scene = sketch:Scene
+              actor ! scene
             }
-            actor ! scene
+
 
             
             //case

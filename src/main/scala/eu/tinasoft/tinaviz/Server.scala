@@ -82,7 +82,6 @@ class Server extends node.util.Actor {
           pipeline ! g
 
         case scene:Scene =>
-          //println("Tinaviz: sending to screen..")
           properties += "scene" -> scene
 
         case ('updated,key:String,value:Any,previous:Any) =>
