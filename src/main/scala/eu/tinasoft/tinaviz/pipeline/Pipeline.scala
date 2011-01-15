@@ -23,8 +23,12 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   start
 
   var nextState = 'output
-  var original = new Graph()
+
+  // used for original graph and global vars
   var data = new Graph()
+
+  var categoryCache = new Graph()
+  var layoutCache = new Graph()
   var sketch = new Sketch()
   
   def act() {
@@ -34,42 +38,28 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
           // reset
           case g:Graph =>
             //println("we can run the full graph..")
-            original = g
             data = g
+            categoryCache = applyCategory(data)
+
             //cache += 'input -> graph
             //self ! 'colors
             // self
           case (key:String, value:Any) =>
             println("updating graph attribute "+key+" -> "+value)
             data += key -> value
-            key match {
-              case "category" => runCategory
-              case "view" => runView
-            }
-
-          case 'colors =>
-            // only update the color layour, not touching positions!
-            //nextState = 'colors
-            //cache += 'body -> runColors
-            //self ! 'body
+            self ! key
             
-          case 'body =>
-            //nextState = 'body
-            //cache += 'layout -> runBody
-            //self ! 'layout
+          case "category" =>
+            println("categoryCache = applyCategory(data)")
+            categoryCache = applyCategory(data)
 
-          case 'layout =>
-            // println("running layout")
-            runLayout
-            //nextState = 'layout
-            //val output = runLayout
-            //cache += 'layout -> output
-            //println("sending data back to the actor")
-
-            sketch.overwrite(data)
-            // println("  Renderer: done complete compilation of scene..")
+          case "frameRate" =>
+            println("layoutCache = applyLayout(layoutCache)")
+            layoutCache = applyLayout(layoutCache)
+            println("")
+            sketch.update(layoutCache)
             actor ! (sketch:Scene)
-           
+            
             //case
           case msg => println("unknow msg: "+msg)
         }
@@ -131,30 +121,35 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
 
 
 
+  def applyCategory(g:Graph) = {
+    val category = g.get[String]("category")
+    g + ("visible" -> (g.category.zipWithIndex map {
+          case (cat,i) => (g.visible(i) && g.equals(category))
+        }))
+  }
   /**
    * apply a force vector algorithm on the graph
    */
-  def runLayout = {
-    val nbNodes = data.get[Int]("nbNodes")
-    val barycenter = data.get[(Double,Double)]("baryCenter")
+  def applyLayout(g:Graph) = {
+    val nbNodes = g.get[Int]("nbNodes")
+    val barycenter = g.get[(Double,Double)]("baryCenter")
 
-    val GRAVITY = data.get[Double]("layout.gravity")// stronger means faster!
-    val ATTRACTION = data.get[Double]("layout.attraction")
-    val REPULSION = data.get[Double]("layout.repulsion")// (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
-
+    val GRAVITY = g.get[Double]("layout.gravity")// stronger means faster!
+    val ATTRACTION = g.get[Double]("layout.attraction")
+    val REPULSION = g.get[Double]("layout.repulsion")// (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
 
     //println("running forceVector on "+nbNodes+" nodes")
 
-    val positions = data.position.zipWithIndex map {
+    val positions = g.position.zipWithIndex map {
       case (p1,i) =>
         var force = (0.0,0.0).computeForce(GRAVITY, barycenter)
-        data.position.zipWithIndex map {
+        g.position.zipWithIndex map {
           case (p2,j)=>
             val p2inDegree = data inDegree j
             val p2outDegree = data outDegree j
             // todo: attract less if too close (will work for both gravity and node attraction)
 
-            if (data.hasAnyLink(i,j)) {
+            if (g.hasAnyLink(i,j)) {
               force += p1.computeForce(ATTRACTION, p2)
             } else {
               force -= p1.computeForceLimiter(REPULSION, p2)
@@ -163,7 +158,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
         p1 + force
     }
     // TODO possible optimization: give some metrics
-    data +="position" -> positions
+    g + ("position" -> positions)
   }
 
   /*

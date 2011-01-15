@@ -10,6 +10,9 @@ import eu.tinasoft.tinaviz._
 import util.Color
 import util.Color._
 
+/**
+ * An immutable, straightforward data-structure used for final rendering to screen
+ */
 case class Scene (
   val background : Color =  new Color(0.0,0.0,1.0),
   val foreground : Color =  new Color(0.0,1.0,0.0),

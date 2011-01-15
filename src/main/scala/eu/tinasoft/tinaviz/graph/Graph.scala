@@ -62,6 +62,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   def color = getArray[Color]("color")
   def weight = getArray[Double]("weight")
   def category = getArray[String]("category")
+  def visible = getArray[Boolean]("visible")
   def selected = getArray[Boolean]("selected")
   def label = getArray[String]("label")
   def rate = getArray[Int]("rate")

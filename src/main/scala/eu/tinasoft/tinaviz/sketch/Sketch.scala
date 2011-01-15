@@ -15,7 +15,7 @@ import tinaviz.graph._
 object Sketch {
   implicit def graphToSketch (graph:Graph) : Sketch = {
     val sketch = new Sketch
-    sketch.overwrite(graph)
+    sketch.update(graph)
     sketch
   }
   implicit def sketchToScene (sketch:Sketch) : Scene = {
@@ -70,9 +70,11 @@ case class Sketch (
 
   /**
    * Update all layers
+   *
+   * TODO: there is place for optimization here, by only update what has changed
    * 
    */
-  def overwrite(graph:Graph) {
+  def update(graph:Graph) {
     reset
     updateNodeColors(graph)
     updateNodePositions(graph)
