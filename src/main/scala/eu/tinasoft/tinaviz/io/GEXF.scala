@@ -117,12 +117,13 @@ class GEXF extends node.util.Actor {
           case x => value
         })
       
-     // println("ATTRIB ="+attr+" = "+r)
+      // println("ATTRIB ="+attr+" = "+r)
 
       r
     }
 
-    var g = new Graph(Map("filter.view" -> "macro",
+    var g = new Graph(Map("pause" -> false,
+                          "filter.view" -> "macro",
                           "filter.category" -> "Document",
                           "layout.gravity" ->  1.1, // stronger means faster!
                           "layout.attraction" -> 1.01,
@@ -168,18 +169,18 @@ class GEXF extends node.util.Actor {
       for (a <- (n \\ "attvalue")) yield {
         val res = attribute(a)
         // g += attribute(id,a)
-      g += (id, res._1, res._2)
+        g += (id, res._1, res._2)
       }
     }
    
-   // for
+    // for
     for (e <- (root \\ "edge")) {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
       
       if (!node1uuid.equals(node2uuid)) {
-      val node1id = g.id(node1uuid)
-      val node2id = g.id(node2uuid)
+        val node1id = g.id(node1uuid)
+        val node2id = g.id(node2uuid)
         g += (node1id, "linkIdArray", g.getArray[List[Int]]("linkIdArray")(node1id) ::: List(node2id))
         g += (node1id, "linkIdSet", g.getArray[Set[Int]]("linkIdSet")(node1id) ++ Set(node2id))
         g += (node1id, "linkWeightArray", g.getArray[List[Double]]("linkWeightArray")(node1id) ::: List((e \ "@weight").text.toDouble))

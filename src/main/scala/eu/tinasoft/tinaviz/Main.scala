@@ -180,4 +180,22 @@ class Main extends TApplet with Client {
   override def positionUpdated(value:(Double,Double)) {
     tinaviz ! "position" -> value
   }
+
+  override def keyPressed() {
+    /*
+     if (key == PConstants.CODED) {
+     if (keyCode == PConstants.UP) {
+     v.translation.add(0.0f, 10f, 0.0f);
+     } else if (keyCode == PConstants.DOWN) {
+     v.translation.add(0.0f, -10f, 0.0f);
+     } else if (keyCode == PConstants.LEFT) {
+     v.translation.add(10f, 0.0f, 0.0f);
+     } else if (keyCode == PConstants.RIGHT) {
+     v.translation.add(-10f, 0.0f, 0.0f);
+     }
+     } else*/
+    if (key == 'p') {
+      tinaviz ! "pause" -> 'toggle
+    }
+  }
 }

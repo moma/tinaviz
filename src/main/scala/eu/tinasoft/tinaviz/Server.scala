@@ -58,17 +58,8 @@ class Server extends node.util.Actor {
   val pipeline  = new Pipeline(this)
   
   var graph = new Graph() // used for some stats
-  var busy = true
 
   start
-
-  def run(s:Symbol) = {
-    if (!busy) {
-      // println("sending "+s+"to pipeline..")
-      busy = true
-      pipeline ! s
-    }
-  }
 
   
   def act() {
@@ -89,27 +80,13 @@ class Server extends node.util.Actor {
           properties = defaultProperties
           graph = g
           pipeline ! g
-          busy = false
-
-        case ("frameRate", value:Any) =>
-          //println("frameRate")
-          properties += "frameRate" -> value
-          run('layout)
 
         case scene:Scene =>
-          busy = false
           //println("Tinaviz: sending to screen..")
           properties += "scene" -> scene
 
-          
-        case ('updated,"view",value:String,previous:Any) =>
-          // log("ignoring update of "+key)
-          pipeline ! "view" -> value
-          
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
-
-          
 
         case ('open, any:Any) => (new GEXF) ! any
           // cb ! true
@@ -135,6 +112,9 @@ class Server extends node.util.Actor {
                 // default case
               case x => properties += key -> value
             }
+            
+            pipeline ! key -> value // update the pipeline
+            //
             //reply(previous)
             if (!previous.equals(value)) {
               self ! ('updated,key,value,previous)

@@ -30,6 +30,9 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   var categoryCache = new Graph()
   var layoutCache = new Graph()
   var sketch = new Sketch()
+  var scene = new Scene()
+
+  //var busy = false
   
   def act() {
     while(true) {
@@ -37,28 +40,37 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
         react {
           // reset
           case g:Graph =>
-            //println("we can run the full graph..")
             data = g
             categoryCache = applyCategory(data)
+            layoutCache = applyLayout(categoryCache)
 
-            //cache += 'input -> graph
-            //self ! 'colors
-            // self
           case (key:String, value:Any) =>
-            println("updating graph attribute "+key+" -> "+value)
+            //println("updating graph attribute "+key+" -> "+value)
             data += key -> value
             self ! key
             
           case "category" =>
             println("categoryCache = applyCategory(data)")
             categoryCache = applyCategory(data)
-
+            layoutCache = applyLayout(categoryCache)
+            
           case "frameRate" =>
-            println("layoutCache = applyLayout(layoutCache)")
-            layoutCache = applyLayout(layoutCache)
-            println("")
-            sketch.update(layoutCache)
-            actor ! (sketch:Scene)
+            val pause : Boolean = try { data.get[Boolean]("pause") } catch { case e => true }
+
+            if (!pause) {
+              //if (!busy) {
+              // busy = true
+              //println("layoutCache = applyLayout(layoutCache)")
+              layoutCache = applyLayout(layoutCache)
+              //println("")
+
+              // we could merge sketch and scene by making sketch immutable
+              // and self-generating
+              sketch.update(layoutCache)
+              scene = sketch:Scene
+            }
+            actor ! scene
+
             
             //case
           case msg => println("unknow msg: "+msg)
@@ -122,7 +134,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
 
 
   def applyCategory(g:Graph) = {
-    val category = g.get[String]("category")
+    val category = g.get[String]("filter.category")
     g + ("visible" -> (g.category.zipWithIndex map {
           case (cat,i) => (g.visible(i) && g.equals(category))
         }))
