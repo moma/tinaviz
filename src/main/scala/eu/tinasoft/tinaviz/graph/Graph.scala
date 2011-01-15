@@ -303,4 +303,22 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
     new Graph(elements ++ Map[String,Any](
         "visible" -> getArray[T](column).map { case x => filter(x) }))
   }
+
+  /**
+   * Hard work in perspective here
+   */
+  def remove(i:Int) : Graph = {
+
+    var newElements = elements.map {
+      case (key:String,entries:Seq[Any]) =>
+        var newEntries = entries
+        val head = entries.toList.take(3) ::: entries.toList.drop(4)
+        // okay, that was easy. a bit slow, though.
+        // and now, the hardest way: update all the IDs
+        //
+        (key,newEntries)
+      case (key:String,entry:Any) => (key, entry)
+    }
+    new Graph(newElements).computeAll
+  }
 }

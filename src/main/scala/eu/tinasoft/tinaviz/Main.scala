@@ -193,6 +193,7 @@ class Main extends TApplet with Client {
      }
      } else*/
     if (key == 'p') {
+      println("toggling pause")
       tinaviz ! "pause" -> 'toggle
     }
   }

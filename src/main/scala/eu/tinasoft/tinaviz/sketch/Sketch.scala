@@ -149,14 +149,14 @@ case class Sketch (
             }
           case "NGram" => 
             s match {
-              case true => colors.secondary.dark
-              case false => colors.secondary.light
+              case true => colors.tertiary.dark
+              case false => colors.tertiary.light
             }
 
           case other =>
             s match {
-              case true => colors.tertiary.dark
-              case false => colors.tertiary.light
+              case true => colors.secondary.dark
+              case false => colors.secondary.light
             }
         }
     }
@@ -166,19 +166,19 @@ case class Sketch (
         graph category i match {
           case "Document" => 
             s match {
-              case true => colors.primary.darker
-              case false => colors.primary.standard
+              case true => new Color (0.0,0.0,0.23)
+              case false => colors.primary.darker
             }
           case "NGram" => 
             s match {
-              case true => colors.secondary.darker
-              case false => colors.secondary.standard
+              case true => new Color (0.0,0.0,0.23)
+              case false => colors.tertiary.darker
             }
 
           case other =>
             s match {
-              case true => colors.tertiary.darker
-              case false => colors.tertiary.standard
+              case true => new Color (0.0,0.0,0.23)
+              case false => colors.secondary.darker
             }
         }
        

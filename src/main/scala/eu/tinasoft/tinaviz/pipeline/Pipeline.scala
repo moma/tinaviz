@@ -55,24 +55,24 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             layoutCache = applyLayout(categoryCache)
             
           case "frameRate" =>
-            val pause : Boolean = try { data.get[Boolean]("pause") } catch { case e => true }
+            //if (!busy) {
+            // busy = true
+            //println("layoutCache = applyLayout(layoutCache)")
+            layoutCache = applyLayout(layoutCache)
+            //println("")
 
-            if (!pause) {
-              //if (!busy) {
-              // busy = true
-              //println("layoutCache = applyLayout(layoutCache)")
-              layoutCache = applyLayout(layoutCache)
-              //println("")
-
-              // we could merge sketch and scene by making sketch immutable
-              // and self-generating
-              sketch.update(layoutCache)
-              scene = sketch:Scene
-              actor ! scene
-            }
-
-
+            // we could merge sketch and scene by making sketch immutable
+            // and self-generating
+            sketch.update(layoutCache)
+            scene = sketch:Scene
+            actor ! scene
             
+
+
+
+          case s:String =>
+            // ignore
+            // 
             //case
           case msg => println("unknow msg: "+msg)
         }
@@ -137,7 +137,8 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   def applyCategory(g:Graph) = {
     val category = g.get[String]("filter.category")
     g + ("visible" -> (g.category.zipWithIndex map {
-          case (cat,i) => (g.visible(i) && g.equals(category))
+          case (cat,i) =>
+             (g.visible(i) && g.equals(category))
         }))
   }
   /**
