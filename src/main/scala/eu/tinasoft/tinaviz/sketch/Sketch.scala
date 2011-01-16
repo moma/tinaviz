@@ -233,13 +233,12 @@ case class Sketch (
 
     //println("updateEdgePositions of "+graph)
 
-    val tmpNodes = graph.linkIdArray.zipWithIndex map {
+    val tmpNodes = graph.links.zipWithIndex map {
       case (links,i) =>
         links.zipWithIndex foreach {
-          case (j,_j) =>
+          case ((j,weight),_j) =>
             val src = graph position i
             val trg = graph position j
-            val weight = graph.linkWeightArray(i)(_j)
             val color = nodeColorLayer(i).blend(nodeColorLayer(j))
             tmpPosition ::= (src,trg)
             tmpColor ::= color
@@ -260,10 +259,11 @@ case class Sketch (
   def updateEdgeColors(graph:Graph) {
     var tmpColor = List.empty[Color]
 
-    graph.linkIdArray.zipWithIndex map {
-      case (links,from) =>
-        links foreach {
-          case to => tmpColor ::= nodeColorLayer(from).blend(nodeColorLayer(to))
+    graph.links.zipWithIndex map {
+      case (mapIntDouble,from) =>
+        mapIntDouble foreach {
+          // todo: use weight to ponderate the color?
+          case (to,weight) => tmpColor ::= nodeColorLayer(from).blend(nodeColorLayer(to))
         }
     }
     edgeColorLayer = tmpColor.toArray
@@ -274,7 +274,7 @@ case class Sketch (
    *
    */
   def updateEdgeSizes(graph:Graph) {
-    edgeWeightLayer = (for (weights <- graph.linkWeightArray; weight <- weights) yield weight).toArray
+    edgeWeightLayer = (for (links <- graph.links; (id,weight) <- links) yield weight).toArray
   }
 
 }

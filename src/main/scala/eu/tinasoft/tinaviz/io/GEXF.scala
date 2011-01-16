@@ -162,9 +162,7 @@ class GEXF extends node.util.Actor {
       g += (id, "weight", 1.0)
       g += (id, "category", "Default")
       g += (id, "position", position)
-      g += (id, "linkIdArray", List.empty[Int])
-      g += (id, "linkWeightArray", List.empty[Double])
-      g += (id, "linkIdSet", Set.empty[Int])
+      g += (id, "links", Map.empty[Int,Double])
       
       for (a <- (n \\ "attvalue")) yield {
         val res = attribute(a)
@@ -181,14 +179,9 @@ class GEXF extends node.util.Actor {
       if (!node1uuid.equals(node2uuid)) {
         val node1id = g.id(node1uuid)
         val node2id = g.id(node2uuid)
-        g += (node1id, "linkIdArray", g.getArray[List[Int]]("linkIdArray")(node1id) ::: List(node2id))
-        g += (node1id, "linkIdSet", g.getArray[Set[Int]]("linkIdSet")(node1id) ++ Set(node2id))
-        g += (node1id, "linkWeightArray", g.getArray[List[Double]]("linkWeightArray")(node1id) ::: List((e \ "@weight").text.toDouble))
+        g += (node1id, "links", g.getArray[Map[Int,Double]]("links")(node1id) + ( node2id -> (e \ "@weight").text.toDouble))
       }
     }
-    //println("added "+g.getArray[List[Int]]("linkIdArray").size+" nodes with edges")
-    g += "linkIdArray" -> g.getArray[List[Int]]("linkIdArray").map(_.toArray)
-    g += "linkWeightArray" -> g.getArray[List[Double]]("linkWeightArray").map(_.toArray)
     g.computeAll
 
   }

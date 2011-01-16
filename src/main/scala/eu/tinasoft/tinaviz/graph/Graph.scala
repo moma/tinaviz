@@ -55,9 +55,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   def getArray[T](key:String) : Array[T] = get[Array[T]](key)
  
   // some built-in functions
-  def linkIdArray = getArray[Array[Int]]("linkIdArray")
-  def linkIdSet = getArray[Set[Int]]("linkIdSet")
-  def linkWeightArray = getArray[Array[Double]]("linkWeightArray")
+  def links = getArray[Map[Int,Double]]("links")
   def position = getArray[(Double,Double)]("position")
   def color = getArray[Color]("color")
   def weight = getArray[Double]("weight")
@@ -71,7 +69,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   def outDegree = getArray[Int]("outDegree")
 
   def hasAnyLink(i:Int,j:Int) = hasThisLink(i,j) | hasThisLink(j,i)
-  def hasThisLink(i:Int,j:Int) = linkIdSet(i).contains(j)
+  def hasThisLink(i:Int,j:Int) = links(i).contains(j)
 
   def + (kv:(String,Any)) = {
     new Graph(elements + kv)
@@ -98,6 +96,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
           case v:List[Double] => List[List[Double]](v).toArray
           case v:List[Int] => List[List[Int]](v).toArray
           case v:Set[Int] => List[Set[Int]](v).toArray
+          case v:Map[Int,Double] => List[Map[Int,Double]](v).toArray
           case v =>
             throw new Exception("UNRECOGNIZED TYPE")
             // List(v).toArray
@@ -135,6 +134,10 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
           case v:(Double,Double) =>
             var m = getArray[(Double,Double)](k)
             if (id < m.size) m(id) = v else m = (m.toList ::: List[(Double,Double)](v)).toArray
+            m
+          case v:Map[Int,Double] =>
+            var m = getArray[Map[Int,Double]](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List[Map[Int,Double]](v)).toArray
             m
           case v:List[Double] =>
             var m = getArray[List[Double]](k)
@@ -180,12 +183,12 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   }
 
   def computeNbSingles = {
-    var s = 0 ; linkIdArray.foreach{ case links => if (links.size ==0) s += 1 }
+    var s = 0 ; links.foreach{ case links => if (links.size ==0) s += 1 }
     new Graph (elements + ("nbSingles" -> s))
   }
 
   def computeNbEdges = {
-    var s = 0 ; linkIdArray.foreach{ case links => s+= links.size }
+    var s = 0 ; links.foreach{ case links => s+= links.size }
     new Graph (elements + ("nbEdges" -> s))
   }
   def computeNbNodes = new Graph (elements + ("nbNodes" -> uuid.size))
@@ -193,14 +196,14 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   /*
    def computeNodeDegree (elements:Map[String,Any],i:Int) : Int = {
 
-   val links = elements("linkIdSet").asInstanceOf[Array[Set[Int]]]
+   val links = elements("links").asInstanceOf[Array[Map[Int,Double]]]
    var d = 0
    links.foreach { case m => if (m.contains(i)) d+= 1 }
    d
    }*/
 
   def computeOutDegree : Graph = {
-    val _outDegree = linkIdSet.map { case n => n.size }
+    val _outDegree = links.map { case n => n.size }
     new Graph(elements ++ Map[String,Any]("outDegree" -> _outDegree))
   }
 
@@ -209,7 +212,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
     val _inDegree = uuid.zipWithIndex.map {
       case (n,i) =>
         var d = 0
-        linkIdSet.foreach {
+        links.foreach {
           case m=> if (m.contains(i)) d+= 1
         }
         d
@@ -217,12 +220,12 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
     new Graph(elements ++ Map[String,Any]("inDegree" -> _inDegree))
   }
   def computeOutDegreeExtremums : Graph = {
-    if (linkIdSet.size == 0) 
+    if (links.size == 0) 
       return new Graph(elements ++ Map[String,Any]("minOutDegree" -> 0,
                                                    "maxOutDegree" -> 0))
     var max = Int.MinValue
     var min = Int.MaxValue
-    linkIdSet.foreach {
+    links.foreach {
       case n =>
         val d = n.size
         if (d < min) min = d
@@ -232,17 +235,17 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
                                           "maxOutDegree" -> max))
   }
   def computeInDegreeExtremums : Graph = {
-    if (linkIdSet.size == 0)
+    if (links.size == 0)
       return new Graph(elements ++ Map[String,Any]("minOutDegree" -> 0,
                                                    "maxOutDegree" -> 0))
     var max = Int.MinValue
     var min = Int.MaxValue
 
-    linkIdSet.zipWithIndex foreach {
-      case (n,i) =>
+    uuid.zipWithIndex foreach {
+      case (_uuid,id) =>
         var d = 0
-        linkIdSet.foreach {
-          case m=> if (m.contains(i)) d+= 1
+        links.foreach {
+          case mapIntDouble => if (mapIntDouble.contains(id)) d+= 1
         }
         if (d < min) min = d
         if (d > max) max = d
@@ -293,12 +296,12 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
 
   }
 
-   def filterNodeVisible[T](column:String,filter: T => Boolean) = {
+  def filterNodeVisible[T](column:String,filter: T => Boolean) = {
 
     new Graph(elements ++ Map[String,Any](
         "visible" -> getArray[T](column).map { case x => filter(x) }))
   }
-   def _filterNodeVisible[T](column:String,filter: T => Boolean) = {
+  def _filterNodeVisible[T](column:String,filter: T => Boolean) = {
 
     new Graph(elements ++ Map[String,Any](
         "visible" -> getArray[T](column).map { case x => filter(x) }))
@@ -307,18 +310,72 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   /**
    * Hard work in perspective here
    */
-  def remove(i:Int) : Graph = {
+  def - (i:Int) : Graph = {
 
-    var newElements = elements.map {
+    val newElements = elements.map {
+ 
+      case ("links",entries:Array[Map[Int,Double]]) =>
+
+        val newEntries = (entries.toList.take(i-1) ::: entries.toList.drop(i+1)).map {
+          case links =>
+           (links - i).map{ case (id,weight) => ((if (id > i) (id - 1) else id),weight) }
+
+        }.toArray
+        println("BEFORE: "+entries.size+" AFTER: "+newEntries.size)
+       ("links",newEntries)
+
       case (key:String,entries:Seq[Any]) =>
-        var newEntries = entries
-        val head = entries.toList.take(3) ::: entries.toList.drop(4)
-        // okay, that was easy. a bit slow, though.
-        // and now, the hardest way: update all the IDs
-        //
-        (key,newEntries)
-      case (key:String,entry:Any) => (key, entry)
+        (key,entries.toList.take(3) ::: entries.toList.drop(4))
+
+      case (key:String,entry:Any) => 
+	(key, entry)
     }
     new Graph(newElements).computeAll
   }
+
+  
+  def converter(removed:Set[Int],max:Int) : Array[Int] = {
+      val _removed = removed.toList.sortBy(_)
+      var j = 0
+       (for (i <- 0 until max) yield {
+           if (_removed.size > j && i == _removed(j)) {
+              j += 1
+              -1 // -1 mean we are deleted
+           } else {
+             i - j
+           }
+       }).toArray
+  }  
+
+  def removeAll(set:Set[Int]) : Graph = {
+       val conversionTable = converter(set)
+
+       val newElements = elements.map {
+
+      case ("links",entries:Array[Map[Int,Double]]) =>
+        var kept = List.empty[Int]
+
+        entries.zipWithIndex foreach{ case (entry,id) =>
+          if (set.contains(id)) kept ::: List(entry)
+        }
+        // ERROR, NOT DROP, BECAUSE DROP DROP THE FIRST ELEMENTS	
+        val newEntries = (entries.toList.take(i-1) ::: entries.toList.takeRight(i+1)).map {
+          case links =>
+           (links - i).map{ case (id,weight) => ((if (id > i) (id - 1) else id),weight) }
+
+        }.toArray
+        println("BEFORE: "+entries.size+" AFTER: "+newEntries.size)
+       ("links",newEntries)
+
+      case (key:String,entries:Seq[Any]) =>
+        (key,entries.toList.take(3) ::: entries.toList.takeRight(4))
+
+      case (key:String,entry:Any) =>
+	(key, entry)
+    }
+    new Graph(newElements).computeAll
+    
+  }
+
+
 }

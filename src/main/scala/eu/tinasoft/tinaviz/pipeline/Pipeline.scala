@@ -133,14 +133,29 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    */
 
 
-
   def applyCategory(g:Graph) = {
     val category = g.get[String]("filter.category")
-    g + ("visible" -> (g.category.zipWithIndex map {
-          case (cat,i) =>
-             (g.visible(i) && g.equals(category))
-        }))
+    var removeMe = Set.empty[Int]
+    g.category.zipWithIndex map {
+      case (cat,i) =>
+        println("scanning node "+i+ "("+cat+")")
+        if (g.visible(i) && cat.equals(category)) {
+          println("Removing node "+i)
+          removeMe += i
+        }
+    }
+    var h = g.removeAll(removeMe)
+    h
+
   }
+  /*
+   def applyCategory(g:Graph) = {
+   val category = g.get[String]("filter.category")
+   g + ("visible" -> (g.category.zipWithIndex map {
+   case (cat,i) =>
+   (g.visible(i) && g.equals(category))
+   }))
+   }*/
   /**
    * apply a force vector algorithm on the graph
    */
