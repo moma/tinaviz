@@ -97,6 +97,7 @@ class Server extends node.util.Actor {
         case ("select",uuid:String) =>
              pipeline ! "select" -> uuid
              
+        // TODO do something for this, it's looks a bit creepy
         case ("filter.node.weight.min", value:Double) =>
              self ! (("filter.node.weight", (value,properties("filter.node.weight").asInstanceOf[(Double,Double)]._2)))
              
@@ -108,7 +109,20 @@ class Server extends node.util.Actor {
              
         case ("filter.edge.weight.max", value:Double) =>
              self ! (("filter.edge.weight", (properties("filter.edge.weight").asInstanceOf[(Double,Double)]._1,value)))
-               
+             
+        case ("filter.node.weight.min") =>
+             reply(properties("filter.node.weight").asInstanceOf[(Double,Double)]._1)
+             
+        case ("filter.node.weight.max", value:Double) =>
+             reply(properties("filter.node.weight").asInstanceOf[(Double,Double)]._2)
+             
+        case ("filter.edge.weight.min", value:Double) =>
+             reply(properties("filter.edge.weight").asInstanceOf[(Double,Double)]._1)
+             
+        case ("filter.edge.weight.max", value:Double) =>
+             reply(properties("filter.edge.weight").asInstanceOf[(Double,Double)]._2))
+             
+           
         case ('updated,"frameRate",value:Any,previous:Any) =>
 
           val pause = get[Boolean]("pause") //: Boolean = try { get[Boolean]("pause") } catch { case e => true }

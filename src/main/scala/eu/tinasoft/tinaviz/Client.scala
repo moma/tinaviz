@@ -228,4 +228,11 @@ trait Client {
 
     // Browser ! "_callbackGetNeighbourhood" -> "'" + getSelectedNodesJSON(view) + "','" + neighbourList + "'"
   }
+  
+  // TODO should be asynchronous
+  def getNodes(view:String, category:String) : String = {
+       //val nodes = (tinaviz ?! "nodes")
+       println("NOT IMPLEMENTED getNodes(view: "+view+", category: "+category+")")
+       return "[]"
+  }
 }
