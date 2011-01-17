@@ -26,17 +26,15 @@ class Server extends node.util.Actor {
     // global real FPS
     "frameRate" -> 0,
     "filter.selection" -> List.empty[String],
-
+                          
     // current view settings
     "filter.view" -> "macro",
     "filter.node.category" -> "Document",
-    "filter.node.weight.min" -> 1.0,
-    "filter.node.weight.max" -> 0.0,
-    "filter.edge.weight.min" -> 1.0,
-    "filter.edge.weight.max" -> 0.0,
-    "layout.gravity" ->  1.2, // stronger means faster!
-    "layout.attraction" -> 10.0,
-    "layout.repulsion" -> -1.4,
+    "filter.node.weight" -> (0.0,1.0),
+    "filter.edge.weight" -> (0.0,1.0),
+    "layout.gravity" ->  1.1, // stronger means faster!
+    "layout.attraction" -> 1.01,
+    "layout.repulsion" -> 1.5,
     "pause" -> false,
     "debug" -> true,
 
@@ -83,8 +81,8 @@ class Server extends node.util.Actor {
         case g:Graph => 
           //if (sender.receiver == sketcher) {
           properties = defaultProperties
-          graph = g
-          pipeline ! g
+          graph = new Graph(properties ++ g.elements)
+          pipeline ! graph
           pipelineBusy = false
 
         case scene:Scene =>
@@ -99,6 +97,18 @@ class Server extends node.util.Actor {
         case ("select",uuid:String) =>
              pipeline ! "select" -> uuid
              
+        case ("filter.node.weight.min", value:Double) =>
+             self ! (("filter.node.weight", (value,properties("filter.node.weight").asInstanceOf[(Double,Double)]._2)))
+             
+        case ("filter.node.weight.max", value:Double) =>
+             self ! (("filter.node.weight", (properties("filter.node.weight").asInstanceOf[(Double,Double)]._1,value)))
+             
+        case ("filter.edge.weight.min", value:Double) =>
+             self ! (("filter.edge.weight", (value,properties("filter.edge.weight").asInstanceOf[(Double,Double)]._2)))
+             
+        case ("filter.edge.weight.max", value:Double) =>
+             self ! (("filter.edge.weight", (properties("filter.edge.weight").asInstanceOf[(Double,Double)]._1,value)))
+               
         case ('updated,"frameRate",value:Any,previous:Any) =>
 
           val pause = get[Boolean]("pause") //: Boolean = try { get[Boolean]("pause") } catch { case e => true }

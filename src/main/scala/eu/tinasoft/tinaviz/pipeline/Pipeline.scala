@@ -159,7 +159,8 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     h
   }*/
   
-  def applyCategory(g:Graph) = {
+  def applyCategory(g:Graph) : Graph = {
+    if (g.nbNodes == 0) return g
     val category = g.get[String]("filter.node.category")
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
@@ -172,6 +173,19 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     h
   }
   
+  
+  def applyNodeWeight(g:Graph) : Graph = {
+    if (g.nbNodes == 0) return g
+    val range = g.get[(Double,Double)]("filter.node.weight")
+    g
+  }
+  
+   def applyEdgeWeight(g:Graph) : Graph = {
+    if (g.nbNodes == 0) return g
+    val range = g.get[(Double,Double)]("filter.edge.weight")
+    g
+  }
+   
   /*
    def applyCategory(g:Graph) = {
    val category = g.get[String]("filter.category")
@@ -187,7 +201,6 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     val nbNodes = g.nbNodes
     if (nbNodes == 0) return g
     val barycenter = g.get[(Double,Double)]("baryCenter")
-
     val GRAVITY = g.get[Double]("layout.gravity")// stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
     val REPULSION = g.get[Double]("layout.repulsion")// (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
@@ -209,6 +222,16 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
               force -= p1.computeForceLimiter(REPULSION, p2)
             }
         }
+        
+        // random repulse
+        /*
+          if (Maths.random() < 0.05f) {
+               val theta = 2 * math.Pi * Maths.random()
+               (((math.cos(theta) - math.sin(theta))) * desiredDist,
+                ((math.cos(theta) + math.sin(theta))) * desiredDist)
+        } else {
+              p1 + force
+        }*/
         p1 + force
     }
     // TODO possible optimization: give some metrics

@@ -34,8 +34,9 @@ object Maths {
 
   def nextInt = rnd.nextInt
   
-  def nextDouble(max:Double) = max * rnd.nextDouble
+  def random(max:Double) = max * rnd.nextDouble
   def random(min:Double,max:Double) = ((max-min) * rnd.nextDouble) - min
+  def random() = rnd.nextDouble
   
   def randomBool = (rnd.nextDouble < 0.5)
 }

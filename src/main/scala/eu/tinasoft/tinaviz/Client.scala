@@ -115,11 +115,17 @@ trait Client {
     tinaviz ! key -> value
   }
   def setAs(key:String, value:Any, t:String) {
+  println("setAs(key:"+key+", value:"+value+", t:"+t+")");
     t match {
-       case "Int" => tinaviz ! key -> value.toString.toInt
-       case "Float" => tinaviz ! key -> value.toString.toFloat
-       case "Double" => tinaviz ! key -> value.toString.toDouble
-       case "Boolean" => tinaviz ! key -> value.toString.toBoolean
+       case "Int" => 
+       tinaviz ! key -> value.toString.toInt
+       case "Float" => 
+       tinaviz ! key -> value.toString.toFloat
+       case "Double" => 
+       tinaviz ! key -> value.toString.toDouble
+       case "Boolean" =>
+        println("converting "+key+" : "+value+" to Boolean")
+        tinaviz ! key -> value.toString.toBoolean
        case "String" => tinaviz ! key -> value.toString
        case x => tinaviz ! key -> value
     }

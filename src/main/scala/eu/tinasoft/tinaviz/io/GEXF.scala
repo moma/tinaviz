@@ -121,13 +121,15 @@ class GEXF extends node.util.Actor {
 
       r
     }
-
+    /*
     var g = new Graph(Map("pause" -> false,
                           "filter.view" -> "macro",
                           "filter.category" -> "NGram",
                           "layout.gravity" ->  1.1, // stronger means faster!
                           "layout.attraction" -> 1.01,
                           "layout.repulsion" -> 1.5))
+    */                  
+    var g = new Graph()
 
     var id = -1
     for (n <- (root \\ "node")) {
