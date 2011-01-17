@@ -55,19 +55,23 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   def getArray[T](key:String) : Array[T] = get[Array[T]](key)
  
   // some built-in functions
-  def links = getArray[Map[Int,Double]]("links")
-  def position = getArray[(Double,Double)]("position")
-  def color = getArray[Color]("color")
-  def weight = getArray[Double]("weight")
-  def category = getArray[String]("category")
-  def visible = getArray[Boolean]("visible")
-  def selected = getArray[Boolean]("selected")
-  def label = getArray[String]("label")
-  def rate = getArray[Int]("rate")
-  def uuid = getArray[String]("uuid")
-  def inDegree = getArray[Int]("inDegree")
-  def outDegree = getArray[Int]("outDegree")
-
+  val links = getArray[Map[Int,Double]]("links")
+  val position = getArray[(Double,Double)]("position")
+  val color = getArray[Color]("color")
+  val weight = getArray[Double]("weight")
+  val category = getArray[String]("category")
+  val visible = getArray[Boolean]("visible")
+  val selected = getArray[Boolean]("selected")
+  val label = getArray[String]("label")
+  val rate = getArray[Int]("rate")
+  val uuid = getArray[String]("uuid")
+  val inDegree = getArray[Int]("inDegree")
+  val outDegree = getArray[Int]("outDegree")
+  val density = getArray[Double]("density")
+  val nbNodes = get[Int]("nbNodes")
+  val nbEdges = get[Int]("nbEdges")
+  val ids = 0 until nbNodes // a Range on ID
+  
   def hasAnyLink(i:Int,j:Int) = hasThisLink(i,j) | hasThisLink(j,i)
   def hasThisLink(i:Int,j:Int) = links(i).contains(j)
 
@@ -291,7 +295,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
    }
    */
   def map[T](column:String,filter: T => T) : Graph = {
-    var newElements = getArray[T](column).map { case f => filter(f) }
+    var newElements = getArray[T](column).map {  f => filter(f) }
     new Graph(elements ++ Map[String,Any](column -> newElements))
 
   }
@@ -299,85 +303,121 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   def filterNodeVisible[T](column:String,filter: T => Boolean) = {
 
     new Graph(elements ++ Map[String,Any](
-        "visible" -> getArray[T](column).map { case x => filter(x) }))
+        "visible" -> getArray[T](column).map { x => filter(x) }))
   }
   def _filterNodeVisible[T](column:String,filter: T => Boolean) = {
 
     new Graph(elements ++ Map[String,Any](
-        "visible" -> getArray[T](column).map { case x => filter(x) }))
+        "visible" -> getArray[T](column).map { x => filter(x) }))
   }
 
   /**
    * Hard work in perspective here
    */
-  def - (i:Int) : Graph = {
+  /*
+   def - (i:Int) : Graph = {
 
-    val newElements = elements.map {
+   val newElements = elements.map {
  
-      case ("links",entries:Array[Map[Int,Double]]) =>
+   case ("links",entries:Array[Map[Int,Double]]) =>
 
-        val newEntries = (entries.toList.take(i-1) ::: entries.toList.drop(i+1)).map {
-          case links =>
-           (links - i).map{ case (id,weight) => ((if (id > i) (id - 1) else id),weight) }
+   val newEntries = (entries.toList.take(i-1) ::: entries.toList.drop(i+1)).map {
+   case links =>
+   (links - i).map{ case (id,weight) => ((if (id > i) (id - 1) else id),weight) }
 
-        }.toArray
-        println("BEFORE: "+entries.size+" AFTER: "+newEntries.size)
-       ("links",newEntries)
+   }.toArray
+   println("BEFORE: "+entries.size+" AFTER: "+newEntries.size)
+   ("links",newEntries)
 
-      case (key:String,entries:Seq[Any]) =>
-        (key,entries.toList.take(3) ::: entries.toList.drop(4))
+   case (key:String,entries:Seq[Any]) =>
+   (key,entries.toList.take(3) ::: entries.toList.drop(4))
 
-      case (key:String,entry:Any) => 
-	(key, entry)
-    }
-    new Graph(newElements).computeAll
-  }
-
+   case (key:String,entry:Any) =>
+   (key, entry)
+   }
+   new Graph(newElements).computeAll
+   }
+   */
   
-  def converter(removed:Set[Int],max:Int) : Array[Int] = {
-      val _removed = removed.toList.sortBy(_)
-      var j = 0
-       (for (i <- 0 until max) yield {
-           if (_removed.size > j && i == _removed(j)) {
-              j += 1
-              -1 // -1 mean we are deleted
-           } else {
-             i - j
-           }
-       }).toArray
+  def converter(removed:Set[Int]) : Array[Int] = {
+    val _removed = removed.toList.sort{(a,b) => a < b}
+    var j = 0
+    (for (i <- 0 until nbNodes) yield {
+        if (_removed.size > j && i == _removed(j)) {
+          j += 1
+          -1
+        } else {
+          i - j
+        }
+      }).toArray
   }  
-
-  def removeAll(set:Set[Int]) : Graph = {
-       // Array (index ) -> newIndex
-       val conversionTable = converter(set, elements("nbNodes"))
-
-
-       val newElements = elements.map {
+  
+  def remove(set:Set[Int]) : Graph = {
+    val conv = converter(set)
+    val newElements = elements.map {
 
       case ("links",entries:Array[Map[Int,Double]]) =>
-        var kept = List.empty[Int]
-
-        entries.zipWithIndex foreach{ case (entry,id) =>
-          if (set.contains(id)) kept ::: List(entry)
+        val filteredEntries = entries.zipWithIndex.filter {
+          case (entry,id) => conv(id) != -1
+        }.map{
+          _._1
         }
-        // ERROR, NOT DROP, BECAUSE DROP DROP THE FIRST ELEMENTS	
-        val newEntries = (entries.toList.take(i-1) ::: entries.toList.takeRight(i+1)).map {
-          case links =>
-           (links - i).map{ case (id,weight) => ((if (id > i) (id - 1) else id),weight) }
+        val newEntries = filteredEntries.map {
+          links => 
+          links.filter {
+            case (id,weight) => conv(id) != -1
+          }.map {
+            case (id,weight) => (conv(id),weight)
+          }
 
-        }.toArray
+        }
         println("BEFORE: "+entries.size+" AFTER: "+newEntries.size)
-       ("links",newEntries)
+        ("links",newEntries)
 
       case (key:String,entries:Seq[Any]) =>
-        (key,entries.toList.take(3) ::: entries.toList.takeRight(4))
+        (key, (entries.zipWithIndex.filter {
+          case (entry,id) => conv(id) != -1
+        }.map{
+          _._1
+        }))
 
       case (key:String,entry:Any) =>
-	(key, entry)
+        (key, entry)
     }
-    new Graph(newElements).computeAll
-    
+    Graph.make(newElements) // will run compute all
   }
+  /*
+   def removeAll(set:Set[Int]) : Graph = {
+   // Array (index ) -> newIndex
+   val conversionTable = converter(set, elements("nbNodes"))
 
+
+   val newElements = elements.map {
+
+   case ("links",entries:Array[Map[Int,Double]]) =>
+   var kept = List.empty[Int]
+
+   entries.zipWithIndex foreach{ case (entry,id) =>
+   if (set.contains(id)) kept ::: List(entry)
+   }
+   // ERROR, NOT DROP, BECAUSE DROP DROP THE FIRST ELEMENTS
+   val newEntries = (entries.toList.take(i-1) ::: entries.toList.takeRight(i+1)).map {
+   case links =>
+   (links - i).map{ case (id,weight) => ((if (id > i) (id - 1) else id),weight) }
+
+   }.toArray
+   println("BEFORE: "+entries.size+" AFTER: "+newEntries.size)
+   ("links",newEntries)
+
+   case (key:String,entries:Seq[Any]) =>
+   (key,entries.toList.take(3) ::: entries.toList.takeRight(4))
+
+   case (key:String,entry:Any) =>
+   (key, entry)
+   }
+   new Graph(newElements).computeAll
+    
+   }
+   */
 
 }

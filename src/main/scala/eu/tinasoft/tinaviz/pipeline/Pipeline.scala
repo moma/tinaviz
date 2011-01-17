@@ -139,12 +139,12 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     g.category.zipWithIndex map {
       case (cat,i) =>
         println("scanning node "+i+ "("+cat+")")
-        if (g.visible(i) && cat.equals(category)) {
+        if (cat.equals(category)) {
           println("Removing node "+i)
           removeMe += i
         }
     }
-    var h = g.removeAll(removeMe)
+    var h = g.remove(removeMe)
     h
 
   }

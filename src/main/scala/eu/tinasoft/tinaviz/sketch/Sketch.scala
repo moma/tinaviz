@@ -239,6 +239,8 @@ case class Sketch (
           case ((j,weight),_j) =>
             val src = graph position i
             val trg = graph position j
+            //val srcd = graph density i
+            val trgd = graph density j
             val color = nodeColorLayer(i).blend(nodeColorLayer(j))
             tmpPosition ::= (src,trg)
             tmpColor ::= color
