@@ -29,7 +29,11 @@ class Server extends node.util.Actor {
 
     // current view settings
     "filter.view" -> "macro",
-    "filter.category" -> "Document",
+    "filter.node.category" -> "Document",
+    "filter.node.weight.min" -> 1.0,
+    "filter.node.weight.max" -> 0.0,
+    "filter.edge.weight.min" -> 1.0,
+    "filter.edge.weight.max" -> 0.0,
     "layout.gravity" ->  1.2, // stronger means faster!
     "layout.attraction" -> 10.0,
     "layout.repulsion" -> -1.4,
@@ -86,21 +90,30 @@ class Server extends node.util.Actor {
         case scene:Scene =>
           properties += "scene" -> scene
           pipelineBusy = false
+          self ! "frameRate" -> properties("frameRate") // force relaunching
 
+        case ("recenter",true) =>
+            println("TODO recentering")
+            //properties += "recenter" -> false
 
+        case ("select",uuid:String) =>
+             pipeline ! "select" -> uuid
+             
         case ('updated,"frameRate",value:Any,previous:Any) =>
 
-          val pause : Boolean = try { get[Boolean]("pause") } catch { case e => true }
+          val pause = get[Boolean]("pause") //: Boolean = try { get[Boolean]("pause") } catch { case e => true }
           if (!pause) {
             if (!pipelineBusy) {
               pipelineBusy = true
               pipeline ! "frameRate" -> value
+            } else {
+              //println("could not update pipeline, too busy..")
             }
           }
 
         case ('updated,key:String,value:Any,previous:Any) =>
           // log("ignoring update of "+key)
-          println("updating pipeline with this data: "+key+" -> "+value)
+          //println("updating pipeline with this data: "+key+" -> "+value)
           pipeline ! key -> value // update the pipeline
 
         case ('open, any:Any) => (new GEXF) ! any

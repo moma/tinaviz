@@ -53,7 +53,16 @@ object Graph {
     "inDegree" -> Array.empty[Int],
     "outDegree" -> Array.empty[Int],
     "nbNodes" -> 0,
-    "nbEdges" -> 0
+    "nbEdges" -> 0,
+    "filter.node.category" -> "Document",
+    "xMin" -> 0,
+    "yMin" -> 0,
+    "xMax" -> 0,
+    "yMax" -> 0,
+    "minOutDegree" -> 0,
+    "minInDegree" -> 0,
+    "maxnOutDegree" -> 0,
+    "maxInDegree" -> 0
   )
 }
 

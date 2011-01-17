@@ -105,14 +105,24 @@ trait Client {
    */
   // { action: unselect }
 
-  def openURI(str:String) = {
-    tinaviz ! 'open -> str
+  def openURI(url:String) = {
+      tinaviz ! 'open -> new java.net.URL(url)
   }
-  def openString(url:String) = {
-    tinaviz ! 'open -> new java.net.URL(url)
+  def openString(str:String) = {
+      tinaviz ! 'open -> str
   }
   def set(key:String, value:Any) {
     tinaviz ! key -> value
+  }
+  def setAs(key:String, value:Any, t:String) {
+    t match {
+       case "Int" => tinaviz ! key -> value.toString.toInt
+       case "Float" => tinaviz ! key -> value.toString.toFloat
+       case "Double" => tinaviz ! key -> value.toString.toDouble
+       case "Boolean" => tinaviz ! key -> value.toString.toBoolean
+       case "String" => tinaviz ! key -> value.toString
+       case x => tinaviz ! key -> value
+    }
   }
   def get(key:String) = {
     (tinaviz !? key)
@@ -172,7 +182,7 @@ trait Client {
 
 
   }
-    
+  
 
   /**
    * TODO fix it (blocking call!)

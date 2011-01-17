@@ -41,15 +41,23 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
           // reset
           case g:Graph =>
             data = g
-            categoryCache = applyCategory(data)
-            layoutCache = applyLayout(categoryCache)
+            self ! "filter.node.category"
 
+          case ("select", uuid:String) =>
+             if (uuid.equals("")) {
+                 // unselect all
+                data += "selected" -> data.selected.map( c => false )
+             } else {
+                data += (data.id(uuid), "select", true)
+             }
+             self ! "filter.node.category"
+             
           case (key:String, value:Any) =>
             println("updating graph attribute "+key+" -> "+value)
             data += key -> value
             self ! key
             
-          case "category" =>
+          case "filter.node.category" =>
             println("categoryCache = applyCategory(data)")
             categoryCache = applyCategory(data)
             layoutCache = applyLayout(categoryCache)
@@ -132,9 +140,14 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    }
    */
 
-
-  def applyCategory(g:Graph) = {
-    val category = g.get[String]("filter.category")
+/*
+  def applyView(g:Graph) = {
+    val view = g.get[String]("filter.view")
+    if (view.equals("macro")) {
+        
+    } else {
+    
+    }
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
       case (cat,i) =>
@@ -144,8 +157,21 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     }
     var h = g.remove(removeMe)
     h
-
+  }*/
+  
+  def applyCategory(g:Graph) = {
+    val category = g.get[String]("filter.node.category")
+    var removeMe = Set.empty[Int]
+    g.category.zipWithIndex map {
+      case (cat,i) =>
+        if (cat.equals(category)) {
+          removeMe += i
+        }
+    }
+    var h = g.remove(removeMe)
+    h
   }
+  
   /*
    def applyCategory(g:Graph) = {
    val category = g.get[String]("filter.category")
@@ -157,8 +183,9 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   /**
    * apply a force vector algorithm on the graph
    */
-  def applyLayout(g:Graph) = {
-    val nbNodes = g.get[Int]("nbNodes")
+  def applyLayout(g:Graph) : Graph = {
+    val nbNodes = g.nbNodes
+    if (nbNodes == 0) return g
     val barycenter = g.get[(Double,Double)]("baryCenter")
 
     val GRAVITY = g.get[Double]("layout.gravity")// stronger means faster!
