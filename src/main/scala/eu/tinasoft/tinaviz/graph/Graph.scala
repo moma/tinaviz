@@ -348,7 +348,9 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   }  
 
   def removeAll(set:Set[Int]) : Graph = {
-       val conversionTable = converter(set)
+       // Array (index ) -> newIndex
+       val conversionTable = converter(set, elements("nbNodes"))
+
 
        val newElements = elements.map {
 
