@@ -124,7 +124,7 @@ class GEXF extends node.util.Actor {
 
     var g = new Graph(Map("pause" -> false,
                           "filter.view" -> "macro",
-                          "filter.category" -> "Document",
+                          "filter.category" -> "NGram",
                           "layout.gravity" ->  1.1, // stronger means faster!
                           "layout.attraction" -> 1.01,
                           "layout.repulsion" -> 1.5))

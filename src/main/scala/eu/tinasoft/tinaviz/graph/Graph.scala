@@ -26,7 +26,7 @@ object Graph {
    * Default, dumb factory
    */
   def make(elements:Map[String,Any]) = {
-    elements.foreach{case (key,value) => println(" Entry: "+key+" ("+value+")")}
+    //elements.foreach{case (key,value) => println(" Entry: "+key+" ("+value+")")}
     // TODO: put nbNodes, nbEdges etc.. directly inside elements
     var g = new Graph(elements)
     g = g.computeAll
@@ -38,11 +38,28 @@ object Graph {
     g
   }
  
-  
+  val defaults : Map[String,Any] = Map ( 
+    "uuid" -> Array.empty[String],
+    "label" -> Array.empty[String],
+    "color" -> Array.empty[Color],
+    "selected" -> Array.empty[Boolean],
+    "density" -> Array.empty[Double],
+    "rate" -> Array.empty[Int],
+    "size" -> Array.empty[Double],
+    "weight" -> Array.empty[Double],
+    "category" -> Array.empty[String],
+    "position" -> Array.empty[(Double,Double)],
+    "links" -> Array.empty[Map[Int,Double]],
+    "inDegree" -> Array.empty[Int],
+    "outDegree" -> Array.empty[Int],
+    "nbNodes" -> 0,
+    "nbEdges" -> 0
+  )
 }
 
-class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
+class Graph (val _elements : Map[String,Any] = Map[String,Any]()) {
   
+  val elements = Graph.defaults ++ _elements
   
   /**
    * Used for export to GEXF
@@ -60,7 +77,6 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   val color = getArray[Color]("color")
   val weight = getArray[Double]("weight")
   val category = getArray[String]("category")
-  val visible = getArray[Boolean]("visible")
   val selected = getArray[Boolean]("selected")
   val label = getArray[String]("label")
   val rate = getArray[Int]("rate")
@@ -73,7 +89,7 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
   val ids = 0 until nbNodes // a Range on ID
   
   def hasAnyLink(i:Int,j:Int) = hasThisLink(i,j) | hasThisLink(j,i)
-  def hasThisLink(i:Int,j:Int) = links(i).contains(j)
+  def hasThisLink(i:Int,j:Int) = if (links.size > i) links(i).contains(j) else false
 
   def + (kv:(String,Any)) = {
     new Graph(elements + kv)
@@ -343,12 +359,12 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
     val _removed = removed.toList.sort{(a,b) => a < b}
     var j = 0
     (for (i <- 0 until nbNodes) yield {
-        if (_removed.size > j && i == _removed(j)) {
+        (if (_removed.size > j && i == _removed(j)) {
           j += 1
           -1
         } else {
           i - j
-        }
+        })
       }).toArray
   }  
   
@@ -369,17 +385,15 @@ class Graph (val elements : Map[String,Any] = Map[String,Any]()) {
           }.map {
             case (id,weight) => (conv(id),weight)
           }
-
         }
-        println("BEFORE: "+entries.size+" AFTER: "+newEntries.size)
         ("links",newEntries)
 
       case (key:String,entries:Seq[Any]) =>
         (key, (entries.zipWithIndex.filter {
-          case (entry,id) => conv(id) != -1
-        }.map{
-          _._1
-        }))
+              case (entry,id) => conv(id) != -1
+            }.map{
+              _._1
+            }))
 
       case (key:String,entry:Any) =>
         (key, entry)

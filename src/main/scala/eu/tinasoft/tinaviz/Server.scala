@@ -40,8 +40,8 @@ class Server extends node.util.Actor {
     "selectionRadius" -> 10.0,
 
     // TODO real-time camera settings
-    "zoom" -> 0.0,
-    "position" -> (0.0,0.0),
+    "camera.zoom" -> 0.0,
+    "camera.position" -> (0.0,0.0),
 
     "views.macro.pause" -> false,
     "views.macro.debug" -> false,

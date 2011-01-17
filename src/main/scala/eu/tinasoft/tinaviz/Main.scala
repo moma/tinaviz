@@ -82,9 +82,9 @@ class Main extends TApplet with Client {
       case e:Exception =>
         tinaviz ! 'open -> new java.net.URL(
           // "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-          "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+         // "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
-          //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
         )
     }
   }
@@ -173,10 +173,10 @@ class Main extends TApplet with Client {
   }
 
   override def zoomUpdated(value:Double) {
-    tinaviz ! "zoom" -> value
+    tinaviz ! "camera.zoom" -> value
   }
   override def positionUpdated(value:(Double,Double)) {
-    tinaviz ! "position" -> value
+    tinaviz ! "camera.position" -> value
   }
 
   override def keyPressed() {

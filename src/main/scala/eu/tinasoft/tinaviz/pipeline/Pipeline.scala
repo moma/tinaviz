@@ -45,7 +45,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
             layoutCache = applyLayout(categoryCache)
 
           case (key:String, value:Any) =>
-            //println("updating graph attribute "+key+" -> "+value)
+            println("updating graph attribute "+key+" -> "+value)
             data += key -> value
             self ! key
             
@@ -138,9 +138,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
       case (cat,i) =>
-        println("scanning node "+i+ "("+cat+")")
         if (cat.equals(category)) {
-          println("Removing node "+i)
           removeMe += i
         }
     }
