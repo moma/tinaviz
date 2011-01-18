@@ -130,7 +130,6 @@ class GEXF extends node.util.Actor {
                           "layout.repulsion" -> 1.5))
     */                  
     var g = new Graph()
-
     var id = -1
     for (n <- (root \\ "node")) {
       id += 1
@@ -159,7 +158,7 @@ class GEXF extends node.util.Actor {
       g += (id, "color", color)
       g += (id, "selected", Maths.randomBool)
       g += (id, "density", 1.0)
-      g += (id, "rating", 1)
+      g += (id, "rate", 1)
       g += (id, "size", 1.0)
       g += (id, "weight", 1.0)
       g += (id, "category", "Default")

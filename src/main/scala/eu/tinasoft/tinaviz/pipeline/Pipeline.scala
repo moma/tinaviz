@@ -169,8 +169,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
           removeMe += i
         }
     }
-    var h = g.remove(removeMe)
-    h
+    g.remove(removeMe)
   }
   
   
@@ -285,6 +284,6 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
 
     }
   }
- 
+
   
 }
