@@ -1,4 +1,3 @@
-
 package eu.tinasoft.tinaviz
 
 import javax.swing.JFrame
@@ -15,6 +14,7 @@ import tinaviz.scene._
 import tinaviz.util._
 import tinaviz.util.Color._
 import math.Pi
+
 /**
  * The Main object
  *
@@ -51,40 +51,46 @@ object Main {
  * @throws
  */
 class Main extends TApplet with Client {
-  
-  override def setup(): Unit = {
 
-    // set some defaults
-    setDefault("scene", new Scene())
-    setDefault("debug", false)
-    setDefault("pause", true)
-    setDefault("selectionRadius", 10.0)
-    size(800,600,PConstants.P2D)
+  override def setup(): Unit = {
+    size(800, 600, PConstants.P2D)
     //size(screenWidth - 400, screenHeight - 400, PConstants.P2D)
-    frameRate(25)
+    frameRate(20)
     noSmooth
     //smooth
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
     bezierDetail(16)
+
+    // set some defaults
+    setDefault("scene", new Scene())
+    setDefault("debug", false)
+    setDefault("pause", true)
+    setDefault("selectionRadius", 10.0)
+
+
     addMouseWheelListener(this)
 
     Browser.start
+
+
     try {
       Browser.init(this, getParameter("js_context"))
+      println("Connecting to web browser..")
     } catch {
       //case exc:NullPointerException =>
       // println("Null pointer exception: "+exc)
       //case exc:JSException =>
       //println("Javascript exception: "+exc)
       //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
-      case e:Exception =>
+      case e: Exception =>
+        println("Looking like we are not running in a web browser context..")
         tinaviz ! 'open -> new java.net.URL(
           // "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-         "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+          "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
-         // "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          // "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
         )
     }
   }
@@ -99,17 +105,17 @@ class Main extends TApplet with Client {
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
-    
+
     // drawing
     //smooth()
-    
+
     setBackground(scene.background)
     if (debug) {
       setColor(scene.foreground)
       text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + scene.nbNodes + " nodes, "+scene.nbEdges+" edges", 10f, 32f)
+      text("drawing " + scene.nbNodes + " nodes, " + scene.nbEdges + " edges", 10f, 32f)
     }
-    
+
 
     // TODO use an immutable Camera (this is the reason for the selection disk bug)
     setupCamera
@@ -120,17 +126,17 @@ class Main extends TApplet with Client {
     noFill
 
     scene.edgePositionLayer.zipWithIndex foreach {
-      case ((source,target),i) =>
+      case ((source, target), i) =>
         val psource = screenPosition(source)
         val ptarget = screenPosition(target)
         if (isVisible(psource) || isVisible(ptarget)) {
           val powd = distance(psource, ptarget)
-          val modulator = 
+          val modulator =
             if (powd >= 10 && width >= 11)
               limit(PApplet.map(powd.toFloat, 10, width, 1, 70), 1, 70)
-          else 
-            1
-          
+            else
+              1
+
           setLod(modulator.toInt)
           lineColor(scene.edgeColorLayer(i))
           //lineThickness(e.weight)
@@ -142,11 +148,11 @@ class Main extends TApplet with Client {
     lineThickness(0)
     noStroke
     scene.nodePositionLayer.zipWithIndex foreach {
-      case (position,i) =>
+      case (position, i) =>
         val size = scene.nodeSizeLayer(i)
         setColor(scene.nodeBorderColorLayer(i))
         scene.nodeShapeLayer(i) match {
-          case 'Disk => 
+          case 'Disk =>
             drawDisk(position, size)
             setColor(scene.nodeColorLayer(i))
             drawDisk(position, size * 0.8)
@@ -159,12 +165,12 @@ class Main extends TApplet with Client {
 
     setColor(scene.labelColor)
     scene.nodePositionLayer.zipWithIndex foreach {
-      case (position,i) =>
+      case (position, i) =>
         val size = scene.nodeSizeLayer(i)
         val np = screenPosition(position._1 + size,
-                                position._2 + size / Pi)
-        text(scene.nodeLabelLayer(i), np._1,np._2)
-  
+          position._2 + size / Pi)
+        text(scene.nodeLabelLayer(i), np._1, np._2)
+
     }
 
 
@@ -172,10 +178,11 @@ class Main extends TApplet with Client {
 
   }
 
-  override def zoomUpdated(value:Double) {
+  override def zoomUpdated(value: Double) {
     tinaviz ! "camera.zoom" -> value
   }
-  override def positionUpdated(value:(Double,Double)) {
+
+  override def positionUpdated(value: (Double, Double)) {
     tinaviz ! "camera.position" -> value
   }
 

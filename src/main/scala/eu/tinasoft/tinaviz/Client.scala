@@ -114,7 +114,8 @@ trait Client {
   def set(key:String, value:Any) {
     tinaviz ! key -> value
   }
-  def setAs(key:String, value:Any, t:String) {
+
+  def setAs(key:String, value:java.lang.Object, t:String) = {
   println("setAs(key:"+key+", value:"+value+", t:"+t+")");
     t match {
        case "Int" => 
@@ -129,6 +130,7 @@ trait Client {
        case "String" => tinaviz ! key -> value.toString
        case x => tinaviz ! key -> value
     }
+    null
   }
   def get(key:String) = {
     (tinaviz !? key)
