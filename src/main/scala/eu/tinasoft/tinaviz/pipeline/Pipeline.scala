@@ -16,9 +16,9 @@ import tinaviz.util.Vector._
 import actors.Actor
 
 /**
- * 
+ *
  */
-class Pipeline(val actor:Actor) extends node.util.Actor {
+class Pipeline(val actor: Actor) extends node.util.Actor {
 
   start
 
@@ -28,61 +28,75 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
   var data = new Graph()
 
   var categoryCache = new Graph()
+  var nodeWeightCache = new Graph()
+  var edgeWeightCache = new Graph()
   var layoutCache = new Graph()
   var sketch = new Sketch()
   var scene = new Scene()
 
   //var busy = false
-  
+
   def act() {
-    while(true) {
+    while (true) {
       loop {
         react {
           // reset
-          case g:Graph =>
+          case g: Graph =>
             data = g
             self ! "filter.node.category"
 
-          case ("select", uuid:String) =>
-             if (uuid.equals("")) {
-                 // unselect all
-                data += "selected" -> data.selected.map( c => false )
-             } else {
-                data += (data.id(uuid), "select", true)
-             }
-             self ! "filter.node.category"
-             
-          case (key:String, value:Any) =>
-            println("updating graph attribute "+key+" -> "+value)
+          case ("select", uuid: String) =>
+            if (uuid.equals("")) {
+              // unselect all
+              data += "selected" -> data.selected.map(c => false)
+            } else {
+              data += (data.id(uuid), "select", true)
+            }
+            self ! "filter.node.category"
+
+          case (key: String, value: Any) =>
+            println("updating graph attribute " + key + " -> " + value)
             data += key -> value
             self ! key
-            
+
           case "filter.node.category" =>
             println("categoryCache = applyCategory(data)")
             categoryCache = applyCategory(data)
-            layoutCache = applyLayout(categoryCache)
-            
+            self ! "filter.node.weight"
+
+          case "filter.node.weight" =>
+            println("nodeWeightCache = applyNodeWeight(categoryCache)")
+            // reinject positions into a new graph
+            val tmp = categoryCache + ("position" -> layoutCache("position"))
+
+            nodeWeightCache = applyNodeWeight(layoutCache)
+            edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+            self ! "filter.edge.weight"
+
+          case "filter.edge.weight" =>
+            println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+            edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+            layoutCache = applyLayout(edgeWeightCache)
+
           case "frameRate" =>
-            //if (!busy) {
-            // busy = true
-            //println("layoutCache = applyLayout(layoutCache)")
+          //if (!busy) {
+          // busy = true
+          //println("layoutCache = applyLayout(layoutCache)")
             layoutCache = applyLayout(layoutCache)
             //println("")
 
             // we could merge sketch and scene by making sketch immutable
             // and self-generating
             sketch.update(layoutCache)
-            scene = sketch:Scene
+            scene = sketch: Scene
             actor ! scene
-            
 
 
-
-          case s:String =>
-            // ignore
-            // 
-            //case
-          case msg => println("unknow msg: "+msg)
+          case s: String =>
+          // ignore
+          //
+          //case
+          case msg => println("unknow msg: " + msg)
         }
       }
     }
@@ -140,7 +154,7 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    }
    */
 
-/*
+  /*
   def applyView(g:Graph) = {
     val view = g.get[String]("filter.view")
     if (view.equals("macro")) {
@@ -158,70 +172,86 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
     var h = g.remove(removeMe)
     h
   }*/
-  
-  def applyCategory(g:Graph) : Graph = {
+
+  def applyCategory(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
     val category = g.get[String]("filter.node.category")
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
-      case (cat,i) =>
+      case (cat, i) =>
         if (cat.equals(category)) {
           removeMe += i
         }
     }
     g.remove(removeMe)
   }
-  
-  
-  def applyNodeWeight(g:Graph) : Graph = {
+
+
+  def applyNodeWeight(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val range = g.get[(Double,Double)]("filter.node.weight")
-    g
+    val range = g.get[(Double, Double)]("filter.node.weight")
+    var removeMe = Set.empty[Int]
+    g.weight.zipWithIndex.map {
+      case (weight, i) =>
+        println("filtering " + weight + " : " + i)
+        if (!(range._1 <= weight && weight <= range._2)) {
+          removeMe += i
+        }
+    }
+    g.remove(removeMe)
   }
-  
-   def applyEdgeWeight(g:Graph) : Graph = {
+
+  def applyEdgeWeight(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val range = g.get[(Double,Double)]("filter.edge.weight")
-    g
+    val range = g.get[(Double, Double)]("filter.edge.weight")
+
+    val newLinks = g.links map {
+      case links =>
+        links.filter {
+          case (id, weight) => (range._1 <= weight && weight <= range._2)
+        }
+    }
+
+    g + ("links" -> newLinks)
   }
-   
+
   /*
-   def applyCategory(g:Graph) = {
-   val category = g.get[String]("filter.category")
-   g + ("visible" -> (g.category.zipWithIndex map {
-   case (cat,i) =>
-   (g.visible(i) && g.equals(category))
-   }))
-   }*/
+  def applyCategory(g:Graph) = {
+  val category = g.get[String]("filter.category")
+  g + ("visible" -> (g.category.zipWithIndex map {
+  case (cat,i) =>
+  (g.visible(i) && g.equals(category))
+  }))
+  }*/
   /**
    * apply a force vector algorithm on the graph
    */
-  def applyLayout(g:Graph) : Graph = {
+  def applyLayout(g: Graph): Graph = {
     val nbNodes = g.nbNodes
     if (nbNodes == 0) return g
-    val barycenter = g.get[(Double,Double)]("baryCenter")
-    val GRAVITY = g.get[Double]("layout.gravity")// stronger means faster!
+    val barycenter = g.get[(Double, Double)]("baryCenter")
+    val GRAVITY = g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
-    val REPULSION = g.get[Double]("layout.repulsion")// (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
+    val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
 
     //println("running forceVector on "+nbNodes+" nodes")
 
     val positions = g.position.zipWithIndex map {
-      case (p1,i) =>
-        var force = (0.0,0.0).computeForce(GRAVITY, barycenter)
+      case (p1, i) =>
+        var force = (0.0, 0.0).computeForce(GRAVITY, barycenter)
         g.position.zipWithIndex map {
-          case (p2,j)=>
+          case (p2, j) =>
             val p2inDegree = data inDegree j
             val p2outDegree = data outDegree j
             // todo: attract less if too close (will work for both gravity and node attraction)
 
-            if (g.hasAnyLink(i,j)) {
+            if (g.hasAnyLink(i, j)) {
               force += p1.computeForce(ATTRACTION, p2)
             } else {
               force -= p1.computeForceLimiter(REPULSION, p2)
             }
         }
-        
+
         // random repulse
         /*
           if (Maths.random() < 0.05f) {
@@ -275,15 +305,14 @@ class Pipeline(val actor:Actor) extends node.util.Actor {
    */
 
 
-
-  def transformColumn[T](column:String,filter: T => T) = {
+  def transformColumn[T](column: String, filter: T => T) = {
     var dataArray = data.getArray[T](column)
     dataArray.foreach {
       case entry =>
-        
+
 
     }
   }
 
-  
+
 }
