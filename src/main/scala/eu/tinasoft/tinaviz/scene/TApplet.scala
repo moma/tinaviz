@@ -7,25 +7,24 @@ package eu.tinasoft.tinaviz.scene
 
 import processing.core._
 
-import eu.tinasoft._
-
 import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 
+import eu.tinasoft._
+
 import tinaviz.util._
-import tinaviz.util.Color._
 
-class Fonts(val p : PApplet,
-            val fontName : String = "Arial",
-            val size:Int=80,
-            val defaultFontSize : Int = 12) {
+class Fonts(val p: PApplet,
+            val fontName: String = "Arial",
+            val size: Int = 80,
+            val defaultFontSize: Int = 12) {
 
-  val fonts = for (i <- List.range(1,size))
-    yield p.createFont(fontName, i, true)
+  val fonts = for (i <- List.range(1, size))
+  yield p.createFont(fontName, i, true)
 
-  val defaultFont = fonts(defaultFontSize)   
-    
-  def get(s:Int) = fonts (if (s > 1) (if (s < size) s else size) else 1)
+  val defaultFont = fonts(defaultFontSize)
+
+  def get(s: Int) = fonts(if (s > 1) (if (s < size) s else size) else 1)
 }
 
 /**
@@ -41,20 +40,26 @@ class Fonts(val p : PApplet,
  * @throws
  */
 class TApplet extends PApplet with MouseWheelListener {
-  
+
+  val minZoom = 0.1
+  val maxZoom = 150.0
+
   private val _fonts = new Fonts(this)
   private val _camera = new Camera()
 
   def getZoom = _camera.zoom
+
   def getPosition = _camera.position
-  def getCamera = (_camera.position,_camera.zoom)
+
+  def getCamera = (_camera.position, _camera.zoom)
+
   /**
    * Draw a square-like shape from a Double Tuple, which represents the position.
    * You must also give a side length.
    *
    */
-  protected def drawSquare(position:(Double,Double),side:Double) = {
-    rect(position._1.toFloat,position._2.toFloat,side.toFloat,side.toFloat)
+  protected def drawSquare(position: (Double, Double), side: Double) = {
+    rect(position._1.toFloat, position._2.toFloat, side.toFloat, side.toFloat)
   }
 
   /**
@@ -62,8 +67,8 @@ class TApplet extends PApplet with MouseWheelListener {
    * You must also give a radius.
    *
    */
-  protected def drawDisk(position:(Double,Double),radius:Double) = {
-    ellipse(position._1.toFloat,position._2.toFloat,radius.toFloat,radius.toFloat)
+  protected def drawDisk(position: (Double, Double), radius: Double) = {
+    ellipse(position._1.toFloat, position._2.toFloat, radius.toFloat, radius.toFloat)
   }
 
   /**
@@ -71,8 +76,8 @@ class TApplet extends PApplet with MouseWheelListener {
    * and target positions.
    *
    */
-  protected def drawCurve(n1:(Double,Double), n2:(Double,Double)) = {
-    drawCurve4(n1._1.toFloat,n1._2.toFloat,n2._1.toFloat,n2._2.toFloat)
+  protected def drawCurve(n1: (Double, Double), n2: (Double, Double)) = {
+    drawCurve4(n1._1.toFloat, n1._2.toFloat, n2._1.toFloat, n2._2.toFloat)
   }
 
   /**
@@ -82,7 +87,7 @@ class TApplet extends PApplet with MouseWheelListener {
    * Original code is not from me, but the original prototype of graphviz
    *
    */
-  private def drawCurve4(n1x:Float, n1y:Float, n2x:Float, n2y:Float) = {
+  private def drawCurve4(n1x: Float, n1y: Float, n2x: Float, n2y: Float) = {
 
     val xa0 = (6 * n1x + n2x) / 7
     val ya0 = (6 * n1y + n2y) / 7
@@ -96,9 +101,9 @@ class TApplet extends PApplet with MouseWheelListener {
 
     //if (curveMode == curveMode.CURVY) {
     bezier(n1x, n1y,
-           xya1a.toFloat, xya1b.toFloat,
-           xyb1a.toFloat, xyb1b.toFloat,
-           n2x, n2y)
+      xya1a.toFloat, xya1b.toFloat,
+      xyb1a.toFloat, xyb1b.toFloat,
+      n2x, n2y)
     //} else {
     //    line(n1x, n1y, n2x, n2y);
     //}
@@ -108,69 +113,72 @@ class TApplet extends PApplet with MouseWheelListener {
   /**
    * Convert a Tuple2 of Double to a PVector
    */
-  implicit def tuple2ToPVector(v:(Double,Double)) : PVector = {
-    new PVector(v._1.toFloat,v._2.toFloat,0.0f)
+  implicit def tuple2ToPVector(v: (Double, Double)): PVector = {
+    new PVector(v._1.toFloat, v._2.toFloat, 0.0f)
   }
 
   /**
    * Convert a Tuple3 of Double to a PVector
    */
-  implicit def tuple3ToPVector(v:(Double,Double,Double)) : PVector = {
-    new PVector(v._1.toFloat,v._2.toFloat,v._3.toFloat)
+  implicit def tuple3ToPVector(v: (Double, Double, Double)): PVector = {
+    new PVector(v._1.toFloat, v._2.toFloat, v._3.toFloat)
   }
 
   /**
    * Convert a PVector to a Tuple2 of Double
    */
-  implicit def pvectorToTuple2(v:PVector) : (Double,Double) = {
-    (v.x.toDouble,v.y.toDouble)
+  implicit def pvectorToTuple2(v: PVector): (Double, Double) = {
+    (v.x.toDouble, v.y.toDouble)
   }
 
   /**
    * Convert a PVector to a Tuple3 of Double
    */
-  implicit def pvectorToTuple3(v:PVector) : (Double,Double,Double) = {
-    (v.x.toDouble,v.y.toDouble,v.z.toDouble)
+  implicit def pvectorToTuple3(v: PVector): (Double, Double, Double) = {
+    (v.x.toDouble, v.y.toDouble, v.z.toDouble)
   }
 
   /**
    * Move the Camera at a given position
    */
-  protected def moveCameraAt(x:Double,y:Double,z:Double) {
+  protected def moveCameraAt(x: Double, y: Double, z: Double) {
     translate(x.toFloat, y.toFloat)
     scale(z.toFloat)
   }
 
   protected def setupCamera = {
-    moveCameraAt(_camera.position._1, _camera.position._2,  _camera.zoom)
+    moveCameraAt(_camera.position._1, _camera.position._2, _camera.zoom)
   }
 
   /**
    * Set the Background color
    */
-  protected def setBackground (c:Color) = {
-    background(c.h.toFloat,c.s.toFloat,c.b.toFloat,c.a.toFloat)
+  protected def setBackground(c: Color) = {
+    background(c.h.toFloat, c.s.toFloat, c.b.toFloat, c.a.toFloat)
   }
 
-  protected def setFontSize(size:Int) = {
+  protected def setFontSize(size: Int) = {
     textFont(_fonts.get(size))
   }
 
-  protected def setColor (c:Color) = {
-    fill(c.h.toFloat,c.s.toFloat,c.b.toFloat,c.a.toFloat)
+  protected def setColor(c: Color) = {
+    fill(c.h.toFloat, c.s.toFloat, c.b.toFloat, c.a.toFloat)
   }
 
-  protected def setLod (v:Int) = {
+  protected def setLod(v: Int) = {
     bezierDetail(v)
   }
-  protected def lineColor(c:Color) = {
-    stroke(c.h.toFloat,c.s.toFloat,c.b.toFloat,c.a.toFloat)
+
+  protected def lineColor(c: Color) = {
+    stroke(c.h.toFloat, c.s.toFloat, c.b.toFloat, c.a.toFloat)
   }
-  protected def lineThickness(t:Double) = {
+
+  protected def lineThickness(t: Double) = {
     strokeWeight(t.toFloat)
   }
-  protected def distance(a:(Int,Int),b:(Int,Int)) : Double = {
-    PApplet.dist(a._1.toFloat,a._2.toFloat, b._1.toFloat, b._2.toFloat)
+
+  protected def distance(a: (Int, Int), b: (Int, Int)): Double = {
+    PApplet.dist(a._1.toFloat, a._2.toFloat, b._1.toFloat, b._2.toFloat)
   }
 
   /*
@@ -214,17 +222,16 @@ class TApplet extends PApplet with MouseWheelListener {
    _camera.position = (v._1,v._2,zr)
    */
 
-  val minZoom = 0.1
-  val maxZoom = 100.0
 
-  def limit(v:Double,min:Double,max:Double) : Double = {
+  def limit(v: Double, min: Double, max: Double): Double = {
     if (v < min) min else if (v > max) max else v
   }
 
-  protected def zoomUpdated(v:Double) {}
-  protected def positionUpdated(v:(Double,Double)) {}
+  protected def zoomUpdated(v: Double) {}
 
-  def zoom(zoomIn:Boolean) {
+  protected def positionUpdated(v: (Double, Double)) {}
+
+  def zoom(zoomIn: Boolean) {
 
     _camera.lastMousePosition = (mouseX, mouseY)
     _camera.center = (mouseX, mouseY)
@@ -235,7 +242,7 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.zoom = limit(_camera.zoom * zoomRatio, minZoom, maxZoom)
     zoomUpdated(_camera.zoom)
 
-    val p : PVector = _camera.position
+    val p: PVector = _camera.position
     p.sub(_camera.center)
     p.mult(zoomRatio.toFloat)
     p.add(_camera.center)
@@ -246,37 +253,39 @@ class TApplet extends PApplet with MouseWheelListener {
   /**
    * Are the given coordinate invisible?
    */
-  def isVisible (p:(Int,Int)) = {
+  def isVisible(p: (Int, Int)) = {
     val w = width / 4.
     val h = height / 4.
     ((p._1 > -w) && (p._1 < (width + w))
-     && (p._2 > -h) && (p._2 < (height + h)))
+      && (p._2 > -h) && (p._2 < (height + h)))
   }
-  
+
   /**
    * Are the given coordinate visible?
    */
-  def isInvisible (p:(Int,Int)) = ! isVisible (p)
+  def isInvisible(p: (Int, Int)) = !isVisible(p)
 
   /**
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
-  def screenPosition (p:(Double,Double)) : (Int,Int) = {
-    screenPosition(p._1,p._2)
+  def screenPosition(p: (Double, Double)): (Int, Int) = {
+    screenPosition(p._1, p._2)
   }
+
   /**
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
-  def screenPosition (x:Double,y:Double) : (Int,Int) = {
+  def screenPosition(x: Double, y: Double): (Int, Int) = {
     (screenX(x.toFloat, y.toFloat).toInt,
-     screenY(x.toFloat, y.toFloat).toInt)
+      screenY(x.toFloat, y.toFloat).toInt)
   }
+
   /**
    * Get the size to the screen
    */
-  def screenSize (s:Double) : Int = {
+  def screenSize(s: Double): Int = {
     (s * _camera.zoom).toInt
   }
 
@@ -290,33 +299,33 @@ class TApplet extends PApplet with MouseWheelListener {
 
    }*/
 
-  def showSelectionCircle(radius:Double) {
+  def showSelectionCircle(radius: Double) {
 
     if (radius < 1) return
-    
-    scale((1.0/_camera.zoom).toFloat)
+
+    scale((1.0 / _camera.zoom).toFloat)
     translate(-_camera.position._1.toFloat, -_camera.position._2.toFloat)
     stroke(0.0f, 1.0f, 0.0f, 0.6f)
     strokeWeight(1.0f)
     fill(.3f, 1.0f, 1.0f, 0.3f)
-    drawDisk((mouseX, mouseY),radius)
+    drawDisk((mouseX, mouseY), radius)
     translate(_camera.position._1.toFloat, _camera.position._2.toFloat)
     scale(_camera.zoom.toFloat)
-   
+
   }
-    
+
   def stopAutoCentering {
-    
+
   }
-  
+
   override def mouseDragged {
     stopAutoCentering
-    val p : PVector = _camera.position
-    val t : PVector = _camera.position
+    val p: PVector = _camera.position
+    val t: PVector = _camera.position
     t.sub(_camera.lastMousePosition)
-    _camera.lastMousePosition = (mouseX,mouseY)
+    _camera.lastMousePosition = (mouseX, mouseY)
     t.add(_camera.lastMousePosition)
-    _camera.positionDelta = PVector.sub(p,t)
+    _camera.positionDelta = PVector.sub(p, t)
     _camera.position = t
     _camera.dragged = true
     positionUpdated(_camera.position)
@@ -326,16 +335,17 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.lastMousePosition = (mouseX, mouseY)
 
   }
+
   override def mouseReleased {
     _camera.lastMousePosition = (mouseX, mouseY)
     _camera.dragged = false
   }
 
-  override def mouseWheelMoved(e:MouseWheelEvent) {
+  override def mouseWheelMoved(e: MouseWheelEvent) {
     if (!(mouseX < 0
-          | mouseX > width
-          | mouseY < 0
-          | mouseY > height)) {
+      | mouseX > width
+      | mouseY < 0
+      | mouseY > height)) {
       if (e.getUnitsToScroll != 0) {
         zoom(e.getWheelRotation < 0)
       }

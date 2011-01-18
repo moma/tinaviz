@@ -59,7 +59,7 @@ class Main extends TApplet with Client {
     setDefault("debug", false)
     setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
-    size(800,600)
+    size(800,600,PConstants.P2D)
     //size(screenWidth - 400, screenHeight - 400, PConstants.P2D)
     frameRate(25)
     noSmooth
