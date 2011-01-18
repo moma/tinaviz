@@ -110,17 +110,17 @@ class Server extends node.util.Actor {
         case ("filter.edge.weight.max", value:Double) =>
              self ! (("filter.edge.weight", (properties("filter.edge.weight").asInstanceOf[(Double,Double)]._1,value)))
              
-        case ("filter.node.weight.min") =>
+        case "filter.node.weight.min" =>
              reply(properties("filter.node.weight").asInstanceOf[(Double,Double)]._1)
              
-        case ("filter.node.weight.max", value:Double) =>
+        case "filter.node.weight.max" =>
              reply(properties("filter.node.weight").asInstanceOf[(Double,Double)]._2)
              
-        case ("filter.edge.weight.min", value:Double) =>
+        case "filter.edge.weight.min" =>
              reply(properties("filter.edge.weight").asInstanceOf[(Double,Double)]._1)
              
-        case ("filter.edge.weight.max", value:Double) =>
-             reply(properties("filter.edge.weight").asInstanceOf[(Double,Double)]._2))
+        case "filter.edge.weight.max" =>
+             reply(properties("filter.edge.weight").asInstanceOf[(Double,Double)]._2)
              
            
         case ('updated,"frameRate",value:Any,previous:Any) =>
