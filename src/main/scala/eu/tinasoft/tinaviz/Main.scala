@@ -55,9 +55,9 @@ class Main extends TApplet with Client {
   override def setup(): Unit = {
     size(800, 600, PConstants.P2D)
     //size(screenWidth - 400, screenHeight - 400, PConstants.P2D)
-    frameRate(20)
-    noSmooth
-    //smooth
+    frameRate(25)
+    //noSmooth
+    smooth
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
@@ -147,7 +147,7 @@ class Main extends TApplet with Client {
     setLod(16)
     lineThickness(0)
     noStroke
-    scene.nodePositionLayer.zipWithIndex foreach {
+    scene.nodePositionLayer.filter{case position => isVisible(screenPosition(position))}.zipWithIndex foreach {
       case (position, i) =>
         val size = scene.nodeSizeLayer(i)
         setColor(scene.nodeBorderColorLayer(i))
@@ -164,7 +164,7 @@ class Main extends TApplet with Client {
     }
 
     setColor(scene.labelColor)
-    scene.nodePositionLayer.zipWithIndex foreach {
+    scene.nodePositionLayer.filter{case position => isVisible(screenPosition(position))}.zipWithIndex foreach {
       case (position, i) =>
         val size = scene.nodeSizeLayer(i)
         val np = screenPosition(position._1 + size,

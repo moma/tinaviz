@@ -62,21 +62,24 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           case "filter.node.category" =>
             println("categoryCache = applyCategory(data)")
             categoryCache = applyCategory(data)
-            self ! "filter.node.weight"
+            categoryCache = categoryCache.updatePosition(layoutCache)
+            nodeWeightCache = applyNodeWeight(categoryCache)
+            edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+            layoutCache = edgeWeightCache
 
           case "filter.node.weight" =>
             println("nodeWeightCache = applyNodeWeight(categoryCache)")
-            // reinject positions into a new graph
-            val tmp = categoryCache + ("position" -> layoutCache("position"))
-
-            nodeWeightCache = applyNodeWeight(layoutCache)
+            categoryCache = categoryCache.updatePosition(layoutCache)
+            nodeWeightCache = applyNodeWeight(categoryCache)
             edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-            self ! "filter.edge.weight"
+            layoutCache = edgeWeightCache
+
 
           case "filter.edge.weight" =>
             println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+            nodeWeightCache = nodeWeightCache.updatePosition(layoutCache)
             edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-            layoutCache = applyLayout(edgeWeightCache)
+            layoutCache = edgeWeightCache
 
           case "frameRate" =>
           //if (!busy) {
@@ -198,7 +201,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           removeMe += i
         }
     }
-    g.remove(removeMe)
+    //g.remove(removeMe)
+    g //
   }
 
   def applyEdgeWeight(g: Graph): Graph = {
@@ -212,7 +216,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
         }
     }
 
-    g + ("links" -> newLinks)
+    g // + ("links" -> newLinks)
   }
 
   /*

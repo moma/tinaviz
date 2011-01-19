@@ -401,10 +401,18 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
 
-  def update[T](g:Graph, key:String) : Graph = {
-       val source = g.getArray[T](key)
-       var target = getArray[T](key).zipWithIndex.map { case (elem, i) => source(g.id(uuid(i))) }
-       Graph.make(elements + target.toArray)
+
+  def updatePosition(g:Graph) : Graph = {
+       val source = g.getArray[(Double,Double)]("position")
+       var target : Array[(Double,Double)] = getArray[(Double,Double)]("position").zipWithIndex.map {
+         case (elem, i) =>
+           val u = uuid(i)
+           val id = g.id(u)
+           if (id == -1) elem else source(id)
+
+       }
+       Graph.make(elements + ("position" -> target.toArray))
   }
+
 
 }
