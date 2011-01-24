@@ -147,24 +147,28 @@ class Main extends TApplet with Client {
     setLod(16)
     lineThickness(0)
     noStroke
-    scene.nodePositionLayer.filter{case position => isVisible(screenPosition(position))}.zipWithIndex foreach {
+    val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter{
+      case (position,i) => isVisible(screenPosition(position))
+    }
+    visibleNodes.foreach {
       case (position, i) =>
         val size = scene.nodeSizeLayer(i)
+        val color = scene.nodeColorLayer(i)
         setColor(scene.nodeBorderColorLayer(i))
         scene.nodeShapeLayer(i) match {
           case 'Disk =>
             drawDisk(position, size)
-            setColor(scene.nodeColorLayer(i))
+            setColor(color)
             drawDisk(position, size * 0.8)
           case x =>
             drawSquare(position, size)
-            setColor(scene.nodeColorLayer(i))
+            setColor(color)
             drawSquare(position, size * 0.8)
         }
     }
 
     setColor(scene.labelColor)
-    scene.nodePositionLayer.filter{case position => isVisible(screenPosition(position))}.zipWithIndex foreach {
+    visibleNodes.foreach {
       case (position, i) =>
         val size = scene.nodeSizeLayer(i)
         val np = screenPosition(position._1 + size,

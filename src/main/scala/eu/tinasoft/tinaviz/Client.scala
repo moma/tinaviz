@@ -233,7 +233,7 @@ trait Client {
   
   // TODO should be asynchronous
   def getNodes(view:String, category:String) : String = {
-       //val nodes = (tinaviz ?! "nodes")
+       val nodes = (tinaviz ?! 'getNodes)
        println("NOT IMPLEMENTED getNodes(view: "+view+", category: "+category+")")
        return "[]"
   }
