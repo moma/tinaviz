@@ -97,5 +97,19 @@ class Color(val h:Double=1.0,
               (b+c.b)/2,
               (a+c.a)/2)
   }
-
+  def hue(x:Double) : Color = {
+    new Color(x,s,b,a)
+  }
+  def saturation(x:Double) : Color = {
+    new Color(h,x,b,a)
+  }
+  def brightness(x:Double) : Color = {
+    new Color(h,s,x,a)
+  }
+  def saturateBy(x:Double) : Color = {
+    new Color(h,s*x,b,a)
+  }
+ def brightnessBy(x:Double) : Color = {
+    new Color(h,s,b*x,a)
+  }
 }
