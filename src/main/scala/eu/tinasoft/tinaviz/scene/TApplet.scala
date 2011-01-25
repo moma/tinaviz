@@ -228,8 +228,8 @@ class TApplet extends PApplet with MouseWheelListener {
   }
 
   protected def zoomUpdated(v: Double) {}
-
   protected def positionUpdated(v: (Double, Double)) {}
+  protected def mouseUpdated(mode: Symbol, onScreen: (Double, Double), inGraph: (Double,Double)) {}
 
   def zoom(zoomIn: Boolean) {
 
@@ -308,22 +308,29 @@ class TApplet extends PApplet with MouseWheelListener {
     stroke(0.0f, 1.0f, 0.0f, 0.6f)
     strokeWeight(1.0f)
     fill(.3f, 1.0f, 1.0f, 0.3f)
-    drawDisk((mouseX, mouseY), radius)
+    drawDisk(mouseXY, radius)
     translate(_camera.position._1.toFloat, _camera.position._2.toFloat)
     scale(_camera.zoom.toFloat)
 
   }
+  def mouseXY = (mouseX.toDouble,mouseY.toDouble)
+  def mouseXYInModel = {
+    ((mouseX.toDouble / _camera.zoom) - _camera.position._1,
+     (mouseY.toDouble / _camera.zoom) - _camera.position._2)
+  }
+
 
   def stopAutoCentering {
 
   }
 
   override def mouseDragged {
+    mouseUpdated('Dragging, mouseXY, mouseXYInModel)
     stopAutoCentering
     val p: PVector = _camera.position
     val t: PVector = _camera.position
     t.sub(_camera.lastMousePosition)
-    _camera.lastMousePosition = (mouseX, mouseY)
+    _camera.lastMousePosition = mouseXY
     t.add(_camera.lastMousePosition)
     _camera.positionDelta = PVector.sub(p, t)
     _camera.position = t
@@ -332,13 +339,38 @@ class TApplet extends PApplet with MouseWheelListener {
   }
 
   override def mouseMoved {
-    _camera.lastMousePosition = (mouseX, mouseY)
-
+    _camera.lastMousePosition = mouseXY
+    mouseUpdated('Moving, mouseXY, mouseXYInModel)
   }
 
   override def mouseReleased {
-    _camera.lastMousePosition = (mouseX, mouseY)
+    _camera.lastMousePosition = mouseXY
     _camera.dragged = false
+        mouseUpdated('Released, mouseXY, mouseXYInModel)
+  }
+
+  override def mouseClicked {
+    mouseUpdated(
+    if (mouseButton == PConstants.LEFT) {
+        if (mouseEvent != null && mouseEvent.getClickCount() == 2) {
+            'ClickedDoubleLeft
+        } else {
+            'ClickedLeft
+        }
+    } else if (mouseButton == PConstants.RIGHT) {
+        if (mouseEvent != null && mouseEvent.getClickCount() == 2) {
+            'ClickedDoubleRight
+        } else {
+            'ClickedRight
+        }
+    } else {
+        if (mouseEvent != null && mouseEvent.getClickCount() == 2) {
+            'ClickedDoubleMiddle
+        } else {
+            'ClickedMiddle
+        }
+    }, mouseXY, mouseXYInModel)
+
   }
 
   override def mouseWheelMoved(e: MouseWheelEvent) {
