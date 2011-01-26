@@ -46,6 +46,8 @@ object Graph {
     "nbEdges" -> 0,
     "filter.node.category" -> "Document",
     "filter.node.size" -> 0.2,
+    "filter.node.weight" -> (0.0, 1.0),
+    "filter.edge.weight" -> (0.0, 1.0),
     "xMin" -> 0,
     "yMin" -> 0,
     "xMax" -> 0,

@@ -49,7 +49,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           // reset
           case g: Graph =>
             data = g
-            self ! "filter.node.category" -> g.get[String]("filter.node.category")
+            self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
           case ("select", uuid: String) =>
             if (uuid.equals("")) {
@@ -57,7 +57,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             } else {
               data += (data.id(uuid), "select", true)
             }
-            self ! "filter.node.category" -> g.get[String]("filter.node.category")
+            self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
           case (key: String, value: Any) =>
             println("updating graph attribute " + key + " -> " + value)
@@ -98,12 +98,10 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                 layoutCache = edgeWeightCache
                 sendScene
               case "frameRate" =>
-              //println("layoutCache = applyLayout(layoutCache)")
                 layoutCache = applyLayout(layoutCache)
-                //println("")
-                // we could merge sketch and scene by making sketch immutable
-                // and self-generating
                 sendScene
+              case any =>
+                // we don't need to update the scene for other attributes
             }
 
 
