@@ -60,7 +60,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             self ! "filter.node.category"
 
           case (key: String, value: Any) =>
-            //println("updating graph attribute " + key + " -> " + value)
+          //println("updating graph attribute " + key + " -> " + value)
             data += key -> value
             self ! key
 
@@ -200,7 +200,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
   def applyCategory(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
     val category = g.get[String]("filter.node.category")
-    println("applyCategory: "+category)
+    println("applyCategory: " + category)
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
       case (cat, i) =>
@@ -214,11 +214,15 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
   def applyNodeWeight(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val range = g.get[(Double, Double)]("filter.node.weight")
+    val range = Maths.map(
+      g.get[(Double, Double)]("filter.node.weight"),
+      (0.0, 1.0),
+      (g.get[Double]("minNodeWeight"), g.get[Double]("maxNodeWeight")))
+    println("applyNodeWeight: " + range + " (" + g.get[(Double, Double)]("filter.node.weight") + ")")
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map {
       case (weight, i) =>
-        println("filtering " + weight + " : " + i)
+      //println("filtering " + weight + " : " + i)
         if (!(range._1 <= weight && weight <= range._2)) {
           removeMe += i
         }
@@ -229,8 +233,11 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
   def applyEdgeWeight(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val range = g.get[(Double, Double)]("filter.edge.weight")
-
+    val range = Maths.map(
+      g.get[(Double, Double)]("filter.edge.weight"),
+      (0.0, 1.0),
+      (g.get[Double]("minEdgeWeight"), g.get[Double]("maxEdgeWeight")))
+    println("applyEdgeWeight: " + range + " (" + g.get[(Double, Double)]("filter.edge.weight") + ")")
     val newLinks = g.links map {
       case links =>
         links.filter {
@@ -238,13 +245,13 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
         }
     }
 
-    g // + ("links" -> newLinks)
+    g + ("links" -> newLinks)
   }
 
   def applyWeightToSize(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
     val ratio = 100.0 * g.get[Double]("filter.node.size")
-    println("applyWeightToSize: "+ratio)
+    println("applyWeightToSize: " + ratio)
     val newSize = g.weight map {
       case weight => weight * ratio
     }
@@ -265,7 +272,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
   def applyLayout(g: Graph): Graph = {
     val nbNodes = g.nbNodes
     if (nbNodes == 0) return g
-    val barycenter = (0.0,0.0)//g.get[(Double, Double)]("baryCenter")
+    val barycenter = (0.0, 0.0) //g.get[(Double, Double)]("baryCenter")
     val GRAVITY = g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
     val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges

@@ -53,7 +53,11 @@ object Graph {
     "minOutDegree" -> 0,
     "minInDegree" -> 0,
     "maxnOutDegree" -> 0,
-    "maxInDegree" -> 0
+    "maxInDegree" -> 0,
+    "minNodeWeight" -> 0.0,
+    "maxNodeWeight" -> 0.0,
+    "minEdgeWeight" -> 0.0,
+    "maxEdgeWeight" -> 0.0
   )
 }
 
@@ -202,7 +206,11 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g.computeNbSingles
     g = g.computeOutDegree
     g = g.computeInDegree
+    g = g.computeOutDegreeExtremums
+    g = g.computeInDegreeExtremums
     g = g.computeExtremums
+    g = g.computeNodeWeightExtremums
+    g = g.computeEdgeWeightExtremums
     g.computeBaryCenter
   }
 
@@ -303,6 +311,36 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "yMin" -> yMin))
   }
 
+
+  def computeNodeWeightExtremums: Graph = {
+    if (position.size == 0)
+      return new Graph(elements ++ Map[String, Any]("minNodeWeight" -> 0.0, "maxNodeWeight" -> 0.0))
+    var max = Double.MinValue
+    var min = Double.MaxValue
+    weight.foreach {
+      case x =>
+        if (x < min) min = x
+        if (x > max) max = x
+    }
+    return new Graph(elements ++ Map[String, Any]("minNodeWeight" -> min, "maxNodeWeight" -> max))
+  }
+
+  def computeEdgeWeightExtremums: Graph = {
+    if (links.size == 0)
+      return new Graph(elements ++ Map[String, Any]("minEdgeWeight" -> 0.0, "maxEdgeWeight" -> 0.0))
+    var max = Double.MinValue
+    var min = Double.MaxValue
+    links.foreach {
+      case lnks =>
+        lnks.foreach {
+          case (id, weight) =>
+            if (weight < min) min = weight
+            if (weight > max) max = weight
+        }
+    }
+    return new Graph(elements ++ Map[String, Any]("minEdgeWeight" -> min, "maxEdgeWeight" -> max))
+  }
+
   def computeBaryCenter: Graph = {
     var p = (0.0, 0.0)
     val N = position.size.toDouble
@@ -359,10 +397,16 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     val newElements = elements.map {
 
       case ("links", entries: Array[Map[Int, Double]]) =>
-        val filteredEntries = entries.zipWithIndex.filter { case (e,i) => conv(i) >= 0 }.map(_._1).toArray
+        val filteredEntries = entries.zipWithIndex.filter {
+          case (e, i) => conv(i) >= 0
+        }.map(_._1).toArray
         val newEntries = filteredEntries.map {
           links =>
-            links.filter { case (id, weight) => conv(id) >= 0 }.map { case (id, weight) => (conv(id), weight) }
+            links.filter {
+              case (id, weight) => conv(id) >= 0
+            }.map {
+              case (id, weight) => (conv(id), weight)
+            }
         }
         ("links", newEntries.toArray)
 
@@ -402,16 +446,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
 
-
-  def updatePosition(g:Graph) : Graph = {
-       val source = g.getArray[(Double,Double)]("position")
-       var target : Array[(Double,Double)] = getArray[(Double,Double)]("position").zipWithIndex.map {
-         case (elem, i) =>
-           val u = uuid(i)
-           val id = g.id(u)
-           if (id == -1) elem else source(id)
-       }
-       Graph.make(elements + ("position" -> target.toArray))
+  def updatePosition(g: Graph): Graph = {
+    val source = g.getArray[(Double, Double)]("position")
+    var target: Array[(Double, Double)] = getArray[(Double, Double)]("position").zipWithIndex.map {
+      case (elem, i) =>
+        val u = uuid(i)
+        val id = g.id(u)
+        if (id == -1) elem else source(id)
+    }
+    Graph.make(elements + ("position" -> target.toArray))
   }
 
 
