@@ -131,7 +131,7 @@ class Main extends TApplet with Client {
         val ptarget = screenPosition(target)
         if (isVisible(psource) || isVisible(ptarget)) {
           val powd = distance(psource, ptarget)
-          val lod = if(powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 70), 1, 70) else 1
+          val lod = if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 70), 1, 70) else 1
           setLod(lod.toInt)
           lineColor(scene.edgeColorLayer(i))
           //lineThickness(e.weight)
@@ -142,8 +142,8 @@ class Main extends TApplet with Client {
     setLod(16)
     lineThickness(0)
     noStroke
-    val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter{
-      case (position,i) => isVisible(screenPosition(position))
+    val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter {
+      case (position, i) => isVisible(screenPosition(position))
     }
     visibleNodes.foreach {
       case (position, i) =>
@@ -185,27 +185,30 @@ class Main extends TApplet with Client {
     tinaviz ! "camera.position" -> value
   }
 
-  override def mouseUpdated(mode: Symbol, onScreen: (Double, Double), inGraph: (Double,Double)) {
+  override def mouseUpdated(mode: Symbol, onScreen: (Double, Double), inGraph: (Double, Double)) {
     tinaviz ! ("camera.mouse", mode, onScreen, inGraph)
   }
 
 
   override def keyPressed() {
-    /*
-     if (key == PConstants.CODED) {
-     if (keyCode == PConstants.UP) {
-     v.translation.add(0.0f, 10f, 0.0f);
-     } else if (keyCode == PConstants.DOWN) {
-     v.translation.add(0.0f, -10f, 0.0f);
-     } else if (keyCode == PConstants.LEFT) {
-     v.translation.add(10f, 0.0f, 0.0f);
-     } else if (keyCode == PConstants.RIGHT) {
-     v.translation.add(-10f, 0.0f, 0.0f);
-     }
-     } else*/
-    if (key == 'p') {
-      println("toggling pause")
-      tinaviz ! "pause" -> 'toggle
+    key match {
+      case 'p' => tinaviz ! "pause" -> 'toggle
+      case 'a' => tinaviz ! "pause" -> 'toggle
+      case 'n' => tinaviz ! "drawing.nodes" -> 'toggle
+      case 'e' => tinaviz ! "drawing.edges" -> 'toggle
+      case 'c' => tinaviz ! "filter.node.category" -> 'toggle
+      case PConstants.CODED =>
+        val amount = 15
+        keyCode match {
+          case PConstants.UP => moveUp(amount)
+          case PConstants.DOWN => moveDown(amount)
+          case PConstants.LEFT => moveLeft(amount)
+          case PConstants.RIGHT => moveRight(amount)
+          case y =>
+
+        }
+      case x =>
+        //
     }
   }
 }

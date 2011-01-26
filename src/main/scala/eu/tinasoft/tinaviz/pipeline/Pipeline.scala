@@ -60,7 +60,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             self ! "filter.node.category"
 
           case (key: String, value: Any) =>
-            println("updating graph attribute " + key + " -> " + value)
+            //println("updating graph attribute " + key + " -> " + value)
             data += key -> value
             self ! key
 
@@ -200,6 +200,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
   def applyCategory(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
     val category = g.get[String]("filter.node.category")
+    println("applyCategory: "+category)
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
       case (cat, i) =>
@@ -264,7 +265,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
   def applyLayout(g: Graph): Graph = {
     val nbNodes = g.nbNodes
     if (nbNodes == 0) return g
-    val barycenter = g.get[(Double, Double)]("baryCenter")
+    val barycenter = (0.0,0.0)//g.get[(Double, Double)]("baryCenter")
     val GRAVITY = g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
     val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges

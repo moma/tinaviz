@@ -384,4 +384,9 @@ class TApplet extends PApplet with MouseWheelListener {
     }
   }
 
+  def moveUp(amount:Double=10) = _camera.position = (_camera.position._1, _camera.position._2 + amount)
+  def moveDown(amount:Double=10) = _camera.position = (_camera.position._1, _camera.position._2 - amount)
+  def moveLeft(amount:Double=10) = _camera.position = (_camera.position._1 + amount, _camera.position._2)
+  def moveRight(amount:Double=10) = _camera.position = (_camera.position._1 - amount, _camera.position._2)
+
 }

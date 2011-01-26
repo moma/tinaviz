@@ -136,7 +136,7 @@ class Server extends node.util.Actor {
             case any =>
           }
 
-        case ('updated, "frame_____XXXX___________________Rate", value: Any, previous: Any) =>
+        case ('updated, "frameRate", value: Any, previous: Any) =>
 
           val pause = get[Boolean]("pause") //: Boolean = try { get[Boolean]("pause") } catch { case e => true }
           if (!pause) {
@@ -160,25 +160,30 @@ class Server extends node.util.Actor {
           reply(properties(key))
 
 
-        case (key: String, value: Any) =>
+        case (key: String, pvalue: Any) =>
+          var value = pvalue
           if (!properties.contains(key)) {
             properties += key -> value
             self ! ('updated, key, value, value)
           } else {
             val previous = properties(key)
-            value match {
+            value = value match {
             // special case for booleans
               case 'toggle =>
                 previous match {
                   case b: Boolean =>
-                    properties += key -> !b
-                  case x =>
-                    throw new Exception("")
+                    !b
+                  case s:String =>
+                       s match {
+                         case "Document" => "NGram"
+                         case "NGram" => "Document"
+                       }
+                  case x => x
                 }
               // default case
-              case x => properties += key -> value
+              case x => value
             }
-
+            properties += key -> value
             //
             //reply(previous)
             if (!previous.equals(value)) {
