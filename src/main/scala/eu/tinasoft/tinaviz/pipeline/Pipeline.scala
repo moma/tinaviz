@@ -49,7 +49,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           // reset
           case g: Graph =>
             data = g
-            self ! "filter.node.category"
+            self ! "filter.node.category" -> g.get[String]("filter.node.category")
 
           case ("select", uuid: String) =>
             if (uuid.equals("")) {
@@ -57,54 +57,55 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             } else {
               data += (data.id(uuid), "select", true)
             }
-            self ! "filter.node.category"
+            self ! "filter.node.category" -> g.get[String]("filter.node.category")
 
           case (key: String, value: Any) =>
-          //println("updating graph attribute " + key + " -> " + value)
+            println("updating graph attribute " + key + " -> " + value)
             data += key -> value
-            self ! key
+            categoryCache += key -> value
+            nodeWeightCache += key -> value
+            edgeWeightCache += key -> value
+            layoutCache += key -> value
+            key match {
+              case "filter.node.category" =>
+                println("categoryCache = applyCategory(data)")
+                categoryCache = applyCategory(data)
+                categoryCache = applyWeightToSize(categoryCache)
+                categoryCache = categoryCache.updatePosition(layoutCache)
+                nodeWeightCache = applyNodeWeight(categoryCache)
+                edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+                layoutCache = edgeWeightCache
+                sendScene
+              case "filter.node.weight" =>
+                println("nodeWeightCache = applyNodeWeight(categoryCache)")
+                categoryCache = categoryCache.updatePosition(layoutCache)
+                nodeWeightCache = applyNodeWeight(categoryCache)
+                edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+                layoutCache = edgeWeightCache
+                sendScene
+              case "filter.edge.weight" =>
+                println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+                nodeWeightCache = nodeWeightCache.updatePosition(layoutCache)
+                edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+                layoutCache = edgeWeightCache
+                sendScene
+              case "filter.node.size" =>
+                println("categoryCache = applyWeightToSize(categoryCache)")
+                categoryCache = applyWeightToSize(categoryCache)
+                categoryCache = categoryCache.updatePosition(layoutCache)
+                nodeWeightCache = applyNodeWeight(categoryCache)
+                edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+                layoutCache = edgeWeightCache
+                sendScene
+              case "frameRate" =>
+              //println("layoutCache = applyLayout(layoutCache)")
+                layoutCache = applyLayout(layoutCache)
+                //println("")
+                // we could merge sketch and scene by making sketch immutable
+                // and self-generating
+                sendScene
+            }
 
-          case "filter.node.category" =>
-            println("categoryCache = applyCategory(data)")
-            categoryCache = applyCategory(data)
-            categoryCache = applyWeightToSize(categoryCache)
-            categoryCache = categoryCache.updatePosition(layoutCache)
-            nodeWeightCache = applyNodeWeight(categoryCache)
-            edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-            layoutCache = edgeWeightCache
-
-          case "filter.node.weight" =>
-            println("nodeWeightCache = applyNodeWeight(categoryCache)")
-            categoryCache = categoryCache.updatePosition(layoutCache)
-            nodeWeightCache = applyNodeWeight(categoryCache)
-            edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-            layoutCache = edgeWeightCache
-
-
-          case "filter.edge.weight" =>
-            println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
-            nodeWeightCache = nodeWeightCache.updatePosition(layoutCache)
-            edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-            layoutCache = edgeWeightCache
-
-          case "filter.node.size" =>
-            println("categoryCache = applyWeightToSize(categoryCache)")
-            categoryCache = applyWeightToSize(categoryCache)
-            categoryCache = categoryCache.updatePosition(layoutCache)
-            nodeWeightCache = applyNodeWeight(categoryCache)
-            edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-            layoutCache = edgeWeightCache
-
-          case "frameRate" =>
-          //println("layoutCache = applyLayout(layoutCache)")
-            layoutCache = applyLayout(layoutCache)
-            //println("")
-
-            // we could merge sketch and scene by making sketch immutable
-            // and self-generating
-            sketch.update(layoutCache)
-            scene = sketch: Scene
-            actor ! scene
 
           /*
   val now = (new Date).getTime
@@ -126,25 +127,31 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
     }
   }
 
-  /*
-   def runMeso(graph:Graph) = {
-   val category = graph.get[String]("filter.category")
-   val selection = graph.get[List[String]]("filter.selection")
-   println("running meso on "+graph.nbNodes+" nodes")
-   val tmp = graph.nodes.filter {
-   case n =>
-   var connected = false
-   graph.nodes.foreach {
-   case m =>
-   if (m.attributes("category").equals(category))
-   if (selection.contains(m.uuid)) connected = true
-   }
-   (selection.contains(n.uuid) || connected)
-   }
+  def sendScene {
+    sketch.update(layoutCache)
+    scene = sketch: Scene
+    actor ! scene
+  }
 
-   repair(Graph.make(tmp, graph.properties), graph)
-   }
-   */
+  /*
+  def runMeso(graph:Graph) = {
+  val category = graph.get[String]("filter.category")
+  val selection = graph.get[List[String]]("filter.selection")
+  println("running meso on "+graph.nbNodes+" nodes")
+  val tmp = graph.nodes.filter {
+  case n =>
+  var connected = false
+  graph.nodes.foreach {
+  case m =>
+  if (m.attributes("category").equals(category))
+  if (selection.contains(m.uuid)) connected = true
+  }
+  (selection.contains(n.uuid) || connected)
+  }
+
+  repair(Graph.make(tmp, graph.properties), graph)
+  }
+  */
 
   /*
    def runMacro(graph:Graph) = {

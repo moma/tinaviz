@@ -100,6 +100,9 @@ class Server extends node.util.Actor {
         case ("select", uuid: String) =>
           pipeline ! "select" -> uuid
 
+        case 'getNodes =>
+          reply("[]")
+
         // TODO do something for this, it's looks a bit creepy
         case ("filter.node.weight.min", value: Double) =>
           self ! (("filter.node.weight", (value, properties("filter.node.weight").asInstanceOf[(Double, Double)]._2)))
@@ -137,7 +140,6 @@ class Server extends node.util.Actor {
           }
 
         case ('updated, "frameRate", value: Any, previous: Any) =>
-
           val pause = get[Boolean]("pause") //: Boolean = try { get[Boolean]("pause") } catch { case e => true }
           if (!pause) {
             if (!pipelineBusy) {
