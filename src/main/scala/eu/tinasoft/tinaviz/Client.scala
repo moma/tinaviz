@@ -116,7 +116,7 @@ trait Client {
   }
 
   def setAs(key:String, value:java.lang.Object, t:String) = {
-  println("setAs(key:"+key+", value:"+value+", t:"+t+")");
+    println("setAs(key:"+key+", value:"+value+", t:"+t+")");
     t match {
        case "Int" => 
        tinaviz ! key -> value.toString.toInt

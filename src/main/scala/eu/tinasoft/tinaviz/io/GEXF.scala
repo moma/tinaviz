@@ -27,10 +27,10 @@ class GEXF extends node.util.Actor {
   def act() {
     while (true) {
       receive {
-        case url:URL =>  println("Loading "+url); reply(load(url))
-        case xml:String => reply(load(xml))
+        case url: URL => println("Loading " + url); reply(load(url))
+        case xml: String => reply(load(xml))
 
-        case graph:Graph =>
+        case graph: Graph =>
           val xml = ""
           /*
            <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
@@ -69,19 +69,19 @@ class GEXF extends node.util.Actor {
   }
 
 
-  def load (rawXML:String) = {
+  def load(rawXML: String) = {
     val root = xml.XML.loadString(rawXML)
     var properties = Map(
       "url" -> ""
     )
-    var nodeAttributes = Map[String, (String,Any)]()
-    var edgeAttributes = Map[String, (String,Any)]()
+    var nodeAttributes = Map[String, (String, Any)]()
+    var edgeAttributes = Map[String, (String, Any)]()
     for (as <- (root \\ "attributes")) {
       (as \\ "@class" text) match {
         case "node" =>
           for (a <- (as \\ "attribute")) {
             nodeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
-                                                   (a \ "@type" text) match {
+              (a \ "@type" text) match {
                 case "float" => 1.0
                 case "double" => 1.0
                 case "integer" => 1
@@ -93,7 +93,7 @@ class GEXF extends node.util.Actor {
         case "edge" =>
           for (a <- (as \\ "attribute")) {
             edgeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
-                                                   (a \ "@type" text) match {
+              (a \ "@type" text) match {
                 case "float" => 1.0
                 case "double" => 1.0
                 case "integer" => 1
@@ -104,43 +104,35 @@ class GEXF extends node.util.Actor {
           }
       }
     }
-  
-    def attribute(e:xml.Node) : (String,Any) = {
-      val attr = nodeAttributes(e \ "@for" text)
-      val value =  (e \ "@value" text)
-      val r = (attr._1, attr._2 match {
-          case x:Double => value.toDouble
-          case x:Float => value.toDouble
-          case x:Int => value.toInt
-          case x:Boolean => value.toBoolean
-          case x:String => value.toString
-          case x => value
-        })
-      
-      // println("ATTRIB ="+attr+" = "+r)
 
-      r
+    def attribute(e: xml.Node): (String, Any) = {
+      val attr = nodeAttributes(e \ "@for" text)
+      val value = (e \ "@value" text)
+      (attr._1, attr._2 match {
+        case x: Double => value.toDouble
+        case x: Float => value.toDouble
+        case x: Int => value.toInt
+        case x: Boolean => value.toBoolean
+        case x: String => value.toString
+        case x => value
+      })
     }
-    /*
-    var g = new Graph(Map("pause" -> false,
-                          "filter.view" -> "macro",
-                          "filter.category" -> "NGram",
-                          "layout.gravity" ->  1.1, // stronger means faster!
-                          "layout.attraction" -> 1.01,
-                          "layout.repulsion" -> 1.5))
-    */                  
     var g = new Graph()
     var id = -1
     for (n <- (root \\ "node")) {
       id += 1
 
       val uuid = n \ "@id" text
-      val label =  try { n \ "@label" text } catch { case x => "Node "+uuid}
+      val label = try {
+        n \ "@label" text
+      } catch {
+        case x => "Node " + uuid
+      }
       val position = try {
         (((n \\ "viz:position") \ "@x" text).toDouble,
-         ((n \\ "viz:position") \ "@y" text).toDouble)
+          ((n \\ "viz:position") \ "@y" text).toDouble)
       } catch {
-        case x => (Maths.random(0,200), Maths.random(0,200))
+        case x => (Maths.random(0, 200), Maths.random(0, 200))
       }
       /*
        val color : Color = try {
@@ -150,9 +142,9 @@ class GEXF extends node.util.Actor {
        } catch {
        case x => (0,0,0)
        }*/
-      val color = new Color(Maths.random(0.0,1.0),
-                            Maths.random(0.8,1.0),
-                            Maths.random(0.8,1.0))
+      val color = new Color(Maths.random(0.0, 1.0),
+        Maths.random(0.8, 1.0),
+        Maths.random(0.8, 1.0))
       g += (id, "uuid", uuid)
       g += (id, "label", label)
       g += (id, "color", color)
@@ -163,31 +155,32 @@ class GEXF extends node.util.Actor {
       g += (id, "weight", 1.0)
       g += (id, "category", "Default")
       g += (id, "position", position)
-      g += (id, "links", Map.empty[Int,Double])
-      
+      g += (id, "links", Map.empty[Int, Double])
+
       for (a <- (n \\ "attvalue")) yield {
         val res = attribute(a)
-        // g += attribute(id,a)
         g += (id, res._1, res._2)
       }
     }
-   
+
     // for
     for (e <- (root \\ "edge")) {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
-      
+
       if (!node1uuid.equals(node2uuid)) {
         val node1id = g.id(node1uuid)
         val node2id = g.id(node2uuid)
-        g += (node1id, "links", g.getArray[Map[Int,Double]]("links")(node1id) + ( node2id -> (e \ "@weight").text.toDouble))
+        g += (node1id, "links", g.getArray[Map[Int, Double]]("links")(node1id) + (node2id -> (e \ "@weight").text.toDouble))
       }
     }
     g.computeAll
 
   }
 
-  implicit def urlToString(url:java.net.URL) : String = {
-    val b = new StringBuilder; Source.fromURL(url).foreach(b.append); b.toString
+  implicit def urlToString(url: java.net.URL): String = {
+    val b = new StringBuilder;
+    Source.fromURL(url).foreach(b.append);
+    b.toString
   }
 }

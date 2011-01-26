@@ -32,6 +32,7 @@ class Server extends node.util.Actor {
     "filter.node.category" -> "NGram",
     "filter.node.weight" -> (0.0, 1.0),
     "filter.edge.weight" -> (0.0, 1.0),
+    "filter.node.size" -> .2,
     "layout.gravity" -> 1.1, // stronger means faster!
     "layout.attraction" -> 1.01,
     "layout.repulsion" -> 1.5,
@@ -128,13 +129,14 @@ class Server extends node.util.Actor {
           mode match {
             case 'Dragging =>
               pauseBuffer = get[Boolean]("pause")
-              properties += "pause" -> true
+               //self ! "pause" -> true
             case 'Released =>
-              properties += "pause" -> false
+              //pauseBugger = false
+              //self ! "pause" -> pauseBuffer
             case any =>
           }
 
-        case ('updated, "frameRate", value: Any, previous: Any) =>
+        case ('updated, "frame_____XXXX___________________Rate", value: Any, previous: Any) =>
 
           val pause = get[Boolean]("pause") //: Boolean = try { get[Boolean]("pause") } catch { case e => true }
           if (!pause) {

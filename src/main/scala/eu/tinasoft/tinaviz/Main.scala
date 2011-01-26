@@ -131,13 +131,8 @@ class Main extends TApplet with Client {
         val ptarget = screenPosition(target)
         if (isVisible(psource) || isVisible(ptarget)) {
           val powd = distance(psource, ptarget)
-          val modulator =
-            if (powd >= 10 && width >= 11)
-              limit(PApplet.map(powd.toFloat, 10, width, 1, 70), 1, 70)
-            else
-              1
-
-          setLod(modulator.toInt)
+          val lod = if(powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 70), 1, 70) else 1
+          setLod(lod.toInt)
           lineColor(scene.edgeColorLayer(i))
           //lineThickness(e.weight)
           drawCurve(source, target)

@@ -45,6 +45,7 @@ object Graph {
     "nbNodes" -> 0,
     "nbEdges" -> 0,
     "filter.node.category" -> "Document",
+    "filter.node.size" -> 0.2,
     "xMin" -> 0,
     "yMin" -> 0,
     "xMax" -> 0,
@@ -409,7 +410,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
            val u = uuid(i)
            val id = g.id(u)
            if (id == -1) elem else source(id)
-
        }
        Graph.make(elements + ("position" -> target.toArray))
   }

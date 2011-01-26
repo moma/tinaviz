@@ -13,7 +13,9 @@ import tinaviz.sketch.Sketch
 import tinaviz.sketch.Sketch._
 import tinaviz.scene.Scene
 import tinaviz.util.Vector._
+import tinaviz.util.Maths
 import actors.Actor
+import java.util.Date
 
 /**
  *
@@ -37,6 +39,10 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
   //var busy = false
 
   def act() {
+
+    val fps: Double = 5
+    var next: Long = 0
+
     while (true) {
       loop {
         react {
@@ -47,7 +53,6 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
           case ("select", uuid: String) =>
             if (uuid.equals("")) {
-              // unselect all
               data += "selected" -> data.selected.map(c => false)
             } else {
               data += (data.id(uuid), "select", true)
@@ -62,6 +67,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           case "filter.node.category" =>
             println("categoryCache = applyCategory(data)")
             categoryCache = applyCategory(data)
+            categoryCache = applyWeightToSize(categoryCache)
             categoryCache = categoryCache.updatePosition(layoutCache)
             nodeWeightCache = applyNodeWeight(categoryCache)
             edgeWeightCache = applyEdgeWeight(nodeWeightCache)
@@ -81,9 +87,15 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             edgeWeightCache = applyEdgeWeight(nodeWeightCache)
             layoutCache = edgeWeightCache
 
+          case "filter.node.size" =>
+            println("categoryCache = applyWeightToSize(categoryCache)")
+            categoryCache = applyWeightToSize(categoryCache)
+            categoryCache = categoryCache.updatePosition(layoutCache)
+            nodeWeightCache = applyNodeWeight(categoryCache)
+            edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+            layoutCache = edgeWeightCache
+
           case "frameRate" =>
-          //if (!busy) {
-          // busy = true
           //println("layoutCache = applyLayout(layoutCache)")
             layoutCache = applyLayout(layoutCache)
             //println("")
@@ -94,6 +106,15 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             scene = sketch: Scene
             actor ! scene
 
+          /*
+  val now = (new Date).getTime
+  if (next > now) {
+    println("waiting")
+    Thread.sleep(next - now)
+  }
+  next = (now.toDouble + 1000.0 / fps).toLong
+  println("self-pinging")
+  self ! 'ping      */
 
           case s: String =>
           // ignore
@@ -219,6 +240,16 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
     g // + ("links" -> newLinks)
   }
 
+  def applyWeightToSize(g: Graph): Graph = {
+    if (g.nbNodes == 0) return g
+    val ratio = 100.0 * g.get[Double]("filter.node.size")
+    println("applyWeightToSize: "+ratio)
+    val newSize = g.weight map {
+      case weight => weight * ratio
+    }
+    g + ("size" -> newSize)
+  }
+
   /*
   def applyCategory(g:Graph) = {
   val category = g.get[String]("filter.category")
@@ -247,12 +278,15 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           case (p2, j) =>
             val p2inDegree = data inDegree j
             val p2outDegree = data outDegree j
-            // todo: attract less if too close (will work for both gravity and node attraction)
+            val doIt = Maths.randomBool
 
+            // todo: attract less if too close (will work for both gravity and node attraction)
             if (g.hasAnyLink(i, j)) {
               force += p1.computeForce(ATTRACTION, p2)
             } else {
-              force -= p1.computeForceLimiter(REPULSION, p2)
+              if (doIt) {
+                force -= p1.computeForceLimiter(REPULSION, p2)
+              }
             }
         }
 
