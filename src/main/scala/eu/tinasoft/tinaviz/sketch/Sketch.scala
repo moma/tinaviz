@@ -205,7 +205,7 @@ case class Sketch(
    * By default, we take the node weight and try to map it to
    */
   def updateNodeSizes(graph: Graph) {
-    nodeSizeLayer = graph.weight
+    nodeSizeLayer = graph.size
     updateEdgeColors(graph)
   }
 

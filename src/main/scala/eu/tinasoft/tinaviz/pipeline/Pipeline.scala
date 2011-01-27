@@ -85,14 +85,15 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                 sendScene
               case "filter.edge.weight" =>
                 println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
-                nodeWeightCache = nodeWeightCache.updatePosition(layoutCache)
+                categoryCache = categoryCache.updatePosition(layoutCache)
+                nodeWeightCache = applyNodeWeight(categoryCache)
                 edgeWeightCache = applyEdgeWeight(nodeWeightCache)
                 layoutCache = edgeWeightCache
                 sendScene
               case "filter.node.size" =>
                 println("categoryCache = applyWeightToSize(categoryCache)")
-                categoryCache = applyWeightToSize(categoryCache)
                 categoryCache = categoryCache.updatePosition(layoutCache)
+                categoryCache = applyWeightToSize(categoryCache)
                 nodeWeightCache = applyNodeWeight(categoryCache)
                 edgeWeightCache = applyEdgeWeight(nodeWeightCache)
                 layoutCache = edgeWeightCache
@@ -232,8 +233,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           removeMe += i
         }
     }
-    //g.remove(removeMe)
-    g //
+    g.remove(removeMe)
   }
 
   def applyEdgeWeight(g: Graph): Graph = {
@@ -255,7 +255,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
   def applyWeightToSize(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val ratio = 100.0 * g.get[Double]("filter.node.size")
+    val ratio = 10.0 * g.get[Double]("filter.node.size")
     println("applyWeightToSize: " + ratio)
     val newSize = g.weight map {
       case weight => weight * ratio

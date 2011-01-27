@@ -83,6 +83,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val position = getArray[(Double, Double)]("position")
   val color = getArray[Color]("color")
   val weight = getArray[Double]("weight")
+  val size = getArray[Double]("size")
   val category = getArray[String]("category")
   val selected = getArray[Boolean]("selected")
   val label = getArray[String]("label")
