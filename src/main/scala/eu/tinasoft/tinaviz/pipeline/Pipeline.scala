@@ -233,7 +233,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           removeMe += i
         }
     }
-    g.remove(removeMe)
+    val h = g.remove(removeMe)
+    h.computeActivity(g)  // todo should be done automatically when addind
   }
 
   def applyEdgeWeight(g: Graph): Graph = {
@@ -249,13 +250,13 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           case (id, weight) => (range._1 <= weight && weight <= range._2)
         }
     }
-
-    g + ("links" -> newLinks)
+    val h = g + ("links" -> newLinks)
+    h.computeActivity(g)
   }
 
   def applyWeightToSize(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val ratio = 10.0 * g.get[Double]("filter.node.size")
+    val ratio = 0.6 * g.get[Double]("filter.node.size")
     println("applyWeightToSize: " + ratio)
     val newSize = g.weight map {
       case weight => weight * ratio
@@ -284,6 +285,10 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
     //println("running forceVector on "+nbNodes+" nodes")
 
+
+    if (g.activity < 0.05) return g + ("activity" -> "0")
+    val cooling = Maths.map(g.activity,(0.0,1.0),(0.70, 0.99))
+
     val positions = g.position.zipWithIndex map {
       case (p1, i) =>
         var force = (0.0, 0.0).computeForce(GRAVITY, barycenter)
@@ -295,10 +300,10 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
             // todo: attract less if too close (will work for both gravity and node attraction)
             if (g.hasAnyLink(i, j)) {
-              force += p1.computeForce(ATTRACTION, p2)
+              force += p1.computeForce(ATTRACTION * cooling, p2)
             } else {
               if (doIt) {
-                force -= p1.computeForceLimiter(REPULSION, p2)
+                force -= p1.computeForceLimiter(REPULSION * cooling, p2)
               }
             }
         }
@@ -315,7 +320,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
         p1 + force
     }
     // TODO possible optimization: give some metrics
-    g + ("position" -> positions)
+    val h = g + ("position" -> positions)
+    h.computeActivity(g)
   }
 
   /*

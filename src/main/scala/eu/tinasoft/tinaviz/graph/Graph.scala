@@ -21,6 +21,7 @@ object Graph {
 
   }
 
+
   /**
    * Default, dumb factory
    */
@@ -59,7 +60,10 @@ object Graph {
     "minNodeWeight" -> 0.0,
     "maxNodeWeight" -> 0.0,
     "minEdgeWeight" -> 0.0,
-    "maxEdgeWeight" -> 0.0
+    "maxEdgeWeight" -> 0.0,
+    "activity" -> 0.0,
+    "entropy" -> 0.95
+
   )
 }
 
@@ -72,7 +76,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def id(_uuid: String): Int = uuid.indexOf(_uuid)
 
-  def getUuuid(i: Int) = uuid(i)
+  def getUuid(i: Int) = uuid(i)
+
+  def has(_uuid: String): Boolean = uuid.contains(_uuid)
 
   def get[T](key: String): T = elements(key).asInstanceOf[T]
 
@@ -94,6 +100,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val density = getArray[Double]("density")
   val nbNodes = get[Int]("nbNodes")
   val nbEdges = get[Int]("nbEdges")
+  val entropy = get[Double]("entropy")
+  val activity = get[Double]("activity")
   val ids = 0 until nbNodes
   // a Range on ID
 
@@ -101,13 +109,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   def hasThisLink(i: Int, j: Int) = if (links.size > i) links(i).contains(j) else false
 
-  def +(kv: (String, Any)) = {
-    new Graph(elements + kv)
-  }
+  def +(kv: (String, Any)) = new Graph(elements + kv)
 
-  def +(id: Int, k: String, v: Any) = {
-    set(id, k, v)
-  }
+  def +(id: Int, k: String, v: Any) = set(id, k, v)
 
   def set(id: Int, k: String, value: Any) = {
     //println("id: "+id+" kv: "+kv)
@@ -215,6 +219,26 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g.computeNodeWeightExtremums
     g = g.computeEdgeWeightExtremums
     g.computeBaryCenter
+  }
+
+  /**
+   * compute the amount of information added to thiq by g
+   */
+  def computeActivity(g: Graph): Graph = {
+    def max(x: Double, y: Double): Double = if (x < y) y else x
+    var addNodes = 0.0
+    var deletedNodes = 0.0
+    var addEdges = 0.0
+    var deletedEdges = 0.0
+    g.uuid.zipWithIndex foreach { case (u, i) => if (!has(u)) addNodes += 1.0 }
+    uuid.zipWithIndex foreach { case (u, i) => if (!g.has(u)) deletedNodes += 1.0 }
+    val activity1 = activity * entropy
+    val count = nbNodes + g.nbNodes
+    val activity2 = if (count > 0) ((addNodes + deletedNodes) / count) else 0
+    //val activity2 = if (count > 0) Maths.map(((addNodes + deletedNodes) / count),(0.0,1.0),(0.1,0.99)) else 0
+    val a = max(activity1,activity2)
+    println("activity: " + a)
+    new Graph(elements + ("activity" -> a))
   }
 
   def computeNbSingles = {
