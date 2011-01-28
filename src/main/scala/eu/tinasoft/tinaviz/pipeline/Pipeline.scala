@@ -286,8 +286,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
     //println("running forceVector on "+nbNodes+" nodes")
 
 
-    if (g.activity < 0.05) return g + ("activity" -> "0")
-    val cooling = Maths.map(g.activity,(0.0,1.0),(0.70, 0.99))
+    if (g.activity < 0.05) return g + ("activity" -> 0.0)
+    val cooling = Maths.map(g.activity,(0.0,1.0),(0.900, 0.999))
 
     val positions = g.position.zipWithIndex map {
       case (p1, i) =>
