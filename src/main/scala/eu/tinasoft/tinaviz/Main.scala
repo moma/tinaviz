@@ -190,6 +190,7 @@ class Main extends TApplet with Client {
   }
 
 
+
   override def keyPressed() {
     key match {
       case 'p' => tinaviz ! "pause" -> 'toggle

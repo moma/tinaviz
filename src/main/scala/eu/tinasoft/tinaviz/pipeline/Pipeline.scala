@@ -14,8 +14,18 @@ import tinaviz.sketch.Sketch._
 import tinaviz.scene.Scene
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
+import java.util.concurrent.{ScheduledFuture, TimeUnit, Executors}
+
+//import tinaviz.util.ActorPing
+
 import actors.Actor
-import java.util.Date
+
+//import java.util.Date
+
+import compat.Platform
+
+//import actors.threadpool.{TimeUnit, Executors}
+
 
 /**
  *
@@ -38,91 +48,131 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
   //var busy = false
 
+
   def act() {
 
     val fps: Double = 5
     var next: Long = 0
+    val me = self
+
+    val sched = Executors.newSingleThreadScheduledExecutor()
+
+    def schedule(msg: Any, ms: Long = 0) = {
+      val ct = Platform.currentTime
+      sched.schedule(new Runnable {
+        def run = actors.Scheduler.execute({
+          Actor.actor {
+            me ! (msg, ct - ms)
+          };
+          ()
+        })
+      }, ms, TimeUnit.MILLISECONDS)
+    }
+
+    schedule('ping)
 
     while (true) {
-      loop {
-        react {
-          // reset
-          case g: Graph =>
-            data = g
-            self ! "filter.node.category" -> data.get[String]("filter.node.category")
+      receive {
+        // reset
+        case g: Graph =>
+          data = g
+          self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
-          case ("select", uuid: String) =>
-            if (uuid.equals("")) {
-              data += "selected" -> data.selected.map(c => false)
+        case ("select", uuid: String) =>
+          if (uuid.equals("")) {
+            data += "selected" -> data.selected.map(c => false)
+          } else {
+            data += (data.id(uuid), "select", true)
+          }
+          self ! "filter.node.category" -> data.get[String]("filter.node.category")
+
+        case (key: String, value: Any) =>
+          println("updating graph attribute " + key + " -> " + value)
+          data += key -> value
+          categoryCache += key -> value
+          nodeWeightCache += key -> value
+          edgeWeightCache += key -> value
+          layoutCache += key -> value
+          key match {
+            case "filter.node.category" =>
+              println("categoryCache = applyCategory(data)")
+              categoryCache = applyCategory(data)
+              categoryCache = applyWeightToSize(categoryCache)
+              categoryCache = categoryCache.updatePosition(layoutCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = edgeWeightCache
+              sendScene
+            case "filter.node.weight" =>
+              println("nodeWeightCache = applyNodeWeight(categoryCache)")
+              categoryCache = categoryCache.updatePosition(layoutCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = edgeWeightCache
+              sendScene
+            case "filter.edge.weight" =>
+              println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+              categoryCache = categoryCache.updatePosition(layoutCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = edgeWeightCache
+              sendScene
+            case "filter.node.size" =>
+              println("categoryCache = applyWeightToSize(categoryCache)")
+              categoryCache = categoryCache.updatePosition(layoutCache)
+              categoryCache = applyWeightToSize(categoryCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = edgeWeightCache
+              sendScene
+
+            //case "frameRate" =>
+            //  layoutCache = applyLayout(layoutCache)
+            //  sendScene
+            case any =>
+          // we don't need to update the scene for other attributes
+          }
+
+        case ('ping, old: Long) =>
+          val pause = data.get[Boolean]("pause")
+          if (!pause) {
+            //println("pingu")
+            layoutCache = applyLayout(layoutCache)
+            sendScene
+            val d = (Platform.currentTime.toLong - old.toLong).toInt
+            println("d:" + d)
+            if (d < 200) {
+              // we are in advance
+              //println("we are in advance, adjusting next frame to "+(-d))
+              schedule('ping, 200 - d)
             } else {
-              data += (data.id(uuid), "select", true)
+              // on time, if not in late, schedule now!
+              //println("we are on time, schedule for right now")
+              schedule('ping)
             }
-            self ! "filter.node.category" -> data.get[String]("filter.node.category")
-
-          case (key: String, value: Any) =>
-            println("updating graph attribute " + key + " -> " + value)
-            data += key -> value
-            categoryCache += key -> value
-            nodeWeightCache += key -> value
-            edgeWeightCache += key -> value
-            layoutCache += key -> value
-            key match {
-              case "filter.node.category" =>
-                println("categoryCache = applyCategory(data)")
-                categoryCache = applyCategory(data)
-                categoryCache = applyWeightToSize(categoryCache)
-                categoryCache = categoryCache.updatePosition(layoutCache)
-                nodeWeightCache = applyNodeWeight(categoryCache)
-                edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-                layoutCache = edgeWeightCache
-                sendScene
-              case "filter.node.weight" =>
-                println("nodeWeightCache = applyNodeWeight(categoryCache)")
-                categoryCache = categoryCache.updatePosition(layoutCache)
-                nodeWeightCache = applyNodeWeight(categoryCache)
-                edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-                layoutCache = edgeWeightCache
-                sendScene
-              case "filter.edge.weight" =>
-                println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
-                categoryCache = categoryCache.updatePosition(layoutCache)
-                nodeWeightCache = applyNodeWeight(categoryCache)
-                edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-                layoutCache = edgeWeightCache
-                sendScene
-              case "filter.node.size" =>
-                println("categoryCache = applyWeightToSize(categoryCache)")
-                categoryCache = categoryCache.updatePosition(layoutCache)
-                categoryCache = applyWeightToSize(categoryCache)
-                nodeWeightCache = applyNodeWeight(categoryCache)
-                edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-                layoutCache = edgeWeightCache
-                sendScene
-              case "frameRate" =>
-                layoutCache = applyLayout(layoutCache)
-                sendScene
-              case any =>
-                // we don't need to update the scene for other attributes
-            }
+            //Scheduler.schedule( { Actor.actor { me ! 'ping }; () }, 100000L)
+          } else {
+               schedule('ping, 200)
+          }
 
 
-          /*
-  val now = (new Date).getTime
-  if (next > now) {
-    println("waiting")
-    Thread.sleep(next - now)
-  }
-  next = (now.toDouble + 1000.0 / fps).toLong
-  println("self-pinging")
-  self ! 'ping      */
+        /*
+val now = (new Date).getTime
+if (next > now) {
+  println("waiting")
+  Thread.sleep(next - now)
+}
+next = (now.toDouble + 1000.0 / fps).toLong
+println("self-pinging")
+self ! 'ping      */
 
-          case s: String =>
-          // ignore
-          //
-          //case
-          case msg => println("unknow msg: " + msg)
-        }
+        case s: String =>
+        // ignore
+        //
+        //case
+        case msg => println("unknow msg: " + msg)
       }
+
     }
   }
 
@@ -234,7 +284,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
         }
     }
     val h = g.remove(removeMe)
-    h.computeActivity(g)  // todo should be done automatically when addind
+    h.computeActivity(g) // todo should be done automatically when addind
   }
 
   def applyEdgeWeight(g: Graph): Graph = {
@@ -286,8 +336,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
     //println("running forceVector on "+nbNodes+" nodes")
 
 
-    if (g.activity < 0.05) return g + ("activity" -> 0.0)
-    val cooling = Maths.map(g.activity,(0.0,1.0),(0.900, 0.999))
+    //if (g.activity < 0.005) return g + ("activity" -> 0.0)
+    val cooling = 1.0 //Maths.map(g.activity,(0.0,1.0),(0.900, 0.999))
 
     val positions = g.position.zipWithIndex map {
       case (p1, i) =>

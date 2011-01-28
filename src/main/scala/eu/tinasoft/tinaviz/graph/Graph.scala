@@ -30,6 +30,7 @@ object Graph {
   }
 
   val defaults: Map[String, Any] = Map(
+    "pause" -> true,
     "uuid" -> Array.empty[String],
     "label" -> Array.empty[String],
     "color" -> Array.empty[Color],

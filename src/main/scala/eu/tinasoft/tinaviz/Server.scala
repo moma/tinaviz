@@ -86,12 +86,12 @@ class Server extends node.util.Actor {
           properties = defaultProperties
           graph = new Graph(properties ++ g.elements)
           pipeline ! graph
-          pipelineBusy = false
+        //pipelineBusy = false
 
         case scene: Scene =>
           properties += "scene" -> scene
-          pipelineBusy = false
-          self ! "frameRate" -> properties("frameRate") // force relaunching
+        //pipelineBusy = false
+        //self ! "frameRate" -> properties("frameRate") // force relaunching
 
         case ("recenter", true) =>
           println("TODO recentering")
@@ -128,32 +128,28 @@ class Server extends node.util.Actor {
         case "filter.edge.weight.max" =>
           reply(properties("filter.edge.weight").asInstanceOf[(Double, Double)]._2)
 
-        case ("camera.mouse", mode:Symbol, onScreen: (Double, Double), inModel: (Double, Double)) =>
+        case ("camera.mouse", mode: Symbol, onScreen: (Double, Double), inModel: (Double, Double)) =>
           mode match {
             case 'Dragging =>
               pauseBuffer = get[Boolean]("pause")
-               //self ! "pause" -> true
+            //self ! "pause" -> true
             case 'Released =>
-              //pauseBugger = false
-              //self ! "pause" -> pauseBuffer
+            //pauseBugger = false
+            //self ! "pause" -> pauseBuffer
             case any =>
           }
 
-        case ('updated, "frameRate", value: Any, previous: Any) =>
-          val pause = get[Boolean]("pause") //: Boolean = try { get[Boolean]("pause") } catch { case e => true }
-          if (!pause) {
-            if (!pipelineBusy) {
-              pipelineBusy = true
-              pipeline ! "frameRate" -> value
-            } else {
-              //println("could not update pipeline, too busy..")
-            }
-          }
 
         case ('updated, key: String, value: Any, previous: Any) =>
         // log("ignoring update of "+key)
         //println("updating pipeline with this data: "+key+" -> "+value)
-          pipeline ! key -> value // update the pipeline
+          key match {
+            case "camera.zoom" =>
+            case "camera.position" =>
+            case "frameRate" =>
+            case any => pipeline ! key -> value // update the pipeline
+          }
+
 
         case ('open, any: Any) => (new GEXF) ! any
         // cb ! true
@@ -175,11 +171,11 @@ class Server extends node.util.Actor {
                 previous match {
                   case b: Boolean =>
                     !b
-                  case s:String =>
-                       s match {
-                         case "Document" => "NGram"
-                         case "NGram" => "Document"
-                       }
+                  case s: String =>
+                    s match {
+                      case "Document" => "NGram"
+                      case "NGram" => "Document"
+                    }
                   case x => x
                 }
               // default case
