@@ -166,8 +166,7 @@ class Main extends TApplet with Client {
     visibleNodes.foreach {
       case (position, i) =>
         val size = scene.nodeSizeLayer(i)
-        val np = screenPosition(position._1 + size,
-          position._2 + size / Pi)
+        val np = screenPosition(position._1 + size, position._2 + (11.0 / 2.0))
         text(scene.nodeLabelLayer(i), np._1, np._2)
 
     }

@@ -87,7 +87,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
         case (key: String, value: Any) =>
-          println("updating graph attribute " + key + " -> " + value)
+          //println("updating graph attribute " + key + " -> " + value)
           data += key -> value
           categoryCache += key -> value
           nodeWeightCache += key -> value
@@ -95,7 +95,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           layoutCache += key -> value
           key match {
             case "filter.node.category" =>
-              println("categoryCache = applyCategory(data)")
+              //println("categoryCache = applyCategory(data)")
               categoryCache = applyCategory(data)
               categoryCache = applyWeightToSize(categoryCache)
               categoryCache = categoryCache.updatePosition(layoutCache)
@@ -104,21 +104,21 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               layoutCache = edgeWeightCache
               sendScene
             case "filter.node.weight" =>
-              println("nodeWeightCache = applyNodeWeight(categoryCache)")
+              //println("nodeWeightCache = applyNodeWeight(categoryCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               sendScene
             case "filter.edge.weight" =>
-              println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+              //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               sendScene
             case "filter.node.size" =>
-              println("categoryCache = applyWeightToSize(categoryCache)")
+              //println("categoryCache = applyWeightToSize(categoryCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
@@ -140,7 +140,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             layoutCache = applyLayout(layoutCache)
             sendScene
             val d = (Platform.currentTime.toLong - old.toLong).toInt
-            println("d:" + d)
+            //println("d:" + d)
             if (d < 200) {
               // we are in advance
               //println("we are in advance, adjusting next frame to "+(-d))
@@ -256,7 +256,7 @@ self ! 'ping      */
   def applyCategory(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
     val category = g.get[String]("filter.node.category")
-    println("applyCategory: " + category)
+    //println("applyCategory: " + category)
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
       case (cat, i) =>
@@ -274,7 +274,7 @@ self ! 'ping      */
       g.get[(Double, Double)]("filter.node.weight"),
       (0.0, 1.0),
       (g.get[Double]("minNodeWeight"), g.get[Double]("maxNodeWeight")))
-    println("applyNodeWeight: " + range + " (" + g.get[(Double, Double)]("filter.node.weight") + ")")
+    //println("applyNodeWeight: " + range + " (" + g.get[(Double, Double)]("filter.node.weight") + ")")
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map {
       case (weight, i) =>
@@ -293,7 +293,7 @@ self ! 'ping      */
       g.get[(Double, Double)]("filter.edge.weight"),
       (0.0, 1.0),
       (g.get[Double]("minEdgeWeight"), g.get[Double]("maxEdgeWeight")))
-    println("applyEdgeWeight: " + range + " (" + g.get[(Double, Double)]("filter.edge.weight") + ")")
+    //println("applyEdgeWeight: " + range + " (" + g.get[(Double, Double)]("filter.edge.weight") + ")")
     val newLinks = g.links map {
       case links =>
         links.filter {
@@ -307,7 +307,7 @@ self ! 'ping      */
   def applyWeightToSize(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
     val ratio = 0.6 * g.get[Double]("filter.node.size")
-    println("applyWeightToSize: " + ratio)
+    //println("applyWeightToSize: " + ratio)
     val newSize = g.weight map {
       case weight => weight * ratio
     }

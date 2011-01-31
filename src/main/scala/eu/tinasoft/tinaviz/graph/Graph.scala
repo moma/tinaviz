@@ -103,6 +103,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val nbEdges = get[Int]("nbEdges")
   val entropy = get[Double]("entropy")
   val activity = get[Double]("activity")
+  val pause = get[Boolean]("pause")
   val ids = 0 until nbNodes
   // a Range on ID
 
@@ -238,7 +239,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     val activity2 = if (count > 0) ((addNodes + deletedNodes) / count) else 0
     //val activity2 = if (count > 0) Maths.map(((addNodes + deletedNodes) / count),(0.0,1.0),(0.1,0.99)) else 0
     val a = max(activity1,activity2)
-    println("activity: " + a)
+    //println("activity: " + a)
     new Graph(elements + ("activity" -> a))
   }
 
