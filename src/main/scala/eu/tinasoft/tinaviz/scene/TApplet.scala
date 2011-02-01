@@ -270,16 +270,17 @@ class TApplet extends PApplet with MouseWheelListener {
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
-  def screenPosition(p: (Double, Double)): (Int, Int) = {
-    screenPosition(p._1, p._2)
-  }
+  def screenPosition(p: (Double, Double)): (Int, Int) = screenPosition(p._1, p._2)
+
 
   /**
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
-  def screenPosition(x: Double, y: Double): (Int, Int) = (screenX(x.toFloat, y.toFloat).toInt,
-    screenY(x.toFloat, y.toFloat).toInt)
+  def screenPosition(x: Double, y: Double): (Int, Int) = (
+    screenX(x.toFloat, y.toFloat).toInt,
+    screenY(x.toFloat, y.toFloat).toInt
+    )
 
 
   /**

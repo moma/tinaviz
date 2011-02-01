@@ -74,6 +74,7 @@ trait Client {
   }
 
   def select(id:String) = {
+    println("JavaScript asked for select("+id+")")
     tinaviz ! 'select -> id
     true
   }
@@ -107,16 +108,20 @@ trait Client {
 
   def openURI(url:String) = {
       tinaviz ! 'open -> new java.net.URL(url)
+    true
   }
   def openString(str:String) = {
       tinaviz ! 'open -> str
+    true
   }
-  def set(key:String, value:Any) {
+  def set(key:String, value:Any) = {
+    println("JavaScript asked for set("+key+","+value+")")
     tinaviz ! key -> value
+    true
   }
 
   def setAs(key:String, value:java.lang.Object, t:String) = {
-    println("setAs(key:"+key+", value:"+value+", t:"+t+")");
+    println("JavaScript asked for setAs(key:"+key+", value:"+value+", t:"+t+")")
     t match {
        case "Int" => 
        tinaviz ! key -> value.toString.toInt
@@ -133,6 +138,7 @@ trait Client {
     null
   }
   def get(key:String) = {
+    println("JavaScript asked of get("+key+")")
     (tinaviz !? key)
   }
   /*
