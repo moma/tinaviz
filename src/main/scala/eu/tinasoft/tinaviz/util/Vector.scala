@@ -5,9 +5,16 @@
 
 package eu.tinasoft.tinaviz.util
 
+import processing.core.PVector
+
 object Vector {   
   implicit def fromDouble (p:(Double,Double)) = new Vector(p._1, p._2)
   implicit def toDouble (v:Vector) = (v.x,v.y)
+  implicit def toPVector (v:Vector) = new PVector(v.x.toFloat,v.y.toFloat)
+  implicit def fromPVector (p:PVector) = new Vector(p.x.toDouble,p.y.toDouble)
+  //implicit def doubleToPVector(p:(Double,Double)) = new PVector(p._1.toFloat,p._2.toFloat)
+  //implicit def pVectorToDouble(p:PVector) = (p.x.toDouble,p.y.toDouble)
+
   
   /**
    * Return the extremums for X (min,max) and Y (min,max)

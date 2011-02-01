@@ -13,6 +13,7 @@ import java.awt.event.MouseWheelListener
 import eu.tinasoft._
 
 import tinaviz.util._
+import tinaviz.util.Vector._
 
 class Fonts(val p: PApplet,
             val fontName: String = "Arial",
@@ -118,6 +119,13 @@ class TApplet extends PApplet with MouseWheelListener {
   }
 
   /**
+   * Convert a Tuple2 of Double to a PVector
+   */
+  implicit def tuple2iToPVector(v: (Int, Int)): PVector = {
+    new PVector(v._1.toFloat, v._2.toFloat, 0.0f)
+  }
+
+  /**
    * Convert a Tuple3 of Double to a PVector
    */
   implicit def tuple3ToPVector(v: (Double, Double, Double)): PVector = {
@@ -129,6 +137,13 @@ class TApplet extends PApplet with MouseWheelListener {
    */
   implicit def pvectorToTuple2(v: PVector): (Double, Double) = {
     (v.x.toDouble, v.y.toDouble)
+  }
+
+  /**
+   * Convert a PVector to a Tuple2 of Double
+   */
+  implicit def pvectorToTuple2i(v: PVector): (Int, Int) = {
+    (v.x.toInt, v.y.toInt)
   }
 
   /**
@@ -181,73 +196,59 @@ class TApplet extends PApplet with MouseWheelListener {
     PApplet.dist(a._1.toFloat, a._2.toFloat, b._1.toFloat, b._2.toFloat)
   }
 
-  /*
-   //println("Moving camera at: "+v)
-   //var zr = v._3
-   val t : PVector = _camera.position
-   val c : PVector = _camera.center
-
-   val newZ =
-   var zr = 0
-   if (zr < 1.0) { // ZOOM-IN
-   zr /= 0.92
-   if (zr >= 0.9) {
-   zr = 1.0
-   }
-   if (v.tryToMultiplyZoom(Camera.zRatio)) {
-   t.sub(Camera.center);
-   t.mult(zr)
-   t.add(Camera.center);
-   } else {
-   zr = 1.0f;
-   // trigger an event: we hit the
-   if (v.getLevel() == ViewLevel.MESO) {
-   //System.out.println("GOING BACK TO MACRO VIEW");
-   setView("macro");
-   }
-   }
-   } else if (Czr > 1.0) { // ZOOM-OUT
-   zr *= 0.92f;
-   if (zr <= 1.1f) {
-   zr = 1.0f;
-   }
-   if (v.tryToMultiplyZoom(Camera.zRatio)) {
-   v.translation.sub(Camera.center);
-   v.translation.mult(Camera.zRatio);
-   v.translation.add(Camera.center);
-   } else {
-   zr = 1.0f;
-   }
-   }
-   _camera.position = (v._1,v._2,zr)
-   */
-
 
   def limit(v: Double, min: Double, max: Double): Double = {
     if (v < min) min else if (v > max) max else v
   }
 
   protected def zoomUpdated(v: Double) {}
+
   protected def positionUpdated(v: (Double, Double)) {}
-  protected def mouseUpdated(mode: Symbol, onScreen: (Double, Double), inGraph: (Double,Double)) {}
 
+  protected def mouseUpdated(kind: Symbol,
+                             side: Symbol,
+                             count: Symbol,
+                             onScreen: (Double, Double),
+                             inGraph: (Double, Double)) {}
+
+  /**
+   * Zoom to the screen's center
+   */
   def zoom(zoomIn: Boolean) {
-
     _camera.lastMousePosition = (mouseX, mouseY)
-    _camera.center = (mouseX, mouseY)
-
+    val center = (mouseX, mouseY)
     val zoomRatio = if (zoomIn) 1.3 else 0.7
-
-    val oldZoom = _camera.zoom
-    _camera.zoom = limit(_camera.zoom * zoomRatio, minZoom, maxZoom)
-    zoomUpdated(_camera.zoom)
-
     val p: PVector = _camera.position
-    p.sub(_camera.center)
+    p.sub(center)
     p.mult(zoomRatio.toFloat)
-    p.add(_camera.center)
-    _camera.position = p
-    positionUpdated(_camera.position)
+    p.add(center)
+    updateZoom(limit(_camera.zoom * zoomRatio, minZoom, maxZoom))
+    updatePosition(p)
+  }
+
+  def updateZoom(value: Double) {
+    _camera.zoom = value
+    zoomUpdated(value)
+  }
+
+
+  def updatePosition(value: (Double, Double)) {
+    _camera.position = value
+    positionUpdated(value)
+  }
+
+  def updateMouse(kind: Symbol) {
+    _camera.lastMousePosition = mouseXY
+    mouseUpdated(kind, whichButton, clickCount, mouseXY, mouseXYInModel)
+  }
+
+  /**
+   * Move the Camera and zoom to a specific position
+   */
+  def moveCameraTo(position: (Double, Double), zoomLevel: Double = 5.0) {
+    _camera.lastMousePosition = (mouseX, mouseY)
+    updateZoom(limit(zoomLevel, minZoom, maxZoom))
+    updatePosition(position)
   }
 
   /**
@@ -277,10 +278,9 @@ class TApplet extends PApplet with MouseWheelListener {
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
-  def screenPosition(x: Double, y: Double): (Int, Int) = {
-    (screenX(x.toFloat, y.toFloat).toInt,
-      screenY(x.toFloat, y.toFloat).toInt)
-  }
+  def screenPosition(x: Double, y: Double): (Int, Int) = (screenX(x.toFloat, y.toFloat).toInt,
+    screenY(x.toFloat, y.toFloat).toInt)
+
 
   /**
    * Get the size to the screen
@@ -289,15 +289,6 @@ class TApplet extends PApplet with MouseWheelListener {
     (s * _camera.zoom).toInt
   }
 
-  /*
-   def zoomAt(zoomIn:Boolean, position:(Double,Double), ratio:Double=1.2) {
-   _camera.lastMousePosition = (mouseX, mouseY)
-   _camera.center = position
-   _camera.position = (_camera.position._1,
-   _camera.position._2,
-   if (zoomIn) (1.0 + ratio) else (1.0 - ratio))
-
-   }*/
 
   def showSelectionCircle(radius: Double) {
 
@@ -313,10 +304,12 @@ class TApplet extends PApplet with MouseWheelListener {
     scale(_camera.zoom.toFloat)
 
   }
-  def mouseXY = (mouseX.toDouble,mouseY.toDouble)
+
+  def mouseXY = (mouseX.toDouble, mouseY.toDouble)
+
   def mouseXYInModel = {
     ((mouseX.toDouble / _camera.zoom) - _camera.position._1,
-     (mouseY.toDouble / _camera.zoom) - _camera.position._2)
+      (mouseY.toDouble / _camera.zoom) - _camera.position._2)
   }
 
 
@@ -325,7 +318,6 @@ class TApplet extends PApplet with MouseWheelListener {
   }
 
   override def mouseDragged {
-    mouseUpdated('Dragging, mouseXY, mouseXYInModel)
     stopAutoCentering
     val p: PVector = _camera.position
     val t: PVector = _camera.position
@@ -333,45 +325,22 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.lastMousePosition = mouseXY
     t.add(_camera.lastMousePosition)
     _camera.positionDelta = PVector.sub(p, t)
-    _camera.position = t
     _camera.dragged = true
-    positionUpdated(_camera.position)
+    updatePosition(t)
+    updateMouse('Drag)
   }
 
-  override def mouseMoved {
-    _camera.lastMousePosition = mouseXY
-    mouseUpdated('Moving, mouseXY, mouseXYInModel)
-  }
+  override def mouseClicked = updateMouse('Click)
+
+  override def mouseMoved = updateMouse('Move)
 
   override def mouseReleased {
-    _camera.lastMousePosition = mouseXY
     _camera.dragged = false
-        mouseUpdated('Released, mouseXY, mouseXYInModel)
+    updateMouse('Release)
   }
 
-  override def mouseClicked {
-    mouseUpdated(
-    if (mouseButton == PConstants.LEFT) {
-        if (mouseEvent != null && mouseEvent.getClickCount() == 2) {
-            'ClickedDoubleLeft
-        } else {
-            'ClickedLeft
-        }
-    } else if (mouseButton == PConstants.RIGHT) {
-        if (mouseEvent != null && mouseEvent.getClickCount() == 2) {
-            'ClickedDoubleRight
-        } else {
-            'ClickedRight
-        }
-    } else {
-        if (mouseEvent != null && mouseEvent.getClickCount() == 2) {
-            'ClickedDoubleMiddle
-        } else {
-            'ClickedMiddle
-        }
-    }, mouseXY, mouseXYInModel)
-
-  }
+  // mouseUpdated(('Click, whichButton, clickType), mouseXY, mouseXYInModel)
+  //
 
   override def mouseWheelMoved(e: MouseWheelEvent) {
     if (!(mouseX < 0
@@ -384,9 +353,27 @@ class TApplet extends PApplet with MouseWheelListener {
     }
   }
 
-  def moveUp(amount:Double=10) = _camera.position = (_camera.position._1, _camera.position._2 + amount)
-  def moveDown(amount:Double=10) = _camera.position = (_camera.position._1, _camera.position._2 - amount)
-  def moveLeft(amount:Double=10) = _camera.position = (_camera.position._1 + amount, _camera.position._2)
-  def moveRight(amount:Double=10) = _camera.position = (_camera.position._1 - amount, _camera.position._2)
+  def moveUp(amount: Double = 10) = _camera.position = (_camera.position._1, _camera.position._2 + amount)
+
+  def moveDown(amount: Double = 10) = _camera.position = (_camera.position._1, _camera.position._2 - amount)
+
+  def moveLeft(amount: Double = 10) = _camera.position = (_camera.position._1 + amount, _camera.position._2)
+
+  def moveRight(amount: Double = 10) = _camera.position = (_camera.position._1 - amount, _camera.position._2)
+
+
+  /**
+   * Return which button is clicked ('Left, 'Right or 'Middle)
+   */
+  def whichButton = mouseButton match {
+    case PConstants.LEFT => 'Left
+    case PConstants.RIGHT => 'Right
+    case any => 'Middle
+  }
+
+  /**
+   * Return the click count, as a symbol ('Simple, or 'Double)
+   */
+  def clickCount = if (mouseEvent.getClickCount() == 2) 'Double else 'Simple
 
 }

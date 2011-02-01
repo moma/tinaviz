@@ -128,12 +128,12 @@ class Server extends node.util.Actor {
         case "filter.edge.weight.max" =>
           reply(properties("filter.edge.weight").asInstanceOf[(Double, Double)]._2)
 
-        case ("camera.mouse", mode: Symbol, onScreen: (Double, Double), inModel: (Double, Double)) =>
-          mode match {
-            case 'Dragging =>
+        case ("camera.mouse", kind: Symbol, side:Symbol, count:Symbol, onScreen: (Double, Double), inModel: (Double, Double)) =>
+          kind match {
+            case 'Drag =>
               pauseBuffer = get[Boolean]("pause")
             //self ! "pause" -> true
-            case 'Released =>
+            case 'Release =>
             //pauseBugger = false
             //self ! "pause" -> pauseBuffer
             case any =>

@@ -367,7 +367,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             if (weight > max) max = weight
         }
     }
-    return new Graph(elements ++ Map[String, Any]("minEdgeWeight" -> min, "maxEdgeWeight" -> max))
+    new Graph(elements ++ Map[String, Any]("minEdgeWeight" -> min, "maxEdgeWeight" -> max))
   }
 
   def computeBaryCenter: Graph = {
