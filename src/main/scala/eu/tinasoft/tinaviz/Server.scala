@@ -103,6 +103,9 @@ class Server extends node.util.Actor {
         case 'getNodes =>
           reply("[]")
 
+        case 'getNodeAttributes =>
+          reply (pipeline !? 'getNodesAttributes)
+
         // TODO do something for this, it's looks a bit creepy
         case ("filter.node.weight.min", value: Double) =>
           self ! (("filter.node.weight", (value, properties("filter.node.weight").asInstanceOf[(Double, Double)]._2)))

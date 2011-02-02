@@ -78,6 +78,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           data = g
           self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
+        case ('getNodeAttributes,uuid:String) => reply(layoutCache.attributes(uuid))
+
         case ("select", uuid: String) =>
           if (uuid.equals("")) {
             data += "selected" -> data.selected.map(c => false)

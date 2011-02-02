@@ -203,10 +203,15 @@ trait Client {
    */
   def getNodeAttributes(view:String, uuid:String) : String = {
     //System.out.println("getting node by UUID: " + uuid)
-    val node = (tinaviz !? 'getNodeAttributes -> uuid) match {
-      case m:Map[Any,Any] => return new JSONObject(m).toString
+    val attributes : String = (tinaviz !? 'getNodeAttributes -> uuid) match {
+      case m:Map[Any,Any] =>
+        return new JSONObject(m).toString
+
+      case any =>
+        throw new Exception("couldn't find node attributes "+uuid)
     }
-    throw new Exception("couldn't find node attributes "+uuid)
+    println("TODO send the node attributes "+attributes+" to the client")
+    attributes
   }
 
   def getNeighbourhood(view:String, rawJSONList:String) : Unit = {

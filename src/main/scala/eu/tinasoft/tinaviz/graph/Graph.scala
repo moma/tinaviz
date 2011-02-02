@@ -208,6 +208,25 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   def set(kv: (String, Any)) = new Graph(elements + kv)
 
+  def arrays = elements collect {
+    case (k, v: Array[Boolean]) => k -> v
+    case (k, v: Array[Int]) => k -> v
+    case (k, v: Array[Double]) => k -> v
+    case (k, v: Array[Color]) => k -> v
+    case (k, v: Array[(Double, Double)]) => k -> v
+  }
+
+  def attributes(uuid: String) = {
+    val i = id(uuid)
+    arrays.map {
+      case (k, v) => v(i)
+    }
+  }
+
+  def attributes(id: Int) = arrays.map {
+    case (k, v) => v(id)
+  }
+
   def computeAll = {
     var g = this
     g = g.computeNbNodes
@@ -232,13 +251,17 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     var deletedNodes = 0.0
     var addEdges = 0.0
     var deletedEdges = 0.0
-    g.uuid.zipWithIndex foreach { case (u, i) => if (!has(u)) addNodes += 1.0 }
-    uuid.zipWithIndex foreach { case (u, i) => if (!g.has(u)) deletedNodes += 1.0 }
+    g.uuid.zipWithIndex foreach {
+      case (u, i) => if (!has(u)) addNodes += 1.0
+    }
+    uuid.zipWithIndex foreach {
+      case (u, i) => if (!g.has(u)) deletedNodes += 1.0
+    }
     val activity1 = activity * entropy
     val count = nbNodes + g.nbNodes
     val activity2 = if (count > 0) ((addNodes + deletedNodes) / count) else 0
     //val activity2 = if (count > 0) Maths.map(((addNodes + deletedNodes) / count),(0.0,1.0),(0.1,0.99)) else 0
-    val a = max(activity1,activity2)
+    val a = max(activity1, activity2)
     //println("activity: " + a)
     new Graph(elements + ("activity" -> a))
   }
@@ -283,8 +306,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   def computeOutDegreeExtremums: Graph = {
     if (links.size == 0)
-      return new Graph(elements ++ Map[String, Any]("minOutDegree" -> 0,
-        "maxOutDegree" -> 0))
+      return new Graph(elements ++ Map[String, Any]("minOutDegree" -> 0, "maxOutDegree" -> 0))
     var max = Int.MinValue
     var min = Int.MaxValue
     links.foreach {
