@@ -227,6 +227,21 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     case (k, v) => v(id)
   }
 
+  def allAttributes = {
+    var nodeData = Map(uuid.map{case uuid => (uuid,Map.empty[String,Any])}:_*)
+    for (i <- nbNodes) {
+      //arrays(i).map{case (k,v) (k,v(i))}
+      for ((k,v) <- arrays(i)) yield {
+         (k,v(i))
+      }
+       nodeData(getUuid(i)) += (k,v(i))
+    }
+    arrays.foreach{
+      case (k,v) =>
+        nodeData += (k,v)
+    }
+  }
+
   def computeAll = {
     var g = this
     g = g.computeNbNodes

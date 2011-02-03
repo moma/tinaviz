@@ -100,13 +100,13 @@ class Server extends node.util.Actor {
         case ("select", uuid: String) =>
           pipeline ! "select" -> uuid
 
-        case 'getNodes =>
-          reply("[]")
+        case ('getNodes,view:String,category:String) =>
+          reply(pipeline !? ('getNodes,view,category))
 
-        case 'getNodeAttributes =>
-          reply (pipeline !? 'getNodesAttributes)
+        case ('getNodeAttributes,uuid:String) =>
+          reply (pipeline !? ('getNodesAttributes, uuid))
 
-        // TODO do something for this, it's looks a bit creepy
+        // TODO do something for this, it looks a bit creepy
         case ("filter.node.weight.min", value: Double) =>
           self ! (("filter.node.weight", (value, properties("filter.node.weight").asInstanceOf[(Double, Double)]._2)))
 

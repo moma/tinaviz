@@ -43,7 +43,7 @@ class Fonts(val p: PApplet,
 class TApplet extends PApplet with MouseWheelListener {
 
   val minZoom = 0.1
-  val maxZoom = 150.0
+  val maxZoom = 300.0
 
   private val _fonts = new Fonts(this)
   private val _camera = new Camera()
@@ -216,14 +216,18 @@ class TApplet extends PApplet with MouseWheelListener {
    */
   def zoom(zoomIn: Boolean) {
     _camera.lastMousePosition = (mouseX, mouseY)
-    val center = (mouseX, mouseY)
+
     val zoomRatio = if (zoomIn) 1.3 else 0.7
-    val p: PVector = _camera.position
-    p.sub(center)
-    p.mult(zoomRatio.toFloat)
-    p.add(center)
-    updateZoom(limit(_camera.zoom * zoomRatio, minZoom, maxZoom))
-    updatePosition(p)
+    val z = limit(_camera.zoom * zoomRatio, minZoom, maxZoom)
+    if (z != minZoom && z != maxZoom) {
+        updateZoom(z)
+        val p: PVector = _camera.position
+        val center = (mouseX, mouseY)
+        p.sub(center)
+        p.mult(zoomRatio.toFloat)
+        p.add(center)
+        updatePosition(p)
+    }
   }
 
   def updateZoom(value: Double) {

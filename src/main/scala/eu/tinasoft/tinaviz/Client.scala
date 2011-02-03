@@ -205,7 +205,7 @@ trait Client {
     //System.out.println("getting node by UUID: " + uuid)
     val attributes : String = (tinaviz !? 'getNodeAttributes -> uuid) match {
       case m:Map[Any,Any] =>
-        return new JSONObject(m).toString
+         new JSONObject(m).toString
 
       case any =>
         throw new Exception("couldn't find node attributes "+uuid)
@@ -244,8 +244,14 @@ trait Client {
   
   // TODO should be asynchronous
   def getNodes(view:String, category:String) : String = {
-       val nodes = (tinaviz !? 'getNodes)
-       println("NOT IMPLEMENTED getNodes(view: "+view+", category: "+category+")")
-       return "[]"
+    //System.out.println("getting node by UUID: " + uuid)
+    val nodes : String = (tinaviz !? ('getNodes,view,category)) match {
+      case m:Map[String,Map[String,Any]} => new JSONObject(m).toString
+
+      case any =>
+        throw new Exception("couldn't find nodes from view: "+view+" and category: "+category)
+    }
+    println("TODO send the nodes "+nodes+" to the client")
+    attributes
   }
 }

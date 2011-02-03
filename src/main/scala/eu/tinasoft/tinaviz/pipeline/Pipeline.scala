@@ -80,6 +80,9 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
         case ('getNodeAttributes,uuid:String) => reply(layoutCache.attributes(uuid))
 
+        case ('getNodes,view:String,category:String) =>
+          reply(layoutCache.allAttributes)
+
         case ("select", uuid: String) =>
           if (uuid.equals("")) {
             data += "selected" -> data.selected.map(c => false)
@@ -136,7 +139,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           }
 
         case ('ping, old: Long) =>
-          val pause = data.get[Boolean]("pause")
+          val pause = try { data.get[Boolean]("pause") } catch { case x => true }
           if (!pause) {
             //println("pingu")
             layoutCache = applyLayout(layoutCache)
@@ -308,7 +311,7 @@ self ! 'ping      */
 
   def applyWeightToSize(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val ratio = 0.6 * g.get[Double]("filter.node.size")
+    val ratio = 1.0 * g.get[Double]("filter.node.size")
     //println("applyWeightToSize: " + ratio)
     val newSize = g.weight map {
       case weight => weight * ratio
