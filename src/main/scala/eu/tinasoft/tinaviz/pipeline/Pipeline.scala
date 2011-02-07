@@ -90,6 +90,35 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             case any => data.allNodes
           })
 
+        case ("camera.mouse", kind: Symbol, side:Symbol, count:Symbol, screenPosition: (Double, Double), modelPosition: (Double,Double)) =>
+
+          // sub routines to convert between screen and model coordinates
+          //val cp = get[Double]("camera.zoom")
+          //val cz = get[(Double,Double)]("camera.position")
+           //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
+           //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
+          //def model2screen(p:(Double,Double)) : (Int,Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
+          //def screen2model(p:(Int,Int)) : (Double,Double) = ((p._1.toDouble / cz ) - cp._1, (p._2.toDouble / cz) - cp._2)
+
+          //val mop = screen2model(onScreen)
+          println("mouse in screen: "+onScreen+"   mouse in model: "+mop)
+          kind match {
+            case 'Move =>
+                 output.position.foreach {
+                   case p =>
+                      // todo check if position match, according to the radius (hmm.. may be too complicated)
+
+                 }
+            case 'Drag =>
+              pauseBuffer = get[Boolean]("pause")
+            //self ! "pause" -> true
+            case 'Release =>
+            //pauseBugger = false
+            //self ! "pause" -> pauseBuffer
+            case any =>
+          }
+
+
         case ("select", uuid: String) =>
           if (uuid.equals("")) {
             data += "selected" -> data.selected.map(c => false)
@@ -193,9 +222,7 @@ self ! 'ping      */
   }
 
   def sendScene {
-    sketch.update(layoutCache)
-    scene = sketch: Scene
-    actor ! scene
+    actor ! (layoutCache,sketch.update(layoutCache): Scene)
   }
 
   /*

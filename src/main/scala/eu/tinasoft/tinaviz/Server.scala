@@ -61,7 +61,8 @@ class Server extends node.util.Actor {
   val pipeline = new Pipeline(this)
   var pipelineBusy = true
 
-  var graph = new Graph()
+  var input = new Graph()
+  var output = new Graph()
   // used for some stats
 
   start
@@ -84,12 +85,13 @@ class Server extends node.util.Actor {
         case g: Graph =>
         //if (sender.receiver == sketcher) {
           properties = defaultProperties
-          graph = new Graph(properties ++ g.elements)
-          pipeline ! graph
+          input = new Graph(properties ++ g.elements)
+          pipeline ! input
         //pipelineBusy = false
 
-        case scene: Scene =>
+        case (graph: Graph, scene: Scene) =>
           properties += "scene" -> scene
+          output += graph
         //pipelineBusy = false
         //self ! "frameRate" -> properties("frameRate") // force relaunching
 
@@ -132,24 +134,12 @@ class Server extends node.util.Actor {
         case "filter.edge.weight.max" =>
           reply(properties("filter.edge.weight").asInstanceOf[(Double, Double)]._2)
 
-        case ("camera.mouse", kind: Symbol, side:Symbol, count:Symbol, onScreen: (Double, Double), inModel: (Double, Double)) =>
-          kind match {
-            case 'Drag =>
-              pauseBuffer = get[Boolean]("pause")
-            //self ! "pause" -> true
-            case 'Release =>
-            //pauseBugger = false
-            //self ! "pause" -> pauseBuffer
-            case any =>
-          }
-
-
         case ('updated, key: String, value: Any, previous: Any) =>
         // log("ignoring update of "+key)
         //println("updating pipeline with this data: "+key+" -> "+value)
           key match {
-            case "camera.zoom" =>
-            case "camera.position" =>
+            //case "camera.zoom" =>
+            //case "camera.position" =>
             case "frameRate" =>
             case any => pipeline ! key -> value // update the pipeline
           }

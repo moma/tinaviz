@@ -187,13 +187,10 @@ class Main extends TApplet with Client {
   override def mouseUpdated(kind:Symbol,
                             side:Symbol,
                             count:Symbol,
-                            onScreen: (Double, Double),
-                            inGraph: (Double, Double)) {
-
-
-    tinaviz ! ("camera.mouse", kind, side, count, onScreen, inGraph)
+                            screenPosition: (Double, Double),
+                             modelPosition: (Double, Double)) {
+    tinaviz ! ("camera.mouse", kind, side, count, screenPosition, modelPosition)
   }
-
 
 
   override def keyPressed() {

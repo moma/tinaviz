@@ -246,10 +246,10 @@ trait Client {
   def getNodes(view:String, category:String) : String = {
     //System.out.println("getting node by UUID: " + uuid)
     val nodes : String = (tinaviz !? ('getNodes,view,category)) match {
-      case m:Map[String,Map[String,List[Any]]] =>
+      case m:Map[String,Map[String,Any]] =>
         println("Server replied with some node map: "+m)
-        Json.build(m.asInstanceOf[Map[Any,List[Any]]]).toString
-
+        //Json.build(m).toString
+        Json.build(m.map{case(k,v)=>v}.toList).toString
       case any =>
         throw new Exception("couldn't find nodes from view: "+view+" and category: "+category)
     }

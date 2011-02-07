@@ -208,8 +208,8 @@ class TApplet extends PApplet with MouseWheelListener {
   protected def mouseUpdated(kind: Symbol,
                              side: Symbol,
                              count: Symbol,
-                             onScreen: (Double, Double),
-                             inGraph: (Double, Double)) {}
+                             screenPosition: (Double, Double),
+                             modelPosition: (Double, Double)) {}
 
   /**
    * Zoom to the screen's center
@@ -243,7 +243,7 @@ class TApplet extends PApplet with MouseWheelListener {
 
   def updateMouse(kind: Symbol) {
     _camera.lastMousePosition = mouseXY
-    mouseUpdated(kind, whichButton, clickCount, mouseXY, mouseXYInModel)
+    mouseUpdated(kind, whichButton, clickCount, mouseXY, modelPosition(mouseXY))
   }
 
   /**
@@ -281,11 +281,15 @@ class TApplet extends PApplet with MouseWheelListener {
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
-  def screenPosition(x: Double, y: Double): (Int, Int) = (
-    screenX(x.toFloat, y.toFloat).toInt,
-    screenY(x.toFloat, y.toFloat).toInt
-    )
+  def screenPosition(x: Double, y: Double): (Int, Int) = (screenX(x.toFloat, y.toFloat).toInt,
+                                                          screenY(x.toFloat, y.toFloat).toInt)
 
+  def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
+  def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
+  def modelPosition(p:(Double,Double)) : (Double,Double) = modelPosition(p._1,p._2)
+  def modelPosition(x:Double,y:Double) : (Double,Double) = (
+    (x.toDouble / _camera.zoom) - _camera.position._1,
+    (y.toDouble / _camera.zoom) - _camera.position._2)
 
   /**
    * Get the size to the screen
