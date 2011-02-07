@@ -194,7 +194,6 @@ trait Client {
     //Visualization.centerOnSelection = center;
     //redrawLater();
 
-
   }
   
 
@@ -214,15 +213,15 @@ trait Client {
     attributes
   }
 
-  def getNeighbourhood(view:String, rawJSONList:String) : Unit = {
+  def getNeighbourhood(view:String, rawJSONList:String) : String = {
     var neighbourList = "{}"
     if (view == null) {
       //Console.log("getNeighbourhood: view is null");
-      return;
+      return neighbourList;
     }
     if (rawJSONList == null) {
       //Console.log("getNeighbourhood: id is null");
-      return;
+      return neighbourList;
     }
     //Console.log("getNeighbourhood(" + view + ", " + rawJSONList + ")");
     try {
@@ -236,22 +235,25 @@ trait Client {
     }
     if (neighbourList == null | neighbourList.isEmpty() | neighbourList.equals("{}")) {
       //Console.log("getNeighbourhood: ERROR, json export failed: " + neighbourList);
-      return;
+      return neighbourList;
     }
-
-    // Browser ! "_callbackGetNeighbourhood" -> "'" + getSelectedNodesJSON(view) + "','" + neighbourList + "'"
+    println("TODO send the neighbourList "+neighbourList+" to the client")
+    neighbourList
+    //Browser ! "_callbackGetNeighbourhood" -> "'" + getSelectedNodesJSON(view) + "','" + neighbourList + "'"
   }
   
   // TODO should be asynchronous
   def getNodes(view:String, category:String) : String = {
     //System.out.println("getting node by UUID: " + uuid)
     val nodes : String = (tinaviz !? ('getNodes,view,category)) match {
-      case m:Map[String,Map[String,Any]} => new JSONObject(m).toString
+      case m:Map[String,Map[String,Any]] =>
+
+        new JSONObject(m.asInstanceOf[Map[Any,Any]]).toString
 
       case any =>
         throw new Exception("couldn't find nodes from view: "+view+" and category: "+category)
     }
     println("TODO send the nodes "+nodes+" to the client")
-    attributes
+    nodes
   }
 }

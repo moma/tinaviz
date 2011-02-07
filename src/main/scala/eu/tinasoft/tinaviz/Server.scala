@@ -104,7 +104,7 @@ class Server extends node.util.Actor {
           reply(pipeline !? ('getNodes,view,category))
 
         case ('getNodeAttributes,uuid:String) =>
-          reply (pipeline !? ('getNodesAttributes, uuid))
+          reply (pipeline !? 'getNodesAttributes -> uuid)
 
         // TODO do something for this, it looks a bit creepy
         case ("filter.node.weight.min", value: Double) =>
