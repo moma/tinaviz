@@ -208,51 +208,60 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   def set(kv: (String, Any)) = new Graph(elements + kv)
 
-  def attributes(uuid: String) : Map[String,Any] = {
+  def attributes(uuid: String): Map[String, Any] = {
     val i = id(uuid)
-    Map[String,Any](
-    "links" -> links(i) ,
-    "position" ->  position(i),
-    "color" -> color(i),
-  "weight" -> weight(i),
-  "size" -> size(i),
-  "category" -> category(i),
-  "selected" -> selected(i),
-  "label" -> label(i),
-  "rate" -> rate(i),
-  "uuid" -> uuid,
-  "inDegree" -> inDegree(i),
-  "outDegree" -> outDegree(i),
-  "density" -> density(i)
-  )
+    Map[String, Any](
+      "links" -> links(i),
+      "position" -> position(i),
+      "color" -> color(i),
+      "weight" -> weight(i),
+      "size" -> size(i),
+      "category" -> category(i),
+      "selected" -> selected(i),
+      "label" -> label(i),
+      "rate" -> rate(i),
+      "uuid" -> uuid,
+      "inDegree" -> inDegree(i),
+      "outDegree" -> outDegree(i),
+      "density" -> density(i)
+    )
   }
 
 
-  def attributes(i: Int) : Map[String,Any] = {
-    Map[String,Any](
-    "links" -> links(i) ,
-    "position" ->  position(i),
-    "color" -> color(i),
-  "weight" -> weight(i),
-  "size" -> size(i),
-  "category" -> category(i),
-  "selected" -> selected(i),
-  "label" -> label(i),
-  "rate" -> rate(i),
-  "uuid" -> uuid(i),
-  "inDegree" -> inDegree(i),
-  "outDegree" -> outDegree(i),
-  "density" -> density(i)
-  )
+  def attributes(i: Int): Map[String, Any] = {
+    Map[String, Any](
+      "links" -> links(i),
+      "position" -> position(i),
+      "color" -> color(i),
+      "weight" -> weight(i),
+      "size" -> size(i),
+      "category" -> category(i),
+      "selected" -> selected(i),
+      "label" -> label(i),
+      "rate" -> rate(i),
+      "uuid" -> uuid(i),
+      "inDegree" -> inDegree(i),
+      "outDegree" -> outDegree(i),
+      "density" -> density(i)
+    )
   }
 
 
-
-  def allAttributes : Map[String,Any] = {
-     Map.empty[String,Any]
+  def allNodes: Map[String, Array[Any]] = {
+    Map[String, Array[Any]](
+      "links" -> links.asInstanceOf[Array[Any]],
+      "category" ->category.asInstanceOf[Array[Any]],
+      "selected" -> selected.asInstanceOf[Array[Any]],
+      "label" -> label.asInstanceOf[Array[Any]],
+      "rate" -> rate.asInstanceOf[Array[Any]],
+      "uuid" -> uuid.asInstanceOf[Array[Any]],
+      "inDegree" -> inDegree.asInstanceOf[Array[Any]],
+      "outDegree" -> outDegree.asInstanceOf[Array[Any]]
+    )
   }
+
   /**
-    var nodeData = Map(uuid.map{case uuid => (uuid,Map.empty[String,Any])}:_*)
+  var nodeData = Map(uuid.map{case uuid => (uuid,Map.empty[String,Any])}:_*)
     for (i <- ids) {
       //arrays(i).map{case (k,v) (k,v(i))}
       //val u = getUuid(i)
@@ -268,7 +277,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         nodeData += (k,v)
     }
     nodeData
-  }   */
+  }*/
 
   def computeAll = {
     var g = this
@@ -285,9 +294,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g.computeBaryCenter
   }
 
-/**
- * compute the amount of information added to thiq by g
- */
+  /**
+   * compute the amount of information added to thiq by g
+   */
   def computeActivity(g: Graph): Graph = {
     def max(x: Double, y: Double): Double = if (x < y) y else x
     var addNodes = 0.0

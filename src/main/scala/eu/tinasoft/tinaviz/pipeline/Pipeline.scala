@@ -78,10 +78,13 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           data = g
           self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
-        case ('getNodeAttributes,uuid:String) => reply(layoutCache.attributes(uuid))
+        case ('getNodeAttributes, uuid: String) =>
+          println("Server: asekd for 'getNodeAttributes " + uuid)
+          reply(layoutCache.attributes(uuid))
 
-        case ('getNodes,view:String,category:String) =>
-          reply(layoutCache.allAttributes)
+        case ('getNodes, view: String, category: String) =>
+          println("Server: asekd for 'getNodes " + view + " " + category)
+          reply(layoutCache.allNodes)
 
         case ("select", uuid: String) =>
           if (uuid.equals("")) {
@@ -92,7 +95,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
         case (key: String, value: Any) =>
-          //println("updating graph attribute " + key + " -> " + value)
+        //println("updating graph attribute " + key + " -> " + value)
           data += key -> value
           categoryCache += key -> value
           nodeWeightCache += key -> value
@@ -100,7 +103,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           layoutCache += key -> value
           key match {
             case "filter.node.category" =>
-              //println("categoryCache = applyCategory(data)")
+            //println("categoryCache = applyCategory(data)")
               categoryCache = applyCategory(data)
               categoryCache = applyWeightToSize(categoryCache)
               categoryCache = categoryCache.updatePosition(layoutCache)
@@ -109,21 +112,21 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               layoutCache = edgeWeightCache
               sendScene
             case "filter.node.weight" =>
-              //println("nodeWeightCache = applyNodeWeight(categoryCache)")
+            //println("nodeWeightCache = applyNodeWeight(categoryCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               sendScene
             case "filter.edge.weight" =>
-              //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+            //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               sendScene
             case "filter.node.size" =>
-              //println("categoryCache = applyWeightToSize(categoryCache)")
+            //println("categoryCache = applyWeightToSize(categoryCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
@@ -139,7 +142,11 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           }
 
         case ('ping, old: Long) =>
-          val pause = try { data.get[Boolean]("pause") } catch { case x => true }
+          val pause = try {
+            data.get[Boolean]("pause")
+          } catch {
+            case x => true
+          }
           if (!pause) {
             //println("pingu")
             layoutCache = applyLayout(layoutCache)
@@ -157,7 +164,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             }
             //Scheduler.schedule( { Actor.actor { me ! 'ping }; () }, 100000L)
           } else {
-               schedule('ping, 200)
+            schedule('ping, 200)
           }
 
 

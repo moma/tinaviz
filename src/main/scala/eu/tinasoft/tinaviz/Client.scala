@@ -247,7 +247,7 @@ trait Client {
     //System.out.println("getting node by UUID: " + uuid)
     val nodes : String = (tinaviz !? ('getNodes,view,category)) match {
       case m:Map[String,Map[String,Any]] =>
-
+        println("Server replied with some node map: "+m)
         new JSONObject(m.asInstanceOf[Map[Any,Any]]).toString
 
       case any =>

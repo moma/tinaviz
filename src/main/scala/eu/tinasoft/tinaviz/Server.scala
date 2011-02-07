@@ -101,6 +101,7 @@ class Server extends node.util.Actor {
           pipeline ! "select" -> uuid
 
         case ('getNodes,view:String,category:String) =>
+          println("Server: asekd for 'getNodes "+view+" "+category)
           reply(pipeline !? ('getNodes,view,category))
 
         case ('getNodeAttributes,uuid:String) =>
