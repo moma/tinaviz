@@ -154,6 +154,7 @@ class GEXF extends node.util.Actor {
       g += (id, "size", 1.0)
       g += (id, "weight", 1.0)
       g += (id, "category", "Default")
+      g += (id, "content", "")
       g += (id, "position", position)
       g += (id, "links", Map.empty[Int, Double])
 

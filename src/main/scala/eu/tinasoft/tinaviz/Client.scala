@@ -11,7 +11,7 @@ import eu.tinasoft._
 import tinaviz.io.JsonParser
 import eu.tinasoft.tinaviz.io.Browser
 import eu.tinasoft.tinaviz.io.json.Json
-import scala.util.parsing.json.JSONObject
+//import scala.util.parsing.json.JSONObject
 
 trait Client {
   
@@ -204,7 +204,7 @@ trait Client {
     //System.out.println("getting node by UUID: " + uuid)
     val attributes : String = (tinaviz !? 'getNodeAttributes -> uuid) match {
       case m:Map[Any,Any] =>
-         new JSONObject(m).toString
+         Json.build(m).toString
 
       case any =>
         throw new Exception("couldn't find node attributes "+uuid)
@@ -246,14 +246,15 @@ trait Client {
   def getNodes(view:String, category:String) : String = {
     //System.out.println("getting node by UUID: " + uuid)
     val nodes : String = (tinaviz !? ('getNodes,view,category)) match {
-      case m:Map[String,Map[String,Any]] =>
+      case m:Map[String,Map[String,List[Any]]] =>
         println("Server replied with some node map: "+m)
-        new JSONObject(m.asInstanceOf[Map[Any,Any]]).toString
+        Json.build(m.asInstanceOf[Map[Any,List[Any]]]).toString
 
       case any =>
         throw new Exception("couldn't find nodes from view: "+view+" and category: "+category)
     }
     println("TODO send the nodes "+nodes+" to the client")
+    Browser ! "_callbackGetNodes" -> "'" + nodes + "'"
     nodes
   }
 }

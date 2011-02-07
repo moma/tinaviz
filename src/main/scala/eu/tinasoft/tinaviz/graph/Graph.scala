@@ -7,7 +7,8 @@ package eu.tinasoft.tinaviz.graph
 
 import eu.tinasoft._
 import eu.tinasoft.tinaviz.util.Color
-import scala.collection.mutable.LinkedList
+import collection.mutable.LinkedList
+import eu.tinasoft.tinaviz.io.json.Base64
 import tinaviz.util.Vector
 
 object Graph {
@@ -40,6 +41,7 @@ object Graph {
     "size" -> Array.empty[Double],
     "weight" -> Array.empty[Double],
     "category" -> Array.empty[String],
+     "content" -> Array.empty[String],
     "position" -> Array.empty[(Double, Double)],
     "links" -> Array.empty[Map[Int, Double]],
     "inDegree" -> Array.empty[Int],
@@ -92,6 +94,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val weight = getArray[Double]("weight")
   val size = getArray[Double]("size")
   val category = getArray[String]("category")
+  val content = getArray[String]("content")
   val selected = getArray[Boolean]("selected")
   val label = getArray[String]("label")
   val rate = getArray[Int]("rate")
@@ -209,22 +212,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   def set(kv: (String, Any)) = new Graph(elements + kv)
 
   def attributes(uuid: String): Map[String, Any] = {
-    val i = id(uuid)
-    Map[String, Any](
-      "links" -> links(i),
-      "position" -> position(i),
-      "color" -> color(i),
-      "weight" -> weight(i),
-      "size" -> size(i),
-      "category" -> category(i),
-      "selected" -> selected(i),
-      "label" -> label(i),
-      "rate" -> rate(i),
-      "uuid" -> uuid,
-      "inDegree" -> inDegree(i),
-      "outDegree" -> outDegree(i),
-      "density" -> density(i)
-    )
+     attributes(id(uuid))
   }
 
 
@@ -236,6 +224,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "weight" -> weight(i),
       "size" -> size(i),
       "category" -> category(i),
+       "content" -> content(i),
       "selected" -> selected(i),
       "label" -> label(i),
       "rate" -> rate(i),
@@ -246,18 +235,33 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     )
   }
 
+     def lessAttributes(uuid: String): Map[String, Any] = {
+       lessAttributes(id(uuid))
+  }
 
-  def allNodes: Map[String, Array[Any]] = {
-    Map[String, Array[Any]](
-      "links" -> links.asInstanceOf[Array[Any]],
-      "category" ->category.asInstanceOf[Array[Any]],
-      "selected" -> selected.asInstanceOf[Array[Any]],
-      "label" -> label.asInstanceOf[Array[Any]],
-      "rate" -> rate.asInstanceOf[Array[Any]],
-      "uuid" -> uuid.asInstanceOf[Array[Any]],
-      "inDegree" -> inDegree.asInstanceOf[Array[Any]],
-      "outDegree" -> outDegree.asInstanceOf[Array[Any]]
+
+  def lessAttributes(i: Int): Map[String, Any] = {
+    Map[String, Any](
+      //"links" -> links(i),
+      //"position" -> position(i),
+      //"color" -> color(i),
+      //"weight" -> weight(i),
+      //"size" -> size(i),
+      "category" -> category(i),
+      "content" -> content(i),//Base64.encode(content(i)),
+      "selected" -> selected(i),
+      "label" -> label(i),// Base64.encode(label(i)),
+      "rate" -> rate(i),
+      "id" -> uuid(i),
+      "inDegree" -> inDegree(i),
+      "outDegree" -> outDegree(i)
+      //"density" -> density(i)
     )
+  }
+  def allNodes: Map[String, Map[String,Any]] = {
+    var nodeData = Map.empty[String,Map[String,Any]]
+    for (i <- ids) nodeData += getUuid(i) -> lessAttributes(i)
+    nodeData
   }
 
   /**

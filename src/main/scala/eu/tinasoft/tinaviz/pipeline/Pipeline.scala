@@ -79,12 +79,16 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
         case ('getNodeAttributes, uuid: String) =>
-          println("Server: asekd for 'getNodeAttributes " + uuid)
-          reply(layoutCache.attributes(uuid))
+          println("Server: asked for 'getNodeAttributes " + uuid)
+          reply(data.lessAttributes(uuid))
+
 
         case ('getNodes, view: String, category: String) =>
-          println("Server: asekd for 'getNodes " + view + " " + category)
-          reply(layoutCache.allNodes)
+          println("Server: asked for 'getNodes " + view + " " + category)
+          reply(view match {
+            case "meso" => layoutCache.allNodes
+            case any => data.allNodes
+          })
 
         case ("select", uuid: String) =>
           if (uuid.equals("")) {
