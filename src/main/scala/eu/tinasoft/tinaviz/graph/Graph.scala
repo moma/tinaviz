@@ -208,33 +208,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   def set(kv: (String, Any)) = new Graph(elements + kv)
 
-
-  /**
-   *
-   */
-  /*val arrays : Map[String,Array[Any]] = elements collect {
-    case (k, v: Array[Boolean]) => k -> v
-    case (k, v: Array[Int]) => k -> v
-    case (k, v: Array[Double]) => k -> v
-    case (k, v: Array[Color]) => k -> v
-    case (k, v: Array[(Double, Double)]) => k -> v
-  }*/
-  val arrays : Map[String,Array[Any]] = Map[String,Array[Any]](
-    "links" -> links.asInstanceOf[Array[Any]],
-    "position" ->  position.asInstanceOf[Array[Any]],
-    "color" -> color.asInstanceOf[Array[Any]],
-  "weight" -> weight.asInstanceOf[Array[Any]],
-  "size" -> size.asInstanceOf[Array[Any]],
-  "category" -> category.asInstanceOf[Array[Any]],
-  "selected" -> selected.asInstanceOf[Array[Any]],
-  "label" -> label.asInstanceOf[Array[Any]],
-  "rate" -> rate.asInstanceOf[Array[Any]],
-  "uuid" -> uuid.asInstanceOf[Array[Any]],
-  "inDegree" -> inDegree.asInstanceOf[Array[Any]],
-  "outDegree" -> outDegree.asInstanceOf[Array[Any]],
-  "density" -> density.asInstanceOf[Array[Any]]
-  )
-
   def attributes(uuid: String) : Map[String,Any] = {
     val i = id(uuid)
     Map[String,Any](
