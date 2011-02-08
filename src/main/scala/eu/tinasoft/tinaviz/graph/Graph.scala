@@ -127,10 +127,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    * List of selected nodes' attributes
    */
   val selectionAttributes = {
-    println("selection size: "+selection.size)
+    // println("selection size: "+selection.size)
     selection.map{ case i =>
-      println("getting attributes of "+i)
-      println("length: "+nbNodes)
+      //println("getting attributes of "+i)
+      //println("length: "+nbNodes)
       lessAttributes(i) }.toList
   }
 
@@ -260,20 +260,21 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def attributes(i: Int): Map[String, Any] = {
     Map[String, Any](
-      "links" -> links(i),
-      "position" -> position(i),
-      "color" -> color(i),
-      "weight" -> weight(i),
-      "size" -> size(i),
-      "category" -> category(i),
-       "content" -> content(i),
-      "selected" -> selected(i),
-      "label" -> label(i),
-      "rate" -> rate(i),
-      "uuid" -> uuid(i),
-      "inDegree" -> inDegree(i),
-      "outDegree" -> outDegree(i),
-      "density" -> density(i)
+      "links" -> (if (links.size > i) links(i) else Map.empty[Int,Double]),
+      "position" -> (if (position.size > i) position(i) else (0.0,0.0)),
+      "color" -> (if (color.size > i) color(i) else new Color(0.0,0.0,0.0)),
+      "weight" -> (if (weight.size > i) weight(i) else 1.0),
+      "size" -> (if (size.size > i) size(i) else 1.0),
+          "category" -> (if (category.size > i) category(i) else ""),
+      "content" -> (if (content.size > i) content(i) else ""),//Base64.encode(content(i)),
+      "selected" -> (if (selected.size > i) selected(i) else false),
+      "label" -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
+      "rate" -> (if (rate.size > i) rate(i) else 0),
+      "id" -> (if (uuid.size > i) uuid(i) else 0),
+      "inDegree" -> (if (inDegree.size > i) inDegree(i) else 0),
+      "outDegree" -> (if(outDegree.size > i) outDegree(i) else 0),
+
+      "density" -> (if (density.size > i) density(i) else 0)
     )
   }
 
@@ -290,20 +291,25 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    * of a node from it's index in the graph
    */
   def lessAttributes(i: Int): Map[String, Any] = {
+    /*
+    println("***category: "+category.size)
+     println("***selected: "+selected.size)
+    println("***content: "+content.size)
+    */
     Map[String, Any](
       //"links" -> links(i),
       //"position" -> position(i),
       //"color" -> color(i),
       //"weight" -> weight(i),
       //"size" -> size(i),
-      "category" -> category(i),
-      "content" -> content(i),//Base64.encode(content(i)),
-      "selected" -> selected(i),
-      "label" -> label(i),// Base64.encode(label(i)),
-      "rate" -> rate(i),
-      "id" -> uuid(i),
-      "inDegree" -> inDegree(i),
-      "outDegree" -> outDegree(i)
+      "category" -> (if (category.size > i) category(i) else ""),
+      "content" -> (if (content.size > i) content(i) else ""),//Base64.encode(content(i)),
+      "selected" -> (if (selected.size > i) selected(i) else false),
+      "label" -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
+      "rate" -> (if (rate.size > i) rate(i) else 0),
+      "id" -> (if (uuid.size > i) uuid(i) else 0),
+      "inDegree" -> (if (inDegree.size > i) inDegree(i) else 0),
+      "outDegree" -> (if(outDegree.size > i) outDegree(i) else 0)
       //"density" -> density(i)
     )
   }

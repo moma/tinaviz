@@ -148,7 +148,7 @@ class GEXF extends node.util.Actor {
       g += (id, "uuid", uuid)
       g += (id, "label", label)
       g += (id, "color", color)
-      g += (id, "selected", Maths.randomBool)
+      g += (id, "selected", false)
       g += (id, "density", 1.0)
       g += (id, "rate", 1)
       g += (id, "size", 1.0)
