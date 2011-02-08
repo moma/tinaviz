@@ -106,20 +106,27 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
         // (i) / cz) / 2.0
 
         //val mop = screen2model(onScreen)
-          println("mouse in screen: " + position + "    mouse in model: " + o)
-          println("selection radius: " + sr + "     scaled: " + r)
+          //println("mouse in screen: " + position + "    mouse in model: " + o)
+          //println("selection radius: " + sr + "     scaled: " + r)
           kind match {
-            case 'Move =>
-              layoutCache.position.zipWithIndex.foreach {
-                case (p,i) =>
-                // todo check if position match, according to the radius (hmm.. may be too complicated)
-                  val d = o.dist(p)
-                  if (d <= r) {
-                    println("scale radius: "+r)
-                    println(""+o+" is in range of "+d)
-                  }
+            case 'Click =>
+              var in = false
+              layoutCache = layoutCache + ("selected" -> layoutCache.selected.zipWithIndex.map {
+                case (before,i) =>
+                  val touched = (layoutCache.position(i).dist(o) <= r )
+                  if (touched) in = true
+                  (before,touched)
+              }.map{
+                case (before,touched) =>
+                if (touched) {
+                  true
+                } else {
+                  // we don't touch a thing, unless nothing was selected at all (we reset everything in this case)
+                  if (in) before else false
+                }
+              }.toArray)
 
-              }
+              sendScene
             case 'Drag =>
             val pause = try {
               data.get[Boolean]("pause")
