@@ -101,7 +101,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
         def screen2model(p:(Double,Double)) : (Double,Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
         val o = screen2model(position)
         val sr = layoutCache.get[Double]("selectionRadius")
-        val r = sr / cz
+        val r = (sr / cz) / 2.0
 
         // (i) / cz) / 2.0
 
