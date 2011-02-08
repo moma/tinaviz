@@ -126,7 +126,13 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   /**
    * List of selected nodes' attributes
    */
-  val selectionAttributes = selection.map{ case i => lessAttributes(i) }.toList
+  val selectionAttributes = {
+    println("selection size: "+selection.size)
+    selection.map{ case i =>
+      println("getting attributes of "+i)
+      println("length: "+nbNodes)
+      lessAttributes(i) }.toList
+  }
 
   /**
    * Check if a graph has any link between i and i (directed or undirected)
