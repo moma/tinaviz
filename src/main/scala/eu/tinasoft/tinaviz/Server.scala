@@ -91,7 +91,7 @@ class Server extends node.util.Actor {
 
         case (graph: Graph, scene: Scene) =>
           properties += "scene" -> scene
-          output += graph
+          output = graph
         //pipelineBusy = false
         //self ! "frameRate" -> properties("frameRate") // force relaunching
 
@@ -133,6 +133,9 @@ class Server extends node.util.Actor {
 
         case "filter.edge.weight.max" =>
           reply(properties("filter.edge.weight").asInstanceOf[(Double, Double)]._2)
+
+        case ("camera.mouse", kind, side, count, position) =>
+          pipeline ! ("camera.mouse", kind, side, count, position)
 
         case ('updated, key: String, value: Any, previous: Any) =>
         // log("ignoring update of "+key)

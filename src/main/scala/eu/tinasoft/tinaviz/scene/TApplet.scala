@@ -208,8 +208,7 @@ class TApplet extends PApplet with MouseWheelListener {
   protected def mouseUpdated(kind: Symbol,
                              side: Symbol,
                              count: Symbol,
-                             screenPosition: (Double, Double),
-                             modelPosition: (Double, Double)) {}
+                             position: (Double, Double)) {}
 
   /**
    * Zoom to the screen's center
@@ -243,7 +242,7 @@ class TApplet extends PApplet with MouseWheelListener {
 
   def updateMouse(kind: Symbol) {
     _camera.lastMousePosition = mouseXY
-    mouseUpdated(kind, whichButton, clickCount, mouseXY, modelPosition(mouseXY))
+    mouseUpdated(kind, whichButton, clickCount, mouseXY)
   }
 
   /**
@@ -284,8 +283,8 @@ class TApplet extends PApplet with MouseWheelListener {
   def screenPosition(x: Double, y: Double): (Int, Int) = (screenX(x.toFloat, y.toFloat).toInt,
                                                           screenY(x.toFloat, y.toFloat).toInt)
 
-  def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
-  def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
+  //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
+  //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
   def modelPosition(p:(Double,Double)) : (Double,Double) = modelPosition(p._1,p._2)
   def modelPosition(x:Double,y:Double) : (Double,Double) = (
     (x.toDouble / _camera.zoom) - _camera.position._1,

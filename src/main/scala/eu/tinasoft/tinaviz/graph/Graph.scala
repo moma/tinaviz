@@ -48,7 +48,10 @@ object Graph {
     "outDegree" -> Array.empty[Int],
     "nbNodes" -> 0,
     "nbEdges" -> 0,
+    "camera.zoom" -> 1.0,
+    "camera.position" -> (0.0,0.0),
     "filter.node.category" -> "Document",
+    "selectionRadius" -> 10.0,
     "filter.node.size" -> 0.2,
     "filter.node.weight" -> (0.0, 1.0),
     "filter.edge.weight" -> (0.0, 1.0),
@@ -108,6 +111,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val activity = get[Double]("activity")
   val pause = get[Boolean]("pause")
   val ids = 0 until nbNodes
+  val cameraZoom = get[Double]("camera.zoom")
+  val cameraPosition = get[(Double,Double)]("camera.position")
   // a Range on ID
 
   def hasAnyLink(i: Int, j: Int) = hasThisLink(i, j) | hasThisLink(j, i)

@@ -5,23 +5,20 @@
 
 package eu.tinasoft.tinaviz.util
 
+//import org.processing.PApplet
 import util.Random
 
 object Maths {
   
   val rnd = new Random(4565)
 
-  def distance (p1: (Int, Int), p2: (Int, Int)) = {
-    val (p1x, p1y) = p1
-    val (p2x, p2y) = p2
-    val dx = p1x - p2x
-    val dy = p1y - p2y
+  def distance (p:(Double,Double), p2: (Double, Double)) = {
+    val dx = p._1 - p2._1
+    val dy = p._2 - p2._2
     math.sqrt(dx*dx + dy*dy)
   }
 
-  def isInCircle(p1 : (Int,Int), p2: (Int,Int), radius:Double)  = {
-    distance (p1,p2) <= radius / 2.0
-  }
+ //def isInRange(p:(Double,Double), p2: (Double,Double), radius:Double) = p.distance(p2) <= (radius / 2.0)
 
   val PI = math.Pi
   val PI_ON_TWO = math.Pi / 2.0
@@ -29,8 +26,6 @@ object Maths {
   val SIN_PI_ON_TWO = math.sin(Maths.PI_ON_TWO)
   val COS_MINUS_PI_ON_TWO = math.cos(-Maths.PI_ON_TWO)
   val SIN_MINUS_PI_ON_TWO = math.sin(-Maths.PI_ON_TWO)
-  
-    
 
   def nextInt = rnd.nextInt
   

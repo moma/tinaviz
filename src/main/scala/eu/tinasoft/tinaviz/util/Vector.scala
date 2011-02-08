@@ -44,6 +44,14 @@ case class Vector (val x:Double,val y:Double) {
   def - (p:(Double,Double)) = (x-p._1,y-p._2)
   def * (p:(Double,Double)) = (x*p._1,y*p._2)
 
+  def dist (p: (Double, Double)) = {
+    val dx = x - p._1
+    val dy = y - p._2
+    math.sqrt(dx*dx + dy*dy)
+  }
+
+  def isInRange(p: (Double,Double), radius:Double) = dist(p) <= (radius / 2.0)
+
   def computeForce(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y

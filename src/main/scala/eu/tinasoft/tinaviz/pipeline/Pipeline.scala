@@ -90,27 +90,42 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             case any => data.allNodes
           })
 
-        case ("camera.mouse", kind: Symbol, side:Symbol, count:Symbol, screenPosition: (Double, Double), modelPosition: (Double,Double)) =>
+        case ("camera.mouse", kind: Symbol, side: Symbol, count: Symbol, position: (Double, Double)) =>
 
-          // sub routines to convert between screen and model coordinates
-          //val cp = get[Double]("camera.zoom")
-          //val cz = get[(Double,Double)]("camera.position")
-           //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
-           //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
-          //def model2screen(p:(Double,Double)) : (Int,Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
-          //def screen2model(p:(Int,Int)) : (Double,Double) = ((p._1.toDouble / cz ) - cp._1, (p._2.toDouble / cz) - cp._2)
+        // sub routines to convert between screen and model coordinates
+        val cz = layoutCache.cameraZoom
+        val cp = layoutCache.cameraPosition
+        //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
+        //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
+        def model2screen(p:(Double,Double)) : (Int,Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
+        def screen2model(p:(Double,Double)) : (Double,Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
+        val o = screen2model(position)
+        val sr = layoutCache.get[Double]("selectionRadius")
+        val r = sr / cz
 
-          //val mop = screen2model(onScreen)
-          println("mouse in screen: "+onScreen+"   mouse in model: "+mop)
+        // (i) / cz) / 2.0
+
+        //val mop = screen2model(onScreen)
+          println("mouse in screen: " + position + "    mouse in model: " + o)
+          println("selection radius: " + sr + "     scaled: " + r)
           kind match {
             case 'Move =>
-                 output.position.foreach {
-                   case p =>
-                      // todo check if position match, according to the radius (hmm.. may be too complicated)
+              layoutCache.position.zipWithIndex.foreach {
+                case (p,i) =>
+                // todo check if position match, according to the radius (hmm.. may be too complicated)
+                  val d = o.dist(p)
+                  if (d <= r) {
+                    println("scale radius: "+r)
+                    println(""+o+" is in range of "+d)
+                  }
 
-                 }
+              }
             case 'Drag =>
-              pauseBuffer = get[Boolean]("pause")
+            val pause = try {
+              data.get[Boolean]("pause")
+            } catch {
+              case x => true
+            }
             //self ! "pause" -> true
             case 'Release =>
             //pauseBugger = false
@@ -222,7 +237,9 @@ self ! 'ping      */
   }
 
   def sendScene {
-    actor ! (layoutCache,sketch.update(layoutCache): Scene)
+    sketch.update(layoutCache)
+    val msg = (layoutCache, sketch : Scene)
+    actor ! msg
   }
 
   /*
