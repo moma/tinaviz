@@ -128,7 +128,13 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               }.toArray)
               // get the current selection with less attributes
               val selection = layoutCache.selectionAttributes
-              Browser ! '_callbackSelection -> selection
+
+              Browser ! '_callbackSelection -> (selection, side match {
+                case 'Left => "left"
+                case 'Right => "right"
+                case any => "none"
+              })
+
               sendScene
             case 'Drag =>
             val pause = try {

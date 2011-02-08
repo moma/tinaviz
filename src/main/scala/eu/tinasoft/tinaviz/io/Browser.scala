@@ -43,16 +43,51 @@ object Browser extends node.util.Actor {
     loop {
       react {
 
+        // asynchronous call
         case func:String =>
-          println("window.call: "+_subPrefix + _apiPrefix + func+"")
+          println("ASYNC window.call: "+_subPrefix + _apiPrefix + func+"")
           if (_window!=null) {
             _window.call("setTimeout", Array[Object] (_subPrefix + _apiPrefix + func+"()",new java.lang.Integer(0)))
           }
 
+         case (func:String,(any1,any2)) =>
+          val args = Array[Object] (
+            Json.build(any1).toString,
+            Json.build(any2).toString,
+            new java.lang.Integer(0))
+          println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
+          if (_window!=null) {
+            _window.call(_subPrefix + _apiPrefix + func, args)
+          }
+
+        case (func:String,(any1,any2,any3)) =>
+         val args = Array[Object] (
+           Json.build(any1).toString,
+           Json.build(any2).toString,
+           Json.build(any3).toString,
+           new java.lang.Integer(0))
+         println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
+         if (_window!=null) {
+           _window.call(_subPrefix + _apiPrefix + func, args)
+         }
+
+        case (func:String,(any1,any2,any3,any4)) =>
+         val args = Array[Object] (
+           Json.build(any1).toString,
+           Json.build(any2).toString,
+           Json.build(any3).toString,
+           Json.build(any4).toString,
+           new java.lang.Integer(0))
+         println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
+         if (_window!=null) {
+           _window.call(_subPrefix + _apiPrefix + func, args)
+         }
+
         case (func:String,any) =>
-          val json = Json.build(any).toString
-          val args = Array[Object] (Json.build(any).toString,new java.lang.Integer(0))
-          println("window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
+          val args = Array[Object] (
+            Json.build(any).toString,
+            new java.lang.Integer(0))
+          println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
           if (_window!=null) {
             _window.call(_subPrefix + _apiPrefix + func, args)
           }
