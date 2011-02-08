@@ -12,6 +12,7 @@ import tinaviz.graph._
 import tinaviz.sketch.Sketch
 import tinaviz.sketch.Sketch._
 import tinaviz.scene.Scene
+import tinaviz.io.Browser
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import java.util.concurrent.{ScheduledFuture, TimeUnit, Executors}
@@ -125,7 +126,9 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                   if (in) before else false
                 }
               }.toArray)
-
+              // get the current selection with less attributes
+              val selection = layoutCache.selectionAttributes
+              Browser ! '_callbackSelection -> selection
               sendScene
             case 'Drag =>
             val pause = try {

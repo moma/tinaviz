@@ -42,6 +42,7 @@ object Browser extends node.util.Actor {
 
     loop {
       react {
+
         case func:String =>
           println("window.call: "+_subPrefix + _apiPrefix + func+"")
           if (_window!=null) {

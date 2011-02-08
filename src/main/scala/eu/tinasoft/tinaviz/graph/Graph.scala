@@ -113,12 +113,34 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val ids = 0 until nbNodes
   val cameraZoom = get[Double]("camera.zoom")
   val cameraPosition = get[(Double,Double)]("camera.position")
-  // a Range on ID
 
+  /**
+   * List of selected nodes' IDs
+   */
+  val selection = selected.zipWithIndex.filter{
+                case (selected,i) => selected
+              }.map{
+                case (s,i) => i
+              }.toList
+
+  /**
+   * List of selected nodes' attributes
+   */
+  val selectionAttributes = selection.map{ case i => lessAttributes(i) }.toList
+
+  /**
+   * Check if a graph has any link between i and i (directed or undirected)
+   */
   def hasAnyLink(i: Int, j: Int) = hasThisLink(i, j) | hasThisLink(j, i)
 
+  /**
+   * Check if a graph has a directed link (from i to j)
+   */
   def hasThisLink(i: Int, j: Int) = if (links.size > i) links(i).contains(j) else false
 
+  /**
+   * Create a new Graph with an updated column
+   */
   def +(kv: (String, Any)) = new Graph(elements + kv)
 
   def +(id: Int, k: String, v: Any) = set(id, k, v)
@@ -214,13 +236,22 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     new Graph(newElements)
   }
 
+  /**
+   * Set a column and create a new Graph
+   */
   def set(kv: (String, Any)) = new Graph(elements + kv)
 
+  /**
+   * Get attributes of a node from it's UUID (Unique ID, arbitrary-length String)
+   */
   def attributes(uuid: String): Map[String, Any] = {
      attributes(id(uuid))
   }
 
 
+  /**
+   * Get attributes of a node from it's index in the graph
+   */
   def attributes(i: Int): Map[String, Any] = {
     Map[String, Any](
       "links" -> links(i),
@@ -240,11 +271,18 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     )
   }
 
+  /**
+   * Get "less" attributes (only the most important, for data transfert and talking with the visualization client)
+   * of a node from it's UUID (Unique ID, arbitrary-length String)
+   */
      def lessAttributes(uuid: String): Map[String, Any] = {
        lessAttributes(id(uuid))
   }
 
-
+   /**
+   * Get "less" attributes (only the most important, for data transfert and talking with the visualization client)
+   * of a node from it's index in the graph
+   */
   def lessAttributes(i: Int): Map[String, Any] = {
     Map[String, Any](
       //"links" -> links(i),
@@ -263,6 +301,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       //"density" -> density(i)
     )
   }
+
+  /**
+   * Get the map of all nodes
+   */
   def allNodes: Map[String, Map[String,Any]] = {
     var nodeData = Map.empty[String,Map[String,Any]]
     for (i <- ids) nodeData += getUuid(i) -> lessAttributes(i)
@@ -270,8 +312,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   /**
-  var nodeData = Map(uuid.map{case uuid => (uuid,Map.empty[String,Any])}:_*)
-    for (i <- ids) {
+  var nodeData = Map(uuid.map {case uuid => (uuid,Map.empty[String,Any])}:_*)
+  for (i <- ids) {
       //arrays(i).map{case (k,v) (k,v(i))}
       //val u = getUuid(i)
       //for ((k,v) <- arrays(i)) {
