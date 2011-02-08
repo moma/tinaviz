@@ -52,7 +52,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
   def act() {
 
-    val fps: Double = 5
+    val fps: Double = 500
     var next: Long = 0
     val me = self
 
@@ -398,6 +398,8 @@ self ! 'ping      */
   (g.visible(i) && g.equals(category))
   }))
   }*/
+
+
   /**
    * apply a force vector algorithm on the graph
    */
@@ -428,9 +430,9 @@ self ! 'ping      */
             if (g.hasAnyLink(i, j)) {
               force += p1.computeForce(ATTRACTION * cooling, p2)
             } else {
-              if (doIt) {
+             // if (doIt) {
                 force -= p1.computeForceLimiter(REPULSION * cooling, p2)
-              }
+             // }
             }
         }
 
