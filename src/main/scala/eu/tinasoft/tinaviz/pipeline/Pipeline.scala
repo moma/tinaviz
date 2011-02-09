@@ -83,6 +83,11 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           println("Server: asked for 'getNodeAttributes " + uuid)
           reply(data.lessAttributes(uuid))
 
+        case ('getNeighbourhood, view:String,todoList:List[Any]) =>
+            todoList.foreach{
+              case x =>
+              println("  - x: "+x)
+            }
 
         case ('getNodes, view: String, category: String) =>
           println("Server: asked for 'getNodes " + view + " " + category)

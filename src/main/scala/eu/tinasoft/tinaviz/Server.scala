@@ -99,12 +99,15 @@ class Server extends node.util.Actor {
           println("TODO recentering")
         //properties += "recenter" -> false
 
-        case ("select", uuid: String) =>
+        case ("select", uuid) =>
           pipeline ! "select" -> uuid
 
-        case ('getNodes,view:String,category:String) =>
+        case ('getNodes,view,category) =>
           println("Server: asekd for 'getNodes "+view+" "+category)
           reply(pipeline !? ('getNodes,view,category))
+
+        case ('getNeighbourhood,view,todoList) =>
+          reply(pipeline !? ('getNeighbourhood,view,todoList))
 
         case ('getNodeAttributes,uuid:String) =>
           reply (pipeline !? 'getNodesAttributes -> uuid)

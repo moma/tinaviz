@@ -214,32 +214,22 @@ trait Client {
   }
 
   def getNeighbourhood(view:String, rawJSONList:String) : String = {
-    var neighbourList = "{}"
-    if (view == null) {
-      //Console.log("getNeighbourhood: view is null");
-      return neighbourList;
+
+    val todoList = Json.parse(rawJSONList)
+
+    println("TODO get the neighbourList of "+rawJSONList+" ----------> "+todoList+"")
+    val neighbours = (tinaviz !? ('getNeighbourhood,view,todoList)) match {
+      case m:Map[Any,Any] =>
+         Json.build(m).toString
+
+      case any =>
+        throw new Exception("couldn't find node attributes "+uuid)
     }
-    if (rawJSONList == null) {
-      //Console.log("getNeighbourhood: id is null");
-      return neighbourList;
-    }
-    //Console.log("getNeighbourhood(" + view + ", " + rawJSONList + ")");
-    try {
-      // neighbourList = (view.isEmpty() | view.equalsIgnoreCase("current"))
-      //   ? getView().getOutputGraph().getNeighbourhoodAsJSON(rawJSONList)
-      //   : getView(view).getInputGraph().getNeighbourhoodAsJSON(rawJSONList);
-    } catch  {
-      case ex:Exception =>
-        throw new Exception(ex)
-        // Console.error("getNeighbourhood error: " + ex)
-    }
-    if (neighbourList == null | neighbourList.isEmpty() | neighbourList.equals("{}")) {
-      //Console.log("getNeighbourhood: ERROR, json export failed: " + neighbourList);
-      return neighbourList;
-    }
-    println("TODO send the neighbourList "+neighbourList+" to the client")
-    neighbourList
-    //Browser ! "_callbackGetNeighbourhood" -> "'" + getSelectedNodesJSON(view) + "','" + neighbourList + "'"
+    // neighbourList
+    //Browser ! "_callbackGetNeighbourhood" -> (getSelectedNodesJSON(view), neighbourList)
+
+    // _callbackGetNeighbourhood = function(selection_list_str,neighbour_node_list_str) {
+    ""
   }
   
   // TODO should be asynchronous
@@ -254,7 +244,7 @@ trait Client {
         throw new Exception("couldn't find nodes from view: "+view+" and category: "+category)
     }
     println("TODO send the nodes "+nodes+" to the client")
-    Browser ! "_callbackGetNodes" -> "'" + nodes + "'"
+    //Browser ! "_callbackGetNodes" -> nodes
     nodes
   }
 }
