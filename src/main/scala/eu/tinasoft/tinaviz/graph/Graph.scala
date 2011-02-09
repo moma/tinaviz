@@ -31,7 +31,7 @@ object Graph {
   }
 
   val defaults: Map[String, Any] = Map(
-    "pause" -> true,
+    "pause" -> false,
     "uuid" -> Array.empty[String],
     "label" -> Array.empty[String],
     "color" -> Array.empty[Color],
@@ -117,21 +117,13 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   /**
    * List of selected nodes' IDs
    */
-  val selection = selected.zipWithIndex.filter{
-                case (selected,i) => selected
-              }.map{
-                case (s,i) => i
-              }.toList
+  val selection = selected.zipWithIndex.filter { case (selected,i) => selected }.map{ case (s,i) => i }.toList
 
   /**
    * List of selected nodes' attributes
    */
   val selectionAttributes = {
-    // println("selection size: "+selection.size)
-    selection.map{ case i =>
-      //println("getting attributes of "+i)
-      //println("length: "+nbNodes)
-      lessAttributes(i) }.toList
+    selection.map{ case i => lessAttributes(i) }.toList
   }
 
   /**
@@ -147,9 +139,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   /**
    * Create a new Graph with an updated column
    */
-  def +(kv: (String, Any)) = new Graph(elements + kv)
+  def +(kv: (String, Any)) = set(kv)
 
   def +(id: Int, k: String, v: Any) = set(id, k, v)
+
+  def ++(kv: Map[String, Any]) = new Graph(elements ++ kv)
+  /**
+    * Set a column and create a new Graph
+    */
+  def set(kv: (String, Any)) = new Graph(elements + kv)
 
   def set(id: Int, k: String, value: Any) = {
     //println("id: "+id+" kv: "+kv)
@@ -242,10 +240,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     new Graph(newElements)
   }
 
-  /**
-   * Set a column and create a new Graph
-   */
-  def set(kv: (String, Any)) = new Graph(elements + kv)
 
   /**
    * Get attributes of a node from it's UUID (Unique ID, arbitrary-length String)
@@ -358,6 +352,14 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   /**
+   * Return a new graph which is centered
+   */
+  def recenter = {
+    var newCameraPosition = get[(Double,Double)]("camera.position")
+     this + ("camera.position" -> newCameraPosition)
+  }
+
+  /**
    * compute the amount of information added to thiq by g
    */
   def computeActivity(g: Graph): Graph = {
@@ -378,7 +380,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     //val activity2 = if (count > 0) Maths.map(((addNodes + deletedNodes) / count),(0.0,1.0),(0.1,0.99)) else 0
     val a = max(activity1, activity2)
     //println("activity: " + a)
-    new Graph(elements + ("activity" -> a))
+    this + ("activity" -> a)
   }
 
   def computeNbSingles = {
@@ -386,7 +388,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     links.foreach {
       case links => if (links.size == 0) s += 1
     }
-    new Graph(elements + ("nbSingles" -> s))
+    this + ("nbSingles" -> s)
   }
 
   def computeNbEdges = {
@@ -394,7 +396,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     links.foreach {
       case links => s += links.size
     }
-    new Graph(elements + ("nbEdges" -> s))
+    this + ("nbEdges" -> s)
   }
 
   def computeNbNodes = new Graph(elements + ("nbNodes" -> uuid.size))
@@ -403,7 +405,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     val _outDegree = links.map {
       case linkMap => linkMap.size
     }
-    new Graph(elements + ("outDegree" -> _outDegree.toArray))
+    this + ("outDegree" -> _outDegree.toArray)
   }
 
   def computeInDegree: Graph = {
@@ -416,7 +418,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         }
         d
     }
-    new Graph(elements ++ Map[String, Any]("inDegree" -> _inDegree.toArray))
+    this + ("inDegree" -> _inDegree.toArray)
   }
 
   def computeOutDegreeExtremums: Graph = {
@@ -430,14 +432,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         if (d < min) min = d
         if (d > max) max = d
     }
-    new Graph(elements ++ Map[String, Any]("minOutDegree" -> min,
-      "maxOutDegree" -> max))
+   this ++ Map[String,Any]("minOutDegree" -> min, "maxOutDegree" -> max)
   }
 
   def computeInDegreeExtremums: Graph = {
     if (links.size == 0)
-      return new Graph(elements ++ Map[String, Any]("minOutDegree" -> 0,
-        "maxOutDegree" -> 0))
+      return this ++ Map[String, Any]("minOutDegree" -> 0, "maxOutDegree" -> 0)
     var max = Int.MinValue
     var min = Int.MaxValue
 
@@ -450,16 +450,14 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         if (d < min) min = d
         if (d > max) max = d
     }
-    new Graph(elements ++ Map[String, Any]("minOutDegree" -> min,
-      "maxOutDegree" -> max))
+    this ++ Map[String,Any]("minOutDegree" -> min, "maxOutDegree" -> max)
   }
 
   def computeExtremums: Graph = {
-    if (position.size == 0)
-      return new Graph(elements ++ Map[String, Any]("xMax" -> 0.0,
-        "xMin" -> 0.0,
-        "yMax" -> 0.0,
-        "yMin" -> 0.0))
+    this ++ (
+    if (position.size == 0) {
+       Map[String, Any]("xMax" -> 0.0, "xMin" -> 0.0, "yMax" -> 0.0, "yMin" -> 0.0)
+    } else {
     var xMax = Double.MinValue
     var xMin = Double.MaxValue
     var yMax = Double.MinValue
@@ -471,16 +469,19 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         if (y < yMin) yMin = y
         if (y > yMax) yMax = y
     }
-    return new Graph(elements ++ Map[String, Any]("xMax" -> xMax,
+    Map[String, Any]("xMax" -> xMax,
       "xMin" -> xMin,
       "yMax" -> yMax,
-      "yMin" -> yMin))
+      "yMin" -> yMin)
+    })
   }
 
 
   def computeNodeWeightExtremums: Graph = {
-    if (position.size == 0)
-      return new Graph(elements ++ Map[String, Any]("minNodeWeight" -> 0.0, "maxNodeWeight" -> 0.0))
+    this ++ (
+    if (position.size == 0) {
+       Map[String, Any]("minNodeWeight" -> 0.0, "maxNodeWeight" -> 0.0)
+    } else {
     var max = Double.MinValue
     var min = Double.MaxValue
     weight.foreach {
@@ -488,12 +489,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         if (x < min) min = x
         if (x > max) max = x
     }
-    return new Graph(elements ++ Map[String, Any]("minNodeWeight" -> min, "maxNodeWeight" -> max))
+     Map[String, Any]("minNodeWeight" -> min, "maxNodeWeight" -> max)
+    })
   }
 
   def computeEdgeWeightExtremums: Graph = {
-    if (links.size == 0)
-      return new Graph(elements ++ Map[String, Any]("minEdgeWeight" -> 0.0, "maxEdgeWeight" -> 0.0))
+    this ++ (
+    if (links.size == 0)  {
+      Map[String, Any]("minEdgeWeight" -> 0.0, "maxEdgeWeight" -> 0.0)
+    } else {
     var max = Double.MinValue
     var min = Double.MaxValue
     links.foreach {
@@ -504,7 +508,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             if (weight > max) max = weight
         }
     }
-    new Graph(elements ++ Map[String, Any]("minEdgeWeight" -> min, "maxEdgeWeight" -> max))
+    Map[String, Any]("minEdgeWeight" -> min, "maxEdgeWeight" -> max)
+    })
+
   }
 
   def computeBaryCenter: Graph = {
@@ -513,7 +519,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     position.foreach {
       case (x, y) => p = (p._1 + x, p._2 + y)
     }
-    new Graph(elements ++ Map[String, Any]("baryCenter" -> (if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0))))
+    this + ("baryCenter" -> (if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)))
   }
 
   def map[T](id: Int, column: String, filter: T => T): Graph = {
@@ -522,25 +528,17 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
 
   def map[T](column: String, filter: T => T): Graph = {
-    new Graph(elements ++ Map[String, Any](column -> (getArray[T](column).map {
+    this + (column -> (getArray[T](column).map {
       f => filter(f)
-    })))
+    }))
   }
 
   def filterNodeVisible[T](column: String, filter: T => Boolean) = {
-
-    new Graph(elements ++ Map[String, Any](
-      "visible" -> getArray[T](column).map {
-        x => filter(x)
-      }))
+    this + ( "visible" -> getArray[T](column).map { x => filter(x) })
   }
 
   def _filterNodeVisible[T](column: String, filter: T => Boolean) = {
-
-    new Graph(elements ++ Map[String, Any](
-      "visible" -> getArray[T](column).map {
-        x => filter(x)
-      }))
+     this + ( "visible" -> getArray[T](column).map {  x => filter(x) })
   }
 
   def converter(removed: Set[Int]): Array[Int] = {

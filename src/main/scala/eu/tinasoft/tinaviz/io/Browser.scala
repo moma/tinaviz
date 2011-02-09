@@ -36,6 +36,9 @@ object Browser extends node.util.Actor {
     // callAndForget("_graphImportedCallback", msg)
   }
 
+  def replace(str:String) = {
+     str.replaceAll("\"","\\\"").replace("'","\\'")
+  }
   def act() {
 
     //var model = new Model()
@@ -51,13 +54,9 @@ object Browser extends node.util.Actor {
           }
 
          case (func:String,(any1,any2)) =>
-          val args = Array[Object] (
-            Json.build(any1).toString,
-            Json.build(any2).toString,
-            new java.lang.Integer(0))
-          println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
           if (_window!=null) {
-            _window.call(_subPrefix + _apiPrefix + func, args)
+            println("calling setTimeout(\""+_subPrefix + _apiPrefix + func+"('"+replace(Json.build(any1).toString)+"','"+replace(Json.build(any2).toString)+"')\")")
+            _window.call("setTimeout", Array[Object] (_subPrefix + _apiPrefix +func+"('"+replace(Json.build(any1).toString)+"','"+replace(Json.build(any2).toString)+"')",new java.lang.Integer(0)))
           }
 
         case (func:String,(any1,any2,any3)) =>
@@ -89,7 +88,8 @@ object Browser extends node.util.Actor {
             new java.lang.Integer(0))
           println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
           if (_window!=null) {
-            _window.call(_subPrefix + _apiPrefix + func, args)
+           // _window.call(_subPrefix + _apiPrefix + func, args)
+            _window.call("setTimeout", Array[Object] (_subPrefix + _apiPrefix +func+"('"+replace(Json.build(any).toString)+"')",new java.lang.Integer(0)))
           }
           /*
            case (func:String,any) =>

@@ -86,50 +86,58 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
         case ('getNodes, view: String, category: String) =>
           println("Server: asked for 'getNodes " + view + " " + category)
-          reply(view match {
+          val all = view match {
             case "meso" => layoutCache.allNodes
             case any => data.allNodes
-          })
+          }
+          val result = if (category.equalsIgnoreCase("none")) {
+            all
+          } else {
+            all.filter {
+              case (uuid,attributes) => attributes("category").asInstanceOf[String].equals(category)
+            }
+          }
+          reply(result)
 
         case ("camera.mouse", kind: Symbol, side: Symbol, count: Symbol, position: (Double, Double)) =>
 
         // sub routines to convert between screen and model coordinates
-        val cz = layoutCache.cameraZoom
-        val cp = layoutCache.cameraPosition
-        //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
-        //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
-        def model2screen(p:(Double,Double)) : (Int,Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
-        def screen2model(p:(Double,Double)) : (Double,Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
-        val o = screen2model(position)
-        val sr = layoutCache.get[Double]("selectionRadius")
-        val r = (sr / cz) / 2.0
+          val cz = layoutCache.cameraZoom
+          val cp = layoutCache.cameraPosition
+          //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
+          //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
+          def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
+          def screen2model(p: (Double, Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
+          val o = screen2model(position)
+          val sr = layoutCache.get[Double]("selectionRadius")
+          val r = (sr / cz) / 2.0
 
-        // (i) / cz) / 2.0
+          // (i) / cz) / 2.0
 
-        //val mop = screen2model(onScreen)
+          //val mop = screen2model(onScreen)
           //println("mouse in screen: " + position + "    mouse in model: " + o)
           //println("selection radius: " + sr + "     scaled: " + r)
           kind match {
             case 'Click =>
               var in = false
               layoutCache = layoutCache + ("selected" -> layoutCache.selected.zipWithIndex.map {
-                case (before,i) =>
-                  val touched = (layoutCache.position(i).dist(o) <= r )
+                case (before, i) =>
+                  val touched = (layoutCache.position(i).dist(o) <= r)
                   if (touched) in = true
-                  (before,touched)
-              }.map{
-                case (before,touched) =>
-                if (touched) {
-                  true
-                } else {
-                  // we don't touch a thing, unless nothing was selected at all (we reset everything in this case)
-                  if (in) before else false
-                }
+                  (before, touched)
+              }.map {
+                case (before, touched) =>
+                  if (touched) {
+                    true
+                  } else {
+                    // we don't touch a thing, unless nothing was selected at all (we reset everything in this case)
+                    if (in) before else false
+                  }
               }.toArray)
               // get the current selection with less attributes
               val selection = layoutCache.selectionAttributes
 
-              Browser ! '_callbackSelection -> (selection, side match {
+              Browser ! "_callbackSelectionChanged" -> (selection, side match {
                 case 'Left => "left"
                 case 'Right => "right"
                 case any => "none"
@@ -254,7 +262,7 @@ self ! 'ping      */
 
   def sendScene {
     sketch.update(layoutCache)
-    val msg = (layoutCache, sketch : Scene)
+    val msg = (layoutCache, sketch: Scene)
     actor ! msg
   }
 
@@ -336,7 +344,7 @@ self ! 'ping      */
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
       case (cat, i) =>
-        if (cat.equals(category)) {
+        if (!cat.equalsIgnoreCase(category)) {
           removeMe += i
         }
     }
@@ -430,9 +438,9 @@ self ! 'ping      */
             if (g.hasAnyLink(i, j)) {
               force += p1.computeForce(ATTRACTION * cooling, p2)
             } else {
-             // if (doIt) {
-                force -= p1.computeForceLimiter(REPULSION * cooling, p2)
-             // }
+              // if (doIt) {
+              force -= p1.computeForceLimiter(REPULSION * cooling, p2)
+              // }
             }
         }
 
