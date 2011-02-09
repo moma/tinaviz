@@ -115,18 +115,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val cameraPosition = get[(Double,Double)]("camera.position")
 
   /**
-   * List of selected nodes' IDs
-   */
-  val selection = selected.zipWithIndex.filter { case (selected,i) => selected }.map{ case (s,i) => i }.toList
-
-  /**
-   * List of selected nodes' attributes
-   */
-  val selectionAttributes = {
-    selection.map{ case i => lessAttributes(i) }.toList
-  }
-
-  /**
    * Check if a graph has any link between i and i (directed or undirected)
    */
   def hasAnyLink(i: Int, j: Int) = hasThisLink(i, j) | hasThisLink(j, i)
@@ -241,6 +229,28 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
 
+    /**
+     * List of selected nodes' IDs
+     */
+    val selection = selected.zipWithIndex.filter { case (selected,i) => selected }.map{ case (s,i) => i }.toList
+
+    /**
+     * List of selected nodes' attributes
+     */
+    val selectionAttributes = {
+      println("mapping selection attributes: "+selection)
+      selection.map{ case i => lessAttributes(i) }.toList
+    }
+
+  /**
+   * Return the current selection as a list of UUID:String
+   */
+  val selectionUUID = selection.map{case i => getUuid(i)}.toList
+
+   val selectionNeighbours = {
+      Map(selectionUUID.zipWithIndex:_*).map{ case (uuid,i) => (uuid, neighbours(i)) }
+    }
+
   /**
    * Get attributes of a node from it's UUID (Unique ID, arbitrary-length String)
    */
@@ -254,22 +264,36 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def attributes(i: Int): Map[String, Any] = {
     Map[String, Any](
-      "links" -> (if (links.size > i) links(i) else Map.empty[Int,Double]),
-      "position" -> (if (position.size > i) position(i) else (0.0,0.0)),
-      "color" -> (if (color.size > i) color(i) else new Color(0.0,0.0,0.0)),
-      "weight" -> (if (weight.size > i) weight(i) else 1.0),
-      "size" -> (if (size.size > i) size(i) else 1.0),
-          "category" -> (if (category.size > i) category(i) else ""),
-      "content" -> (if (content.size > i) content(i) else ""),//Base64.encode(content(i)),
-      "selected" -> (if (selected.size > i) selected(i) else false),
-      "label" -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
-      "rate" -> (if (rate.size > i) rate(i) else 0),
-      "id" -> (if (uuid.size > i) uuid(i) else 0),
-      "inDegree" -> (if (inDegree.size > i) inDegree(i) else 0),
-      "outDegree" -> (if(outDegree.size > i) outDegree(i) else 0),
-
-      "density" -> (if (density.size > i) density(i) else 0)
+      "links"      -> (if (links.size > i) links(i) else Map.empty[Int,Double]),
+      "position"   -> (if (position.size > i) position(i) else (0.0,0.0)),
+      "color"      -> (if (color.size > i) color(i) else new Color(0.0,0.0,0.0)),
+      "weight"     -> (if (weight.size > i) weight(i) else 1.0),
+      "size"       -> (if (size.size > i) size(i) else 1.0),
+      "category"   -> (if (category.size > i) category(i) else ""),
+      "content"    -> (if (content.size > i) content(i) else ""),//Base64.encode(content(i)),
+      "selected"   -> (if (selected.size > i) selected(i) else false),
+      "label"      -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
+      "rate"       -> (if (rate.size > i) rate(i) else 0),
+      "id"         -> (if (uuid.size > i) uuid(i) else 0),
+      "inDegree"   -> (if (inDegree.size > i) inDegree(i) else 0),
+      "outDegree"  -> (if(outDegree.size > i) outDegree(i) else 0),
+      "density"    -> (if (density.size > i) density(i) else 0)
     )
+  }
+
+
+  /**
+   * Return neighbours of a node ID
+   *
+   */
+  def neighbours(i:Int) : Map[String,Map[String,Any]] = {
+      (if (links.size > i) {
+        println("  - mapping neighbours of node "+i+"..")
+        links(i).map{ case (i,w) =>
+          (getUuid(i),minimalAttributes(i)) }
+      }
+       else
+        Map.empty[String,Map[String,Any]])
   }
 
   /**
@@ -307,7 +331,33 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       //"density" -> density(i)
     )
   }
-
+     /**
+   * Get "mininal" attributes (only the most important, for neighbourhood data)
+   * of a node from it's index in the graph
+   */
+  def minimalAttributes(i: Int): Map[String, Any] = {
+    /*
+    println("***category: "+category.size)
+     println("***selected: "+selected.size)
+    println("***content: "+content.size)
+    */
+    Map[String, Any](
+      //"links" -> links(i),
+      //"position" -> position(i),
+      //"color" -> color(i),
+      //"weight" -> weight(i),
+      //"size" -> size(i),
+      "category" -> (if (category.size > i) category(i) else ""),
+      //"content" -> (if (content.size > i) content(i) else ""),//Base64.encode(content(i)),
+      // "selected" -> (if (selected.size > i) selected(i) else false),
+      "label" -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
+      //"rate" -> (if (rate.size > i) rate(i) else 0),
+      "id" -> (if (uuid.size > i) uuid(i) else 0),
+      "inDegree" -> (if (inDegree.size > i) inDegree(i) else 0),
+      "outDegree" -> (if(outDegree.size > i) outDegree(i) else 0)
+      //"density" -> density(i)
+    )
+  }
   /**
    * Get the map of all nodes
    */

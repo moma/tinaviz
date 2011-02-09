@@ -84,17 +84,25 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           reply(data.lessAttributes(uuid))
 
         case ('getNeighbourhood, view:String,todoList:List[Any]) =>
+
+          /*
             todoList.foreach{
               case x =>
               println("  - x: "+x)
-            }
+            } */
+          val result = (view match {
+            case "meso" => layoutCache
+            case any => data
+          }).selectionNeighbours
+          println("built selection neighbours: "+result)
+          reply(result)
 
         case ('getNodes, view: String, category: String) =>
           println("Server: asked for 'getNodes " + view + " " + category)
-          val all = view match {
-            case "meso" => layoutCache.allNodes
-            case any => data.allNodes
-          }
+          val all = (view match {
+            case "meso" => layoutCache
+            case any => data
+          }).allNodes
           val result = if (category.equalsIgnoreCase("none")) {
             all
           } else {
@@ -265,9 +273,46 @@ self ! 'ping      */
     }
   }
 
+
+  /**
+   * Do some pre-processing, then send the final scene to the View
+   * TODO: keep the Graph?
+   */
   def sendScene {
-    sketch.update(layoutCache)
-    val msg = (layoutCache, sketch: Scene)
+      val graph = layoutCache
+    val g = graph + ("links" -> graph.links.zipWithIndex.map {
+      case (links, i) =>
+        links.filter {
+          case (j, weight) =>
+          // in the case of mutual link, we have a bit of work to remove the link
+            if (graph.hasThisLink(j, i)) {
+
+              // the bigger win
+              if (graph.weight(i) > graph.weight(j)) {
+                true
+              } else if (graph.weight(i) < graph.weight(j)) {
+                false
+
+                // in the case of equal weight (eg. in Documents), we fall back to label comparison
+              } else {
+
+                // were the bigger win
+                if (graph.label(i).compareTo(graph.label(j)) > 0) {
+                  true
+                } else {
+                  false
+                }
+              }
+
+              // in the case of non-mutual link (directed), there is nothing to do; we keep the link
+            } else {
+              true
+            }
+        }
+
+    }.toArray)
+    sketch.update(g)
+    val msg = (g, sketch: Scene)
     actor ! msg
   }
 
@@ -414,7 +459,7 @@ self ! 'ping      */
 
 
   /**
-   * apply a force vector algorithm on the graph
+   *  apply a force vector algorithm on the graph
    */
   def applyLayout(g: Graph): Graph = {
     val nbNodes = g.nbNodes

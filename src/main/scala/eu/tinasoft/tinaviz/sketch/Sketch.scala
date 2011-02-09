@@ -75,6 +75,7 @@ case class Sketch(
    */
   def update(graph: Graph) {
     reset
+
     updateNodeColors(graph)
     updateNodePositions(graph)
     updateNodeLabels(graph)
@@ -265,8 +266,8 @@ case class Sketch(
         mapIntDouble foreach {
           // todo: use weight to ponderate the color?
           case (to, weight) =>
-            // FEATURE we want the edge color to be a mix of source node and target node color
-            // FEATURE we want the edge color to be less saturated
+          // FEATURE we want the edge color to be a mix of source node and target node color
+          // FEATURE we want the edge color to be less saturated
             tmpColor ::= nodeColorLayer(from).blend(nodeColorLayer(to)).saturateBy(0.4)
         }
     }

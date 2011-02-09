@@ -217,16 +217,17 @@ trait Client {
 
     val todoList = Json.parse(rawJSONList)
 
-    println("TODO get the neighbourList of "+rawJSONList+" ----------> "+todoList+"")
+    println("TODO get the neighbourListof "+todoList+"")
     val neighbours = (tinaviz !? ('getNeighbourhood,view,todoList)) match {
-      case m:Map[Any,Any] =>
+      case m:Map[Any,Map[String,Any]] =>
+          println("TODO building neighbours JSON reply..")
          Json.build(m).toString
 
       case any =>
-        throw new Exception("couldn't find node attributes "+uuid)
+        throw new Exception("couldn't find neighbourList for any of "+rawJSONList)
     }
     // neighbourList
-    //Browser ! "_callbackGetNeighbourhood" -> (getSelectedNodesJSON(view), neighbourList)
+    Browser ! "_callbackGetNeighbourhood" -> (todoList, neighbours)
 
     // _callbackGetNeighbourhood = function(selection_list_str,neighbour_node_list_str) {
     ""
