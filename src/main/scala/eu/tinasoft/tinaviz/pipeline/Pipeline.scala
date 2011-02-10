@@ -83,18 +83,18 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           println("Server: asked for 'getNodeAttributes " + uuid)
           reply(data.lessAttributes(uuid))
 
-        case ('getNeighbourhood, view:String,todoList:List[Any]) =>
+        case ('getNeighbourhood, view: String, todoList: List[Any]) =>
 
-          /*
-            todoList.foreach{
-              case x =>
-              println("  - x: "+x)
-            } */
+        /*
+       todoList.foreach{
+         case x =>
+         println("  - x: "+x)
+       } */
           val result = (view match {
             case "meso" => layoutCache
             case any => data
           }).selectionNeighbours
-          println("built selection neighbours: "+result)
+          println("built selection neighbours: " + result)
           reply(result)
 
         case ('getNodes, view: String, category: String) =>
@@ -107,7 +107,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             all
           } else {
             all.filter {
-              case (uuid,attributes) => attributes("category").asInstanceOf[String].equals(category)
+              case (uuid, attributes) => attributes("category").asInstanceOf[String].equals(category)
             }
           }
           reply(result)
@@ -279,7 +279,7 @@ self ! 'ping      */
    * TODO: keep the Graph?
    */
   def sendScene {
-      val graph = layoutCache
+    val graph = layoutCache
     val g = graph + ("links" -> graph.links.zipWithIndex.map {
       case (links, i) =>
         links.filter {
@@ -387,14 +387,44 @@ self ! 'ping      */
     h
   }*/
 
+
+  def applyView(g: Graph): Graph = {
+    if (g.nbNodes == 0) return g
+    g.get[String]("filter.node.view") match {
+      case "macro" => g
+      case "meso" =>
+        val category = g.currentCategory
+        var removeMe = Set.empty[Int]
+        g.selected.zipWithIndex map {
+          case i =>
+             if (selected, i) =>
+
+
+                if (selected) {
+                    // we keep
+                } else {
+                  // if we are a link of the selection
+                  selection.foreach {
+                    case j =>
+                    if (g.hasAnyLink(i,j)) {
+
+                    }
+                  }
+
+                }
+        }
+        g.remove(removeMe)
+    }
+
+  }
+
   def applyCategory(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val category = g.get[String]("filter.node.category")
     //println("applyCategory: " + category)
     var removeMe = Set.empty[Int]
     g.category.zipWithIndex map {
       case (cat, i) =>
-        if (!cat.equalsIgnoreCase(category)) {
+        if (!cat.equalsIgnoreCase(g.currentCategory)) {
           removeMe += i
         }
     }

@@ -51,6 +51,7 @@ object Graph {
     "camera.zoom" -> 1.0,
     "camera.position" -> (0.0,0.0),
     "filter.node.category" -> "Document",
+    "filter.view" -> "macro",
     "selectionRadius" -> 10.0,
     "filter.node.size" -> 0.2,
     "filter.node.weight" -> (0.0, 1.0),
@@ -113,6 +114,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val ids = 0 until nbNodes
   val cameraZoom = get[Double]("camera.zoom")
   val cameraPosition = get[(Double,Double)]("camera.position")
+  val currentCategory = g.get[String]("filter.node.category")
+  val currentView = get[String]("filter.view")
 
   /**
    * Check if a graph has any link between i and i (directed or undirected)
