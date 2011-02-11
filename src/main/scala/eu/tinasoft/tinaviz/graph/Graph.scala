@@ -114,7 +114,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   val ids = 0 until nbNodes
   val cameraZoom = get[Double]("camera.zoom")
   val cameraPosition = get[(Double,Double)]("camera.position")
-  val currentCategory = g.get[String]("filter.node.category")
+  val currentCategory = get[String]("filter.node.category")
   val currentView = get[String]("filter.view")
 
   /**
@@ -241,7 +241,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
      * List of selected nodes' attributes
      */
     val selectionAttributes = {
-      println("mapping selection attributes: "+selection)
+      //println("mapping selection attributes: "+selection)
       selection.map{ case i => lessAttributes(i) }.toList
     }
 

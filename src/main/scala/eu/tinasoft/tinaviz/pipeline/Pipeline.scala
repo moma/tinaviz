@@ -187,6 +187,15 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           edgeWeightCache += key -> value
           layoutCache += key -> value
           key match {
+            case "filter.view" =>
+              categoryCache = applyCategory(data)
+              categoryCache = applyWeightToSize(categoryCache)
+              categoryCache = categoryCache.updatePosition(layoutCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = edgeWeightCache
+              sendScene
+
             case "filter.node.category" =>
             //println("categoryCache = applyCategory(data)")
               categoryCache = applyCategory(data)
@@ -388,44 +397,36 @@ self ! 'ping      */
   }*/
 
 
-  def applyView(g: Graph): Graph = {
-    if (g.nbNodes == 0) return g
-    g.get[String]("filter.node.view") match {
-      case "macro" => g
-      case "meso" =>
-        val category = g.currentCategory
-        var removeMe = Set.empty[Int]
-        g.selected.zipWithIndex map {
-          case i =>
-             if (selected, i) =>
-
-
-                if (selected) {
-                    // we keep
-                } else {
-                  // if we are a link of the selection
-                  selection.foreach {
-                    case j =>
-                    if (g.hasAnyLink(i,j)) {
-
-                    }
-                  }
-
-                }
-        }
-        g.remove(removeMe)
-    }
-
-  }
-
   def applyCategory(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    //println("applyCategory: " + category)
     var removeMe = Set.empty[Int]
-    g.category.zipWithIndex map {
-      case (cat, i) =>
-        if (!cat.equalsIgnoreCase(g.currentCategory)) {
-          removeMe += i
+    val category = g.currentCategory
+    g.get[String]("filter.view") match {
+      case "macro" =>
+        g.category.zipWithIndex map {
+          case (cat, i) =>
+            if (!g.currentCategory.equalsIgnoreCase(cat)) {
+              removeMe += i
+            }
+        }
+
+      case "meso" =>
+        println("filtering the meso view..")
+        g.selected.zipWithIndex foreach {
+          case (f, i) => if (!f) {
+            // we only need to filter unselected nodes
+            g.selection.foreach {
+              case j =>
+                if (!g.hasAnyLink(i, j)) {// we remove nodes not connected to the selection
+                  removeMe += j
+                }
+                else {
+                  if (!g.currentCategory.equalsIgnoreCase(g.category(j))) { // or nodes connected but not in the desired category
+                  removeMe += j
+                  }
+                }
+            }
+          }
         }
     }
     g.remove(removeMe)
