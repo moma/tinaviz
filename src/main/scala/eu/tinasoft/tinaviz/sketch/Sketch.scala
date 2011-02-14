@@ -75,7 +75,7 @@ case class Sketch(
    */
   def update(graph: Graph) {
     reset
-    println("-----------UPDATING FROM GRAPH: "+graph.debugStats)
+
     updateNodeColors(graph)
     updateNodePositions(graph)
     updateNodeLabels(graph)
@@ -138,7 +138,7 @@ case class Sketch(
    *
    */
   def updateNodeColors(graph: Graph) {
-    println("selected length: "+graph.selected.size)
+    //println("selected length: "+graph.selected.size)
     nodeColorLayer = graph.selected.zipWithIndex map {
       case (s, i) =>
         graph category i match {
@@ -260,8 +260,8 @@ case class Sketch(
    */
   def updateEdgeColors(graph: Graph) {
     var tmpColor = List.empty[Color]
-    println(" node color size: "+nodeColorLayer.size)
-    println("graph links size: "+graph.links.size)
+    //println(" node color size: "+nodeColorLayer.size)
+    //println("graph links size: "+graph.links.size)
     graph.links.zipWithIndex map {
       case (mapIntDouble, from) =>
         mapIntDouble foreach {

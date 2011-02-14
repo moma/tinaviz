@@ -239,11 +239,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     /**
      * List of selected nodes' IDs
      */
-    lazy val selection : List[Int] = {
-      val l = selected.zipWithIndex.filter { case (selected,i) => selected }.map{ case (s,i) => i }.toList
-      println("******selection: "+l)
-      l
-    }
+    lazy val selection : List[Int] = selected.zipWithIndex.filter { case (selected,i) => selected }.map{ case (s,i) => i }.toList
 
     /**
      * List of selected nodes' attributes

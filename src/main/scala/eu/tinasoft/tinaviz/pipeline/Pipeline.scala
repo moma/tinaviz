@@ -52,13 +52,12 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
   def act() {
 
-    val fps: Double = 500
     var next: Long = 0
     val me = self
 
     val sched = Executors.newSingleThreadScheduledExecutor()
 
-    def schedule(msg: Any, ms: Long = 0) = {
+    def schedule(msg: Any, ms: Long = 10) = {
       val ct = Platform.currentTime
       sched.schedule(new Runnable {
         def run = actors.Scheduler.execute({
@@ -141,10 +140,11 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               }.map {
                 case (before, touched) =>
                   if (touched) {
-                    true
+                    !before
                   } else {
+                    before
                     // we don't touch a thing, unless nothing was selected at all (we reset everything in this case)
-                    if (in) before else false
+                    //if (in) before else false
                   }
               }.toArray)
               // get the current selection with less attributes
@@ -157,7 +157,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                 case any => "none"
               })
 
-              sendScene
+              self ! "filter.view" -> data.get[String]("filter.view")
+
             case 'Drag =>
             val pause = try {
               data.get[Boolean]("pause")
@@ -189,27 +190,20 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           layoutCache += key -> value
           key match {
             case "filter.view" =>
-              println("filter.view")
-              categoryCache = applyCategory(data)
+            //println("filter.view")
+              categoryCache = data.updatePosition(layoutCache)
+              categoryCache = applyCategory(categoryCache)
               categoryCache = applyWeightToSize(categoryCache)
-              categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               sendScene
 
             case "filter.node.category" =>
-              println("filter.node.category")
-            //println("categoryCache = applyCategory(data)")
-              println("\nAAAAAAAAAAAAAAA:"+data.debugStats+"\n")
-              categoryCache = applyCategory(data)
-
-              println("\nBBBBBBBBBBBBBBBB:"+categoryCache.debugStats+"\n")
+            //println("filter.node.category")
+              categoryCache = data.updatePosition(layoutCache)
+              categoryCache = applyCategory(categoryCache)
               categoryCache = applyWeightToSize(categoryCache)
-              println("CHECK: "+layoutCache.selected.size)
-              println("\nCCCCCCCCCCCCCCCCC:"+categoryCache.debugStats+"\n")
-              categoryCache = categoryCache.updatePosition(layoutCache)
-              println("\nDDDDDDDDDDDDDDDDD:"+categoryCache.debugStats+"\n")
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
@@ -297,6 +291,7 @@ self ! 'ping      */
    * TODO: keep the Graph?
    */
   def sendScene {
+    // TODO: do that in another Actor, which will reply directly to our master
     val graph = layoutCache
     val g = graph + ("links" -> graph.links.zipWithIndex.map {
       case (links, i) =>
@@ -407,7 +402,7 @@ self ! 'ping      */
 
 
   def applyCategory(g: Graph): Graph = {
-    println("applyCategory: "+g.debugStats)
+    //println("applyCategory: "+g.debugStats)
     if (g.nbNodes == 0) return g
     var removeMe = Set.empty[Int]
     val category = g.currentCategory
@@ -421,33 +416,31 @@ self ! 'ping      */
         }
 
       case "meso" =>
-        println("\n\nfiltering the meso view: "+g.debugStats)
+      //println("\n\nfiltering the meso view: "+g.debugStats)
         g.selected.zipWithIndex foreach {
           case (f, i) => if (!f) {
             // we only need to filter unselected nodes
-            println(" - GOT !F: "+g.selection.size)
+            //println(" - GOT !F: "+g.selection.size)
             g.selection.foreach {
               case j =>
-                //println(" - for each select")
-                if (!g.hasAnyLink(i, j)) {// we remove nodes not connected to the selection
-                  println("removing single")
+              //println(" - for each select")
+                if (!g.hasAnyLink(i, j)) {
+                  // we remove nodes not connected to the selection
+                  //println("removing single")
                   removeMe += i
                 }
                 else {
-                  if (!g.currentCategory.equalsIgnoreCase(g.category(j))) { // or nodes connected but not in the desired category
-                    println("removing unrelated node. expected: "+g.currentCategory+" and got: "+g.category(j))
-                  removeMe += i
+                  if (!g.currentCategory.equalsIgnoreCase(g.category(j))) {
+                    // or nodes connected but not in the desired category
+                    //println("removing unrelated node. expected: "+g.currentCategory+" and got: "+g.category(j))
+                    removeMe += i
                   }
                 }
             }
-          } else {
-            println(" - GOT F: "+g.selection.size)
           }
         }
     }
-    val res = g.remove(removeMe)
-    println("END OF applyCategory: "+res.debugStats)
-    res
+    g.remove(removeMe)
   }
 
 
