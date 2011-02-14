@@ -415,14 +415,17 @@ self ! 'ping      */
         g.selected.zipWithIndex foreach {
           case (f, i) => if (!f) {
             // we only need to filter unselected nodes
+            println("looking like we have a match   ")
             g.selection.foreach {
               case j =>
                 if (!g.hasAnyLink(i, j)) {// we remove nodes not connected to the selection
-                  removeMe += j
+                  println("removing single")
+                  removeMe += i
                 }
                 else {
                   if (!g.currentCategory.equalsIgnoreCase(g.category(j))) { // or nodes connected but not in the desired category
-                  removeMe += j
+                    println("removing unrelated node. expected: "+g.currentCategory+" and got: "+g.category(j))
+                  removeMe += i
                   }
                 }
             }

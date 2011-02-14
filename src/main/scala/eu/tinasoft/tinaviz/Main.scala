@@ -199,6 +199,7 @@ class Main extends TApplet with Client {
       case 'n' => tinaviz ! "drawing.nodes" -> 'toggle
       case 'e' => tinaviz ! "drawing.edges" -> 'toggle
       case 'c' => tinaviz ! "filter.node.category" -> 'toggle
+      case 'v' => tinaviz ! "filter.view" -> 'toggle
       case PConstants.CODED =>
         val amount = 15
         keyCode match {

@@ -175,6 +175,9 @@ class Server extends node.util.Actor {
                     s match {
                       case "Document" => "NGram"
                       case "NGram" => "Document"
+                      case "macro" => "meso"
+                      case "meso" => "macro"
+                      case any => any
                     }
                   case x => x
                 }

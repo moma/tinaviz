@@ -291,7 +291,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def neighbours(i:Int) : Map[String,Map[String,Any]] = {
       (if (links.size > i) {
-        println("  - mapping neighbours of node "+i+"..")
+        // println("  - mapping neighbours of node "+i+"..")
         links(i).map{ case (i,w) =>
           (getUuid(i),minimalAttributes(i)) }
       }
