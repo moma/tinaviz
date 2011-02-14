@@ -176,7 +176,6 @@ class GEXF extends node.util.Actor {
       }
     }
     g.computeAll
-
   }
 
   implicit def urlToString(url: java.net.URL): String = {

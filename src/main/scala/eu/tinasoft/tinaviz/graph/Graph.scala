@@ -92,30 +92,34 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   def getArray[T](key: String): Array[T] = get[Array[T]](key)
 
   // some built-in functions
-  val links = getArray[Map[Int, Double]]("links")
-  val position = getArray[(Double, Double)]("position")
-  val color = getArray[Color]("color")
-  val weight = getArray[Double]("weight")
-  val size = getArray[Double]("size")
-  val category = getArray[String]("category")
-  val content = getArray[String]("content")
-  val selected = getArray[Boolean]("selected")
-  val label = getArray[String]("label")
-  val rate = getArray[Int]("rate")
-  val uuid = getArray[String]("uuid")
-  val inDegree = getArray[Int]("inDegree")
-  val outDegree = getArray[Int]("outDegree")
-  val density = getArray[Double]("density")
-  val nbNodes = get[Int]("nbNodes")
-  val nbEdges = get[Int]("nbEdges")
-  val entropy = get[Double]("entropy")
-  val activity = get[Double]("activity")
-  val pause = get[Boolean]("pause")
-  val ids = 0 until nbNodes
-  val cameraZoom = get[Double]("camera.zoom")
-  val cameraPosition = get[(Double,Double)]("camera.position")
-  val currentCategory = get[String]("filter.node.category")
-  val currentView = get[String]("filter.view")
+  lazy val links = getArray[Map[Int, Double]]("links")
+  lazy val position = getArray[(Double, Double)]("position")
+  lazy val color = getArray[Color]("color")
+  lazy val weight = getArray[Double]("weight")
+  lazy val size = getArray[Double]("size")
+  lazy val category = getArray[String]("category")
+  lazy val content = getArray[String]("content")
+  lazy val selected = getArray[Boolean]("selected")
+  lazy val label = getArray[String]("label")
+  lazy val rate = getArray[Int]("rate")
+  lazy val uuid = getArray[String]("uuid")
+  lazy val inDegree = getArray[Int]("inDegree")
+  lazy val outDegree = getArray[Int]("outDegree")
+  lazy val density = getArray[Double]("density")
+  lazy val nbNodes = get[Int]("nbNodes")
+  lazy val nbEdges = get[Int]("nbEdges")
+  lazy val entropy = get[Double]("entropy")
+  lazy val activity = get[Double]("activity")
+  lazy val pause = get[Boolean]("pause")
+  lazy val ids = 0 until nbNodes
+  lazy val cameraZoom = get[Double]("camera.zoom")
+  lazy val cameraPosition = get[(Double,Double)]("camera.position")
+  lazy val currentCategory = get[String]("filter.node.category")
+  lazy val currentView = get[String]("filter.view")
+
+  lazy val debugStats = {
+    "**DEBUG**\nlinks.size: "+links.size+"\nposition.size: "+position.size+"\ncolor.size: "+color.size+"\nuuid.size: "+uuid.size+"\ncategory.size: "+category.size+"\nselected.size: "+selected.size+"\nselection.size: "+selection.size+"\n**END DEBUG**"
+  }
 
   /**
    * Check if a graph has any link between i and i (directed or undirected)
@@ -235,12 +239,16 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     /**
      * List of selected nodes' IDs
      */
-    val selection = selected.zipWithIndex.filter { case (selected,i) => selected }.map{ case (s,i) => i }.toList
+    lazy val selection : List[Int] = {
+      val l = selected.zipWithIndex.filter { case (selected,i) => selected }.map{ case (s,i) => i }.toList
+      println("******selection: "+l)
+      l
+    }
 
     /**
      * List of selected nodes' attributes
      */
-    val selectionAttributes = {
+    lazy val selectionAttributes = {
       //println("mapping selection attributes: "+selection)
       selection.map{ case i => lessAttributes(i) }.toList
     }
@@ -248,9 +256,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   /**
    * Return the current selection as a list of UUID:String
    */
-  val selectionUUID = selection.map{case i => getUuid(i)}.toList
+  lazy val selectionUUID = selection.map{case i => getUuid(i)}.toList
 
-   val selectionNeighbours = {
+  // { UUID : {neighbours}, UUID2; {neighbours}, ... }
+   lazy  val selectionNeighbours = {
       Map(selectionUUID.zipWithIndex:_*).map{ case (uuid,i) => (uuid, neighbours(i)) }
     }
 
@@ -664,14 +673,25 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
 
   def updatePosition(g: Graph): Graph = {
-    val source = g.getArray[(Double, Double)]("position")
-    var target: Array[(Double, Double)] = getArray[(Double, Double)]("position").zipWithIndex.map {
+
+    val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
       case (elem, i) =>
         val u = uuid(i)
         val id = g.id(u)
-        if (id == -1) elem else source(id)
-    }
-    Graph.make(elements + ("position" -> target.toArray))
+        if (id == -1) elem else g.position(id)
+    }.toArray
+
+    val tmp2: Array[Boolean] = selected.zipWithIndex.map {
+      case (s, i) =>
+        val u = uuid(i)
+        val id = g.id(u)
+        if (id == -1) s else g.selected(id)
+    }.toArray
+
+    Graph.make(elements ++ Map[String,Any](
+      "position" -> tmp1,
+      "selected"  -> tmp2) // need to recompute things
+    )
   }
 
 

@@ -74,10 +74,10 @@ object Color {
   // val samba = new Palette
   
   def fromRGBTuple3(c:(Double,Double,Double)) : Color  = {
-    new Color(c._1,c._2,c._2)
+    new Color(c._1,c._2,c._3)
   }
   def fromRGBTuple4(c:(Double,Double,Double,Double)) : Color  = {
-    new Color(c._1,c._2,c._2,c._4)
+    new Color(c._1,c._2,c._3,c._4)
   }
   def toRGBTuple3(c:Color) : (Double,Double,Double) = {
     (c.h,c.s,c.b)
