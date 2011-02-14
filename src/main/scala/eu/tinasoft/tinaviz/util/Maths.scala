@@ -48,4 +48,22 @@ object Maths {
     val r = if (vr._2-vr._1 == 0) 1.0 else ((v-vr._1) / (vr._2-vr._1))
     (tr._1 + ((tr._2 - tr._1) * r))
   }
+
+  def limit(v: Double, min: Double, max: Double): Double = {
+    if (v < min) min else if (v > max) max else v
+  }
+
+
+  def min(a:Double,b:Double) = {
+     if (a < b) a else b
+  }
+  def max(a:Double,b:Double) = {
+     if (a > b) a else b
+  }
+  def min(ab:(Double,Double)) = {
+     if (ab._1 < ab._2) ab._1 else ab._2
+  }
+  def max(ab:(Double,Double)) = {
+     if (ab._1 > ab._2) ab._1 else ab._2
+  }
 }

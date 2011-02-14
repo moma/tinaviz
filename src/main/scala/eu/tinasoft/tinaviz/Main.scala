@@ -55,13 +55,13 @@ class Main extends TApplet with Client {
   override def setup(): Unit = {
     size(800, 600, PConstants.P2D)
     //size(screenWidth - 400, screenHeight - 400, PConstants.P2D)
-    frameRate(25)
+    frameRate(30)
     //noSmooth
     smooth
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
-    bezierDetail(16)
+    bezierDetail(18)
 
     // set some defaults
     setDefault("scene", new Scene())
@@ -129,12 +129,16 @@ class Main extends TApplet with Client {
       case ((source, target), i) =>
         val psource = screenPosition(source)
         val ptarget = screenPosition(target)
+
+        val weight = scene.edgeWeightLayer(i)
         if (isVisible(psource) || isVisible(ptarget)) {
           val powd = distance(psource, ptarget)
           val lod = if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 70), 1, 70) else 1
           setLod(lod.toInt)
           lineColor(scene.edgeColorLayer(i))
-          //lineThickness(e.weight)
+          //Maths.map(weight, scene.)
+          println("weight: "+weight)
+          lineThickness(weight)
           drawCurve(source, target)
         }
     }
@@ -166,7 +170,7 @@ class Main extends TApplet with Client {
     visibleNodes.foreach {
       case (position, i) =>
         val size = scene.nodeSizeLayer(i)
-        val np = screenPosition(position._1 + size, position._2 + (11.0 / 2.0))
+        val np = screenPosition(position._1 + size, position._2)
         text(scene.nodeLabelLayer(i), np._1, np._2)
 
     }

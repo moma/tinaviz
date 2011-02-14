@@ -668,6 +668,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
 
+  /**
+   * TODO refactor to use a generic field update function
+   */
   def updatePosition(g: Graph): Graph = {
 
     val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {

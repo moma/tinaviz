@@ -207,6 +207,7 @@ case class Sketch(
    */
   def updateNodeSizes(graph: Graph) {
     nodeSizeLayer = graph.size
+    updateEdgeSizes(graph)
     updateEdgeColors(graph)
   }
 
@@ -280,11 +281,27 @@ case class Sketch(
   }
 
   /**
-   * Update the edges' colors layer
+   * Update the edges' weight layer
    *
    */
   def updateEdgeSizes(graph: Graph) {
-    edgeWeightLayer = (for (links <- graph.links; (id, weight) <- links) yield weight).toArray
+
+    //val min
+
+
+    val min = graph.get[Double]("minEdgeWeight")
+    val max = graph.get[Double]("maxEdgeWeight")
+
+
+    edgeWeightLayer = (for ((links,i) <- graph.links.zipWithIndex; (j, weight) <- links) yield {
+      val sizes = (graph.size(i), graph.size(j))
+      val avgSize = ( sizes._1 + sizes._2 ) / 2.0
+      val w = Maths.limit(avgSize, Maths.min(sizes), Maths.max(sizes))
+      print("  w: "+w)
+      val r = weight * 100.0 * graph.cameraZoom
+      println("  r: "+r)
+      r
+    }).toArray
   }
 
 }
