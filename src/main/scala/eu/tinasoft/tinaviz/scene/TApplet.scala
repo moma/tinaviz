@@ -308,9 +308,9 @@ class TApplet extends PApplet with MouseWheelListener {
 
     scale((1.0 / _camera.zoom).toFloat)
     translate(-_camera.position._1.toFloat, -_camera.position._2.toFloat)
-    stroke(0.0f, 1.0f, 0.0f, 0.6f)
+    stroke(0.0f, 1.0f, 0.0f, 0.5f)
     strokeWeight(1.0f)
-    fill(.3f, 1.0f, 1.0f, 0.3f)
+    fill(.57f, 1.0f, 1.0f, 0.2f)
     drawDisk(mouseXY, radius)
     translate(_camera.position._1.toFloat, _camera.position._2.toFloat)
     scale(_camera.zoom.toFloat)
