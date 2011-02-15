@@ -187,7 +187,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
 
         case ("select", uuid: String) =>
-          if (uuid.equals("")) {
+          println("selecting node: '"+uuid+"'")
+          if (uuid.equals(" ") || uuid.isEmpty) {
             data += "selected" -> data.selected.map(c => false)
           } else {
             data += (data.id(uuid), "select", true)
