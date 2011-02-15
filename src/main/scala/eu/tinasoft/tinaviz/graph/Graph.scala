@@ -411,10 +411,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   /**
    * Return a new graph which is centered
+   * we can center it using XY normalization, or camera, or camera force.. for the moment we keep it simple
    */
   def recenter = {
-    var newCameraPosition = get[(Double,Double)]("camera.position")
-     this + ("camera.position" -> newCameraPosition)
+    //var newCameraPosition = get[(Double,Double)]("camera.position")
+    // assuming the graph is centered in 0.0
+     this + ("camera.position" -> (0.0,0.0))
   }
 
   /**
@@ -613,6 +615,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       })
     }).toArray
   }
+
+
 
   def remove(set: Set[Int]): Graph = {
     val conv = converter(set)

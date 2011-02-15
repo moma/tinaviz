@@ -47,6 +47,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
   var sketch = new Sketch()
   var scene = new Scene()
 
+  var framedelay = 200
   //var busy = false
 
 
@@ -57,7 +58,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
     val sched = Executors.newSingleThreadScheduledExecutor()
 
-    def schedule(msg: Any, ms: Long = 10) = {
+    def schedule(msg: Any, ms: Long) = {
       val ct = Platform.currentTime
       sched.schedule(new Runnable {
         def run = actors.Scheduler.execute({
@@ -69,7 +70,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
       }, ms, TimeUnit.MILLISECONDS)
     }
 
-    schedule('ping)
+    schedule('ping, 500)
 
     while (true) {
       receive {
@@ -110,6 +111,11 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             }
           }
           reply(result)
+
+        case "recenter" =>
+          println("recentering now..")
+          layoutCache = layoutCache.recenter
+          updateScreen
 
         case ("camera.mouse", kind: Symbol, side: Symbol, count: Symbol, position: (Double, Double)) =>
 
@@ -197,7 +203,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
-              sendScene
+              updateScreen
 
             case "filter.node.category" =>
             //println("filter.node.category")
@@ -207,21 +213,21 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
-              sendScene
+              updateScreen
             case "filter.node.weight" =>
             //println("nodeWeightCache = applyNodeWeight(categoryCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
-              sendScene
+              updateScreen
             case "filter.edge.weight" =>
             //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
-              sendScene
+              updateScreen
             case "filter.node.size" =>
             //println("categoryCache = applyWeightToSize(categoryCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
@@ -229,11 +235,11 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
-              sendScene
+              updateScreen
 
             //case "frameRate" =>
             //  layoutCache = applyLayout(layoutCache)
-            //  sendScene
+            //  updateScreen
             case any =>
           // we don't need to update the scene for other attributes
           }
@@ -247,21 +253,21 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           if (!pause) {
             //println("pingu")
             layoutCache = applyLayout(layoutCache)
-            sendScene
+            updateScreen
             val d = (Platform.currentTime.toLong - old.toLong).toInt
             //println("d:" + d)
-            if (d < 200) {
+            if (d < framedelay) {
               // we are in advance
               //println("we are in advance, adjusting next frame to "+(-d))
-              schedule('ping, 200 - d)
+              schedule('ping, framedelay - d)
             } else {
               // on time, if not in late, schedule now!
               //println("we are on time, schedule for right now")
-              schedule('ping)
+              schedule('ping, 0)
             }
             //Scheduler.schedule( { Actor.actor { me ! 'ping }; () }, 100000L)
           } else {
-            schedule('ping, 200)
+            schedule('ping, framedelay)
           }
 
 
@@ -290,7 +296,7 @@ self ! 'ping      */
    * Do some pre-processing, then send the final scene to the View
    * TODO: keep the Graph?
    */
-  def sendScene {
+  def updateScreen {
     // TODO: do that in another Actor, which will reply directly to our master
     val graph = layoutCache
     val g = graph + ("links" -> graph.links.zipWithIndex.map {

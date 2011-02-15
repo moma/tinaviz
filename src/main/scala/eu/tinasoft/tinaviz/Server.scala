@@ -29,7 +29,7 @@ class Server extends node.util.Actor {
 
     // current view settings
     "filter.view" -> "macro",
-    "filter.node.category" -> "NGram",
+    "filter.node.category" -> "Document",
     "filter.node.weight" -> (0.0, 1.0),
     "filter.edge.weight" -> (0.0, 1.0),
     "filter.node.size" -> .2,
@@ -95,9 +95,8 @@ class Server extends node.util.Actor {
         //pipelineBusy = false
         //self ! "frameRate" -> properties("frameRate") // force relaunching
 
-        case ("recenter", true) =>
-          println("TODO recentering")
-        //properties += "recenter" -> false
+        case "recenter" =>
+          pipeline ! "recenter"
 
         case ("select", uuid) =>
           pipeline ! "select" -> uuid
