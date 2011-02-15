@@ -153,7 +153,11 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                     // we don't touch a thing, unless nothing was selected at all (we reset everything in this case)
                     //
                     //
-                   if (in) before else false
+                   if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
+                     if (in) before else false
+                   } else {
+                      before
+                   }
                   }
               }.toArray)
               // get the current selection with less attributes

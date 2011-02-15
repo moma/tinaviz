@@ -145,19 +145,19 @@ case class Sketch(
         graph category i match {
           case "Document" =>
             s match {
-              case true => colors.primary.dark
-              case false => if (selectionValid) colors.primary.lighter else colors.primary.light
+              case true => colors.primary.standard
+              case false => if (selectionValid) colors.primary.lighter.saturation(0.15) else colors.primary.light
             }
           case "NGram" =>
             s match {
-              case true => colors.tertiary.dark
-              case false => if (selectionValid) colors.tertiary.lighter else colors.tertiary.light
+              case true => colors.tertiary.standard
+              case false => if (selectionValid) colors.tertiary.lighter.saturation(0.15) else colors.tertiary.light
             }
 
           case other =>
             s match {
-              case true => colors.secondary.dark
-              case false => if (selectionValid) colors.secondary.lighter else colors.secondary.light
+              case true => colors.secondary.standard
+              case false => if (selectionValid) colors.secondary.lighter.saturation(0.15) else colors.secondary.light
             }
         }
     }
@@ -168,18 +168,18 @@ case class Sketch(
           case "Document" =>
             s match {
               case true => new Color(0.0, 0.0, 0.23)
-              case false => if (selectionValid) colors.primary.dark else colors.primary.darker
+              case false => if (selectionValid) colors.primary.darker.saturation(0.15) else colors.primary.darker
             }
           case "NGram" =>
             s match {
               case true => new Color(0.0, 0.0, 0.23)
-              case false => if (selectionValid) colors.tertiary.dark else colors.tertiary.darker
+              case false => if (selectionValid) colors.tertiary.darker.saturation(0.15) else colors.tertiary.darker
             }
 
           case other =>
             s match {
               case true => new Color(0.0, 0.0, 0.23)
-              case false => if (selectionValid) colors.secondary.dark else colors.secondary.darker
+              case false => if (selectionValid) colors.secondary.darker.saturation(0.15) else colors.secondary.darker
             }
         }
 
