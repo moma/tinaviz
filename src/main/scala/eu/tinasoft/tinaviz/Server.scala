@@ -33,7 +33,7 @@ class Server extends node.util.Actor {
     "filter.node.weight" -> (0.0, 1.0),
     "filter.edge.weight" -> (0.0, 1.0),
     "filter.node.size" -> .2,
-    "layout.gravity" -> 1.1, // stronger means faster!
+    "layout.gravity" -> 1.3, // stronger means faster!
     "layout.attraction" -> 1.01,
     "layout.repulsion" -> 1.5,
     "pause" -> false,
