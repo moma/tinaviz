@@ -133,12 +133,12 @@ class Main extends TApplet with Client {
         val weight = scene.edgeWeightLayer(i)
         if (isVisible(psource) || isVisible(ptarget)) {
           val powd = distance(psource, ptarget)
-          val lod = if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 70), 1, 70) else 1
-          setLod(lod.toInt)
+          val lod = if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 120), 1, 120).toInt else 1
+          setLod(lod)
           lineColor(scene.edgeColorLayer(i))
           //Maths.map(weight, scene.)
-          println("weight: "+weight)
-          lineThickness(weight)
+          //println("weight: "+weight)
+          lineThickness(weight * getScale)
           drawCurve(source, target)
         }
     }

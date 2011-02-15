@@ -297,9 +297,10 @@ case class Sketch(
       val sizes = (graph.size(i), graph.size(j))
       val avgSize = ( sizes._1 + sizes._2 ) / 2.0
       val w = Maths.limit(avgSize, Maths.min(sizes), Maths.max(sizes))
-      print("  w: "+w)
-      val r = weight * 100.0 * graph.cameraZoom
-      println("  r: "+r)
+     // print("  w: "+w)
+      //val r = weight * 1.0
+      val r = 1.0 * 1.0
+      //println("  r: "+r)
       r
     }).toArray
   }
