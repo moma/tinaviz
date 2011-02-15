@@ -139,24 +139,25 @@ case class Sketch(
    */
   def updateNodeColors(graph: Graph) {
     //println("selected length: "+graph.selected.size)
+    val selectionValid = (graph.selection.size > 0)
     nodeColorLayer = graph.selected.zipWithIndex map {
       case (s, i) =>
         graph category i match {
           case "Document" =>
             s match {
               case true => colors.primary.dark
-              case false => colors.primary.light
+              case false => if (selectionValid) colors.primary.lighter else colors.primary.light
             }
           case "NGram" =>
             s match {
               case true => colors.tertiary.dark
-              case false => colors.tertiary.light
+              case false => if (selectionValid) colors.tertiary.lighter else colors.tertiary.light
             }
 
           case other =>
             s match {
               case true => colors.secondary.dark
-              case false => colors.secondary.light
+              case false => if (selectionValid) colors.secondary.lighter else colors.secondary.light
             }
         }
     }
@@ -167,18 +168,18 @@ case class Sketch(
           case "Document" =>
             s match {
               case true => new Color(0.0, 0.0, 0.23)
-              case false => colors.primary.darker
+              case false => if (selectionValid) colors.primary.dark else colors.primary.darker
             }
           case "NGram" =>
             s match {
               case true => new Color(0.0, 0.0, 0.23)
-              case false => colors.tertiary.darker
+              case false => if (selectionValid) colors.tertiary.dark else colors.tertiary.darker
             }
 
           case other =>
             s match {
               case true => new Color(0.0, 0.0, 0.23)
-              case false => colors.secondary.darker
+              case false => if (selectionValid) colors.secondary.dark else colors.secondary.darker
             }
         }
 

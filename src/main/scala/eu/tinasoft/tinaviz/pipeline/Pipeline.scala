@@ -138,6 +138,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           kind match {
             case 'Click =>
               var in = false
+              // TODO a selection counter
               layoutCache = layoutCache + ("selected" -> layoutCache.selected.zipWithIndex.map {
                 case (before, i) =>
                   val touched = (layoutCache.position(i).dist(o) <= r)
@@ -148,9 +149,11 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                   if (touched) {
                     !before
                   } else {
-                    before
+                    //before
                     // we don't touch a thing, unless nothing was selected at all (we reset everything in this case)
-                    //if (in) before else false
+                    //
+                    //
+                   if (in) before else false
                   }
               }.toArray)
               // get the current selection with less attributes
