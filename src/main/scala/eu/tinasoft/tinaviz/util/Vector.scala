@@ -55,7 +55,7 @@ case class Vector (val x:Double,val y:Double) {
   def computeForce(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
-    val d = math.sqrt(dx*dx + dy*dy)
+    val d = math.sqrt(dx*dx + dy*dy) * 0.8
     //println("  d: "+d)
     if (d!=0.0) ((dx / d) * f, (dy / d) * f) else (0.0,0.0)
   }
@@ -64,7 +64,7 @@ case class Vector (val x:Double,val y:Double) {
   def computeForceLimiter(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
-    var d = math.sqrt(dx*dx + dy*dy)
+    var d = math.sqrt(dx*dx + dy*dy) * 0.8
     val f2 = if (d!=0.0) 1./d else 0
     if (d!=0.0) ((dx / d) * (f * f2), (dy / d) * (f * f2)) else (0.0,0.0)
   }

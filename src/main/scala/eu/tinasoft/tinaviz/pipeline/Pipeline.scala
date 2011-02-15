@@ -335,78 +335,6 @@ self ! 'ping      */
     actor ! msg
   }
 
-  /*
-  def runMeso(graph:Graph) = {
-  val category = graph.get[String]("filter.category")
-  val selection = graph.get[List[String]]("filter.selection")
-  println("running meso on "+graph.nbNodes+" nodes")
-  val tmp = graph.nodes.filter {
-  case n =>
-  var connected = false
-  graph.nodes.foreach {
-  case m =>
-  if (m.attributes("category").equals(category))
-  if (selection.contains(m.uuid)) connected = true
-  }
-  (selection.contains(n.uuid) || connected)
-  }
-
-  repair(Graph.make(tmp, graph.properties), graph)
-  }
-  */
-
-  /*
-   def runMacro(graph:Graph) = {
-   val category = graph.get[String]("filter.category")
-   println("running macro on "+graph.nbNodes+" nodes")
-
-   filterBy(graph,"category",category)
-   }*/
-
-  /*
-  
-   def runBody = {
-   val graph = cache('input)
-   graph.get[String]("filter.view") match {
-   case "macro" => runMacro(graph)
-   case any => runMeso(graph)
-   }
-   }
-   */
-  /*
-   def runColors = {
-   val graph = cache('input)
-   val palette = graph.get[String]("filter.palette")
-   println("running meso on "+graph.nbNodes+" nodes")
-   val tmp = graph.nodes.map {
-   case n =>
-        
-   }
-
-   repair(Graph.make(tmp, graph.properties), graph)
-   }
-   */
-
-  /*
-  def applyView(g:Graph) = {
-    val view = g.get[String]("filter.view")
-    if (view.equals("macro")) {
-        
-    } else {
-    
-    }
-    var removeMe = Set.empty[Int]
-    g.category.zipWithIndex map {
-      case (cat,i) =>
-        if (cat.equals(category)) {
-          removeMe += i
-        }
-    }
-    var h = g.remove(removeMe)
-    h
-  }*/
-
-
   def applyCategory(g: Graph): Graph = {
     //println("applyCategory: "+g.debugStats)
     if (g.nbNodes == 0) return g
@@ -425,23 +353,17 @@ self ! 'ping      */
       //println("\n\nfiltering the meso view: "+g.debugStats)
         g.selected.zipWithIndex foreach {
           case (f, i) => if (!f) {
-            // we only need to filter unselected nodes
-            //println(" - GOT !F: "+g.selection.size)
-            g.selection.foreach {
-              case j =>
-              //println(" - for each select")
-                if (!g.hasAnyLink(i, j)) {
-                  // we remove nodes not connected to the selection
-                  //println("removing single")
-                  removeMe += i
-                }
-                else {
-                  if (!g.currentCategory.equalsIgnoreCase(g.category(j))) {
-                    // or nodes connected but not in the desired category
-                    //println("removing unrelated node. expected: "+g.currentCategory+" and got: "+g.category(j))
-                    removeMe += i
-                  }
-                }
+
+            // remove the node which is not in our category
+            if (!g.currentCategory.equalsIgnoreCase(g.category(i))) {
+              removeMe += i
+            } else {
+              var keepThat = false
+              // we remove nodes not connected to the selection
+              g.selection.foreach {
+                case j => if (g.hasAnyLink(i, j)) keepThat = true
+              }
+              if (!keepThat) removeMe += i
             }
           }
         }
@@ -534,10 +456,10 @@ self ! 'ping      */
 
             // todo: attract less if too close (will work for both gravity and node attraction)
             if (g.hasAnyLink(i, j)) {
-              force += p1.computeForce(ATTRACTION * cooling, p2)
+              force += (p1.computeForce(ATTRACTION * cooling, p2))
             } else {
               // if (doIt) {
-              force -= p1.computeForceLimiter(REPULSION * cooling, p2)
+              force -= (p1.computeForceLimiter(REPULSION * cooling, p2))
               // }
             }
         }
