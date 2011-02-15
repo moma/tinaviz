@@ -138,7 +138,7 @@ class Main extends TApplet with Client {
           lineColor(scene.edgeColorLayer(i))
           //Maths.map(weight, scene.)
           //println("weight: "+weight)
-          lineThickness(weight * getScale)
+         // lineThickness(weight * getScale)
           drawCurve(source, target)
         }
     }
