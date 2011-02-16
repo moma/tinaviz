@@ -188,7 +188,10 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                 case any => "none"
               })
 
-              self ! "filter.view" -> data.get[String]("filter.view")
+              self ! "filter.view" -> (count match {
+                case 'Simple => data.get[String]("filter.view")
+                case 'Double => "meso"
+              })
 
             case 'Drag =>
             val pause = try {
