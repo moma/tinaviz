@@ -149,7 +149,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                       }.toArray)
                       // get the current selection with less attributes
                       // todo: update everything
-                      if (in) self ! "filter.view" -> data.get[String]("filter.view")
+                      if (in) updateScreen
 
 
             case 'Click =>
