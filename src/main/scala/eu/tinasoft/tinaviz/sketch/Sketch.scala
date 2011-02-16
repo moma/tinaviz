@@ -141,48 +141,35 @@ case class Sketch(
     //println("selected length: "+graph.selected.size)
     val selectionValid = (graph.selection.size > 0)
     nodeColorLayer = graph.selected.zipWithIndex map {
-      case (s, i) =>
-        graph category i match {
-          case "Document" =>
-            s match {
-              case true => colors.primary.standard
-              case false => if (selectionValid) colors.primary.lighter.saturation(0.3) else colors.primary.light
-            }
-          case "NGram" =>
-            s match {
-              case true => colors.tertiary.standard
-              case false => if (selectionValid) colors.tertiary.lighter.saturation(0.3) else colors.tertiary.light
-            }
-
-          case other =>
-            s match {
-              case true => colors.secondary.standard
-              case false => if (selectionValid) colors.secondary.lighter.saturation(0.3) else colors.secondary.light
-            }
+      case (selected, i) =>
+        val mode = if (selected) 'selected else if (graph.highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
+        val color = graph category i match {
+          case "Document" => colors.primary
+          case "NGram" => colors.tertiary
+          case other => colors.secondary
+        }
+        mode match {
+          case 'selected => color.standard
+          case 'highlighted => color.standard
+          case 'unselected => color.lighter.saturation(0.3)
+          case 'default => color.light
         }
     }
 
     nodeBorderColorLayer = graph.selected.zipWithIndex map {
-      case (s, i) =>
-        graph category i match {
-          case "Document" =>
-            s match {
-              case true => new Color(0.0, 0.0, 0.23)
-              case false => if (selectionValid) colors.primary.darker.saturation(0.3) else colors.primary.darker
-            }
-          case "NGram" =>
-            s match {
-              case true => new Color(0.0, 0.0, 0.23)
-              case false => if (selectionValid) colors.tertiary.darker.saturation(0.3) else colors.tertiary.darker
-            }
-
-          case other =>
-            s match {
-              case true => new Color(0.0, 0.0, 0.23)
-              case false => if (selectionValid) colors.secondary.darker.saturation(0.3) else colors.secondary.darker
-            }
+      case (selected, i) =>
+        val mode = if (selected) 'selected else if (graph.highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
+        val color = graph category i match {
+          case "Document" => colors.primary
+          case "NGram" => colors.tertiary
+          case other => colors.secondary
         }
-
+        mode match {
+          case 'selected => new Color(0.0, 0.0, 0.23)
+          case 'highlighted => new Color(0.0, 0.0, 0.23)
+          case 'unselected => color.darker.saturation(0.3)
+          case 'default => color.darker
+        }
     }
     updateEdgeColors(graph)
   }
@@ -294,11 +281,11 @@ case class Sketch(
     val max = graph.get[Double]("maxEdgeWeight")
 
 
-    edgeWeightLayer = (for ((links,i) <- graph.links.zipWithIndex; (j, weight) <- links) yield {
+    edgeWeightLayer = (for ((links, i) <- graph.links.zipWithIndex; (j, weight) <- links) yield {
       val sizes = (graph.size(i), graph.size(j))
-      val avgSize = ( sizes._1 + sizes._2 ) / 2.0
+      val avgSize = (sizes._1 + sizes._2) / 2.0
       val w = Maths.limit(avgSize, Maths.min(sizes), Maths.max(sizes))
-     // print("  w: "+w)
+      // print("  w: "+w)
       //val r = weight * 1.0
       val r = 1.0 * 1.0
       //println("  r: "+r)

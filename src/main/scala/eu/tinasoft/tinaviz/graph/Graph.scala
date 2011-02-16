@@ -36,12 +36,13 @@ object Graph {
     "label" -> Array.empty[String],
     "color" -> Array.empty[Color],
     "selected" -> Array.empty[Boolean],
+    "highlighted" -> Array.empty[Boolean],
     "density" -> Array.empty[Double],
     "rate" -> Array.empty[Int],
     "size" -> Array.empty[Double],
     "weight" -> Array.empty[Double],
     "category" -> Array.empty[String],
-     "content" -> Array.empty[String],
+    "content" -> Array.empty[String],
     "position" -> Array.empty[(Double, Double)],
     "links" -> Array.empty[Map[Int, Double]],
     "inDegree" -> Array.empty[Int],
@@ -100,6 +101,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val category = getArray[String]("category")
   lazy val content = getArray[String]("content")
   lazy val selected = getArray[Boolean]("selected")
+  lazy val highlighted = getArray[Boolean]("highlighted")
   lazy val label = getArray[String]("label")
   lazy val rate = getArray[Int]("rate")
   lazy val uuid = getArray[String]("uuid")
