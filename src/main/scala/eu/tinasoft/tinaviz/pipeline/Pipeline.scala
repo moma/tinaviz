@@ -6,9 +6,11 @@
 package eu.tinasoft.tinaviz.pipeline
 
 import org.daizoru._
-
 import eu.tinasoft._
-import tinaviz.graph._
+import tinaviz.graph.Graph
+import tinaviz.graph.GraphMetrics
+import tinaviz.graph.GraphFunctions
+
 import tinaviz.sketch.Sketch
 import tinaviz.sketch.Sketch._
 import tinaviz.scene.Scene
@@ -16,17 +18,8 @@ import tinaviz.io.Browser
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import java.util.concurrent.{ScheduledFuture, TimeUnit, Executors}
-
-//import tinaviz.util.ActorPing
-
 import actors.Actor
-
-//import java.util.Date
-
 import compat.Platform
-
-//import actors.threadpool.{TimeUnit, Executors}
-
 
 /**
  *
@@ -36,26 +29,19 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
   start
 
   var nextState = 'output
-
-  // used for original graph and global vars
   var data = new Graph()
-
   var categoryCache = new Graph()
   var nodeWeightCache = new Graph()
   var edgeWeightCache = new Graph()
   var layoutCache = new Graph()
   var sketch = new Sketch()
   var scene = new Scene()
-
   var framedelay = 200
-  //var busy = false
-
 
   def act() {
 
     var next: Long = 0
     val me = self
-
     val sched = Executors.newSingleThreadScheduledExecutor()
 
     def schedule(msg: Any, ms: Long) = {
@@ -85,11 +71,6 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
         case ('getNeighbourhood, view: String, todoList: List[Any]) =>
 
-        /*
-       todoList.foreach{
-         case x =>
-         println("  - x: "+x)
-       } */
           val result = (view match {
             case "meso" => layoutCache
             case any => data
@@ -114,27 +95,17 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
 
         case "recenter" =>
           println("recentering now..")
-          layoutCache = layoutCache.recenter
+          layoutCache = GraphFunctions.recenter(layoutCache)
           updateScreen
 
         case ("camera.mouse", kind: Symbol, side: Symbol, count: Symbol, position: (Double, Double)) =>
-
-        // sub routines to convert between screen and model coordinates
           val cz = layoutCache.cameraZoom
           val cp = layoutCache.cameraPosition
-          //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
-          //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
           def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
           def screen2model(p: (Double, Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
           val o = screen2model(position)
           val sr = layoutCache.get[Double]("selectionRadius")
           val r = (sr / cz) / 2.0
-
-          // (i) / cz) / 2.0
-
-          //val mop = screen2model(onScreen)
-          //println("mouse in screen: " + position + "    mouse in model: " + o)
-          //println("selection radius: " + sr + "     scaled: " + r)
           kind match {
             case 'Move =>
                       var in = false
@@ -147,10 +118,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                           if (ggg) in = true
                           ggg
                       }.toArray)
-                      // get the current selection with less attributes
-                      // todo: update everything
                       if (in) updateScreen
-
 
             case 'Click =>
               var in = false
@@ -167,10 +135,6 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                   if (touched) {
                     !before
                   } else {
-                    //before
-                    // we don't touch a thing, unless nothing was selected at all (we reset everything in this case)
-                    //
-                    //
                    if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
                      if (in) before else false
                    } else {
@@ -178,8 +142,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                    }
                   }
               }.toArray)
-              // get the current selection with less attributes
-              val selection = layoutCache.selectionAttributes // a List of selection
+              val selection = layoutCache.selectionAttributes
               // todo: update everything
 
               Browser ! "_callbackSelectionChanged" -> (selection, side match {
@@ -205,7 +168,6 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             //self ! "pause" -> pauseBuffer
             case any =>
           }
-
 
         case ("select", uuid: String) =>
           println("selecting node: '"+uuid+"'")
@@ -233,7 +195,6 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               updateScreen
-
             case "filter.node.category" =>
             //println("filter.node.category")
               categoryCache = data.updatePosition(layoutCache)
@@ -265,12 +226,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               updateScreen
-
-            //case "frameRate" =>
-            //  layoutCache = applyLayout(layoutCache)
-            //  updateScreen
-            case any =>
-          // we don't need to update the scene for other attributes
+            case any => // we don't need to update the scene for other attributes
           }
 
         case ('ping, old: Long) =>
@@ -280,46 +236,25 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             case x => true
           }
           if (!pause) {
-            //println("pingu")
             layoutCache = applyLayout(layoutCache)
             updateScreen
             val d = (Platform.currentTime.toLong - old.toLong).toInt
             //println("d:" + d)
             if (d < framedelay) {
-              // we are in advance
               //println("we are in advance, adjusting next frame to "+(-d))
               schedule('ping, framedelay - d)
             } else {
-              // on time, if not in late, schedule now!
               //println("we are on time, schedule for right now")
               schedule('ping, 0)
             }
-            //Scheduler.schedule( { Actor.actor { me ! 'ping }; () }, 100000L)
           } else {
             schedule('ping, framedelay)
           }
-
-
-        /*
-val now = (new Date).getTime
-if (next > now) {
-  println("waiting")
-  Thread.sleep(next - now)
-}
-next = (now.toDouble + 1000.0 / fps).toLong
-println("self-pinging")
-self ! 'ping      */
-
         case s: String =>
-        // ignore
-        //
-        //case
         case msg => println("unknow msg: " + msg)
       }
-
     }
   }
-
 
   /**
    * Do some pre-processing, then send the final scene to the View
@@ -340,18 +275,11 @@ self ! 'ping      */
                 true
               } else if (graph.weight(i) < graph.weight(j)) {
                 false
-
                 // in the case of equal weight (eg. in Documents), we fall back to label comparison
               } else {
-
-                // were the bigger win
-                if (graph.label(i).compareTo(graph.label(j)) > 0) {
-                  true
-                } else {
-                  false
-                }
+               // the bigger win
+              (graph.label(i).compareTo(graph.label(j)) > 0)
               }
-
               // in the case of non-mutual link (directed), there is nothing to do; we keep the link
             } else {
               true
@@ -400,24 +328,16 @@ self ! 'ping      */
     g.remove(removeMe)
   }
 
-
   def applyNodeWeight(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
     val range = Maths.map(
       g.get[(Double, Double)]("filter.node.weight"),
       (0.0, 1.0),
       (g.get[Double]("minNodeWeight"), g.get[Double]("maxNodeWeight")))
-    //println("applyNodeWeight: " + range + " (" + g.get[(Double, Double)]("filter.node.weight") + ")")
     var removeMe = Set.empty[Int]
-    g.weight.zipWithIndex.map {
-      case (weight, i) =>
-      //println("filtering " + weight + " : " + i)
-        if (!(range._1 <= weight && weight <= range._2)) {
-          removeMe += i
-        }
-    }
+    g.weight.zipWithIndex.map { case (weight, i) => if (!(range._1 <= weight && weight <= range._2)) removeMe += i }
     val h = g.remove(removeMe)
-    h.computeActivity(g) // todo should be done automatically when addind
+    h + ("activity" -> GraphMetrics.activity(h,g))
   }
 
   def applyEdgeWeight(g: Graph): Graph = {
@@ -428,13 +348,10 @@ self ! 'ping      */
       (g.get[Double]("minEdgeWeight"), g.get[Double]("maxEdgeWeight")))
     //println("applyEdgeWeight: " + range + " (" + g.get[(Double, Double)]("filter.edge.weight") + ")")
     val newLinks = g.links map {
-      case links =>
-        links.filter {
-          case (id, weight) => (range._1 <= weight && weight <= range._2)
-        }
+      case links => links.filter { case (id, weight) => (range._1 <= weight && weight <= range._2) }
     }
     val h = g + ("links" -> newLinks)
-    h.computeActivity(g)
+   h + ("activity" -> GraphMetrics.activity(h,g))
   }
 
   def applyWeightToSize(g: Graph): Graph = {
@@ -447,16 +364,6 @@ self ! 'ping      */
     g + ("size" -> newSize)
   }
 
-  /*
-  def applyCategory(g:Graph) = {
-  val category = g.get[String]("filter.category")
-  g + ("visible" -> (g.category.zipWithIndex map {
-  case (cat,i) =>
-  (g.visible(i) && g.equals(category))
-  }))
-  }*/
-
-
   /**
    *  apply a force vector algorithm on the graph
    */
@@ -467,10 +374,7 @@ self ! 'ping      */
     val GRAVITY = g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
     val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
-
     //println("running forceVector on "+nbNodes+" nodes")
-
-
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
     val cooling = 1.0 //Maths.map(g.activity,(0.0,1.0),(0.900, 0.999))
 
@@ -509,52 +413,11 @@ self ! 'ping      */
     h.computeActivity(g)
   }
 
-  /*
-   def repair(graph:Graph,reference:Graph) = {
-   val tmp1 = graph.nodes
-   val tmp2 = tmp1.map{
-   case node =>
-   val links = node.links.map{case (id,weight) => (tmp1.indexOf(reference.node(id)),weight)}
-   new Node(node.uuid,
-   node.label,
-   node.position,
-   node.color,
-   node.attributes,
-   links,
-   node.inDegree,
-   links.size)
-   }
-   var i = -1
-   val tmp3 = tmp2.map{
-   case node =>
-   i += 1
-   var inDegree = 0
-   tmp2.foreach { case m =>
-   if (m.hasLink(i)) inDegree += 1
-   }
-   inDegree
-   new Node(node.uuid,
-   node.label,
-   node.position,
-   node.color,
-   node.attributes,
-   node.links,
-   inDegree,
-   node.outDegree)
-   }
-   Graph.make(tmp3, graph.properties)
-   }
-   */
-
-
   def transformColumn[T](column: String, filter: T => T) = {
     var dataArray = data.getArray[T](column)
     dataArray.foreach {
       case entry =>
-
-
     }
   }
-
 
 }

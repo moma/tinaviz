@@ -6,28 +6,53 @@
 package eu.tinasoft.tinaviz.graph
 
 import eu.tinasoft._
-import eu.tinasoft.tinaviz.util.Color
-import collection.mutable.LinkedList
-import eu.tinasoft.tinaviz.io.json.Base64
+import tinaviz.util.Color
 import tinaviz.util.Vector
+import tinaviz.graph.GraphMetrics
+import tinaviz.graph.GraphFunctions
+import tinaviz.io.json.Base64
+import collection.mutable.LinkedList
+
 
 object Graph {
 
   def get[T](elements: Map[String, Any], key: String): T = elements.get(key).get.asInstanceOf[T]
-
 
   // TODO be an optimized factory
   def makeDiff(newElements: Map[String, Array[Any]],
                oldElements: Map[String, Array[Any]]) = {
 
   }
-
-
   /**
    * Default, dumb factory
    */
   def make(elements: Map[String, Any]) = {
-    new Graph(elements).computeAll
+    var g = new Graph(elements)
+
+    // g + ("activity" -> a)
+    g = g + ("nbNodes" -> GraphMetrics.nbNodes(g))
+    g = g + ("nbEdges" -> GraphMetrics.nbEdges(g))
+    g = g + ("nbSingles" -> GraphMetrics.nbSingles(g))
+    g = g + ("outDegree" -> GraphMetrics.outDegree(g))
+    g = g + ("inDegree" -> GraphMetrics.inDegree(g))
+
+    val ode = GraphMetrics outDegreeExtremums g
+    g = g ++ Map[String,Any]("minOutDegree" -> ode._1, "maxOutDegree" -> ode._2)
+
+    val ide = GraphMetrics inDegreeExtremums g
+    g = g ++ Map[String,Any]("minInDegree" -> ide._1, "maxInDegree" -> ide._2)
+
+    val e = GraphMetrics extremums g
+    g = g ++ Map[String,Any]("xMax" -> e._1, "xMin" -> e._2, "yMax" -> e._3, "yMin" -> e._4)
+
+    val nwe = GraphMetrics nodeWeightExtremums g
+    g = g ++ Map[String,Any]("minNodeWeight" -> nwe._1, "maxNodeWeight" -> nwe._2)
+
+    val ewe = GraphMetrics edgeWeightExtremums g
+    g = g ++ Map[String,Any]("minEdgeWeight" -> ewe._1, "maxEdgeWeight" -> ewe._2)
+
+    g = g + ("baryCenter" -> GraphMetrics.baryCenter(g))
+    g
   }
 
   val defaults: Map[String, Any] = Map(
@@ -403,193 +428,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     nodeData
   }*/
 
-  def computeAll = {
-    var g = this
-    g = g.computeNbNodes
-    g = g.computeNbEdges
-    g = g.computeNbSingles
-    g = g.computeOutDegree
-    g = g.computeInDegree
-    g = g.computeOutDegreeExtremums
-    g = g.computeInDegreeExtremums
-    g = g.computeExtremums
-    g = g.computeNodeWeightExtremums
-    g = g.computeEdgeWeightExtremums
-    g.computeBaryCenter
-  }
 
-  /**
-   * Return a new graph which is centered
-   * we can center it using XY normalization, or camera, or camera force.. for the moment we keep it simple
-   */
-  def recenter = {
-    //var newCameraPosition = get[(Double,Double)]("camera.position")
-    // assuming the graph is centered in 0.0
-     this + ("camera.position" -> (0.0,0.0))
-  }
-
-  /**
-   * compute the amount of information added to thiq by g
-   */
-  def computeActivity(g: Graph): Graph = {
-    def max(x: Double, y: Double): Double = if (x < y) y else x
-    var addNodes = 0.0
-    var deletedNodes = 0.0
-    var addEdges = 0.0
-    var deletedEdges = 0.0
-    g.uuid.zipWithIndex foreach {
-      case (u, i) => if (!has(u)) addNodes += 1.0
-    }
-    uuid.zipWithIndex foreach {
-      case (u, i) => if (!g.has(u)) deletedNodes += 1.0
-    }
-    val activity1 = activity * entropy
-    val count = nbNodes + g.nbNodes
-    val activity2 = if (count > 0) ((addNodes + deletedNodes) / count) else 0
-    //val activity2 = if (count > 0) Maths.map(((addNodes + deletedNodes) / count),(0.0,1.0),(0.1,0.99)) else 0
-    val a = max(activity1, activity2)
-    //println("activity: " + a)
-    this + ("activity" -> a)
-  }
-
-  def computeNbSingles = {
-    var s = 0;
-    links.foreach {
-      case links => if (links.size == 0) s += 1
-    }
-    this + ("nbSingles" -> s)
-  }
-
-  def computeNbEdges = {
-    var s = 0;
-    links.foreach {
-      case links => s += links.size
-    }
-    this + ("nbEdges" -> s)
-  }
-
-  def computeNbNodes = new Graph(elements + ("nbNodes" -> uuid.size))
-
-  def computeOutDegree: Graph = {
-    val _outDegree = links.map {
-      case linkMap => linkMap.size
-    }
-    this + ("outDegree" -> _outDegree.toArray)
-  }
-
-  def computeInDegree: Graph = {
-
-    val _inDegree = uuid.zipWithIndex.map {
-      case (n, i) =>
-        var d = 0
-        links.foreach {
-          case m => if (m.contains(i)) d += 1
-        }
-        d
-    }
-    this + ("inDegree" -> _inDegree.toArray)
-  }
-
-  def computeOutDegreeExtremums: Graph = {
-    if (links.size == 0)
-      return new Graph(elements ++ Map[String, Any]("minOutDegree" -> 0, "maxOutDegree" -> 0))
-    var max = Int.MinValue
-    var min = Int.MaxValue
-    links.foreach {
-      case n =>
-        val d = n.size
-        if (d < min) min = d
-        if (d > max) max = d
-    }
-   this ++ Map[String,Any]("minOutDegree" -> min, "maxOutDegree" -> max)
-  }
-
-  def computeInDegreeExtremums: Graph = {
-    if (links.size == 0)
-      return this ++ Map[String, Any]("minOutDegree" -> 0, "maxOutDegree" -> 0)
-    var max = Int.MinValue
-    var min = Int.MaxValue
-
-    uuid.zipWithIndex foreach {
-      case (_uuid, id) =>
-        var d = 0
-        links.foreach {
-          case mapIntDouble => if (mapIntDouble.contains(id)) d += 1
-        }
-        if (d < min) min = d
-        if (d > max) max = d
-    }
-    this ++ Map[String,Any]("minOutDegree" -> min, "maxOutDegree" -> max)
-  }
-
-  def computeExtremums: Graph = {
-    this ++ (
-    if (position.size == 0) {
-       Map[String, Any]("xMax" -> 0.0, "xMin" -> 0.0, "yMax" -> 0.0, "yMin" -> 0.0)
-    } else {
-    var xMax = Double.MinValue
-    var xMin = Double.MaxValue
-    var yMax = Double.MinValue
-    var yMin = Double.MaxValue
-    position.foreach {
-      case (x, y) =>
-        if (x < xMin) xMin = x
-        if (x > xMax) xMax = x
-        if (y < yMin) yMin = y
-        if (y > yMax) yMax = y
-    }
-    Map[String, Any]("xMax" -> xMax,
-      "xMin" -> xMin,
-      "yMax" -> yMax,
-      "yMin" -> yMin)
-    })
-  }
-
-
-  def computeNodeWeightExtremums: Graph = {
-    this ++ (
-    if (position.size == 0) {
-       Map[String, Any]("minNodeWeight" -> 0.0, "maxNodeWeight" -> 0.0)
-    } else {
-    var max = Double.MinValue
-    var min = Double.MaxValue
-    weight.foreach {
-      case x =>
-        if (x < min) min = x
-        if (x > max) max = x
-    }
-     Map[String, Any]("minNodeWeight" -> min, "maxNodeWeight" -> max)
-    })
-  }
-
-  def computeEdgeWeightExtremums: Graph = {
-    this ++ (
-    if (links.size == 0)  {
-      Map[String, Any]("minEdgeWeight" -> 0.0, "maxEdgeWeight" -> 0.0)
-    } else {
-    var max = Double.MinValue
-    var min = Double.MaxValue
-    links.foreach {
-      case lnks =>
-        lnks.foreach {
-          case (id, weight) =>
-            if (weight < min) min = weight
-            if (weight > max) max = weight
-        }
-    }
-    Map[String, Any]("minEdgeWeight" -> min, "maxEdgeWeight" -> max)
-    })
-
-  }
-
-  def computeBaryCenter: Graph = {
-    var p = (0.0, 0.0)
-    val N = position.size.toDouble
-    position.foreach {
-      case (x, y) => p = (p._1 + x, p._2 + y)
-    }
-    this + ("baryCenter" -> (if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)))
-  }
 
   def map[T](id: Int, column: String, filter: T => T): Graph = {
     set(id, column, filter(getArray[T](column)(id)))
@@ -624,8 +463,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       })
     }).toArray
   }
-
-
 
   def remove(set: Set[Int]): Graph = {
     val conv = converter(set)
@@ -705,6 +542,5 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "selected"  -> tmp2) // need to recompute things
     )
   }
-
 
 }

@@ -25,7 +25,7 @@ class Fonts(val p: PApplet,
 
   val defaultFont = fonts(defaultFontSize)
 
-  def get(s: Int) = fonts(if (s > 1) (if (s < size) s else size) else 1)
+  def get(s: Int) = fonts(if (s > 1) (if (s < size - 1) s else size) else 1)
 }
 
 /**
