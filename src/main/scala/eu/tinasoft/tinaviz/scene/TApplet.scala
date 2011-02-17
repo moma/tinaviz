@@ -17,7 +17,7 @@ import tinaviz.util.Vector._
 
 class Fonts(val p: PApplet,
             val fontName: String = "Arial",
-            val size: Int = 80,
+            val size: Int = 95,
             val defaultFontSize: Int = 12,
             val min: Int = 7) {
 
