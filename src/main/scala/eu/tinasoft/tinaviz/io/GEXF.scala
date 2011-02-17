@@ -160,13 +160,9 @@ class GEXF extends node.util.Actor {
       g += (id, "position", position)
       g += (id, "links", Map.empty[Int, Double])
 
-      for (a <- (n \\ "attvalue")) yield {
-        val res = attribute(a)
-        g += (id, res._1, res._2)
-      }
+      for (a <- (n \\ "attvalue")) g += (id, attribute(a)._1, attribute(a)._2)
     }
 
-    // for
     for (e <- (root \\ "edge")) {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
@@ -177,7 +173,7 @@ class GEXF extends node.util.Actor {
         g += (node1id, "links", g.getArray[Map[Int, Double]]("links")(node1id) + (node2id -> (e \ "@weight").text.toDouble))
       }
     }
-    g.computeAll
+    Graph.make(g.elements)
   }
 
   implicit def urlToString(url: java.net.URL): String = {

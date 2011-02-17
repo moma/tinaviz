@@ -178,7 +178,7 @@ class Main extends TApplet with Client {
 
     }
 
-
+    setFontSize(10)
     showSelectionCircle(selectionRadius)
 
   }

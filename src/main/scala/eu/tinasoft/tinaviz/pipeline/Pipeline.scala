@@ -396,7 +396,6 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
               // }
             }
         }
-
         // random repulse
         /*
           if (Maths.random() < 0.05f) {
@@ -410,7 +409,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
     }
     // TODO possible optimization: give some metrics
     val h = g + ("position" -> positions)
-    h.computeActivity(g)
+    h + ("activity" -> GraphMetrics.activity(h,g))
   }
 
   def transformColumn[T](column: String, filter: T => T) = {

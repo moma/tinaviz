@@ -8,8 +8,6 @@ package eu.tinasoft.tinaviz.graph
 import eu.tinasoft._
 import tinaviz.util.Color
 import tinaviz.util.Vector
-import tinaviz.graph.GraphMetrics
-import tinaviz.graph.GraphFunctions
 import tinaviz.io.json.Base64
 import collection.mutable.LinkedList
 

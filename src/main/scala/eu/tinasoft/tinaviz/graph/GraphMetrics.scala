@@ -11,7 +11,7 @@ object GraphMetrics  {
   /**
    * compute the amount of information added to thiq by g
    */
-  def activity(g:Graph,f: Graph): Graph = {
+  def activity(g:Graph,f: Graph): Double = {
     def max(x: Double, y: Double): Double = if (x < y) y else x
     var addNodes = 0.0
     var deletedNodes = 0.0
@@ -20,10 +20,10 @@ object GraphMetrics  {
     f.uuid.zipWithIndex foreach {
       case (u, i) => if (!g.has(u)) addNodes += 1.0
     }
-    uuid.zipWithIndex foreach {
+    g.uuid.zipWithIndex foreach {
       case (u, i) => if (!f.has(u)) deletedNodes += 1.0
     }
-    val activity1 = activity * entropy
+    val activity1 = g.activity * g.entropy
     val count = g.nbNodes + f.nbNodes
     val activity2 = if (count > 0) ((addNodes + deletedNodes) / count) else 0
     //val activity2 = if (count > 0) Maths.map(((addNodes + deletedNodes) / count),(0.0,1.0),(0.1,0.99)) else 0
@@ -35,7 +35,7 @@ object GraphMetrics  {
   /**
    * Compute the number of single nodes
    */
-  def nbSingles(g:Graph) = {
+  def nbSingles(g:Graph) : Int = {
     var s = 0
     g.links.foreach { case lnk => if (lnk.size == 0) s += 1 }
     s
@@ -44,7 +44,7 @@ object GraphMetrics  {
   /**
    * Compute the number of edges
    */
-  def nbEdges(g:Graph) = {
+  def nbEdges(g:Graph) : Int = {
     var s = 0
     g.links.foreach { case lnk => s += lnk.size }
     s
@@ -53,22 +53,20 @@ object GraphMetrics  {
   /**
    * Compute the number of nodes
    */
-  def nbNodes(g:Graph) = g.uuid.size
+  def nbNodes(g:Graph) : Int = g.uuid.size
 
   /**
    * Compute the out degree array
    */
-  def computeOutDegree(g:Graph) = {
-    val _outDegree = g.links.map {
-      case linkMap => linkMap.size
-    }
+  def outDegree(g:Graph) : Array[Int] = {
+    val _outDegree = g.links.map { case m => m.size }
     _outDegree.toArray
   }
 
   /**
    * Compute the in degree array
    */
-  def inDegree(g:Graph) = {
+  def inDegree(g:Graph) : Array[Int] = {
 
     val _inDegree = g.uuid.zipWithIndex.map {
       case (n, i) =>
