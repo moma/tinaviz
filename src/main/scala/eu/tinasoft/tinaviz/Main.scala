@@ -171,6 +171,9 @@ class Main extends TApplet with Client {
       case (position, i) =>
         val size = scene.nodeSizeLayer(i)
         val np = screenPosition(position._1 + size, position._2)
+
+        setFontSize((size * getZoom).toInt)
+
         text(scene.nodeLabelLayer(i), np._1, np._2)
 
     }

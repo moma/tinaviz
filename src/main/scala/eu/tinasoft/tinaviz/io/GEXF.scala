@@ -149,6 +149,8 @@ class GEXF extends node.util.Actor {
       g += (id, "label", label)
       g += (id, "color", color)
       g += (id, "selected", false)
+      g += (id, "highlighted", false)
+      g += (id, "state", 'serverChanged) // serverChanged, visualizationChanged, synchronizing, synchronized
       g += (id, "density", 1.0)
       g += (id, "rate", 1)
       g += (id, "size", 1.0)

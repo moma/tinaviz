@@ -136,12 +136,30 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           //println("mouse in screen: " + position + "    mouse in model: " + o)
           //println("selection radius: " + sr + "     scaled: " + r)
           kind match {
+            case 'Move =>
+                      var in = false
+                      // TODO a selection counter
+                      layoutCache = layoutCache + ("highlighted" -> layoutCache.highlighted.zipWithIndex.map {
+                        case (before, i) =>
+                          val l = layoutCache.size(i)   // maths hack
+                          val p = layoutCache.position(i)
+                          val ggg = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
+                          if (ggg) in = true
+                          ggg
+                      }.toArray)
+                      // get the current selection with less attributes
+                      // todo: update everything
+                      if (in) updateScreen
+
+
             case 'Click =>
               var in = false
               // TODO a selection counter
               layoutCache = layoutCache + ("selected" -> layoutCache.selected.zipWithIndex.map {
                 case (before, i) =>
-                  val touched = (layoutCache.position(i).dist(o) <= r)
+                  val l = layoutCache.size(i)   // maths hack
+                  val p = layoutCache.position(i)
+                  val touched = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
                   if (touched) in = true
                   (before, touched)
               }.map {
@@ -170,7 +188,10 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                 case any => "none"
               })
 
-              self ! "filter.view" -> data.get[String]("filter.view")
+              self ! "filter.view" -> (count match {
+                case 'Simple => data.get[String]("filter.view")
+                case 'Double => "meso"
+              })
 
             case 'Drag =>
             val pause = try {
