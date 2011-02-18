@@ -19,4 +19,15 @@ object GraphFunctions  {
      g + ("camera.position" -> (0.0,0.0))
   }
 
+  def isBiggerThan(g:Graph,i:Int,j:Int) = {
+    // the bigger win
+    if (g.weight(i) > g.weight(j)) {
+       true
+    } else if (g.weight(i) < g.weight(j)) {
+       false
+     } else {
+        // in the case of equal weights we fall back to label comparison, where the bigger win
+        (g.label(i).compareTo(g.label(j)) > 0)
+     }
+  }
 }

@@ -269,17 +269,8 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           case (j, weight) =>
           // in the case of mutual link, we have a bit of work to remove the link
             if (graph.hasThisLink(j, i)) {
-
-              // the bigger win
-              if (graph.weight(i) > graph.weight(j)) {
-                true
-              } else if (graph.weight(i) < graph.weight(j)) {
-                false
-                // in the case of equal weight (eg. in Documents), we fall back to label comparison
-              } else {
-               // the bigger win
-              (graph.label(i).compareTo(graph.label(j)) > 0)
-              }
+              // if i is bigger than j, we keep
+              GraphFunctions.isBiggerThan(graph,i,j)
               // in the case of non-mutual link (directed), there is nothing to do; we keep the link
             } else {
               true

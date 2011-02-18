@@ -87,10 +87,10 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         tinaviz ! 'open -> new java.net.URL(
-           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-         // "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+          //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
+          // "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
-           "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
         )
     }
   }
@@ -112,8 +112,9 @@ class Main extends TApplet with Client {
     setBackground(scene.background)
     if (debug) {
       setColor(scene.foreground)
-      text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + scene.nbNodes + " nodes, " + scene.nbEdges + " edges", 10f, 32f)
+      setFontSize(9)
+      //text("" + frameRate.toInt + " img/sec", 10f, 13f)
+      text("drawing " + scene.nbNodes + " nodes, " + scene.nbEdges + " edges ("+frameRate.toInt + " img/sec)", 10f, 13f)
     }
 
 
@@ -133,12 +134,11 @@ class Main extends TApplet with Client {
         val weight = scene.edgeWeightLayer(i)
         if (isVisible(psource) || isVisible(ptarget)) {
           val powd = distance(psource, ptarget)
-          val lod = if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 120), 1, 120).toInt else 1
-          setLod(lod)
+          setLod(if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 120), 1, 120).toInt else 1)
           lineColor(scene.edgeColorLayer(i))
           //Maths.map(weight, scene.)
           //println("weight: "+weight)
-         // lineThickness(weight * getScale)
+          // lineThickness(weight * getScale)
           drawCurve(source, target)
         }
     }
@@ -170,34 +170,37 @@ class Main extends TApplet with Client {
     // implicit def nodeListToOrderedNode(p: Int) = new OrderedNode(p)
     // util.Sorting.quickSort(visibleNodes)
 
+
+
     setColor(scene.labelColor)
     visibleNodes.foreach {
       case (p1, i) =>
         val r1 = scene.nodeSizeLayer(i)
         val x1 = p1._1 + r1
         val y1 = p1._2
-        val np = screenPosition(x1, y1)
-        val label = scene.nodeLabelLayer(i)
+        val np1 = screenPosition(x1, y1)
+        val l1 = scene.nodeLabelLayer(i)
 
         val h1 = (r1 * getZoom).toInt
         setFontSize(h1)
-        val w1 = textWidth(label)
+        val w1 = textWidth(l1) / getZoom
+        if (!visibleNodes.exists {
+          case (p2,j) =>
+            val r2 = scene.nodeSizeLayer(j)
+            val x2 = p2._1 + r2
+            val y2 = p2._2
+            val np2 = screenPosition(x2, y2)
+            val l2 = scene.nodeLabelLayer(j)
+            val h2 = (r2 * getZoom).toInt
+            setFontSize(h2)
+            val w2 = textWidth(l2) / getZoom //
 
-        if (! visibleNodes.exists {
-           case j =>
-             val p2 =
-              val r2 = scene.nodeSizeLayer(j)
-              val x2 = n2.screenPosition.x + r2
-              val y2 = n2.screenPosition.y
-              val h2 = n2.boxHeight
-              val w2 = n2.boxWidth
-              (((((x1 <= x2) && (x1 + w1 >= x2)) || ((x1 >= x2) && (x1 <= x2 + w2)))
-             && (((y1 <= y2) && (y1 + h1 >= y2)) || ((y1 >= y2) && (y1 <= y2 + h2))))
-             && n.compareTo(n2)) <= 0
-        }) text(label, np._1, np._2)
+            (((((x1 <= x2) && (x1 + w1 >= x2)) || ((x1 >= x2) && (x1 <= x2 + w2)))
+              && (((y1 <= y2) && (y1 + h1 >= y2)) || ((y1 >= y2) && (y1 <= y2 + h2))))
+              && (if (r1 > r2) true else (if (r1 < r2)  false else (w1 > w2))))
+        }) text(l1, np1._1, np1._2)
     }
 
-    setFontSize(10)
     showSelectionCircle(selectionRadius)
 
   }
@@ -210,9 +213,9 @@ class Main extends TApplet with Client {
     tinaviz ! "camera.position" -> value
   }
 
-  override def mouseUpdated(kind:Symbol,
-                            side:Symbol,
-                            count:Symbol,
+  override def mouseUpdated(kind: Symbol,
+                            side: Symbol,
+                            count: Symbol,
                             position: (Double, Double)) {
     tinaviz ! ("camera.mouse", kind, side, count, position)
   }
@@ -238,7 +241,7 @@ class Main extends TApplet with Client {
 
         }
       case x =>
-        //
+    //
     }
   }
 }
