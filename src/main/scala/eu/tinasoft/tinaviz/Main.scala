@@ -54,36 +54,25 @@ class Main extends TApplet with Client {
 
   override def setup(): Unit = {
     size(800, 600, PConstants.P2D)
-    //size(screenWidth - 400, screenHeight - 400, PConstants.P2D)
     frameRate(30)
-    //noSmooth
     smooth
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
     bezierDetail(18)
 
-    // set some defaults
     setDefault("scene", new Scene())
     setDefault("debug", false)
     setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
 
-
     addMouseWheelListener(this)
-
     Browser.start
-
 
     try {
       Browser.init(this, getParameter("js_context"))
       println("Connecting to web browser..")
     } catch {
-      //case exc:NullPointerException =>
-      // println("Null pointer exception: "+exc)
-      //case exc:JSException =>
-      //println("Javascript exception: "+exc)
-      //tinaviz ! 'openURL -> "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         tinaviz ! 'open -> new java.net.URL(
@@ -95,7 +84,6 @@ class Main extends TApplet with Client {
     }
   }
 
-
   override def draw(): Unit = {
 
     // send some values
@@ -106,22 +94,15 @@ class Main extends TApplet with Client {
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
 
-    // drawing
-    //smooth()
-
     setBackground(scene.background)
     if (debug) {
       setColor(scene.foreground)
       setFontSize(9)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + scene.nbNodes + " nodes, " + scene.nbEdges + " edges ("+frameRate.toInt + " img/sec)", 10f, 13f)
+      text("drawing " + scene.nbNodes + " nodes, " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
 
-
-    // TODO use an immutable Camera (this is the reason for the selection disk bug)
-    setupCamera
-
-
+    setupCamera  // TODO use an immutable Camera (this is the reason for the selection disk bug)
     setLod(32)
     lineThickness(1)
     noFill
@@ -166,38 +147,43 @@ class Main extends TApplet with Client {
         }
     }
 
-    // class OrderedNode(val nodeId: Int) extends Ordered[Int] { def compare(that: Int) = person.name.compare(that.name) }
-    // implicit def nodeListToOrderedNode(p: Int) = new OrderedNode(p)
-    // util.Sorting.quickSort(visibleNodes)
+    def compare(i:Int, j: Int) : Boolean = {
+        val r1 = scene.nodeSizeLayer(i)
+        val l1 = scene.nodeLabelLayer(i)
+        val r2 = scene.nodeSizeLayer(j)
+        val l2 = scene.nodeLabelLayer(j)
+        val rez = if (r1 > r2) true else (if (r1 < r2) false else (scene.nodeLabelLayer(i).compareTo(scene.nodeLabelLayer(j)) < 0))
+        //println("compare("+l1+","+l2+")="+rez)
+        rez
+    }
 
+    val sortedLabelIDs = visibleNodes.map { _._2 }.toList.sort(compare).toArray
 
-
-    setColor(scene.labelColor)
-    visibleNodes.foreach {
-      case (p1, i) =>
+    setColor(scene.labelColor) // default color
+    sortedLabelIDs.foreach {
+      case (i) =>
+        val p1 = scene.nodePositionLayer(i)
         val r1 = scene.nodeSizeLayer(i)
         val x1 = p1._1 + r1
         val y1 = p1._2
         val np1 = screenPosition(x1, y1)
         val l1 = scene.nodeLabelLayer(i)
-
-        val h1 = (r1 * getZoom).toInt
-        setFontSize(h1)
-        val w1 = textWidth(l1) / getZoom
-        if (!visibleNodes.exists {
-          case (p2,j) =>
+        val h1 = setFontSize((r1 * getZoom).toInt)
+         //println("r1: "+r1)
+        val w1 = textWidth(l1) /// getZoom
+        if (!sortedLabelIDs.exists {
+          case (j) =>
+            val p2 = scene.nodePositionLayer(j)
             val r2 = scene.nodeSizeLayer(j)
             val x2 = p2._1 + r2
             val y2 = p2._2
             val np2 = screenPosition(x2, y2)
             val l2 = scene.nodeLabelLayer(j)
-            val h2 = (r2 * getZoom).toInt
-            setFontSize(h2)
-            val w2 = textWidth(l2) / getZoom //
-
+            val h2 = setFontSize((r2 * getZoom).toInt)
+            val w2 = textWidth(l2) /// getZoom //
             (((((x1 <= x2) && (x1 + w1 >= x2)) || ((x1 >= x2) && (x1 <= x2 + w2)))
               && (((y1 <= y2) && (y1 + h1 >= y2)) || ((y1 >= y2) && (y1 <= y2 + h2))))
-              && (if (r1 > r2) true else (if (r1 < r2)  false else (w1 > w2))))
+              && (if (r1 > r2) true else (if (r1 < r2) false else (scene.nodeLabelLayer(j).compareTo(scene.nodeLabelLayer(i)) < 0))))
         }) text(l1, np1._1, np1._2)
     }
 
