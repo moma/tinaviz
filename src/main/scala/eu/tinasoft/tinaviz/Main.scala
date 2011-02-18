@@ -166,16 +166,35 @@ class Main extends TApplet with Client {
         }
     }
 
+    // class OrderedNode(val nodeId: Int) extends Ordered[Int] { def compare(that: Int) = person.name.compare(that.name) }
+    // implicit def nodeListToOrderedNode(p: Int) = new OrderedNode(p)
+    // util.Sorting.quickSort(visibleNodes)
+
     setColor(scene.labelColor)
     visibleNodes.foreach {
-      case (position, i) =>
-        val size = scene.nodeSizeLayer(i)
-        val np = screenPosition(position._1 + size, position._2)
+      case (p1, i) =>
+        val r1 = scene.nodeSizeLayer(i)
+        val x1 = p1._1 + r1
+        val y1 = p1._2
+        val np = screenPosition(x1, y1)
+        val label = scene.nodeLabelLayer(i)
 
-        setFontSize((size * getZoom).toInt)
+        val h1 = (r1 * getZoom).toInt
+        setFontSize(h1)
+        val w1 = textWidth(label)
 
-        text(scene.nodeLabelLayer(i), np._1, np._2)
-
+        if (! visibleNodes.exists {
+           case j =>
+             val p2 =
+              val r2 = scene.nodeSizeLayer(j)
+              val x2 = n2.screenPosition.x + r2
+              val y2 = n2.screenPosition.y
+              val h2 = n2.boxHeight
+              val w2 = n2.boxWidth
+              (((((x1 <= x2) && (x1 + w1 >= x2)) || ((x1 >= x2) && (x1 <= x2 + w2)))
+             && (((y1 <= y2) && (y1 + h1 >= y2)) || ((y1 >= y2) && (y1 <= y2 + h2))))
+             && n.compareTo(n2)) <= 0
+        }) text(label, np._1, np._2)
     }
 
     setFontSize(10)

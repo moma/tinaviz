@@ -44,7 +44,7 @@ class Fonts(val p: PApplet,
 class TApplet extends PApplet with MouseWheelListener {
 
   val minZoom = 0.1
-  val maxZoom = 300.0
+  val maxZoom = 500.0
 
   private val _fonts = new Fonts(this)
   private val _camera = new Camera()
