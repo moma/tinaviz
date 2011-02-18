@@ -108,17 +108,17 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           val r = (sr / cz) / 2.0
           kind match {
             case 'Move =>
-                      var in = false
+                      var changed = false
                       // TODO a selection counter
                       layoutCache = layoutCache + ("highlighted" -> layoutCache.highlighted.zipWithIndex.map {
                         case (before, i) =>
                           val l = layoutCache.size(i)   // maths hack
                           val p = layoutCache.position(i)
                           val ggg = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
-                          if (ggg) in = true
+                          if (ggg != before) changed = true
                           ggg
                       }.toArray)
-                      if (in) updateScreen
+                      if (changed) updateScreen
 
             case 'Click =>
               var in = false

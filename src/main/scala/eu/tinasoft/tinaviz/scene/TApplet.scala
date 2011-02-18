@@ -17,18 +17,16 @@ import tinaviz.util.Vector._
 
 class Fonts(val p: PApplet,
             val fontName: String = "Arial",
-            val size: Int = 95,
+            val size: Int = 100,
             val defaultFontSize: Int = 12,
-            val min: Int = 7) {
+            val min: Int = 6) {
 
-  val fonts = for (i <- List.range(min, size+1))
-  yield p.createFont(fontName, i, true)
+  val fonts = for (i <- List.range(1, size+1)) yield p.createFont(fontName, i, true)
 
   val defaultFont = fonts(defaultFontSize)
 
-  def get(s: Int) = {
-    fonts(if (s > min) (if (s < size-1) s else (size-1)) else 1)
-  }
+  def get(s: Int) = fonts(if (s < min) min else (if (s >= size) (size - 1) else s))
+
 }
 
 /**
