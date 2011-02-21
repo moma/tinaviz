@@ -185,7 +185,11 @@ class TApplet extends PApplet with MouseWheelListener {
     textFont(fsz._1)
     fsz._2
   }
-
+  protected def tryFontSize(size: Int) : Int = {
+    val fsz = _fonts.get(size.toInt)
+    //textFont(fsz._1)
+    fsz._2
+  }
   protected def setColor(c: Color) = {
     fill(c.h.toFloat, c.s.toFloat, c.b.toFloat, c.a.toFloat)
   }

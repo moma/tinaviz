@@ -79,7 +79,8 @@ class Main extends TApplet with Client {
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
           // "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
-          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+           "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          //"file:///home/jbilcke/Desktop/mini.gexf"
         )
     }
   }
@@ -169,9 +170,9 @@ class Main extends TApplet with Client {
         val np1 = screenPosition(x1, y1)
         val l1 = scene.nodeLabelLayer(i)
         val h1 = setFontSize((r1 * getZoom).toInt)
-         //println("r1: "+r1)
         val w1 = textWidth(l1) /// getZoom
-        if (!sortedLabelIDs.exists {
+        // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
+        val weHaveACollision = sortedLabelIDs.exists {
           case (j) =>
             val p2 = scene.nodePositionLayer(j)
             val r2 = scene.nodeSizeLayer(j)
@@ -181,10 +182,14 @@ class Main extends TApplet with Client {
             val l2 = scene.nodeLabelLayer(j)
             val h2 = setFontSize((r2 * getZoom).toInt)
             val w2 = textWidth(l2) /// getZoom //
-            (((((x1 <= x2) && (x1 + w1 >= x2)) || ((x1 >= x2) && (x1 <= x2 + w2)))
-              && (((y1 <= y2) && (y1 + h1 >= y2)) || ((y1 >= y2) && (y1 <= y2 + h2))))
-              && (if (r1 > r2) true else (if (r1 < r2) false else (scene.nodeLabelLayer(j).compareTo(scene.nodeLabelLayer(i)) < 0))))
-        }) text(l1, np1._1, np1._2)
+            val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1)) || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2))) && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2)) || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
+            val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (scene.nodeLabelLayer(j).compareTo(scene.nodeLabelLayer(i)) > 0))
+            //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
+           if (i==j) false else (weTouchSomething && whichIsLarger)
+        }
+         setFontSize((r1 * getZoom).toInt)
+         //println("weHaveACollision? "+weHaveACollision)
+        if (!weHaveACollision) text(l1, np1._1, np1._2)
     }
 
     showSelectionCircle(selectionRadius)
