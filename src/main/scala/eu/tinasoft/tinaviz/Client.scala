@@ -168,35 +168,34 @@ trait Client {
     
   }
   
-  def selectNodesByLabel(matchLabel:String, matchCategory:String, matchMode:String, viewToSearch:String, center:Boolean) : Unit = {
-    if (viewToSearch == null || matchLabel == null || matchCategory == null || matchMode == null) {
-      System.out.println("selectNodesByLabel(" + matchLabel + ", " + matchCategory + ", " + matchMode + ", " + viewToSearch + ", " + center + ")");
+  def selectByPattern(pattern:String, patternMode:String) : Unit = {
+    
+    if (pattern == null || patternMode == null) {
+      System.out.println("selectByPattern(" + pattern + ", " + patternMode + ")");
       return;
     }
     // shutdown the "center on visualization" mode
 
-    if (matchLabel.isEmpty()) {
+    if (pattern.isEmpty()) {
       return;
     }
-
-    if (viewToSearch.equalsIgnoreCase("visualization") || viewToSearch.isEmpty()) {
-      System.out.println("calling selectFromNodes on output graph..");
-      //selectFromNodes(
-      //        getView().getOutputGraph().getNodesByLabel(
-      //        matchLabel, matchMode));
-    } else {
-      System.out.println("calling selectFromNodes on any graph..");
-      //selectFromNodes(
-      //        getView(viewToSearch).getNodesByLabel(
-      //        matchLabel, matchCategory, matchMode));
-    }
-
-    //Visualization.centerOnSelection = center;
-    //redrawLater();
-
+    tinaviz ! 'selectByPattern -> pattern
   }
   
+  def highlightByPattern(pattern:String, patternMode:String) : Unit = {
+    
+    if (pattern == null || patternMode == null) {
+      System.out.println("highlightByPattern(" + pattern + ", " + patternMode + ")");
+      return;
+    }
+    // shutdown the "center on visualization" mode
 
+    if (pattern.isEmpty()) {
+      return;
+    }
+    tinaviz ! 'highlightByPattern -> pattern
+  }
+  
   /**
    * TODO fix it (blocking call!)
    */

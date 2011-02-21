@@ -30,8 +30,20 @@ class GEXF extends node.util.Actor {
         case url: URL => println("Loading " + url); reply(load(url))
         case xml: String => reply(load(xml))
 
-        case graph: Graph =>
-          val xml = ""
+        case graph: Graph => reply(
+           <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
+              <graph type="static">
+                 <attributes class="node" type="dynamic">
+                 <attribute id="0" title="category" type="string"/>
+                 <attribute id="1" title="proximity" type="float"/>
+                 </attributes>
+              <nodes>
+                 </nodes>
+              <edges>
+              </edges>
+              </graph>
+           </gexf>
+         )
           /*
            <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
            <graph type="static">
@@ -62,8 +74,6 @@ class GEXF extends node.util.Actor {
            </graph>
            </gexf>
            */
-          sender ! 'gexfExport -> xml
-          exit
       }
     }
   }
@@ -177,8 +187,8 @@ class GEXF extends node.util.Actor {
   }
 
   implicit def urlToString(url: java.net.URL): String = {
-    val b = new StringBuilder;
-    Source.fromURL(url).foreach(b.append);
+    val b = new StringBuilder
+    Source.fromURL(url).foreach(b.append)
     b.toString
   }
 }

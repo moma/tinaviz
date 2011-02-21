@@ -95,11 +95,24 @@ class Server extends node.util.Actor {
         //pipelineBusy = false
         //self ! "frameRate" -> properties("frameRate") // force relaunching
 
+        case x:scala.xml.Elem =>
+          println("Got XML: "+x)
+          
+        // import/export functions
+        case ("export","gexf") => (new GEXF) ! output
+        case ('open, pathOrURL: Any) => (new GEXF) ! pathOrURL
+
         case "recenter" =>
           pipeline ! "recenter"
 
         case ("select", uuid) =>
           pipeline ! "select" -> uuid
+          
+        case('selectByPattern,pattern:String) =>
+          pipeline ! 'selectByPattern -> pattern
+          
+        case('highlightByPattern,pattern:String) =>
+          pipeline ! 'highlightByPattern -> pattern
 
         case ('getNodes,view,category) =>
           println("Server: asekd for 'getNodes "+view+" "+category)
@@ -150,8 +163,6 @@ class Server extends node.util.Actor {
           }
 
 
-        case ('open, any: Any) => (new GEXF) ! any
-        // cb ! true
 
         case key: String =>
           reply(properties(key))

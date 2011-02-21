@@ -19,7 +19,7 @@ class Fonts(val p: PApplet,
             val fontName: String = "Arial",
             val size: Int = 100,
             val defaultFontSize: Int = 12,
-            val min: Int = 6) {
+            val min: Int = 8) {
 
   val fonts = for (i <- List.range(1, size+1)) yield p.createFont(fontName, i, true)
 

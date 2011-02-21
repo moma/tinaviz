@@ -93,6 +93,20 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
           }
           reply(result)
 
+        case('selectByPattern,pattern:String) =>
+            layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
+                case label => if (pattern.isEmpty) false else (label contains pattern)
+            })
+            Browser ! "_callbackSelectionChanged" -> "left"
+            self ! "filter.view" -> data.get[String]("filter.view")
+            
+        case('highlightByPattern,pattern:String) =>
+            layoutCache = layoutCache + ("highlighted" -> layoutCache.label.map {
+                case label => if (pattern.isEmpty) false else (label contains pattern)
+            })
+            //Browser ! "_callbackSelectionChanged" -> "left"
+            self ! "filter.view" -> data.get[String]("filter.view")
+          
         case "recenter" =>
           println("recentering now..")
           layoutCache = GraphFunctions.recenter(layoutCache)
