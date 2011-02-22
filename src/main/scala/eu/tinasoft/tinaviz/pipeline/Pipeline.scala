@@ -97,7 +97,12 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
             layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
                 case label => if (pattern.isEmpty) false else (label contains pattern)
             })
-            Browser ! "_callbackSelectionChanged" -> "left"
+          
+              val selection = layoutCache.selectionAttributes
+              // todo: update everything
+
+              Browser ! "_callbackSelectionChanged" -> (selection, "left")
+
             self ! "filter.view" -> data.get[String]("filter.view")
             
         case('highlightByPattern,pattern:String) =>
