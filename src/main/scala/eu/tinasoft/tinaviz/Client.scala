@@ -3,12 +3,11 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.Server
+package eu.tinasoft.tinaviz
 
 import actors._
 import Actor._
 import eu.tinasoft._
-import tinaviz.Server
 import tinaviz.io.json.Json
 
 trait Client {
@@ -221,7 +220,7 @@ trait Client {
         throw new Exception("couldn't find neighbourList for any of "+rawJSONList)
     }
     // neighbourList
-    Browser ! "_callbackGetNeighbourhood" -> (todoList, neighbours)
+    // Browser ! "_callbackGetNeighbourhood" -> (todoList, neighbours)
 
     // _callbackGetNeighbourhood = function(selection_list_str,neighbour_node_list_str) {
     ""

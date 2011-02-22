@@ -19,7 +19,7 @@ import Actor._
 import io.Source
 
 import xml._
-import java.net.URL
+import java.net.{URLConnection, URL, Authenticator, PasswordAuthentication}
 
 class GEXF extends node.util.Actor {
   start
@@ -27,10 +27,18 @@ class GEXF extends node.util.Actor {
   def act() {
     while (true) {
       receive {
-        case url: URL => println("Loading " + url); reply(load(url))
-        case xml: String => reply(load(xml))
+        case url: URL => {
+          println("Connecting to " + url)
+          val conn = url.openConnection
+          println("Reading graph stream, please wait..")
+          reply(XML.load(conn.getInputStream))
+        }
+        case str: String => {
+          println("Reading graph string, please wait..")
+          reply(XML.load(str))
+        }
 
-        case graph: Graph => reply(
+        case graph: Graph => reply (
            <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
               <graph type="static">
                  <attributes class="node" type="dynamic">
@@ -49,9 +57,10 @@ class GEXF extends node.util.Actor {
                  </node>
               }</nodes>
               <edges>{ 
-               var edgeIndex = 0; for ((links,nodeIndex) <- graph.links.zipWithIndex; (target, weight) <- links) yield {
+               var edgeIndex = 0
+               for ((links,nodeIndex) <- graph.links.zipWithIndex; (target, weight) <- links) yield {
                  edgeIndex += 1
-                 <edge id={nodeIndex} source={graph.uuid(nodeIndex)} target={graph.uuid(target)} weight={weight}>
+                 <edge id={ nodeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } weight={ weight.toString }>
                  </edge>
                 }
               }</edges>
@@ -63,8 +72,7 @@ class GEXF extends node.util.Actor {
   }
 
 
-  def load(rawXML: String) = {
-    val root = xml.XML.loadString(rawXML)
+  def load(root:Elem) = {
     var properties = Map(
       "url" -> ""
     )
@@ -172,9 +180,11 @@ class GEXF extends node.util.Actor {
     Graph.make(g.elements)
   }
 
+  
+/*
   implicit def urlToString(url: java.net.URL): String = {
     val b = new StringBuilder
     Source.fromURL(url).foreach(b.append)
     b.toString
-  }
+  }*/
 }

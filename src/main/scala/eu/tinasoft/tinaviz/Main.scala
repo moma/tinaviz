@@ -27,8 +27,8 @@ object Main {
    */
   def main(args: Array[String]): Unit = {
     var frame = new JFrame("TinaViz")
-    var applet = new Main()
-    frame.getContentPane().add(applet)
+    var applet = new Main
+    frame.getContentPane.add(applet)
     applet.init
     frame.pack
     frame.setVisible(true)
@@ -61,7 +61,7 @@ class Main extends TApplet with Client {
     rectMode(PConstants.CENTER)
     bezierDetail(18)
 
-    setDefault("scene", new Scene())
+    setDefault("scene", new Scene)
     setDefault("debug", false)
     setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
@@ -75,7 +75,7 @@ class Main extends TApplet with Client {
     } catch {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
-        tinaviz ! 'open -> new java.net.URL(
+          Server ! 'open -> new java.net.URL(
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
           // "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
@@ -88,7 +88,7 @@ class Main extends TApplet with Client {
   override def draw(): Unit = {
 
     // send some values
-    tinaviz ! "frameRate" -> frameRate.toInt
+    Server ! "frameRate" -> frameRate.toInt
 
     // get some values in a non-blocking way (using futures)
     val scene = getIfPossible[Scene]("scene")
@@ -197,30 +197,30 @@ class Main extends TApplet with Client {
   }
 
   override def zoomUpdated(value: Double) {
-    tinaviz ! "camera.zoom" -> value
+    Server ! "camera.zoom" -> value
   }
 
   override def positionUpdated(value: (Double, Double)) {
-    tinaviz ! "camera.position" -> value
+    Server ! "camera.position" -> value
   }
 
   override def mouseUpdated(kind: Symbol,
                             side: Symbol,
                             count: Symbol,
                             position: (Double, Double)) {
-    tinaviz ! ("camera.mouse", kind, side, count, position)
+    Server ! ("camera.mouse", kind, side, count, position)
   }
 
 
   override def keyPressed() {
     key match {
-      case 'p' => tinaviz ! "pause" -> 'toggle
-      case 'a' => tinaviz ! "pause" -> 'toggle
-      case 'n' => tinaviz ! "drawing.nodes" -> 'toggle
-      case 'e' => tinaviz ! "drawing.edges" -> 'toggle
-      case 'c' => tinaviz ! "filter.node.category" -> 'toggle
-      case 'v' => tinaviz ! "filter.view" -> 'toggle
-      case 'r' => tinaviz ! "recenter"
+      case 'p' => Server ! "pause" -> 'toggle
+      case 'a' => Server ! "pause" -> 'toggle
+      case 'n' => Server ! "drawing.nodes" -> 'toggle
+      case 'e' => Server ! "drawing.edges" -> 'toggle
+      case 'c' => Server ! "filter.node.category" -> 'toggle
+      case 'v' => Server ! "filter.view" -> 'toggle
+      case 'r' => Server ! "recenter"
       case PConstants.CODED =>
         val amount = 15
         keyCode match {
