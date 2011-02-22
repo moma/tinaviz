@@ -188,6 +188,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case v: Color => List[Color](v).toArray
           case v: Symbol => List[Symbol](v).toArray
           case v: (Double, Double) => List[(Double, Double)](v).toArray
+          case v: Array[Symbol] => List[Array[Symbol]](v).toArray
           case v: Array[Double] => List[Array[Double]](v).toArray
           case v: Array[Int] => List[Array[Int]](v).toArray
           case v: List[Double] => List[List[Double]](v).toArray
@@ -482,7 +483,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             }
         }
         ("links", newEntries.toArray)
-
+      case (key: String, entries: Array[Symbol]) =>
+        (key, entries.zipWithIndex.filter {
+          case (e, i) => conv(i) >= 0
+        }.map(_._1).toArray)
       case (key: String, entries: Array[Boolean]) =>
         (key, entries.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0

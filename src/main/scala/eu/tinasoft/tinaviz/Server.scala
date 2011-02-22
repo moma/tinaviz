@@ -20,7 +20,7 @@ import Actor._
 
 case class Step(val step: Symbol)
 
-class Server extends node.util.Actor {
+object Server extends node.util.Actor {
 
   val defaultProperties: Map[String, Any] = Map(
     // global real FPS
@@ -50,7 +50,7 @@ class Server extends node.util.Actor {
     "views.macro.debug" -> false,
 
     //  workflow
-    //"pipeline" -> List ("viewFilter", "nodeWeightFilter", "edgeWeightFilter"),
+    //"Pipeline" -> List ("viewFilter", "nodeWeightFilter", "edgeWeightFilter"),
 
     // final scene
     "scene" -> new Scene()
@@ -58,8 +58,6 @@ class Server extends node.util.Actor {
 
   var properties: Map[String, Any] = defaultProperties
 
-  val pipeline = new Pipeline(this)
-  var pipelineBusy = true
 
   var input = new Graph()
   var output = new Graph()
@@ -86,13 +84,13 @@ class Server extends node.util.Actor {
         //if (sender.receiver == sketcher) {
           properties = defaultProperties
           input = new Graph(properties ++ g.elements)
-          pipeline ! input
-        //pipelineBusy = false
+          Pipeline ! input
+        //PipelineBusy = false
 
         case (graph: Graph, scene: Scene) =>
           properties += "scene" -> scene
           output = graph
-        //pipelineBusy = false
+        //PipelineBusy = false
         //self ! "frameRate" -> properties("frameRate") // force relaunching
 
         case x:scala.xml.Elem =>
@@ -103,26 +101,26 @@ class Server extends node.util.Actor {
         case ('open, pathOrURL: Any) => (new GEXF) ! pathOrURL
 
         case "recenter" =>
-          pipeline ! "recenter"
+          Pipeline ! "recenter"
 
         case ("select", uuid) =>
-          pipeline ! "select" -> uuid
+          Pipeline ! "select" -> uuid
           
         case('selectByPattern,pattern:String) =>
-          pipeline ! 'selectByPattern -> pattern
+          Pipeline ! 'selectByPattern -> pattern
           
         case('highlightByPattern,pattern:String) =>
-          pipeline ! 'highlightByPattern -> pattern
+          Pipeline ! 'highlightByPattern -> pattern
 
         case ('getNodes,view,category) =>
           println("Server: asekd for 'getNodes "+view+" "+category)
-          reply(pipeline !? ('getNodes,view,category))
+          reply(Pipeline !? ('getNodes,view,category))
 
         case ('getNeighbourhood,view,todoList) =>
-          reply(pipeline !? ('getNeighbourhood,view,todoList))
+          reply(Pipeline !? ('getNeighbourhood,view,todoList))
 
         case ('getNodeAttributes,uuid:String) =>
-          reply (pipeline !? 'getNodesAttributes -> uuid)
+          reply (Pipeline !? 'getNodesAttributes -> uuid)
 
         // TODO do something for this, it looks a bit creepy
         case ("filter.node.weight.min", value: Double) =>
@@ -150,16 +148,16 @@ class Server extends node.util.Actor {
           reply(properties("filter.edge.weight").asInstanceOf[(Double, Double)]._2)
 
         case ("camera.mouse", kind, side, count, position) =>
-          pipeline ! ("camera.mouse", kind, side, count, position)
+          Pipeline ! ("camera.mouse", kind, side, count, position)
 
         case ('updated, key: String, value: Any, previous: Any) =>
         // log("ignoring update of "+key)
-        //println("updating pipeline with this data: "+key+" -> "+value)
+        //println("updating Pipeline with this data: "+key+" -> "+value)
           key match {
             //case "camera.zoom" =>
             //case "camera.position" =>
             case "frameRate" =>
-            case any => pipeline ! key -> value // update the pipeline
+            case any => Pipeline ! key -> value // update the Pipeline
           }
 
 

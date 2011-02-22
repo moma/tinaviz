@@ -10,7 +10,7 @@ import eu.tinasoft._
 import tinaviz.graph.Graph
 import tinaviz.graph.GraphMetrics
 import tinaviz.graph.GraphFunctions
-
+import tinaviz.Server
 import tinaviz.sketch.Sketch
 import tinaviz.sketch.Sketch._
 import tinaviz.scene.Scene
@@ -24,7 +24,7 @@ import compat.Platform
 /**
  *
  */
-class Pipeline(val actor: Actor) extends node.util.Actor {
+object Pipeline extends node.util.Actor {
 
   start
 
@@ -98,10 +98,10 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
                 case label => if (pattern.isEmpty) false else (label contains pattern)
             })
           
-              val selection = layoutCache.selectionAttributes
-              // todo: update everything
+            val selection = layoutCache.selectionAttributes
+            // todo: update everything
 
-              Browser ! "_callbackSelectionChanged" -> (selection, "left")
+            Browser ! "_callbackSelectionChanged" -> (selection, "left")
 
             self ! "filter.view" -> data.get[String]("filter.view")
             
@@ -299,7 +299,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
     }.toArray)
     
     var r = Set.empty[Int]
-    val g = graph + ("links" -> f.updateStatus.zipWithIndex.map {
+    val g = graph + ("updateStatus" -> f.updateStatus.zipWithIndex.map {
        //  'outdated) // outdated, updating, updated, failure
       //  'saved) // saving, saved
        case ('outdated, i) => 
@@ -313,7 +313,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
     
     sketch.update(h)
     val msg = (h, sketch: Scene)
-    actor ! msg
+    Server ! msg
   }
 
   def applyCategory(g: Graph): Graph = {

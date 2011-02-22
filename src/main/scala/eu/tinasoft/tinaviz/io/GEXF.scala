@@ -35,29 +35,26 @@ class GEXF extends node.util.Actor {
               <graph type="static">
                  <attributes class="node" type="dynamic">
                  <attribute id="0" title="category" type="string"/>
-                 <attribute id="1" title="proximity" type="float"/>
                  </attributes>
-              <nodes>
-                 {
-                   for ((id,i) <- graph.uuid.zipWithIndex) yield 
-
-                 <node id={id} label={graph.label(i)}>
-                   {
-                     val p = graph.position(i)
-                     
-                   }
+              <nodes>{ 
+               for ((nodeUUID,nodeIndex) <- graph.uuid.zipWithIndex) yield 
+                 <node id={nodeUUID} label={ graph.label(nodeIndex) }>
+                   { val p = graph.position(nodeIndex) }
                    <!--<viz:color b={node.color._1} g={node.color._2} r={node.color._3}/>-->
                    <!--<viz:position x={graph.position(i)._1} y={graph.position(i)._2} z="0.0"/>-->
                    <!--<viz:size value={graph.size(i)}/>-->
                    <attvalues>
-                     <attvalue id="0" value="project"/>
-                     <attvalue id="1" value="0.1"/>
+                     <attvalue id="0" value={ graph.category(nodeIndex) }/>
                    </attvalues>
                  </node>
-                 }
-              </nodes>
-              <edges>
-              </edges>
+              }</nodes>
+              <edges>{ 
+               var edgeIndex = 0; for ((links,nodeIndex) <- graph.links.zipWithIndex; (target, weight) <- links) yield {
+                 edgeIndex += 1
+                 <edge id={nodeIndex} source={graph.uuid(nodeIndex)} target={graph.uuid(target)} weight={weight}>
+                 </edge>
+                }
+              }</edges>
               </graph>
            </gexf>
          )
@@ -147,8 +144,8 @@ class GEXF extends node.util.Actor {
       g += (id, "color", color)
       g += (id, "selected", false)
       g += (id, "highlighted", false)
-      g += (id, "updateStatus", 'outdated) // outdated, updating, updated, failure
-      g += (id, "saveSatatus", 'saved) // saving, saved
+      g += (id, "updateStatus", 'outdated ) // outdated, updating, updated, failure
+      g += (id, "saveSatatus", 'saved ) // saving, saved
      
       g += (id, "density", 1.0)
       g += (id, "rate", 1)

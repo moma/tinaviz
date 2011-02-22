@@ -3,21 +3,15 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz
+package eu.tinasoft.Server
 
 import actors._
 import Actor._
 import eu.tinasoft._
-import tinaviz.io.JsonParser
-import eu.tinasoft.tinaviz.io.Browser
-import eu.tinasoft.tinaviz.io.json.Json
-//import scala.util.parsing.json.JSONObject
+import tinaviz.Server
 
 trait Client {
   
-  val tinaviz : Actor = new Server()
-
-
   private var cached : Map[String,(Any,Future[Any])] = Map.empty
 
   /**
@@ -36,7 +30,7 @@ trait Client {
     tp._2 match {
       case null =>
         //if (key.equals("scene")) println("asking for future!")
-        (tinaviz !! key) match {
+        (Server !! key) match {
           case f:Future[T] =>
             //if (key.equals("scene")) println("got future! storing it..")
             future = f
@@ -67,7 +61,7 @@ trait Client {
 // Called by Javascript
 
   def togglePause = {
-    (tinaviz !? "pause" -> 'toggle) match {
+    (Server !? "pause" -> 'toggle) match {
       case b:Boolean => b
       case x => false
     }
@@ -75,11 +69,11 @@ trait Client {
 
   def select(id:String) = {
     println("JavaScript asked for select("+id+")")
-    tinaviz ! 'select -> id
+    Server ! 'select -> id
     true
   }
   def unselect = {
-    tinaviz ! 'unselect
+    Server ! 'unselect
     true
   }
 
@@ -96,7 +90,7 @@ trait Client {
    //loop {
    receive {
    case any =>
-   Browser ! "callCb" -> Map( "cb" -> cb, "data" -> (tinaviz !? key))
+   Browser ! "callCb" -> Map( "cb" -> cb, "data" -> (Server !? key))
    }
    //}
    }
@@ -107,16 +101,16 @@ trait Client {
   // { action: unselect }
 
   def openURI(url:String) = {
-      tinaviz ! 'open -> new java.net.URL(url)
+      Server ! 'open -> new java.net.URL(url)
     true
   }
   def openString(str:String) = {
-      tinaviz ! 'open -> str
+      Server ! 'open -> str
     true
   }
   def set(key:String, value:Any) = {
     println("JavaScript asked for set("+key+","+value+")")
-    tinaviz ! key -> value
+    Server ! key -> value
     true
   }
 
@@ -124,22 +118,22 @@ trait Client {
     println("JavaScript asked for setAs(key:"+key+", value:"+value+", t:"+t+")")
     t match {
        case "Int" => 
-       tinaviz ! key -> value.toString.toInt
+       Server ! key -> value.toString.toInt
        case "Float" => 
-       tinaviz ! key -> value.toString.toFloat
+       Server ! key -> value.toString.toFloat
        case "Double" => 
-       tinaviz ! key -> value.toString.toDouble
+       Server ! key -> value.toString.toDouble
        case "Boolean" =>
         println("converting "+key+" : "+value+" to Boolean")
-        tinaviz ! key -> value.toString.toBoolean
-       case "String" => tinaviz ! key -> value.toString
-       case x => tinaviz ! key -> value
+        Server ! key -> value.toString.toBoolean
+       case "String" => Server ! key -> value.toString
+       case x => Server ! key -> value
     }
     null
   }
   def get(key:String) = {
     println("JavaScript asked of get("+key+")")
-    (tinaviz !? key)
+    (Server !? key)
   }
   /*
    def msgCb(action:String, args:String, cbId:Int) {
@@ -150,7 +144,7 @@ trait Client {
    case msg => Browser ! "callCb" -> Map( "cb" -> cbId, "data" -> msg)
    }
    }
-   tinaviz ! ('js, action, Json.parse(args), cb)
+   Server ! ('js, action, Json.parse(args), cb)
    }*/
 
   // warning: synchronous..
@@ -164,7 +158,7 @@ trait Client {
     val res = JsonParser.parse(str)
     
     if (!res.isDefined) throw new IllegalArgumentException("Error, invalid JSON!")
-    tinaviz ! 'updateNode -> res.get
+    Server ! 'updateNode -> res.get
     
   }
   
@@ -179,7 +173,7 @@ trait Client {
     if (pattern.isEmpty()) {
       return;
     }
-    tinaviz ! 'selectByPattern -> pattern
+    Server ! 'selectByPattern -> pattern
   }
   
   def highlightByPattern(pattern:String, patternMode:String) : Unit = {
@@ -193,7 +187,7 @@ trait Client {
     if (pattern.isEmpty()) {
       return;
     }
-    tinaviz ! 'highlightByPattern -> pattern
+    Server ! 'highlightByPattern -> pattern
   }
   
   /**
@@ -201,7 +195,7 @@ trait Client {
    */
   def getNodeAttributes(view:String, uuid:String) : String = {
     //System.out.println("getting node by UUID: " + uuid)
-    val attributes : String = (tinaviz !? 'getNodeAttributes -> uuid) match {
+    val attributes : String = (Server !? 'getNodeAttributes -> uuid) match {
       case m:Map[Any,Any] =>
          Json.build(m).toString
 
@@ -217,7 +211,7 @@ trait Client {
     val todoList = Json.parse(rawJSONList)
 
     println("TODO get the neighbourListof "+todoList+"")
-    val neighbours = (tinaviz !? ('getNeighbourhood,view,todoList)) match {
+    val neighbours = (Server !? ('getNeighbourhood,view,todoList)) match {
       case m:Map[Any,Map[String,Any]] =>
           println("TODO building neighbours JSON reply..")
          Json.build(m).toString
@@ -235,7 +229,7 @@ trait Client {
   // TODO should be asynchronous
   def getNodes(view:String, category:String) : String = {
     //System.out.println("getting node by UUID: " + uuid)
-    val nodes : String = (tinaviz !? ('getNodes,view,category)) match {
+    val nodes : String = (Server !? ('getNodes,view,category)) match {
       case m:Map[String,Map[String,Any]] =>
         println("Server replied with some node map: "+m)
         //Json.build(m).toString
