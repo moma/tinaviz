@@ -2,9 +2,8 @@ package eu.tinasoft.tinaviz.io
 
 import actors._
 import Actor._
+import daizoru._
 import eu.tinasoft._
-import tinaviz.io.JsonParser
-import tinaviz.io.Browser
 import tinaviz.io.json.Json
 
 object Synchronizer extends node.util.Actor {

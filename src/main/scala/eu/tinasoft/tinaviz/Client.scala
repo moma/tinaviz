@@ -9,6 +9,7 @@ import actors._
 import Actor._
 import eu.tinasoft._
 import tinaviz.Server
+import tinaviz.io.json.Json
 
 trait Client {
   
@@ -155,10 +156,10 @@ trait Client {
    */
   def updateNode(id:String, str:String) = {
     // we help the JS developer by telling him if the JSON is valid or not
-    val res = JsonParser.parse(str)
+   // val res = JsonParser.parse(str)
     
-    if (!res.isDefined) throw new IllegalArgumentException("Error, invalid JSON!")
-    Server ! 'updateNode -> res.get
+    //if (!res.isDefined) throw new IllegalArgumentException("Error, invalid JSON!")
+    //Server ! 'updateNode -> res.get
     
   }
   
