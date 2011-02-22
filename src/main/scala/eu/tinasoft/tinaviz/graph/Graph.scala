@@ -60,7 +60,8 @@ object Graph {
     "color" -> Array.empty[Color],
     "selected" -> Array.empty[Boolean],
     "highlighted" -> Array.empty[Boolean],
-    "state" -> Array.empty[Symbol],
+    "updateStatus" -> Array.empty[Symbol], // outdated, updating, updated
+    "saveStatus" -> Array.empty[Symbol],  // saving, saved
     "density" -> Array.empty[Double],
     "rate" -> Array.empty[Int],
     "size" -> Array.empty[Double],
@@ -94,7 +95,8 @@ object Graph {
     "minEdgeWeight" -> 0.0,
     "maxEdgeWeight" -> 0.0,
     "activity" -> 0.0,
-    "entropy" -> 0.95
+    "entropy" -> 0.95,
+    "maxDrawedNodes" -> 10
 
   )
 }
@@ -126,7 +128,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val content = getArray[String]("content")
   lazy val selected = getArray[Boolean]("selected")
   lazy val highlighted = getArray[Boolean]("highlighted")
-  lazy val state = getArray[Symbol]("state")
+  lazy val updateStatus = getArray[Symbol]("updateStatus") // outdated, updating, updated
+  lazy val saveStatus = getArray[Symbol]("saveStatus") // saving, saved
   lazy val label = getArray[String]("label")
   lazy val rate = getArray[Int]("rate")
   lazy val uuid = getArray[String]("uuid")

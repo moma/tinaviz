@@ -282,7 +282,7 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
   def updateScreen {
     // TODO: do that in another Actor, which will reply directly to our master
     val graph = layoutCache
-    val g = graph + ("links" -> graph.links.zipWithIndex.map {
+    val f = graph + ("links" -> graph.links.zipWithIndex.map {
       case (links, i) =>
         links.filter {
           case (j, weight) =>
@@ -297,8 +297,22 @@ class Pipeline(val actor: Actor) extends node.util.Actor {
         }
 
     }.toArray)
-    sketch.update(g)
-    val msg = (g, sketch: Scene)
+    
+    var r = Set.empty[Int]
+    val g = graph + ("links" -> f.updateStatus.zipWithIndex.map {
+       //  'outdated) // outdated, updating, updated, failure
+      //  'saved) // saving, saved
+       case ('outdated, i) => 
+          //  send the query, and update the status
+          // if we can't send the query (pool is full) then we keep the "outdated" symbol
+          println("We are outdated, updating..")
+          ('updating, i)
+       case any => any
+     })
+    val h = g.remove(r)
+    
+    sketch.update(h)
+    val msg = (h, sketch: Scene)
     actor ! msg
   }
 
