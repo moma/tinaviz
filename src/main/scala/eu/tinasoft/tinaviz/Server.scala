@@ -5,7 +5,6 @@
 
 package eu.tinasoft.tinaviz
 
-import eu.tinasoft.tinaviz.io.json.Base64
 import org.daizoru._
 import eu.tinasoft._
 
@@ -95,9 +94,8 @@ object Server extends node.util.Actor {
         //self ! "frameRate" -> properties("frameRate") // force relaunching
 
         case x:scala.xml.Elem =>
-          println("Got XML: "+x)
-          val base64ified = "data:xml;base64,"+Base64.encode(x.toString)
-          Browser ! 'forceDownload-> base64ified
+          //println("Got XML: "+x)
+          Browser ! 'forceDownload -> x.toString
           
         // import/export functions
         case ("export","gexf") => 

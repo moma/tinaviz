@@ -11,6 +11,7 @@ import eu.tinasoft.tinaviz._
 import eu.tinasoft.tinaviz.io.json.Json
 import java.applet.Applet
 import netscape.javascript.JSObject
+import eu.tinasoft.tinaviz.io.json.Base64
 
 object Browser extends node.util.Actor {
 
@@ -83,8 +84,8 @@ object Browser extends node.util.Actor {
          }
 
         case ('forceDownload, str:String) => 
-            _window.call("open", Array[Object] (str,"_newtab",new java.lang.Integer(0)))
-
+            val base64ified = "data:application/xml;base64,"+Base64.encode(str)
+            _window.call("open", Array[Object] (base64ified,"_newtab",new java.lang.Integer(0)))
         
         case (func:String,any) =>
           val args = Array[Object] (
