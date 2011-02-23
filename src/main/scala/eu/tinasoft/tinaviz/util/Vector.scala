@@ -67,15 +67,15 @@ case class Vector (val x:Double,val y:Double) {
     val dy = e._2 - y
     val d = sqrt(dx*dx+dy*dy) //* 0.8
     //println("  d: "+d)
-    if (d!=0.0) ((dx / d) * f, (dy / d) * f) else (dx * f,dy * f)
+    if (d > 0.1) ((dx / d) * f, (dy / d) * f) else (dx * f,dy * f)
   }
   
    def computeLessForce(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
-    val d = (sqrt(dx*dx+dy*dy)) + 0.00000001 //* 0.8
+    val d = (sqrt(dx*dx+dy*dy)) //* 0.8
     //println("  d: "+d)
-    if (d < 0.000001) (0.0,0.0) else ((dx / d) * f, (dy / d) * f)
+    if (d > 0.1) ((dx / d) * f, (dy / d) * f) else (dx * f, dy * f)
   }
   
   

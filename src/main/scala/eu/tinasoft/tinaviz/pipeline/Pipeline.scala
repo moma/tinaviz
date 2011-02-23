@@ -394,20 +394,22 @@ object Pipeline extends node.util.Actor {
     val positions = g.position.zipWithIndex map {
       case (p1, i) =>
         var force = (0.0,0.0)
-        force += p1.computeLessForce(30.0 * cooling, (0.0,0.0))
+        force += p1.computeLessForce(300.0 * cooling, (0.0,0.0))
         g.position.zipWithIndex foreach {
           case (p2, j) =>
             val p2inDegree = data inDegree j
             val p2outDegree = data outDegree j
             val doIt = Maths.randomBool
 
-            
+            //"layout.attraction" -> 1.01,
+            //"layout.repulsion" -> 1.5,
+            //
             // todo: attract less if too close (will work for both gravity and node attraction)
-            if (true || g.hasAnyLink(i, j)) {
-              force += p1.computeLessForce(ATTRACTION * cooling, p2)
+            if (g.hasAnyLink(i, j)) {
+              force += p1.computeLessForce(40 * cooling, p2)
             } else {
               // if (doIt) {
-              force -= p1.computeLessForce(REPULSION * cooling, p2)
+              force -= p1.computeLessForce(0.4 * cooling, p2)
               // }
             }
         }
@@ -431,8 +433,8 @@ object Pipeline extends node.util.Actor {
        //activ += (force._1+force._2)
        //
 
-        p1 + (if (math.abs(force._1) > 0.01) force._1 else { println("cancelling force in X "); 0.0 },
-              if (math.abs(force._2) > 0.01) force._2 else { println("cancelling force in Y "); 0.0 })
+        p1 + (if (math.abs(force._1) > 0.01) force._1 else { /*println("cancelling force in X ");*/ 0.0 },
+              if (math.abs(force._2) > 0.01) force._2 else { /*println("cancelling force in Y ");*/ 0.0 })
     }
    
     //println("activity: "+activity)
