@@ -28,28 +28,28 @@ object Graph {
     var g = new Graph(elements)
 
     // g + ("activity" -> a)
-    g = g + ("nbNodes" -> GraphMetrics.nbNodes(g))
-    g = g + ("nbEdges" -> GraphMetrics.nbEdges(g))
-    g = g + ("nbSingles" -> GraphMetrics.nbSingles(g))
-    g = g + ("outDegree" -> GraphMetrics.outDegree(g))
-    g = g + ("inDegree" -> GraphMetrics.inDegree(g))
+    g = g + ("nbNodes" -> Metrics.nbNodes(g))
+    g = g + ("nbEdges" -> Metrics.nbEdges(g))
+    g = g + ("nbSingles" -> Metrics.nbSingles(g))
+    g = g + ("outDegree" -> Metrics.outDegree(g))
+    g = g + ("inDegree" -> Metrics.inDegree(g))
 
-    val ode = GraphMetrics outDegreeExtremums g
+    val ode = Metrics outDegreeExtremums g
     g = g ++ Map[String,Any]("minOutDegree" -> ode._1, "maxOutDegree" -> ode._2)
 
-    val ide = GraphMetrics inDegreeExtremums g
+    val ide = Metrics inDegreeExtremums g
     g = g ++ Map[String,Any]("minInDegree" -> ide._1, "maxInDegree" -> ide._2)
 
-    val e = GraphMetrics extremums g
+    val e = Metrics extremums g
     g = g ++ Map[String,Any]("xMax" -> e._1, "xMin" -> e._2, "yMax" -> e._3, "yMin" -> e._4)
 
-    val nwe = GraphMetrics nodeWeightExtremums g
+    val nwe = Metrics nodeWeightExtremums g
     g = g ++ Map[String,Any]("minNodeWeight" -> nwe._1, "maxNodeWeight" -> nwe._2)
 
-    val ewe = GraphMetrics edgeWeightExtremums g
+    val ewe = Metrics edgeWeightExtremums g
     g = g ++ Map[String,Any]("minEdgeWeight" -> ewe._1, "maxEdgeWeight" -> ewe._2)
 
-    g = g + ("baryCenter" -> GraphMetrics.baryCenter(g))
+    g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g
   }
 

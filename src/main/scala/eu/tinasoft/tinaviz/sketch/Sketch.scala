@@ -265,9 +265,10 @@ case class Sketch(
             val a = nodeColorLayer(from)
             val b = nodeColorLayer(to)
             val c = a.blend(b)
-            val d = c.saturateBy(0.4)
-            val e = d.alpha(Maths.map(weight, extremums, (0.4,1.0)))
-            tmpColor ::= e
+            //val d = c.saturateBy(0.4)
+            val d = c.saturation(Maths.map(weight, extremums, (0.3,1.0)))
+            //val d = c.alpha(Maths.map(weight, extremums, (1.0,0.3)))
+            tmpColor ::= d
         }
     }
     edgeColorLayer = tmpColor.toArray

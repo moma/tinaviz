@@ -6,7 +6,7 @@ package eu.tinasoft.tinaviz.graph
  * Date: 2/17/11
  * Time: 12:33 PM
  */
-object GraphMetrics  {
+object Metrics  {
 
   /**
    * compute the amount of information added to thiq by g

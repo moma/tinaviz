@@ -8,7 +8,7 @@ package eu.tinasoft.tinaviz.graph
  * To change this template use File | Settings | File Templates.
  */
 
-object GraphFunctions  {
+object Functions  {
   /**
    * Return a new graph which is centered
    * we can center it using XY normalization, or camera, or camera force.. for the moment we keep it simple

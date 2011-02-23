@@ -41,14 +41,17 @@ object Maths {
   /**
    * imitation of Processing's map function, with different downsides, I hope
    */
-  def map (value:Double, valueRange:(Double,Double), targetRange:(Double,Double)) : Double = {
+  def map (value:Double, valueRange:(Double,Double), tr:(Double,Double)) : Double = {
     val vr = if (valueRange._1 > valueRange._2) (valueRange._2,valueRange._1) else valueRange
-    val tr = if (targetRange._1 > targetRange._2) (targetRange._2,targetRange._1) else targetRange
     val v = if (value < vr._1) vr._1 else { if (value > vr._2) vr._2 else value }
     val r = if (vr._2-vr._1 == 0) 1.0 else ((v-vr._1) / (vr._2-vr._1))
-    (tr._1 + ((tr._2 - tr._1) * r))
+    if (tr._1 > tr._2) 
+      (tr._2 - ((tr._2 - tr._1) * r))
+    else 
+       (tr._1 + ((tr._2 - tr._1) * r))
   }
 
+  
   def limit(v: Double, min: Double, max: Double): Double = {
     if (v < min) min else if (v > max) max else v
   }

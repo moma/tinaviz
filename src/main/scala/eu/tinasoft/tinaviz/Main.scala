@@ -95,7 +95,6 @@ class Main extends TApplet with Client {
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
 
-
     setBackground(scene.background)
     if (debug) {
       setColor(scene.foreground)
@@ -126,7 +125,7 @@ class Main extends TApplet with Client {
           //Maths.map(weight, scene.)
           //println("weight: "+weight)
           if (visibleNodes.size < 80) {
-            lineThickness(weight * getScale)
+            //lineThickness(Maths.map(weight,()) * getScale)
           }
           // lineThickness(weight * getScale)
           drawCurve(source, target)

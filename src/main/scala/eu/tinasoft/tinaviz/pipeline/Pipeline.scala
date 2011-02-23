@@ -8,8 +8,8 @@ package eu.tinasoft.tinaviz.pipeline
 import org.daizoru._
 import eu.tinasoft._
 import tinaviz.graph.Graph
-import tinaviz.graph.GraphMetrics
-import tinaviz.graph.GraphFunctions
+import tinaviz.graph.Metrics
+import tinaviz.graph.Functions
 import tinaviz.Server
 import tinaviz.sketch.Sketch
 import tinaviz.sketch.Sketch._
@@ -17,6 +17,8 @@ import tinaviz.scene.Scene
 import tinaviz.io.Browser
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
+import eu.tinasoft.tinaviz.graph.Filters
+import eu.tinasoft.tinaviz.graph.Layout
 import java.util.concurrent.{ScheduledFuture, TimeUnit, Executors}
 import actors.Actor
 import compat.Platform
@@ -114,7 +116,7 @@ object Pipeline extends node.util.Actor {
           
         case "recenter" =>
           println("recentering now..")
-          layoutCache = GraphFunctions.recenter(layoutCache)
+          layoutCache = Functions.recenter(layoutCache)
           updateScreen
 
         case ("camera.mouse", kind: Symbol, side: Symbol, count: Symbol, position: (Double, Double)) =>
@@ -152,12 +154,18 @@ object Pipeline extends node.util.Actor {
                 }.map {
                   case (before, touched) =>
                     if (touched) {
-                      !before
+                      count match {
+                        case 'Simple => !before
+                        case 'Double => true
+                      }
                     } else {
                       if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
                         if (in) before else false
                       } else {
-                        before
+                      count match {
+                        case 'Simple => before
+                        case 'Double => false
+                      }
                       }
                     }
                 }.toArray)
@@ -289,7 +297,7 @@ object Pipeline extends node.util.Actor {
               // in the case of mutual link, we have a bit of work to remove the link
               if (graph.hasThisLink(j, i)) {
                 // if i is bigger than j, we keep
-                GraphFunctions.isBiggerThan(graph,i,j)
+                Functions.isBiggerThan(graph,i,j)
                 // in the case of non-mutual link (directed), there is nothing to do; we keep the link
               } else {
                 true
@@ -339,31 +347,9 @@ object Pipeline extends node.util.Actor {
     g.remove(removeMe)
   }
 
-  def applyNodeWeight(g: Graph): Graph = {
-    if (g.nbNodes == 0) return g
-    val range = Maths.map(
-      g.get[(Double, Double)]("filter.node.weight"),
-      (0.0, 1.0),
-      (g.get[Double]("minNodeWeight"), g.get[Double]("maxNodeWeight")))
-    var removeMe = Set.empty[Int]
-    g.weight.zipWithIndex.map { case (weight, i) => if (!(range._1 <= weight && weight <= range._2)) removeMe += i }
-    val h = g.remove(removeMe)
-    h + ("activity" -> GraphMetrics.activity(h,g))
-  }
-
-  def applyEdgeWeight(g: Graph): Graph = {
-    if (g.nbNodes == 0) return g
-    val range = Maths.map(
-      g.get[(Double, Double)]("filter.edge.weight"),
-      (0.0, 1.0),
-      (g.get[Double]("minEdgeWeight"), g.get[Double]("maxEdgeWeight")))
-    //println("applyEdgeWeight: " + range + " (" + g.get[(Double, Double)]("filter.edge.weight") + ")")
-    val newLinks = g.links map {
-      case links => links.filter { case (id, weight) => (range._1 <= weight && weight <= range._2) }
-    }
-    val h = g + ("links" -> newLinks)
-    h + ("activity" -> GraphMetrics.activity(h,g))
-  }
+  def applyNodeWeight(g: Graph) = Filters.nodeWeight(g)
+  def applyEdgeWeight(g: Graph) = Filters.edgeWeight(g)
+  def applyLayout(g: Graph) = Layout.layout(g)
 
   def applyWeightToSize(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
@@ -375,83 +361,8 @@ object Pipeline extends node.util.Actor {
     g + ("size" -> newSize)
   }
 
-  /**
-   *  apply a force vector algorithm on the graph
-   */
-  def applyLayout(g: Graph): Graph = {
-    val nbNodes = g.nbNodes
-    if (nbNodes == 0) return g
-    val barycenter = (0.0, 0.0) //g.get[(Double, Double)]("baryCenter")
-    val GRAVITY = g.get[Double]("layout.gravity") // stronger means faster!
-    val ATTRACTION = g.get[Double]("layout.attraction")
-    val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
-    
-    //println("running forceVector on "+nbNodes+" nodes")
-    //if (g.activity < 0.005) return g + ("activity" -> 0.0)
-    val cooling =1.0
-    
-    //var activ = 0.0
-    val positions = g.position.zipWithIndex map {
-      case (p1, i) =>
-        var force = (0.0,0.0)
-        val p1inDegree = data inDegree i
-        val p1outDegree = data outDegree i
-        val p1degree = p1inDegree + p1outDegree
-        force += p1.computeLessForce(80 * cooling, (0.0,0.0))
-        
-        // do not apply the force-vector for single nodes
-        if (p1degree > 0) {
-          g.position.zipWithIndex foreach {
-            case (p2, j) =>
-              val p2inDegree = data inDegree j
-              val p2outDegree = data outDegree j
-              val p2degree = p2inDegree + p2outDegree
-              val doIt = Maths.randomBool
 
-              //"layout.attraction" -> 1.01,
-              //"layout.repulsion" -> 1.5,
-              //
-              // todo: attract less if too close (will work for both gravity and node attraction)
-              if (g.hasAnyLink(i, j)) {
-                force += p1.computeLessForce(40 * cooling, p2)
-              } else {
-                // if (doIt) {
-                if (p2degree > 0) {
-                force -= p1.computeLessForce(0.4 * cooling, p2)
-              }
-                // }
-              }
-          }
-        }
-        // random repulse
-        /*
-         if (Maths.random() < 0.05f) {
-         val theta = 2 * math.Pi * Maths.random()
-         (((math.cos(theta) - math.sin(theta))) * desiredDist,
-         ((math.cos(theta) + math.sin(theta))) * desiredDist)
-         } else {
-         p1 + force
-         }*/
-       
-        
-        
-        //println("p1: "+p1+" abs_f1: "+math.abs(force._1)+" abs_f2 "+math.abs(force._2)+" p1': "+(p1 + force))
-       
-        
-        
-        //(math.max(0.01, math.abs(force._1)), math.max(0.01, math.abs(force._1)))
-        //activ += (force._1+force._2)
-        //
-
-        p1 + (if (math.abs(force._1) > 0.01) force._1 else { /*println("cancelling force in X ");*/ 0.0 },
-              if (math.abs(force._2) > 0.01) force._2 else { /*println("cancelling force in Y ");*/ 0.0 })
-    }
-   
-    //println("activity: "+activity)
-    // TODO possible optimization: give some metrics
-    val h = g + ("position" -> positions)
-    h //+ ("activity" -> activity)
-  }
+  
 
   def transformColumn[T](column: String, filter: T => T) = {
     var dataArray = data.getArray[T](column)
