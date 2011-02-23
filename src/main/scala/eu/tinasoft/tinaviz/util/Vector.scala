@@ -69,16 +69,7 @@ case class Vector (val x:Double,val y:Double) {
     //println("  d: "+d)
     if (d > 0.1) ((dx / d) * f, (dy / d) * f) else (dx * f,dy * f)
   }
-  
-   def computeLessForce(f:Double,e:(Double,Double)) : (Double,Double) = {
-    val dx = e._1 - x
-    val dy = e._2 - y
-    val d = (sqrt(dx*dx+dy*dy)) //* 0.8
-    //println("  d: "+d)
-    if (d > 0.1) ((dx / d) * f, (dy / d) * f) else (dx * f, dy * f)
-  }
-  
-  
+
   // stronger when closer
   def computeForceDeflector(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x

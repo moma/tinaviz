@@ -20,6 +20,8 @@ object Layout {
     val nbNodes = g.nbNodes
     if (nbNodes == 0) return g
     val barycenter = (0.0, 0.0) //g.get[(Double, Double)]("baryCenter")
+    
+  
     val GRAVITY = g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
     val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
@@ -30,14 +32,14 @@ object Layout {
     
     //var activ = 0.0
     val positions = g.position.zipWithIndex map {
-      case (p1, i) =>
-        var force = (0.0,0.0)
+      case (nodePosition, i) =>
+        var delta = (0.0,0.0)
         val p1inDegree = g inDegree i
         val p1outDegree = g outDegree i
         val p1degree = p1inDegree + p1outDegree
         
         // GRAVITY
-        force += p1.computeLessForce(80 * cooling, (0.0,0.0))
+        delta += nodePosition.computeForce(GRAVITY * cooling, barycenter)
         
         // WEIGHT MAP
         val weightMap = Map[Int,Double](g.links(i).map{ case (a,b) => (a,b) }.toList : _*)
@@ -45,32 +47,34 @@ object Layout {
         // IF THE NODE HAS NEIGHBOURS
         if (p1degree > 0) {
           
-          // WE CHECK WHAT TO WITH ALL OTHER NODES
+          // WE CHECK WHAT TO DO FOR EACH OTHER NODE
           g.position.zipWithIndex foreach {
-            case (p2, j) =>
+            case (otherNodePosition, j) =>
               val p2inDegree = g inDegree j
               val p2outDegree = g outDegree j
               val p2degree = p2inDegree + p2outDegree
               val doIt = Maths.randomBool
 
-              //"layout.attraction" -> 1.01,
-              //"layout.repulsion" -> 1.5,
-              //
-              // todo: attract less if too close (will work for both gravity and node attraction)
-              if (g.hasAnyLink(i, j)) {
-                force += p1.computeLessForce(10 * weightMap(j) * cooling, p2)
-              } else {
-                // if (doIt) {
-                if (p2degree > 0) {
-                  force -= p1.computeLessForce(0.4 * cooling, p2)
+              // FONCTION UTILITAIRES
+              // g.hasAnyLink(A,B)  A <--> B
+              // g.hasThisLink(A,B)  A --> B
+              
+              // AVOIR UN ATTRIBUT
+              // val occ = g.get[Double]("occurences")(ID_DU_NOEUD)
+              // val occ = g.get[String]("category")(ID_DU_NOEUD)
+              // 
+                // if we have a link to another node..
+                if (weightMap.contains(j)) {
+                  // we go toward it..
+                 // delta += nodePosition.computeForce(ATTRACTION * weightMap(j) * cooling, otherNodePosition)
+                } else  {
+                  // else we escape!
+                delta -= nodePosition.computeForce(REPULSION * cooling, otherNodePosition)
                 }
-                // }
-              }
           }
           
-          // ELSE THE NODE IS SINGLE, PUT IT ON THE RING
         } else {
-          // for the moment we only apply the standard gravity..
+          // else put on the ring?
         }
        
         // random repulse
@@ -80,12 +84,13 @@ object Layout {
          (((math.cos(theta) - math.sin(theta))) * 100,
          ((math.cos(theta) + math.sin(theta))) * 100)
          } else {
-         p1 + force
+         p1 + delta
          }*/
         
-        //println("p1: "+p1+" abs_f1: "+math.abs(force._1)+" abs_f2 "+math.abs(force._2)+" p1': "+(p1 + force))
-        p1 + (if (math.abs(force._1) > 0.01) force._1 else { /*println("cancelling force in X ");*/ 0.0 },
-              if (math.abs(force._2) > 0.01) force._2 else { /*println("cancelling force in Y ");*/ 0.0 })
+        //println("p1: "+p1+" abs_f1: "+math.abs(delta._1)+" abs_f2 "+math.abs(delta._2)+" p1': "+(p1 + delta))
+        // try to not apply force 
+        nodePosition + (if (math.abs(delta._1) > 0.01) delta._1 else { 0.0 },
+                        if (math.abs(delta._2) > 0.01) delta._2 else { 0.0 })
     }
    
     g + ("position" -> positions)
