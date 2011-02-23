@@ -94,7 +94,7 @@ object Graph {
     "maxNodeWeight" -> 0.0,
     "minEdgeWeight" -> 0.0,
     "maxEdgeWeight" -> 0.0,
-    "activity" -> 0.0,
+    "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10
 

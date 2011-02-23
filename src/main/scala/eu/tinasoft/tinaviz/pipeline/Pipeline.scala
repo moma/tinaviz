@@ -298,21 +298,8 @@ object Pipeline extends node.util.Actor {
 
     }.toArray)
     
-    var r = Set.empty[Int]
-    val g = graph + ("updateStatus" -> f.updateStatus.zipWithIndex.map {
-       //  'outdated) // outdated, updating, updated, failure
-      //  'saved) // saving, saved
-       case ('outdated, i) => 
-          //  send the query, and update the status
-          // if we can't send the query (pool is full) then we keep the "outdated" symbol
-          println("We are outdated, updating..")
-          ('updating, i)
-       case any => any
-     })
-    val h = g.remove(r)
-    
-    sketch.update(h)
-    val msg = (h, sketch: Scene)
+    sketch.update(f)
+    val msg = (f, sketch: Scene)
     Server ! msg
   }
 
@@ -398,25 +385,29 @@ object Pipeline extends node.util.Actor {
     val GRAVITY = g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
     val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
+    
     //println("running forceVector on "+nbNodes+" nodes")
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
-    val cooling = 1.0 //Maths.map(g.activity,(0.0,1.0),(0.900, 0.999))
-
+    val cooling =1.0
+    
+    //var activ = 0.0
     val positions = g.position.zipWithIndex map {
       case (p1, i) =>
-        var force = (0.0, 0.0).computeForce(GRAVITY, barycenter)
-        g.position.zipWithIndex map {
+        var force = (0.0,0.0)
+        force += p1.computeLessForce(30.0 * cooling, (0.0,0.0))
+        g.position.zipWithIndex foreach {
           case (p2, j) =>
             val p2inDegree = data inDegree j
             val p2outDegree = data outDegree j
             val doIt = Maths.randomBool
 
+            
             // todo: attract less if too close (will work for both gravity and node attraction)
-            if (g.hasAnyLink(i, j)) {
-              force += (p1.computeForce(ATTRACTION * cooling, p2))
+            if (true || g.hasAnyLink(i, j)) {
+              force += p1.computeLessForce(ATTRACTION * cooling, p2)
             } else {
               // if (doIt) {
-              force -= (p1.computeForceLimiter(REPULSION * cooling, p2))
+              force -= p1.computeLessForce(REPULSION * cooling, p2)
               // }
             }
         }
@@ -429,11 +420,19 @@ object Pipeline extends node.util.Actor {
         } else {
               p1 + force
         }*/
-        p1 + force
+       println("p1: "+p1+" abs_f1: "+math.abs(force._1)+" abs_f2 "+math.abs(force._2)+" p1': "+(p1 + force))
+       //(math.max(0.01, math.abs(force._1)), math.max(0.01, math.abs(force._1)))
+       //activ += (force._1+force._2)
+       //
+
+        p1 + (if (math.abs(force._1) > 0.01) force._1 else { println("cancelling force in X "); 0.0 },
+              if (math.abs(force._2) > 0.01) force._2 else { println("cancelling force in Y "); 0.0 })
     }
+   
+    //println("activity: "+activity)
     // TODO possible optimization: give some metrics
     val h = g + ("position" -> positions)
-    h + ("activity" -> GraphMetrics.activity(h,g))
+    h //+ ("activity" -> activity)
   }
 
   def transformColumn[T](column: String, filter: T => T) = {

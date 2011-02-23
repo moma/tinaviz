@@ -6,6 +6,7 @@
 package eu.tinasoft.tinaviz.util
 
 import processing.core.PVector
+import math._
 
 object Vector {   
   implicit def fromDouble (p:(Double,Double)) = new Vector(p._1, p._2)
@@ -47,27 +48,53 @@ case class Vector (val x:Double,val y:Double) {
   def dist (p: (Double, Double)) = {
     val dx = x - p._1
     val dy = y - p._2
-    math.sqrt(dx*dx + dy*dy)
+    sqrt(dx*dx + dy*dy)
   }
 
 
+  
+
+  def sqroot(a:Double,b:Double) = {
+    def e(d:Double) = if (d < 1.0) (10 * pow(10,abs(log10(d).toInt))).toInt else  1
+    val c = max(e(a),e(b))
+    sqrt(a*a*c*c + b*b*c*c) / c
+  }
+  
   def isInRange(p: (Double,Double), radius:Double) = dist(p) <= (radius / 2.0)
 
   def computeForce(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
-    val d = math.sqrt(dx*dx + dy*dy) * 0.8
-    //println("  d: "+d)
-    if (d!=0.0) ((dx / d) * f, (dy / d) * f) else (0.0,0.0)
+    val d = sqrt(dx*dx+dy*dy) //* 0.8
+    println("  d: "+d)
+    if (d!=0.0) ((dx / d) * f, (dy / d) * f) else (dx * f,dy * f)
   }
-
+  
+   def computeLessForce(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    val d = (sqrt(dx*dx+dy*dy)) + 0.00000001 //* 0.8
+    println("  d: "+d)
+    if (d < 0.000001) (0.0,0.0) else ((dx / d) * f, (dy / d) * f)
+  }
+  
+  
+  // stronger when closer
+  def computeForceDeflector(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    var d = sqrt(dx*dx+dy*dy) + 0.000001 //* 0.8
+    val f2 = 1./ d 
+   ((dx / d) * (f * f2), (dy / d) * (f * f2)) 
+  }
+  
   // stronger when closer
   def computeForceLimiter(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
-    var d = math.sqrt(dx*dx + dy*dy) * 0.8
-    val f2 = if (d!=0.0) 1./d else 0
-    if (d!=0.0) ((dx / d) * (f * f2), (dy / d) * (f * f2)) else (0.0,0.0)
+    var d = sqrt(dx*dx+dy*dy) //* 0.8
+    val f2 = if (d!=0.0) 1./d else 0.
+    if (d!=0.0) ((dx / d) * (f * f2), (dy / d) * (f * f2)) else (dx * f * f2,dy * f * f2)
   }
 
 }

@@ -36,5 +36,46 @@ case class Scene(
                                                                   (Double, Double))],
   val edgeColorLayer: Array[Color] = Array.empty[Color],
   val edgeWeightLayer: Array[Double] = Array.empty[Double]
-)
+) {
+  
+  val maxLod : Int = 120
+  /*
+  val maxLod : Int = nbEdges match { 
+    case i:Int => 
+        if (i < 2000) {
+          120
+        } else if (i < 4000) {
+          100
+        } else if (i < 6000) {
+          80
+        } else if (i < 8000) {
+          60
+        } else if (i < 10000) {
+          40
+        } else if (i < 12000) {
+          30
+        } else if (i < 14000) {
+          25
+        } else if (i < 16000) {
+          20
+        } else if (i < 18000) {
+          15
+        } else if (i < 20000) {
+          10
+        } else if (i < 22000) {
+          8
+        } else if (i < 24000) {
+          6
+        } else if (i < 26000) {
+          4
+        } else if (i < 28000) {
+          3
+        } else if (i < 30000) {
+          2
+        } else {
+          1
+        }
+    }
+ */
+}
 

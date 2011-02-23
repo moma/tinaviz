@@ -79,8 +79,8 @@ class Main extends TApplet with Client {
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
           // "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
-           "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
-          //"file:///home/jbilcke/Desktop/mini.gexf"
+          //  "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          "file:///home/jbilcke/Desktop/mini.gexf"
         )
     }
   }
@@ -94,6 +94,7 @@ class Main extends TApplet with Client {
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
+
 
     setBackground(scene.background)
     if (debug) {
@@ -116,7 +117,7 @@ class Main extends TApplet with Client {
         val weight = scene.edgeWeightLayer(i)
         if (isVisible(psource) || isVisible(ptarget)) {
           val powd = distance(psource, ptarget)
-          setLod(if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 120), 1, 120).toInt else 1)
+          setLod(if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, scene.maxLod), 1, scene.maxLod).toInt else 1)
           lineColor(scene.edgeColorLayer(i))
           //Maths.map(weight, scene.)
           //println("weight: "+weight)

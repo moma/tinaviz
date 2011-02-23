@@ -31,11 +31,11 @@ class GEXF extends node.util.Actor {
           println("Connecting to " + url)
           val conn = url.openConnection
           println("Reading graph stream, please wait..")
-          reply(XML.load(conn.getInputStream))
+          reply(load(XML.load(conn.getInputStream)))
         }
         case str: String => {
           println("Reading graph string, please wait..")
-          reply(XML.load(str))
+          reply(load(XML.load(str)))
         }
 
         case graph: Graph => reply (
