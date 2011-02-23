@@ -82,6 +82,10 @@ object Browser extends node.util.Actor {
            _window.call(_subPrefix + _apiPrefix + func, args)
          }
 
+        case ('forceDownload, str:String) => 
+            _window.call("open", Array[Object] (str,"_newtab",new java.lang.Integer(0)))
+
+        
         case (func:String,any) =>
           val args = Array[Object] (
             Json.build(any).toString,

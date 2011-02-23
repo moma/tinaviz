@@ -420,7 +420,13 @@ object Pipeline extends node.util.Actor {
         } else {
               p1 + force
         }*/
-       println("p1: "+p1+" abs_f1: "+math.abs(force._1)+" abs_f2 "+math.abs(force._2)+" p1': "+(p1 + force))
+       
+        
+        
+       //println("p1: "+p1+" abs_f1: "+math.abs(force._1)+" abs_f2 "+math.abs(force._2)+" p1': "+(p1 + force))
+       
+        
+        
        //(math.max(0.01, math.abs(force._1)), math.max(0.01, math.abs(force._1)))
        //activ += (force._1+force._2)
        //

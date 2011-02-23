@@ -1,98 +1,96 @@
 package eu.tinasoft.tinaviz.io.json
 
 /**
- * Scala Base64 encode/decode - https://github.com/tototoshi/scala-base64
- *
- * Code by Toshiyuki Takahashi - https://github.com/tototoshi
- *
- * "Base64エンコード作ってみたが、われながら汚い"
+ * Scala Base64 encode/decode - https://github.com/crawshaw/saws/raw/master/src/Base64.scala
  */
 
-import scala.annotation.tailrec
-
 object Base64 {
-  val encodeTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
-  def encode(str:String) : String = encode(str.map{case x => x.toByte }.toList)
+  // Mapping table from 6-bit nibbles to Base64 characters.
+  private val map1 = (
+      ('A' to 'Z') ++ ('a' to 'z') ++ ('0' to '9')
+  ).toArray[Char] ++ Array('+', '/')
 
-  def encode(fromBytes: Array[Byte]) : String = encode(fromBytes.toList)
+  // Mapping table from Base64 characters to 6-bit nibbles.
+  private val map2 = new Array[Byte](128);
+  {
+    for (i <- 0 until map2.length) map2(i) = -1;
+    for (i <- 0 until 64) map2(map1(i)) = i.toByte;
+  }
 
-  def encode(fromBytes: List[Byte]) :String = {
-    val encoded = {
-      get6BitStrList(fromBytes)
-      .map(x => encodeChar(binaryStringToDecimal(x)))
-      .mkString
+  def encode(s: String) : String =
+    new String(encode(s.getBytes()))
+
+  def encode(in: Array[Byte]) : Array[Char] =
+    encode(in,in.length)
+
+  def encode(in: Array[Byte], iLen: Int) : Array[Char] = {
+    val oDataLen = (iLen*4+2)/3;       // output length without padding
+    val oLen = ((iLen+2)/3)*4;         // output length including padding
+    val out = new Array[Char](oLen);
+    var ip = 0;
+    var op = 0;
+    while (ip < iLen) {
+      val i0 = in(ip) & 0xff;
+      ip += 1;
+      val i1 = if (ip < iLen) in(ip) & 0xff else 0;
+      ip += 1;
+      val i2 = if (ip < iLen) in(ip) & 0xff else 0;
+      ip += 1;
+      val o0 = i0 >>> 2;
+      val o1 = ((i0 &   3) << 4) | (i1 >>> 4);
+      val o2 = ((i1 & 0xf) << 2) | (i2 >>> 6);
+      val o3 = i2 & 0x3F;
+      out(op) = map1(o0);
+      op += 1;
+      out(op) = map1(o1);
+      op += 1;
+      out(op) = if (op < oDataLen) map1(o2) else '=';
+      op += 1;
+      out(op) = if (op < oDataLen) map1(o3) else '=';
+      op += 1;
     }
-    encoded + "=" * (4 - encoded.length % 4)
+
+    out
   }
 
-  def encodeChar(i: Int) :Char = encodeTable(i)
+  def decode(s : String) : Array[Byte] =
+    decode(s.toCharArray())
 
-  def binaryStringToDecimal(src: String) :Int = Integer.parseInt(src, 2)
-
-  def get6BitStrList(fromBytes: List[Byte]) :List[String] = {
-    val BIT_LENGTH = 6
-    val src = toBinaryString(fromBytes)
-    trimList[Char](src.toList.sliding(BIT_LENGTH, BIT_LENGTH).toList, BIT_LENGTH, '0')
-    .map(_.mkString)
-  }
-
-  def toBinaryString(fromBytes: List[Byte]) :String = {
-    val BIT_LENGTH = 8
-    val MASK = binaryStringToDecimal("11111111")
-
-    fromBytes
-    .map(x => (x & MASK).toBinaryString)
-    .map(s => s.length match {
-      case len if len > BIT_LENGTH => s.slice(len - BIT_LENGTH, len)
-      case len => ("0" * (BIT_LENGTH - len)) + s
-    })
-    .mkString
-  }
-
-  def deleteEqual(src: String) :String = src.filter(_ != '=')
-
-  def getEncodeTableIndexList(s: String): List[Int]= {
-    deleteEqual(s)
-    .map(x => encodeTable.indexOf(x))
-    .toList
-  }
-
-  def convertIntTo6bitString(i: Int) :String = {
-    val BIT_LENGTH = 6
-    val result = i.toBinaryString
-    "0" * (BIT_LENGTH - result.length) + result
-  }
-
-  def decode(src: String) :String = {
-    val BIT_LENGTH = 8
-
-    val indexArray = {
-      getEncodeTableIndexList(src)
-      .map(x => convertIntTo6bitString(x))
+  def decode(in : Array[Char]) : Array[Byte] = {
+    var iLen = in.length;
+    if (iLen % 4 != 0) {
+      throw new IllegalArgumentException(
+        "Length of Base64 encoded input string is not a multiple of 4."
+      );
     }
-    val binaryStringArray: String = deleteExtraZero(indexArray.mkString)
-
-    binaryStringArray
-    .sliding(BIT_LENGTH, BIT_LENGTH)
-    .map(x => x + "0" * (6 - x.length))
-    .map(binaryStringToDecimal(_).toChar)
-    .mkString
-  }
-
-  def deleteExtraZero(s: String): String = {
-    val BIT_LENGTH = 8
-    val len = s.length
-    s.slice(0, (len / BIT_LENGTH)  * BIT_LENGTH)
-  }
-
-  def trim[A](xs: List[A], n: Int, c: A): List[A] = {
-    xs.length match {
-      case l if l == n => xs
-      case l if l < n  => xs ::: List.fill(n - l)(c)
-      case l if l > n  => xs.take(n)
+    while (iLen > 0 && in(iLen-1) == '=') iLen -= 1;
+    val oLen = (iLen*3) / 4;
+    var out = new Array[Byte](oLen);
+    var ip = 0;
+    var op = 0;
+    while (ip < iLen) {
+      val i0 = in(ip); ip += 1;
+      val i1 = in(ip); ip += 1;
+      val i2 = if (ip < iLen) in(ip) else 'A'; ip += 1;
+      val i3 = if (ip < iLen) in(ip) else 'A'; ip += 1;
+      if (i0 > 127 || i1 > 127 || i2 > 127 || i3 > 127)
+         throw new IllegalArgumentException ("Illegal character in Base64 encoded data.");
+      val b0 = map2(i0);
+      val b1 = map2(i1);
+      val b2 = map2(i2);
+      val b3 = map2(i3);
+      if (b0 < 0 || b1 < 0 || b2 < 0 || b3 < 0)
+         throw new IllegalArgumentException ("Illegal character in Base64 encoded data.");
+      val o0 = ( b0       <<2) | (b1>>>4);
+      val o1 = ((b1 & 0xf)<<4) | (b2>>>2);
+      val o2 = ((b2 &   3)<<6) |  b3;
+      out(op) = o0.toByte;
+      op += 1;
+      if (op<oLen) { out(op) = o1.toByte; op +=1; }
+      if (op<oLen) { out(op) = o2.toByte; op +=1; }
     }
+    out
   }
 
-  def trimList[A](xss: List[List[A]], n: Int, c: A) :List[List[A]] = xss.map(xs => trim[A](xs, n, c))
 }

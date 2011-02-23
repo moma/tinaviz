@@ -218,7 +218,9 @@ class Main extends TApplet with Client {
       case 'p' => Server ! "pause" -> 'toggle
       case 'a' => Server ! "pause" -> 'toggle
       case 'n' => Server ! "drawing.nodes" -> 'toggle
-      case 'e' => Server ! "drawing.edges" -> 'toggle
+      case 'l' => Server ! "drawing.edges" -> 'toggle
+      case 'e' => Server ! ("export","gexf")
+        
       case 'c' => Server ! "filter.node.category" -> 'toggle
       case 'v' => Server ! "filter.view" -> 'toggle
       case 'r' => Server ! "recenter"
