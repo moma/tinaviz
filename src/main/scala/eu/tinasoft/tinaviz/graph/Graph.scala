@@ -135,6 +135,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val uuid = getArray[String]("uuid")
   lazy val inDegree = getArray[Int]("inDegree")
   lazy val outDegree = getArray[Int]("outDegree")
+  lazy val degree = inDegree zip outDegree map { case (a,b) => a+b }
   lazy val density = getArray[Double]("density")
   lazy val nbNodes = get[Int]("nbNodes")
   lazy val nbEdges = get[Int]("nbEdges")

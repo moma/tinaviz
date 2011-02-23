@@ -108,7 +108,11 @@ class Main extends TApplet with Client {
     setLod(32)
     lineThickness(1)
     noFill
-
+    
+    val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter {
+      case (position, i) => isVisible(screenPosition(position))
+    }
+    
     scene.edgePositionLayer.zipWithIndex foreach {
       case ((source, target), i) =>
         val psource = screenPosition(source)
@@ -121,6 +125,9 @@ class Main extends TApplet with Client {
           lineColor(scene.edgeColorLayer(i))
           //Maths.map(weight, scene.)
           //println("weight: "+weight)
+          if (visibleNodes.size < 80) {
+            lineThickness(weight * getScale)
+          }
           // lineThickness(weight * getScale)
           drawCurve(source, target)
         }
@@ -129,9 +136,8 @@ class Main extends TApplet with Client {
     setLod(16)
     lineThickness(0)
     noStroke
-    val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter {
-      case (position, i) => isVisible(screenPosition(position))
-    }
+   
+
     visibleNodes.foreach {
       case (position, i) =>
         val size = scene.nodeSizeLayer(i)

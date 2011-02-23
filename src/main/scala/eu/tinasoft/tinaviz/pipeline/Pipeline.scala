@@ -47,13 +47,13 @@ object Pipeline extends node.util.Actor {
     def schedule(msg: Any, ms: Long) = {
       val ct = Platform.currentTime
       sched.schedule(new Runnable {
-        def run = actors.Scheduler.execute({
-          Actor.actor {
-            me ! (msg, ct - ms)
-          };
-          ()
-        })
-      }, ms, TimeUnit.MILLISECONDS)
+          def run = actors.Scheduler.execute({
+              Actor.actor {
+                me ! (msg, ct - ms)
+              };
+              ()
+            })
+        }, ms, TimeUnit.MILLISECONDS)
     }
 
     schedule('ping, 500)
@@ -72,18 +72,18 @@ object Pipeline extends node.util.Actor {
         case ('getNeighbourhood, view: String, todoList: List[Any]) =>
 
           val result = (view match {
-            case "meso" => layoutCache
-            case any => data
-          }).selectionNeighbours
+              case "meso" => layoutCache
+              case any => data
+            }).selectionNeighbours
           println("built selection neighbours: " + result)
           reply(result)
 
         case ('getNodes, view: String, category: String) =>
           println("Server: asked for 'getNodes " + view + " " + category)
           val all = (view match {
-            case "meso" => layoutCache
-            case any => data
-          }).allNodes
+              case "meso" => layoutCache
+              case any => data
+            }).allNodes
           val result = if (category.equalsIgnoreCase("none")) {
             all
           } else {
@@ -94,23 +94,23 @@ object Pipeline extends node.util.Actor {
           reply(result)
 
         case('selectByPattern,pattern:String) =>
-            layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
-                case label => if (pattern.isEmpty) false else (label contains pattern)
+          layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
+              case label => if (pattern.isEmpty) false else (label contains pattern)
             })
           
-            val selection = layoutCache.selectionAttributes
-            // todo: update everything
+          val selection = layoutCache.selectionAttributes
+          // todo: update everything
 
-            Browser ! "_callbackSelectionChanged" -> (selection, "left")
+          Browser ! "_callbackSelectionChanged" -> (selection, "left")
 
-            self ! "filter.view" -> data.get[String]("filter.view")
+          self ! "filter.view" -> data.get[String]("filter.view")
             
         case('highlightByPattern,pattern:String) =>
-            layoutCache = layoutCache + ("highlighted" -> layoutCache.label.map {
-                case label => if (pattern.isEmpty) false else (label contains pattern)
+          layoutCache = layoutCache + ("highlighted" -> layoutCache.label.map {
+              case label => if (pattern.isEmpty) false else (label contains pattern)
             })
-            //Browser ! "_callbackSelectionChanged" -> "left"
-            self ! "filter.view" -> data.get[String]("filter.view")
+          //Browser ! "_callbackSelectionChanged" -> "left"
+          self ! "filter.view" -> data.get[String]("filter.view")
           
         case "recenter" =>
           println("recentering now..")
@@ -127,64 +127,64 @@ object Pipeline extends node.util.Actor {
           val r = (sr / cz) / 2.0
           kind match {
             case 'Move =>
-                      var changed = false
-                      // TODO a selection counter
-                      layoutCache = layoutCache + ("highlighted" -> layoutCache.highlighted.zipWithIndex.map {
-                        case (before, i) =>
-                          val l = layoutCache.size(i)   // maths hack
-                          val p = layoutCache.position(i)
-                          val ggg = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
-                          if (ggg != before) changed = true
-                          ggg
-                      }.toArray)
-                      if (changed) updateScreen
+              var changed = false
+              // TODO a selection counter
+              layoutCache = layoutCache + ("highlighted" -> layoutCache.highlighted.zipWithIndex.map {
+                  case (before, i) =>
+                    val l = layoutCache.size(i)   // maths hack
+                    val p = layoutCache.position(i)
+                    val ggg = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
+                    if (ggg != before) changed = true
+                    ggg
+                }.toArray)
+              if (changed) updateScreen
 
             case 'Click =>
               var in = false
               // TODO a selection counter
               layoutCache = layoutCache + ("selected" -> layoutCache.selected.zipWithIndex.map {
-                case (before, i) =>
-                  val l = layoutCache.size(i)   // maths hack
-                  val p = layoutCache.position(i)
-                  val touched = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
-                  if (touched) in = true
-                  (before, touched)
-              }.map {
-                case (before, touched) =>
-                  if (touched) {
-                    !before
-                  } else {
-                   if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
-                     if (in) before else false
-                   } else {
-                      before
-                   }
-                  }
-              }.toArray)
+                  case (before, i) =>
+                    val l = layoutCache.size(i)   // maths hack
+                    val p = layoutCache.position(i)
+                    val touched = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
+                    if (touched) in = true
+                    (before, touched)
+                }.map {
+                  case (before, touched) =>
+                    if (touched) {
+                      !before
+                    } else {
+                      if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
+                        if (in) before else false
+                      } else {
+                        before
+                      }
+                    }
+                }.toArray)
               val selection = layoutCache.selectionAttributes
               // todo: update everything
 
               Browser ! "_callbackSelectionChanged" -> (selection, side match {
-                case 'Left => "left"
-                case 'Right => "right"
-                case any => "none"
-              })
+                  case 'Left => "left"
+                  case 'Right => "right"
+                  case any => "none"
+                })
 
               self ! "filter.view" -> (count match {
-                case 'Simple => data.get[String]("filter.view")
-                case 'Double => "meso"
-              })
+                  case 'Simple => data.get[String]("filter.view")
+                  case 'Double => "meso"
+                })
 
             case 'Drag =>
-            val pause = try {
-              data.get[Boolean]("pause")
-            } catch {
-              case x => true
-            }
-            //self ! "pause" -> true
+              val pause = try {
+                data.get[Boolean]("pause")
+              } catch {
+                case x => true
+              }
+              //self ! "pause" -> true
             case 'Release =>
-            //pauseBugger = false
-            //self ! "pause" -> pauseBuffer
+              //pauseBugger = false
+              //self ! "pause" -> pauseBuffer
             case any =>
           }
 
@@ -198,7 +198,7 @@ object Pipeline extends node.util.Actor {
           self ! "filter.node.category" -> data.get[String]("filter.node.category")
 
         case (key: String, value: Any) =>
-        //println("updating graph attribute " + key + " -> " + value)
+          //println("updating graph attribute " + key + " -> " + value)
           data += key -> value
           categoryCache += key -> value
           nodeWeightCache += key -> value
@@ -206,7 +206,7 @@ object Pipeline extends node.util.Actor {
           layoutCache += key -> value
           key match {
             case "filter.view" =>
-            //println("filter.view")
+              //println("filter.view")
               categoryCache = data.updatePosition(layoutCache)
               categoryCache = applyCategory(categoryCache)
               categoryCache = applyWeightToSize(categoryCache)
@@ -215,7 +215,7 @@ object Pipeline extends node.util.Actor {
               layoutCache = edgeWeightCache
               updateScreen
             case "filter.node.category" =>
-            //println("filter.node.category")
+              //println("filter.node.category")
               categoryCache = data.updatePosition(layoutCache)
               categoryCache = applyCategory(categoryCache)
               categoryCache = applyWeightToSize(categoryCache)
@@ -224,21 +224,21 @@ object Pipeline extends node.util.Actor {
               layoutCache = edgeWeightCache
               updateScreen
             case "filter.node.weight" =>
-            //println("nodeWeightCache = applyNodeWeight(categoryCache)")
+              //println("nodeWeightCache = applyNodeWeight(categoryCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               updateScreen
             case "filter.edge.weight" =>
-            //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+              //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = edgeWeightCache
               updateScreen
             case "filter.node.size" =>
-            //println("categoryCache = applyWeightToSize(categoryCache)")
+              //println("categoryCache = applyWeightToSize(categoryCache)")
               categoryCache = categoryCache.updatePosition(layoutCache)
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
@@ -283,20 +283,20 @@ object Pipeline extends node.util.Actor {
     // TODO: do that in another Actor, which will reply directly to our master
     val graph = layoutCache
     val f = graph + ("links" -> graph.links.zipWithIndex.map {
-      case (links, i) =>
-        links.filter {
-          case (j, weight) =>
-          // in the case of mutual link, we have a bit of work to remove the link
-            if (graph.hasThisLink(j, i)) {
-              // if i is bigger than j, we keep
-              GraphFunctions.isBiggerThan(graph,i,j)
-              // in the case of non-mutual link (directed), there is nothing to do; we keep the link
-            } else {
-              true
-            }
-        }
+        case (links, i) =>
+          links.filter {
+            case (j, weight) =>
+              // in the case of mutual link, we have a bit of work to remove the link
+              if (graph.hasThisLink(j, i)) {
+                // if i is bigger than j, we keep
+                GraphFunctions.isBiggerThan(graph,i,j)
+                // in the case of non-mutual link (directed), there is nothing to do; we keep the link
+              } else {
+                true
+              }
+          }
 
-    }.toArray)
+      }.toArray)
     
     sketch.update(f)
     val msg = (f, sketch: Scene)
@@ -318,22 +318,22 @@ object Pipeline extends node.util.Actor {
         }
 
       case "meso" =>
-      //println("\n\nfiltering the meso view: "+g.debugStats)
+        //println("\n\nfiltering the meso view: "+g.debugStats)
         g.selected.zipWithIndex foreach {
           case (f, i) => if (!f) {
 
-            // remove the node which is not in our category
-            if (!g.currentCategory.equalsIgnoreCase(g.category(i))) {
-              removeMe += i
-            } else {
-              var keepThat = false
-              // we remove nodes not connected to the selection
-              g.selection.foreach {
-                case j => if (g.hasAnyLink(i, j)) keepThat = true
+              // remove the node which is not in our category
+              if (!g.currentCategory.equalsIgnoreCase(g.category(i))) {
+                removeMe += i
+              } else {
+                var keepThat = false
+                // we remove nodes not connected to the selection
+                g.selection.foreach {
+                  case j => if (g.hasAnyLink(i, j)) keepThat = true
+                }
+                if (!keepThat) removeMe += i
               }
-              if (!keepThat) removeMe += i
             }
-          }
         }
     }
     g.remove(removeMe)
@@ -362,7 +362,7 @@ object Pipeline extends node.util.Actor {
       case links => links.filter { case (id, weight) => (range._1 <= weight && weight <= range._2) }
     }
     val h = g + ("links" -> newLinks)
-   h + ("activity" -> GraphMetrics.activity(h,g))
+    h + ("activity" -> GraphMetrics.activity(h,g))
   }
 
   def applyWeightToSize(g: Graph): Graph = {
@@ -394,44 +394,54 @@ object Pipeline extends node.util.Actor {
     val positions = g.position.zipWithIndex map {
       case (p1, i) =>
         var force = (0.0,0.0)
-        force += p1.computeLessForce(300.0 * cooling, (0.0,0.0))
-        g.position.zipWithIndex foreach {
-          case (p2, j) =>
-            val p2inDegree = data inDegree j
-            val p2outDegree = data outDegree j
-            val doIt = Maths.randomBool
+        val p1inDegree = data inDegree i
+        val p1outDegree = data outDegree i
+        val p1degree = p1inDegree + p1outDegree
+        force += p1.computeLessForce(80 * cooling, (0.0,0.0))
+        
+        // do not apply the force-vector for single nodes
+        if (p1degree > 0) {
+          g.position.zipWithIndex foreach {
+            case (p2, j) =>
+              val p2inDegree = data inDegree j
+              val p2outDegree = data outDegree j
+              val p2degree = p2inDegree + p2outDegree
+              val doIt = Maths.randomBool
 
-            //"layout.attraction" -> 1.01,
-            //"layout.repulsion" -> 1.5,
-            //
-            // todo: attract less if too close (will work for both gravity and node attraction)
-            if (g.hasAnyLink(i, j)) {
-              force += p1.computeLessForce(40 * cooling, p2)
-            } else {
-              // if (doIt) {
-              force -= p1.computeLessForce(0.4 * cooling, p2)
-              // }
-            }
+              //"layout.attraction" -> 1.01,
+              //"layout.repulsion" -> 1.5,
+              //
+              // todo: attract less if too close (will work for both gravity and node attraction)
+              if (g.hasAnyLink(i, j)) {
+                force += p1.computeLessForce(40 * cooling, p2)
+              } else {
+                // if (doIt) {
+                if (p2degree > 0) {
+                force -= p1.computeLessForce(0.4 * cooling, p2)
+              }
+                // }
+              }
+          }
         }
         // random repulse
         /*
-          if (Maths.random() < 0.05f) {
-               val theta = 2 * math.Pi * Maths.random()
-               (((math.cos(theta) - math.sin(theta))) * desiredDist,
-                ((math.cos(theta) + math.sin(theta))) * desiredDist)
-        } else {
-              p1 + force
-        }*/
+         if (Maths.random() < 0.05f) {
+         val theta = 2 * math.Pi * Maths.random()
+         (((math.cos(theta) - math.sin(theta))) * desiredDist,
+         ((math.cos(theta) + math.sin(theta))) * desiredDist)
+         } else {
+         p1 + force
+         }*/
        
         
         
-       //println("p1: "+p1+" abs_f1: "+math.abs(force._1)+" abs_f2 "+math.abs(force._2)+" p1': "+(p1 + force))
+        //println("p1: "+p1+" abs_f1: "+math.abs(force._1)+" abs_f2 "+math.abs(force._2)+" p1': "+(p1 + force))
        
         
         
-       //(math.max(0.01, math.abs(force._1)), math.max(0.01, math.abs(force._1)))
-       //activ += (force._1+force._2)
-       //
+        //(math.max(0.01, math.abs(force._1)), math.max(0.01, math.abs(force._1)))
+        //activ += (force._1+force._2)
+        //
 
         p1 + (if (math.abs(force._1) > 0.01) force._1 else { /*println("cancelling force in X ");*/ 0.0 },
               if (math.abs(force._2) > 0.01) force._2 else { /*println("cancelling force in Y ");*/ 0.0 })

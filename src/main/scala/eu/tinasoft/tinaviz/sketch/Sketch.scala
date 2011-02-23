@@ -251,6 +251,9 @@ case class Sketch(
     var tmpColor = List.empty[Color]
     //println(" node color size: "+nodeColorLayer.size)
     //println("graph links size: "+graph.links.size)
+    val extremums = (graph.get[Double]("minEdgeWeight"),
+                     graph.get[Double]("maxEdgeWeight"))
+    val target = (0.4,1.0)
     graph.links.zipWithIndex map {
       case (mapIntDouble, from) =>
         mapIntDouble foreach {
@@ -258,11 +261,13 @@ case class Sketch(
           case (to, weight) =>
           // FEATURE we want the edge color to be a mix of source node and target node color
           // FEATURE we want the edge color to be less saturated
+            //val v = graph.
             val a = nodeColorLayer(from)
             val b = nodeColorLayer(to)
             val c = a.blend(b)
             val d = c.saturateBy(0.4)
-            tmpColor ::= d
+            val e = d.alpha(Maths.map(weight, extremums, (0.4,1.0)))
+            tmpColor ::= e
         }
     }
     edgeColorLayer = tmpColor.toArray

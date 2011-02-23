@@ -112,4 +112,11 @@ class Color(val h:Double=1.0,
  def brightnessBy(x:Double) : Color = {
     new Color(h,s,b*x,a)
   }
+  
+  def alpha(a:Double) : Color = {
+    new Color(h,s,b,a)
+  }
+  def alphaBy(f:Double) : Color = {
+    new Color(h,s,b,a*f)
+  }
 }
