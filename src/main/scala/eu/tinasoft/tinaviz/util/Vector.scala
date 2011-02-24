@@ -62,12 +62,40 @@ case class Vector (val x:Double,val y:Double) {
   
   def isInRange(p: (Double,Double), radius:Double) = dist(p) <= (radius / 2.0)
 
-  def computeForce(f:Double,e:(Double,Double)) : (Double,Double) = {
+  def attract(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
-    val d = sqrt(dx*dx+dy*dy) //* 0.8
+    val td = sqrt(dx*dx+dy*dy) * 0.5 //* 0.8
+    val d = if (td < 0.01) 0.01 else td
     //println("  d: "+d)
-    if (d > 0.1) ((dx / d) * f, (dy / d) * f) else (dx * f,dy * f)
+    (d * f, d * f)
+  }
+  def repulseLess(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    val td = sqrt(dx*dx+dy*dy) * 0.5 //* 0.8
+    val d = if (td < 0.0001) 0.0001 else td
+    //println("  d: "+d)
+    (d * f, d * f)
+  }
+    def attractLess(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    val td = sqrt(dx*dx+dy*dy) * 0.5 //* 0.8
+    val d = if (td < 0.0001) 0.0001 else td
+    //println("  d: "+d)
+    //val ddx = if (dx > 0) (d * f) else (- d * f)
+    //val ddy = if (dy > 0) (d * f) else (- d * f)
+     (dx / (d * f), dy / (d * f))
+  }
+  
+   def repulse(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    val td = sqrt(dx*dx+dy*dy) * 0.5 //* 0.8
+    val d = if (td < 0.01) 0.01 else td
+    //println("  d: "+d)
+    (dx / (d * f), dy / (d * f))
   }
 
   // stronger when closer
@@ -88,4 +116,10 @@ case class Vector (val x:Double,val y:Double) {
     if (d!=0.0) ((dx / d) * (f * f2), (dy / d) * (f * f2)) else (dx * f * f2,dy * f * f2)
   }
 
+  def absLimit(t:(Double,Double),l:(Double,Double)) : (Double,Double) = {
+    val ax = math.abs(x)
+    val ay = math.abs(y)
+     (if (ax > t._1) (if (ax < t._2) x else { if (x > 0) (l._2) else (-l._2) }) else { l._1 },
+         if (ay > t._1) (if (ay < t._2) y else { if (y > 0) (l._2) else (-l._2) }) else { l._1 })
+  }
 }
