@@ -7,16 +7,30 @@ package eu.tinasoft.tinaviz.graph
 
 import org.daizoru._
 import eu.tinasoft._
+import traer.physics._
 
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
 
 object Layout {
+  
+  val ps = new ParticleSystem(0f, 0.1f)
+
+  ps.setIntegrator( ParticleSystem.MODIFIED_EULER )
+  //ps.setGravity( 0.0f ) // between 0.0 and 5.0
+  
+  var gravity = ps.makeParticle
+  gravity.position().set( 0.0f,0.0f,0.0f )
+  gravity.setMass( 1.0f )
+  gravity.makeFixed
+  
+  var lastHash = 0
 
   /**
    * Compute the layout
    */
   def layout(g:Graph) : Graph = {
+
     val nbNodes = g.nbNodes
     if (nbNodes == 0) return g
     val barycenter = g.get[(Double, Double)]("baryCenter")
@@ -31,65 +45,66 @@ object Layout {
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
     val cooling =1.0
     
-    //var activ = 0.0
-    val deltas = g.position.zipWithIndex map {
+     val factor = 100000.0
+     
+
+          
+    if (g.hashed != lastHash) {
+      lastHash = g.hashed
+      println("hash changed, regenerating a particle system..")
+      
+      gravity = ps.makeParticle
+      gravity.position().set( barycenter._1.toFloat,barycenter._2.toFloat, 0.0f )
+      gravity.setMass( 1.0f )
+      gravity.makeFixed
+  
+    val positions = g.position.zipWithIndex map {
+       case (nodePosition, i) =>
+         ((nodePosition._1 * factor, nodePosition._2*factor), i)
+    }
+      // nodes
+      val tmp = positions map {
       case (nodePosition, i) =>
-        var delta = (0.0,0.0)
-        val p1inDegree = g inDegree i
-        val p1outDegree = g outDegree i
-        val p1degree = p1inDegree + p1outDegree
-
-        // GRAVITY
-        delta += nodePosition.attractLess( 1.5 * cooling, barycenter).absLimit((0.01,100),(0.0,100))
-        
-        // WEIGHT MAP
-        val weightMap = Map[Int,Double](g.links(i).map{ case (a,b) => (a,b) }.toList : _*)
-
-        // IF THE NODE HAS NEIGHBOURS
-        if (p1degree > 0) {
-          
-          // WE CHECK WHAT TO DO FOR EACH OTHER NODE
-          g.position.zipWithIndex foreach {
-            case (otherNodePosition, j) =>
-              val p2inDegree = g inDegree j
-              val p2outDegree = g outDegree j
-              val p2degree = p2inDegree + p2outDegree
-              val doIt = Maths.randomBool
-
-              // FONCTION UTILITAIRES
-              // g.hasAnyLink(A,B)  A <--> B
-              // g.hasThisLink(A,B)  A --> B
-              
-              // AVOIR UN ATTRIBUT
-              // val occ = g.get[Double]("occurences")(ID_DU_NOEUD)
-              // val occ = g.get[String]("category")(ID_DU_NOEUD)
-              // 
-                // if we have a link to another node..
-                if (weightMap.contains(j)) {
-                  // we go toward it..
-                  val ponderatedWeight = Maths.map(weightMap(j),minMaxWeights,(0.5,1.0))
-                  delta += nodePosition.attractLess(0.01 *  cooling, otherNodePosition).absLimit((0.01,100),(0.0,100))
-                } else  {
-                  // else we escape!
-                 
-               delta -= nodePosition.attractLess(10 * cooling, otherNodePosition).absLimit((0.01,100),(0.0,100))
-                }
-          }
-          
-        } else {
-          // else put on the ring?
+        //val p1inDegree = g inDegree i
+        //val p1outDegree = g outDegree i
+        //val p1degree = p1inDegree + p1outDegree
+        // g.weight(i).toFloat
+          val p = ps.makeParticle( 1.0f, nodePosition._1.toFloat, nodePosition._2.toFloat, 0.0f )
+         //ps.makeSpring(gravity, p, 0.3f, 1.0f, 1.0f)    
+        (nodePosition, p, i)
+      } 
+      
+      // every node are repulsing each other
+      val tmp2 = tmp.map {
+        case (node1, p1, i) =>
+        tmp map {
+          case (node2, p2, j) =>
+          //if (j > i) ps.makeSpring(p1, p2, 20, 20.0f, 100f)
         }
-        
-        // absolute value limiter. if < 0.01, we map to 0.0, if > 100 we map to 100
-        // negative values are limited too (eg. -150 will become -100 as well)
-        delta//.absLimit((0.01,100),(0.0,100))
+        (node1, p1,  Map[Particle,Double](g.links(i).map{ case (a,b) => (tmp(a)._2,b) }.toList : _*), i)
+      }
+      
+      // links are attrazcting with a spring
+      tmp2 foreach {
+        case (nodePosition, src, links, i) =>
 
+           links.foreach {
+             case (target, weight) =>
+                // val ponderatedWeight = Maths.map(weightMap(j),minMaxWeights,(40.0,60.0))
+               ps.makeSpring(src, target, 0.3f, 1.0f, 1.0f)
+           }
+      }
     }
-       
+    
+    println("running step ("+ps.numberOfParticles+" particles)..")
+    ps.tick(1.0f)
+    
     //var activ = 0.0
-    val positions = g.position zip deltas map {
-      case (a,b) => a + b
-    }
-    g + ("position" -> positions)
+   g + ("position" -> (g.position.zipWithIndex map {
+      case (nodePosition, i) =>
+       val v = ps.getParticle( i+1 )
+       (v.position().x().toDouble / factor, v.position().y().toDouble / factor)
+        
+    }))
   }
 }

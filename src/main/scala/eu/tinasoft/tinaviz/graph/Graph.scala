@@ -148,6 +148,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val currentCategory = get[String]("filter.node.category")
   lazy val currentView = get[String]("filter.view")
 
+  // hashcode will change if nodes/links are added/deleted
+  lazy val hashed = (uuid.toList.mkString("") + links.map{ case mapID => mapID.hashCode }.toList.mkString("")).hashCode
+  
   lazy val debugStats = {
     "**DEBUG**\nlinks.size: "+links.size+"\nposition.size: "+position.size+"\ncolor.size: "+color.size+"\nuuid.size: "+uuid.size+"\ncategory.size: "+category.size+"\nselected.size: "+selected.size+"\nselection.size: "+selection.size+"\n**END DEBUG**"
   }

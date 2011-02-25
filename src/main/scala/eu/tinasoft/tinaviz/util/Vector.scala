@@ -122,4 +122,49 @@ case class Vector (val x:Double,val y:Double) {
      (if (ax > t._1) (if (ax < t._2) x else { if (x > 0) (l._2) else (-l._2) }) else { l._1 },
          if (ay > t._1) (if (ay < t._2) y else { if (y > 0) (l._2) else (-l._2) }) else { l._1 })
   }
+  
+  /**************************************************/
+    def _computeForce(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    val d = sqrt(dx*dx+dy*dy) //* 0.8
+    //println("  d: "+d)
+    if (d > 0.1) ((dx / d) * f, (dy / d) * f) else (dx * f,dy * f)
+  }
+  
+   def _computeLessForce(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    val td = (sqrt(dx*dx+dy*dy))  //* 0.8
+    val d = sqrt(td)
+    //println("  d: "+d)
+    if (abs(d) > 0.001) ((dx / d) * f, (dy / d) * f) else (0.0,0.0)
+  }
+   def _computeForceToRadius(f:Double,r:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - r - x
+    val dy = e._2 - r - y
+    val td = (sqrt(dx*dx+dy*dy))  //* 0.8
+    val d = sqrt(td)
+    //println("  d: "+d)
+    if (abs(d) > 0.001) ((dx / d) * f, (dy / d) * f) else (0.0,0.0)
+  }
+  
+  
+  // stronger when closer
+  def _computeForceDeflector(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    var d = sqrt(dx*dx+dy*dy) + 0.000001 //* 0.8
+    val f2 = 1./ d 
+   ((dx / d) * (f * f2), (dy / d) * (f * f2)) 
+  }
+  
+  // stronger when closer
+  def _computeForceLimiter(f:Double,e:(Double,Double)) : (Double,Double) = {
+    val dx = e._1 - x
+    val dy = e._2 - y
+    var d = sqrt(dx*dx+dy*dy) //* 0.8
+    val f2 = if (d!=0.0) 1./d else 0.
+    if (d!=0.0) ((dx / d) * (f * f2), (dy / d) * (f * f2)) else (dx * f * f2,dy * f * f2)
+  }
 }
