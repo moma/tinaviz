@@ -16,7 +16,8 @@ object Layout {
   
   val ps = new ParticleSystem(0f, 0.1f)
 
-  ps.setIntegrator( ParticleSystem.MODIFIED_EULER )
+  //ps.setIntegrator( ParticleSystem.MODIFIED_EULER )
+  //
   //ps.setGravity( 0.0f ) // between 0.0 and 5.0
   ps.setDrag( 0.1f )
   
@@ -47,10 +48,8 @@ object Layout {
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
     val cooling =1.0
     
-    val factor = 100000.0
-     
+    val factor = 1.0
 
-          
     if (g.hashed != lastHash) {
       lastHash = g.hashed
       println("hash changed, regenerating a particle system..")
@@ -75,21 +74,22 @@ object Layout {
           //val p1degree = p1inDegree + p1outDegree
           // g.weight(i).toFloat
           val p = ps.makeParticle( 1.0f, node1._1.toFloat, node1._2.toFloat, 0.0f )
-          println("added particle number "+ps.numberOfParticles+"")
+          //println("added particle number "+ps.numberOfParticles+"")
           //ps.makeSpring(gravity, p, 0.3f, 1.0f, 1.0f)    
-          (node1, p, i)
+          (p, i)
       } 
 
       // every node are repulsing each other (negative attraction)
       tmp foreach {
-        case (node1, p1, i) =>
+        case (p1, i) =>
           tmp foreach {
-            case (node2, p2, j) =>
+            case (p2, j) =>
               if (j != i) {
                 if (g.hasThisLink(i, j)) {
                   ps.makeSpring(p1, p2, 0.02f, 0.02f, 10.0f)
                 } else {
                   if (!g.hasAnyLink(i, j)) {
+                    //println("creating repulsion..")
                     ps.makeAttraction(p1, p2, -1000f, 10f)
                   } 
                 }
