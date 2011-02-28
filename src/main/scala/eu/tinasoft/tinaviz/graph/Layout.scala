@@ -47,8 +47,6 @@ object Layout {
     //println("running forceVector on "+nbNodes+" nodes")
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
     val cooling =1.0
-    
-    val factor = 1.0
 
     if (g.hashed != lastHash) {
       lastHash = g.hashed
@@ -61,13 +59,9 @@ object Layout {
        gravity.setMass( 1.0f )
        gravity.makeFixed
        */
-  
-      val positions = g.position.zipWithIndex map {
-        case (nodePosition, i) =>
-          ((nodePosition._1 * factor, nodePosition._2*factor), i)
-      }
+      ps.clear
       // nodes
-      val tmp = positions map {
+      val tmp = g.position.zipWithIndex map {
         case (node1, i) =>
           //val p1inDegree = g inDegree i
           //val p1outDegree = g outDegree i
@@ -80,19 +74,18 @@ object Layout {
       } 
 
       // every node are repulsing each other (negative attraction)
-      tmp foreach {
-        case (p1, i) =>
-          tmp foreach {
-            case (p2, j) =>
+      tmp foreach { case (p1, i) =>
+          tmp foreach { case (p2, j) =>
               if (j != i) {
+                // if we have a link, we create a sprinf
                 if (g.hasThisLink(i, j)) {
-                  ps.makeSpring(p1, p2, 0.02f, 0.02f, 10.0f)
-                } else {
-                  if (!g.hasAnyLink(i, j)) {
-                    //println("creating repulsion..")
-                    ps.makeAttraction(p1, p2, -1000f, 10f)
-                  } 
+                  val d = Maths.map( g.links(i)(j), minMaxWeights, (3.0, 10.0))
+                  ps.makeSpring(p1, p2, 0.02f, 0.02f, d.toFloat) // 10.0f
+                  
                 }
+                 // we repulse unrelated nodes
+                else if (!g.hasAnyLink(i, j)) ps.makeAttraction(p1, p2, -1000f, 10f)
+           
               }
 
           }
@@ -106,7 +99,7 @@ object Layout {
     g + ("position" -> (g.position.zipWithIndex map {
           case (nodePosition, i) =>
             val v = ps.getParticle( i+1 )
-            (v.position().x().toDouble / factor, v.position().y().toDouble / factor)
+            (v.position().x().toDouble, v.position().y().toDouble)
         
         }))
   }
