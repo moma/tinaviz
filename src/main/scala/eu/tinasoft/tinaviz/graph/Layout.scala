@@ -74,8 +74,8 @@ object Layout {
               if (j != i) {
                 // if we have a link, we create a sprinf
                 if (g.hasThisLink(i, j)) {
-                  val d = Maths.map( g.links(i)(j), minMaxWeights, (3.0, 10.0))
-                  ps.makeSpring(p1, p2, 0.02f, 0.02f, d.toFloat) // 10.0f
+                  val d = Maths.map( g.links(i)(j), minMaxWeights, (3.0, 6.0))
+                  ps.makeSpring(p1, p2, 0.04f, 0.04f, d.toFloat) // 10.0f
                   
                 }
                  // we repulse unrelated nodes

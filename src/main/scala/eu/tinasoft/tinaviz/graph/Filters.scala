@@ -42,10 +42,14 @@ object Filters {
       case (links,i) => 
         links.filter { 
           case (j, weight) => 
-            if (g.hasThisLink(j,i))
-              true // always keep mutual links
-            else 
+            if (!g.category(i).equalsIgnoreCase(g.category(j))) {
+              true
+            } else {
+            //if (g.hasThisLink(j,i))
+            //  true // always keep mutual links
+           // else 
               (range._1 <= weight && weight <= range._2) // else we filter
+            }
         }
     }
     val h = g + ("links" -> newLinks)
