@@ -60,15 +60,10 @@ object Layout {
        gravity.makeFixed
        */
       ps.clear
-      // nodes
       val tmp = g.position.zipWithIndex map {
         case (node1, i) =>
-          //val p1inDegree = g inDegree i
-          //val p1outDegree = g outDegree i
-          //val p1degree = p1inDegree + p1outDegree
           // g.weight(i).toFloat
           val p = ps.makeParticle( 1.0f, node1._1.toFloat, node1._2.toFloat, 0.0f )
-          //println("added particle number "+ps.numberOfParticles+"")
           //ps.makeSpring(gravity, p, 0.3f, 1.0f, 1.0f)    
           (p, i)
       } 
@@ -98,9 +93,8 @@ object Layout {
     //var activ = 0.0
     g + ("position" -> (g.position.zipWithIndex map {
           case (nodePosition, i) =>
-            val v = ps.getParticle( i+1 )
+            val v = ps.getParticle( i )
             (v.position().x().toDouble, v.position().y().toDouble)
-        
         }))
   }
 }
