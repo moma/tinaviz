@@ -5,15 +5,17 @@
 
 package eu.tinasoft.tinaviz.scene
 
-import eu.tinasoft.tinaviz._
+import eu.tinasoft._
 
-import util.Color
-import util.Color._
+import tinaviz.graph.Graph
+import tinaviz.util.Color
+import tinaviz.util.Color._
 
 /**
  * An immutable, straightforward data-structure used for final rendering to screen
  */
 case class Scene(
+  val graph : Graph = new Graph,
   val background: Color = new Color(0.0, 0.0, 1.0),
   val foreground: Color = new Color(0.0, 1.0, 0.0),
   val labelColor: Color = new Color(0.0, 1.0, 0.0),

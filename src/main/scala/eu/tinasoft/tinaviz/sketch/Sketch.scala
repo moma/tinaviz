@@ -21,6 +21,7 @@ object Sketch {
 
   implicit def sketchToScene(sketch: Sketch): Scene = {
     new Scene(
+      sketch.graph,
       sketch.background,
       sketch.foreground,
       sketch.labelColor,
@@ -44,7 +45,7 @@ object Sketch {
   }
 }
 
-case class Sketch(
+case class Sketch( var graph : Graph = new Graph,
                    var colors: Scheme = Rio,
                    var background: Color = new Color(0.0, 0.0, 1.0),
                    var foreground: Color = new Color(0.0, 1.0, 0.0),
@@ -73,14 +74,14 @@ case class Sketch(
    * TODO: there is place for optimization here, by only update what has changed
    *
    */
-  def update(graph: Graph) {
+  def update(_graph: Graph) {
     reset
-
-    updateNodeColors(graph)
-    updateNodePositions(graph)
-    updateNodeLabels(graph)
-    updateNodeShapes(graph)
-    updateNodeSizes(graph)
+    graph = _graph
+    updateNodeColors(_graph)
+    updateNodePositions(_graph)
+    updateNodeLabels(_graph)
+    updateNodeShapes(_graph)
+    updateNodeSizes(_graph)
   }
 
   /*

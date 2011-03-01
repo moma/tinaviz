@@ -1,5 +1,7 @@
 package eu.tinasoft.tinaviz
 
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import javax.swing.JFrame
 
 import netscape.javascript.JSException
@@ -54,13 +56,27 @@ class Main extends TApplet with Client {
 
   override def setup(): Unit = {
     size(800, 600, PConstants.P2D)
+    /*
+     frame.setResizable(true)
+     frame.addComponentListener(new ComponentAdapter() { 
+     override def componentResized(e:ComponentEvent) { 
+     if(e.getSource()==frame) { 
+                     
+     // HACK we need to update the screen ratio for recentering..
+     // TODO put the following two calls in a "screen resized" callback"
+     println("RESIZE CALLBACK")
+     Server ! "screen.width" -> width
+     Server ! "screen.height" -> height
+     } 
+     } 
+     }
+     )*/
     frameRate(30)
     smooth
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
     bezierDetail(18)
-
     setDefault("scene", new Scene)
     setDefault("debug", false)
     setDefault("pause", true)
@@ -75,13 +91,14 @@ class Main extends TApplet with Client {
     } catch {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
-          Server ! 'open -> new java.net.URL(
+        Server ! 'open -> new java.net.URL(
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
           // "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
-          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
           //"file:///home/jbilcke/Desktop/mini.gexf"
           //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
+          "file:///home/jbilcke/test-graph.gexf"
         )
     }
   }
@@ -95,6 +112,12 @@ class Main extends TApplet with Client {
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
+    
+    // HACK we need to update the zoom. sometimes.
+    // if (scene.graph.cameraZoom != getZoom) {
+     //   zoomWith(scene.graph.cameraZoom)
+    //} 
+    
 
     setBackground(scene.background)
     if (debug) {
@@ -112,7 +135,7 @@ class Main extends TApplet with Client {
     val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter {
       case (position, i) => isVisible(screenPosition(position))
     }
-    
+    // TODO filter by weight, and show only the N biggers
     scene.edgePositionLayer.zipWithIndex foreach {
       case ((source, target), i) =>
         val psource = screenPosition(source)
@@ -129,7 +152,9 @@ class Main extends TApplet with Client {
             //lineThickness(Maths.map(weight,()) * getScale)
           }
           // lineThickness(weight * getScale)
-          drawCurve(source, target)
+          if (visibleNodes.size < 100000) {
+             drawCurve(source, target)
+          }
         }
     }
 
@@ -156,13 +181,13 @@ class Main extends TApplet with Client {
     }
 
     def compare(i:Int, j: Int) : Boolean = {
-        val r1 = scene.nodeSizeLayer(i)
-        val l1 = scene.nodeLabelLayer(i)
-        val r2 = scene.nodeSizeLayer(j)
-        val l2 = scene.nodeLabelLayer(j)
-        val rez = if (r1 > r2) true else (if (r1 < r2) false else (scene.nodeLabelLayer(i).compareTo(scene.nodeLabelLayer(j)) < 0))
-        //println("compare("+l1+","+l2+")="+rez)
-        rez
+      val r1 = scene.nodeSizeLayer(i)
+      val l1 = scene.nodeLabelLayer(i)
+      val r2 = scene.nodeSizeLayer(j)
+      val l2 = scene.nodeLabelLayer(j)
+      val rez = if (r1 > r2) true else (if (r1 < r2) false else (scene.nodeLabelLayer(i).compareTo(scene.nodeLabelLayer(j)) < 0))
+      //println("compare("+l1+","+l2+")="+rez)
+      rez
     }
 
     val sortedLabelIDs = visibleNodes.map { _._2 }.toList.sort(compare).toArray
@@ -192,10 +217,10 @@ class Main extends TApplet with Client {
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1)) || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2))) && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2)) || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
             val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (scene.nodeLabelLayer(j).compareTo(scene.nodeLabelLayer(i)) > 0))
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
-           if (i==j) false else (weTouchSomething && whichIsLarger)
+            if (i==j) false else (weTouchSomething && whichIsLarger)
         }
-         setFontSize((r1 * getZoom).toInt)
-         //println("weHaveACollision? "+weHaveACollision)
+        setFontSize((r1 * getZoom).toInt)
+        //println("weHaveACollision? "+weHaveACollision)
         if (!weHaveACollision) text(l1, np1._1, np1._2)
     }
 
@@ -229,7 +254,12 @@ class Main extends TApplet with Client {
         
       case 'c' => Server ! "filter.node.category" -> 'toggle
       case 'v' => Server ! "filter.view" -> 'toggle
-      case 'r' => Server ! "recenter"
+      case 'r' =>
+        // TODO should be in a "resized" callback
+        Server ! "screen.width" -> width
+        Server ! "screen.height" -> height
+          
+        Server ! "recenter"
       case PConstants.CODED =>
         val amount = 15
         keyCode match {
@@ -241,7 +271,7 @@ class Main extends TApplet with Client {
 
         }
       case x =>
-    //
+        //
     }
   }
 }

@@ -52,6 +52,8 @@ object Server extends node.util.Actor {
     //  workflow
     //"Pipeline" -> List ("viewFilter", "nodeWeightFilter", "edgeWeightFilter"),
 
+    "screen.width" -> 100,
+    "screen.height" -> 100,
     // final scene
     "scene" -> new Scene()
   )

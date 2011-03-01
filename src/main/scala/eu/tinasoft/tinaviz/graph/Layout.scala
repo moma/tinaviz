@@ -34,8 +34,15 @@ object Layout {
    */
   def layout(g:Graph) : Graph = {
 
-    val nbNodes = g.nbNodes
-    if (nbNodes == 0) return g
+    if (g.nbNodes == 0) return g
+    
+    val drag = if (g.nbEdges > 20000) {
+     0.01
+    } else {
+      0.1
+    }
+   println("setting drag to "+drag)
+    ps.setDrag( drag.toFloat )
     val barycenter = g.get[(Double, Double)]("baryCenter")
     val minMaxWeights = (g.get[Double]("minEdgeWeight"),g.get[Double]("maxEdgeWeight"))
     
@@ -86,6 +93,17 @@ object Layout {
 
           }
       }
+    }
+    
+    // if a position has changed 
+    // (eg. after a normalization), we update the engine
+    g.position.zipWithIndex foreach {
+          case (nodePosition, i) =>
+            val (x,y,z) = (nodePosition._1.toFloat, 
+                           nodePosition._2.toFloat, 
+                           0.0f)
+            val p = ps.getParticle( i ).position()
+            if (p.x != x || p.y != y) p.set(x,y,z)
     }
     
     println("running step ("+ps.numberOfParticles+" particles)..")

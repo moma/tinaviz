@@ -228,9 +228,15 @@ class TApplet extends PApplet with MouseWheelListener {
    * Zoom to the screen's center
    */
   def zoom(zoomIn: Boolean) {
+    zoomWith(if (zoomIn) 1.3 else 0.7)
+  }
+
+  /**
+   * Zoom to the screen's center
+   */
+  def zoomWith(zoomRatio:Double) {
     _camera.lastMousePosition = (mouseX, mouseY)
 
-    val zoomRatio = if (zoomIn) 1.3 else 0.7
     val z = limit(_camera.zoom * zoomRatio, minZoom, maxZoom)
     if (z != minZoom && z != maxZoom) {
         updateZoom(z)
@@ -242,7 +248,7 @@ class TApplet extends PApplet with MouseWheelListener {
         updatePosition(p)
     }
   }
-
+  
   def updateZoom(value: Double) {
     _camera.zoom = value
     zoomUpdated(value)

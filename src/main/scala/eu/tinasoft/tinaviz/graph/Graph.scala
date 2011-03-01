@@ -96,7 +96,8 @@ object Graph {
     "maxEdgeWeight" -> 0.0,
     "activity" -> 100.0,
     "entropy" -> 0.95,
-    "maxDrawedNodes" -> 10
+    "maxDrawedNodes" -> 10,
+    "baryCenter" -> (0.0, 0.0)
 
   )
 }
@@ -147,6 +148,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val cameraPosition = get[(Double,Double)]("camera.position")
   lazy val currentCategory = get[String]("filter.node.category")
   lazy val currentView = get[String]("filter.view")
+  lazy val baryCenter = get[(Double,Double)]("baryCenter")
 
   // hashcode will change if nodes/links are added/deleted
   lazy val hashed = (uuid.toList.mkString("") + links.map{ case mapID => mapID.hashCode }.toList.mkString("")).hashCode
