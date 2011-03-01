@@ -36,6 +36,11 @@ object Layout {
 
     if (g.nbNodes == 0) return g
     
+    val springFactor = if (g.nbEdges > 20000) {
+      0.002f
+    } else {
+      0.02f
+    }
     val drag = if (g.nbEdges > 20000) {
      0.01
     } else {
@@ -83,7 +88,7 @@ object Layout {
                 if (g.hasThisLink(i, j)) {
                   val d = Maths.map( g.links(i)(j), minMaxWeights, (3.0, 6.0))
                   //
-                  ps.makeSpring(p1, p2, 0.02f, 0.02f, d.toFloat) // 10.0f
+                  ps.makeSpring(p1, p2, springFactor, springFactor, d.toFloat) // 10.0f
                   
                 }
                  // we repulse unrelated nodes

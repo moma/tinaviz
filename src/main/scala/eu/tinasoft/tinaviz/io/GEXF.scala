@@ -198,6 +198,7 @@ class GEXF extends node.util.Actor {
       g += (id, "links", Map.empty[Int, Double])
 
       for (a <- (n \\ "attvalue")) g += (id, attribute(a)._1, attribute(a)._2)
+      //println("added size "+g.getArray[Double]("weight")(id))
     }
 
     for (e <- (root \\ "edge")) {
