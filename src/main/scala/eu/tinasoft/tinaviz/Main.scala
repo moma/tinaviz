@@ -17,12 +17,14 @@ import tinaviz.util._
 import tinaviz.util.Color._
 import math.Pi
 
+
 /**
  * The Main object
  *
  * Only used when run from the command-line
  */
 object Main {
+
 
   /**
    * main method
@@ -112,12 +114,18 @@ class Main extends TApplet with Client {
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
-    
-    // HACK we need to update the zoom. sometimes.
-    // if (scene.graph.cameraZoom != getZoom) {
-     //   zoomWith(scene.graph.cameraZoom)
-    //} 
-    
+    scene.graph.get[Symbol]("camera.target") match {
+      case 'all =>
+      case 'selection =>
+        // move it
+      case 'none =>
+      case err =>
+    }
+    // val centering = scene.graph.get[Boolean]("centering")
+
+    // we need to manually move the camera
+    // to the graph's center
+
 
     setBackground(scene.background)
     if (debug) {
@@ -127,7 +135,7 @@ class Main extends TApplet with Client {
       text("drawing " + scene.nbNodes + " nodes ("+scene.graph.nbSingles+" singles), " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
 
-    setupCamera  // TODO use an immutable Camera (this is the reason for the selection disk bug)
+    setupCamera// TODO use an immutable Camera (this is the reason for the selection disk bug)
     setLod(32)
     lineThickness(1)
     noFill
@@ -220,14 +228,49 @@ class Main extends TApplet with Client {
             if (i==j) false else (weTouchSomething && whichIsLarger)
         }
         setFontSize((r1 * getZoom).toInt)
-        //println("weHaveACollision? "+weHaveACollision)
         if (!weHaveACollision) text(l1, np1._1, np1._2)
     }
 
     showSelectionCircle(selectionRadius)
-
   }
 
+  /*
+  private def _recenter(g:Graph) = {
+       val w = width.toDouble
+       val h = height.toDouble
+       val cz = g.cameraZoom
+       val cp = g.cameraPosition
+       def model2screen(p: (Double,
+                            Double)): (Int,
+                                       Int) = (((p._1 + cp._1) * cz).toInt,
+                                               ((p._2 + cp._2) * cz).toInt)
+       def screen2model(p: (Double,
+                            Double)): (Double,
+                                       Double) = ((p._1 - cp._1) / cz,
+                                                  (p._2 - cp._2) / cz)
+
+       // first we normalize the graph (although optional - this might interfer with the layout)
+       //val h = normalizePositions(g)
+       val (xMin,yMin,
+            xMax,yMax) = (g.get[Double]("xMin"),g.get[Double]("yMin"),
+                          g.get[Double]("xMax"),g.get[Double]("yMax"))
+       // now we want the coordinate within the screen
+       val (a,b) = (model2screen(xMin,yMin), model2screen(xMax,yMax))
+       val (sxMin,syMin,
+            sxMax,syMax) = (a._1.toDouble,a._1.toDouble,
+                            b._2.toDouble,b._2.toDouble)
+       println("sxMin,syMin,sxMax,syMax = "+(sxMin,syMin,sxMax,syMax))
+
+       // then we want to compute the difference
+       val (xRatio,yRatio) = (abs(sxMax-sxMin) / width,
+                              abs(syMax-syMin) / height)
+
+       println("xRatio: "+xRatio+" yRatio: "+yRatio)
+       val big = max(xRatio,yRatio)
+
+       println("big: "+big)
+  }
+  */
   override def zoomUpdated(value: Double) {
     Server ! "camera.zoom" -> value
   }

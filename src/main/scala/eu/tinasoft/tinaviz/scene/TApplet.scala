@@ -15,6 +15,8 @@ import eu.tinasoft._
 import tinaviz.util._
 import tinaviz.util.Vector._
 
+import traer.physics._
+
 class Fonts(val p: PApplet,
             val fontName: String = "Arial",
             val size: Int = 100,
@@ -45,6 +47,10 @@ class Fonts(val p: PApplet,
  * @throws
  */
 class TApplet extends PApplet with MouseWheelListener {
+
+  // particle system for the Camera (smooth moves)
+  //
+  val ps = new ParticleSystem(0f, 0.1f)
 
   val minZoom = 0.05
   val maxZoom = 500.0
@@ -165,7 +171,8 @@ class TApplet extends PApplet with MouseWheelListener {
     scale(z.toFloat)
   }
 
-  protected def setupCamera = {
+  protected def setupCamera {
+    // todo use the smoother
     moveCameraAt(_camera.position._1, _camera.position._2, _camera.zoom)
   }
 

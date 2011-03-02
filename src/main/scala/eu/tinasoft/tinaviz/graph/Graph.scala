@@ -77,6 +77,7 @@ object Graph {
     "nbSingles" -> 0,
     "camera.zoom" -> 1.0,
     "camera.position" -> (0.0,0.0),
+    "camera.target" -> 'all, //'all, 'none, or 'selection
     "filter.node.category" -> "Document",
     "filter.view" -> "macro",
     "selectionRadius" -> 10.0,
@@ -148,6 +149,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val ids = 0 until nbNodes
   lazy val cameraZoom = get[Double]("camera.zoom")
   lazy val cameraPosition = get[(Double,Double)]("camera.position")
+  lazy val cameraSymbol = get[Symbol]("camera.target")
   lazy val currentCategory = get[String]("filter.node.category")
   lazy val currentView = get[String]("filter.view")
   lazy val baryCenter = get[(Double,Double)]("baryCenter")

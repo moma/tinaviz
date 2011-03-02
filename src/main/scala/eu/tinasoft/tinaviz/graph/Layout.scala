@@ -20,13 +20,7 @@ object Layout {
   //
   //ps.setGravity( 0.0f ) // between 0.0 and 5.0
   ps.setDrag( 0.1f )
-  
-  
-  var gravity = ps.makeParticle
-  gravity.position().set( 0.0f,0.0f,0.0f )
-  gravity.setMass( 1.0f )
-  gravity.makeFixed
-  
+
   var lastHash = 0
 
   /**
