@@ -124,7 +124,7 @@ class Main extends TApplet with Client {
       setColor(scene.foreground)
       setFontSize(9)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + scene.nbNodes + " nodes, " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
+      text("drawing " + scene.nbNodes + " nodes ("+scene.graph.nbSingles+" singles), " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
 
     setupCamera  // TODO use an immutable Camera (this is the reason for the selection disk bug)

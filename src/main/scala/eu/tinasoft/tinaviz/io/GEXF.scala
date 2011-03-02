@@ -199,8 +199,10 @@ class GEXF extends node.util.Actor {
 
       for (a <- (n \\ "attvalue")) g += (id, attribute(a)._1, attribute(a)._2)
       //println("added size "+g.getArray[Double]("weight")(id))
+      
     }
 
+    
     for (e <- (root \\ "edge")) {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
@@ -211,6 +213,7 @@ class GEXF extends node.util.Actor {
         g += (node1id, "links", g.getArray[Map[Int, Double]]("links")(node1id) + (node2id -> (e \ "@weight").text.toDouble))
       }
     }
+
     Graph.make(g.elements)
   }
 

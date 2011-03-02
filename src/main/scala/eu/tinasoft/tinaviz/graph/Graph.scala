@@ -74,6 +74,7 @@ object Graph {
     "outDegree" -> Array.empty[Int],
     "nbNodes" -> 0,
     "nbEdges" -> 0,
+    "nbSingles" -> 0,
     "camera.zoom" -> 1.0,
     "camera.position" -> (0.0,0.0),
     "filter.node.category" -> "Document",
@@ -140,6 +141,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val density = getArray[Double]("density")
   lazy val nbNodes = get[Int]("nbNodes")
   lazy val nbEdges = get[Int]("nbEdges")
+  lazy val nbSingles = get[Int]("nbSingles")
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
   lazy val pause = get[Boolean]("pause")
@@ -553,5 +555,40 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "selected"  -> tmp2) // need to recompute things
     )
   }
+  /**
+   * TODO refactor to use a generic field update function
+   */
+  def updatePositionWithCategory(g: Graph): Graph = {
 
+    val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
+      case (elem, i) =>
+        val u = uuid(i)
+        val id = g.id(u) 
+        if (id == -1) {
+          elem
+        } else if (g.category(id).equalsIgnoreCase(category(i))) {
+        g.position(id)
+        } else {
+          elem
+        }
+    }.toArray
+
+    val tmp2: Array[Boolean] = selected.zipWithIndex.map {
+      case (s, i) =>
+        val u = uuid(i)
+        val id = g.id(u)
+        if (id == -1) {
+          s
+        } else if (g.category(id).equalsIgnoreCase(category(i))) {
+        g.selected(id)
+        } else {
+          s
+        }
+    }.toArray
+
+    Graph.make(elements ++ Map[String,Any](
+      "position" -> tmp1,
+      "selected"  -> tmp2) // need to recompute things
+    )
+  }
 }

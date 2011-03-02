@@ -45,9 +45,9 @@ object Filters {
             if (!g.category(i).equalsIgnoreCase(g.category(j))) {
               true
             } else {
-            //if (g.hasThisLink(j,i))
-            //  true // always keep mutual links
-           // else 
+              //if (g.hasThisLink(j,i))
+              //  true // always keep mutual links
+              // else 
               (range._1 <= weight && weight <= range._2) // else we filter
             }
         }
@@ -56,4 +56,13 @@ object Filters {
     h + ("activity" -> Metrics.activity(h,g))
   }
   
+  def weightToSize(g: Graph) : Graph = {
+    if (g.nbNodes == 0) return g
+    val ratio = 1.0 * g.get[Double]("filter.node.size")
+    //println("applyWeightToSize: " + ratio)
+    val newSize = g.weight map {
+      case weight => weight * ratio
+    }
+    g + ("size" -> newSize)
+  }
 }

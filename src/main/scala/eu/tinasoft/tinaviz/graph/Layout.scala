@@ -64,6 +64,10 @@ object Layout {
       lastHash = g.hashed
       println("hash changed, regenerating a particle system..")
       
+      //g.position.zipWithIndex map {
+        
+     // }
+      
       /*
        gravity = ps.makeParticle
       
@@ -89,13 +93,11 @@ object Layout {
                   val d = Maths.map( g.links(i)(j), minMaxWeights, (3.0, 6.0))
                   //
                   ps.makeSpring(p1, p2, springFactor, springFactor, d.toFloat) // 10.0f
-                  
                 }
                  // we repulse unrelated nodes
                 else if (!g.hasAnyLink(i, j)) ps.makeAttraction(p1, p2, -1000f, 10f)
            
               }
-
           }
       }
     }
