@@ -52,7 +52,7 @@ object Layout {
     
     //println("running forceVector on "+nbNodes+" nodes")
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
-    val cooling =1.0
+    val cooling = 1.0
 
     if (g.hashed != lastHash) {
       lastHash = g.hashed
@@ -84,7 +84,7 @@ object Layout {
               if (j != i) {
                 // if we have a link, we create a sprinf
                 if (g.hasThisLink(i, j)) {
-                  val d = Maths.map( g.links(i)(j), minMaxWeights, (3.0, 6.0))
+                  val d = Maths.map( g.links(i)(j), minMaxWeights, (3.0, 3.5))  // seems pretty small..
                   //
                   ps.makeSpring(p1, p2, springFactor, springFactor, d.toFloat) // 10.0f
                 }

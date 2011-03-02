@@ -59,9 +59,10 @@ object Filters {
   def weightToSize(g: Graph) : Graph = {
     if (g.nbNodes == 0) return g
     val ratio = 1.0 * g.get[Double]("filter.node.size")
+    val minmaxweight =  (g.get[Double]("minNodeWeight"), g.get[Double]("maxNodeWeight"))
     //println("applyWeightToSize: " + ratio)
     val newSize = g.weight map {
-      case weight => weight * ratio
+      case weight => Maths.map(weight,minmaxweight,(1.0, 100.0)) * ratio
     }
     g + ("size" -> newSize)
   }
