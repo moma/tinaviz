@@ -215,8 +215,8 @@ object Pipeline extends node.util.Actor {
           key match {
             case "filter.view" =>
               //println("filter.view")
-              categoryCache = data.updatePositionWithCategory(layoutCache)
-              categoryCache = applyCategory(categoryCache)
+              data = data.updatePositionWithCategory(layoutCache)
+              categoryCache = applyCategory(data)
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
@@ -225,8 +225,8 @@ object Pipeline extends node.util.Actor {
             case "filter.node.category" =>
               //println("filter.node.category")
               println("we store the positions")
-              categoryCache = data.updatePositionWithCategory(layoutCache)
-              categoryCache = applyCategory(categoryCache)
+              data = data.updatePositionWithCategory(layoutCache)
+              categoryCache = applyCategory(data)
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
@@ -234,6 +234,7 @@ object Pipeline extends node.util.Actor {
               updateScreen
             case "filter.node.weight" =>
               //println("nodeWeightCache = applyNodeWeight(categoryCache)")
+              data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
@@ -241,6 +242,7 @@ object Pipeline extends node.util.Actor {
               updateScreen
             case "filter.edge.weight" =>
               //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+              data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
@@ -248,6 +250,7 @@ object Pipeline extends node.util.Actor {
               updateScreen
             case "filter.node.size" =>
               //println("categoryCache = applyWeightToSize(categoryCache)")
+              data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)

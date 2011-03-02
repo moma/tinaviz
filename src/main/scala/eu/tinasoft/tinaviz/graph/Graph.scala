@@ -538,15 +538,13 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
     val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
       case (elem, i) =>
-        val u = uuid(i)
-        val id = g.id(u)
+        val id = g.id(uuid(i))
         if (id == -1) elem else g.position(id)
     }.toArray
 
     val tmp2: Array[Boolean] = selected.zipWithIndex.map {
       case (s, i) =>
-        val u = uuid(i)
-        val id = g.id(u)
+        val id = g.id(uuid(i))
         if (id == -1) s else g.selected(id)
     }.toArray
 
@@ -562,8 +560,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
     val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
       case (elem, i) =>
-        val u = uuid(i)
-        val id = g.id(u) 
+        val id = g.id(uuid(i))
         if (id == -1) {
           elem
         } else if (g.category(id).equalsIgnoreCase(category(i))) {
@@ -575,8 +572,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
     val tmp2: Array[Boolean] = selected.zipWithIndex.map {
       case (s, i) =>
-        val u = uuid(i)
-        val id = g.id(u)
+        val id = g.id(uuid(i))
         if (id == -1) {
           s
         } else if (g.category(id).equalsIgnoreCase(category(i))) {
