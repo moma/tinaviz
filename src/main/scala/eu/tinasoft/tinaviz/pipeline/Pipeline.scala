@@ -315,6 +315,7 @@ object Pipeline extends node.util.Actor {
     Server ! msg
   }
 
+
   def applyCategory(g: Graph): Graph = {
     //println("applyCategory: "+g.debugStats)
     if (g.nbNodes == 0) return g

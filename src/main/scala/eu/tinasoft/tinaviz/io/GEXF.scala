@@ -140,6 +140,9 @@ class GEXF extends node.util.Actor {
       }
     }
 
+    def title(s: String) = { s split(" ") map(_.capitalize) mkString(" ")  }
+
+
     def attribute(e: xml.Node): (String, Any) = {
       val attr = nodeAttributes(e \ "@for" text)
       val value = (e \ "@value" text)
@@ -181,7 +184,7 @@ class GEXF extends node.util.Actor {
                             Maths.random(0.8, 1.0),
                             Maths.random(0.8, 1.0))
       g += (id, "uuid", uuid)
-      g += (id, "label", label)
+      g += (id, "label", title(label))
       g += (id, "color", color)
       g += (id, "selected", false)
       g += (id, "highlighted", false)

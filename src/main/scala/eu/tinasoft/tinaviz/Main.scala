@@ -228,7 +228,7 @@ class Main extends TApplet with Client {
             if (i==j) false else (weTouchSomething && whichIsLarger)
         }
         setFontSize((r1 * getZoom).toInt)
-        if (!weHaveACollision) text(l1, np1._1, np1._2)
+        if (!weHaveACollision) text(l1, np1._1, (np1._2 + (h1/ 2.0)).toInt)
     }
 
     showSelectionCircle(selectionRadius)
