@@ -40,6 +40,7 @@ object Browser extends node.util.Actor {
   def replace(str:String) = {
      str.replaceAll("\"","\\\"").replace("'","\\'")
   }
+
   def act() {
 
     //var model = new Model()

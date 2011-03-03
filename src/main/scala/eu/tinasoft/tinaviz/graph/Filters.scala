@@ -62,7 +62,7 @@ object Filters {
     val minmaxweight =  (g.get[Double]("minNodeWeight"), g.get[Double]("maxNodeWeight"))
     //println("applyWeightToSize: " + ratio)
     val newSize = g.weight map {
-      case weight => Maths.map(weight,minmaxweight,(1.0, 100.0)) * ratio
+      case weight => Maths.map(weight,minmaxweight,(1.0, 50.0)) * ratio
     }
     g + ("size" -> newSize)
   }

@@ -199,7 +199,7 @@ class GEXF extends node.util.Actor {
 
       for (a <- (n \\ "attvalue")) g += (id, attribute(a)._1, attribute(a)._2)
       //println("added size "+g.getArray[Double]("weight")(id))
-      
+
     }
 
     

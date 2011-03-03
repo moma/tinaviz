@@ -126,7 +126,7 @@ object Pipeline extends node.util.Actor {
           def screen2model(p: (Double, Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
           val o = screen2model(position)
           val sr = layoutCache.get[Double]("selectionRadius")
-          val r = (sr / cz) / 2.0
+          val r = (sr / cz)
           kind match {
             case 'Move =>
               var changed = false
@@ -356,7 +356,7 @@ object Pipeline extends node.util.Actor {
   def applyLayout(g: Graph) = Layout.layout(g)
   def applyWeightToSize(g: Graph): Graph = Filters.weightToSize(g)
   
-
+  /*  */
   def transformColumn[T](column: String, filter: T => T) = {
     var dataArray = data.getArray[T](column)
     dataArray.foreach {
