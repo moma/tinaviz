@@ -77,7 +77,7 @@ object Graph {
     "nbSingles" -> 0,
     "camera.zoom" -> 1.0,
     "camera.position" -> (0.0,0.0),
-    "camera.target" -> 'all, //'all, 'none, or 'selection
+    "camera.target" -> 'none, //'all, 'none, or 'selection
     "filter.node.category" -> "Document",
     "filter.view" -> "macro",
     "selectionRadius" -> 10.0,

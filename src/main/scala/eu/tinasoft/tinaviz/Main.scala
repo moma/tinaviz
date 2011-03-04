@@ -57,8 +57,6 @@ object Main {
  */
 class Main extends TApplet with Client {
 
-  var focus = 'none // 'all, 'selection, 'none
-
   override def setup(): Unit = {
     size(800, 600, PConstants.P2D)
     /*
@@ -98,9 +96,9 @@ class Main extends TApplet with Client {
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-           "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+           //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
-          //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
           //"file:///home/jbilcke/Desktop/mini.gexf"
           //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
           //"file:///home/jbilcke/test-graph.gexf"
@@ -119,10 +117,14 @@ class Main extends TApplet with Client {
     val selectionRadius = getIfPossible[Double]("selectionRadius")
     scene.graph.get[Symbol]("camera.target") match {
       case 'all =>
+        println("recentering to all")
       case 'selection =>
+        println("recentering to selection")
         // move it
       case 'none =>
+        println("recentering to none")
       case err =>
+        println("error")
     }
     // val centering = scene.graph.get[Boolean]("centering")
 
@@ -281,6 +283,7 @@ class Main extends TApplet with Client {
    * value contains here the new value of the camera zoom
    */
   override def zoomUpdated (value: Double) {
+    Server ! "camera.target" -> 'none
     Server ! "camera.zoom" -> value
   }
 
@@ -289,6 +292,7 @@ class Main extends TApplet with Client {
    *
    */
   override def positionUpdated (value: (Double, Double)) {
+    Server ! "camera.target" -> 'none
     Server ! "camera.position" -> value
   }
 
@@ -314,12 +318,9 @@ class Main extends TApplet with Client {
         
       case 'c' => Server ! "filter.node.category" -> 'toggle
       case 'v' => Server ! "filter.view" -> 'toggle
-      case 'r' =>
-        // TODO should be in a "resized" callback
-        Server ! "screen.width" -> width
-        Server ! "screen.height" -> height
-          
-        Server ! "recenter"
+      case 'r' => Server ! "camera.target" -> 'all
+      case 's' => Server ! "camera.target" -> 'selection
+
       case PConstants.CODED =>
         val amount = 15
         keyCode match {
