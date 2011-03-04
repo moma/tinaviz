@@ -225,7 +225,7 @@ object Pipeline extends node.util.Actor {
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-              layoutCache = edgeWeightCache
+              layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.node.category" =>
               //println("filter.node.category")
@@ -235,7 +235,7 @@ object Pipeline extends node.util.Actor {
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-              layoutCache = edgeWeightCache
+              layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.node.weight" =>
               //println("nodeWeightCache = applyNodeWeight(categoryCache)")
@@ -243,7 +243,7 @@ object Pipeline extends node.util.Actor {
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-              layoutCache = edgeWeightCache
+              layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.edge.weight" =>
               //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
@@ -251,7 +251,7 @@ object Pipeline extends node.util.Actor {
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-              layoutCache = edgeWeightCache
+              layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.node.size" =>
               //println("categoryCache = applyWeightToSize(categoryCache)")
@@ -260,7 +260,7 @@ object Pipeline extends node.util.Actor {
               categoryCache = applyWeightToSize(categoryCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-              layoutCache = edgeWeightCache
+              layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case any => // we don't need to update the scene for other attributes
           }
@@ -292,6 +292,16 @@ object Pipeline extends node.util.Actor {
     }
   }
 
+  def genericWorkflow {
+              //println("categoryCache = applyWeightToSize(categoryCache)")
+              data = data.updatePositionWithCategory(layoutCache)
+              categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
+              categoryCache = applyWeightToSize(categoryCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = applyCategory(edgeWeightCache)
+              updateScreen
+  }
   /**
    * Do some pre-processing, then send the final scene to the View
    * TODO: keep the Graph?
@@ -321,42 +331,7 @@ object Pipeline extends node.util.Actor {
   }
 
 
-  def applyCategory(g: Graph): Graph = {
-    //println("applyCategory: "+g.debugStats)
-    if (g.nbNodes == 0) return g
-    var removeMe = Set.empty[Int]
-    val category = g.currentCategory
-    g.get[String]("filter.view") match {
-      case "macro" =>
-        g.category.zipWithIndex map {
-          case (cat, i) =>
-            if (!g.currentCategory.equalsIgnoreCase(cat)) {
-              removeMe += i
-            }
-        }
-
-      case "meso" =>
-        //println("\n\nfiltering the meso view: "+g.debugStats)
-        g.selected.zipWithIndex foreach {
-          case (f, i) => if (!f) {
-
-              // remove the node which is not in our category
-              if (!g.currentCategory.equalsIgnoreCase(g.category(i))) {
-                removeMe += i
-              } else {
-                var keepThat = false
-                // we remove nodes not connected to the selection
-                g.selection.foreach {
-                  case j => if (g.hasAnyLink(i, j)) keepThat = true
-                }
-                if (!keepThat) removeMe += i
-              }
-            }
-        }
-    }
-    g.remove(removeMe)
-  }
-
+  def applyCategory(g: Graph) = Filters.category(g)
   def applyNodeWeight(g: Graph) = Filters.nodeWeight(g)
   def applyEdgeWeight(g: Graph) = Filters.edgeWeight(g)
   def applyLayout(g: Graph) = Layout.layout(g)

@@ -283,7 +283,7 @@ class Main extends TApplet with Client {
 
     println("big: " + big)
     // TODO should call the zoom updated callback as well
-    zoomWith(big)
+    //zoomWith(big)
     val pos =  mode match {
       case 'all =>
         g.baryCenter
