@@ -64,8 +64,13 @@ object Pipeline extends node.util.Actor {
       receive {
         // reset
         case g: Graph =>
-          data = g
-          self ! "filter.node.category" -> data.get[String]("filter.node.category")
+         data = g
+         categoryCache = applyCategory(data)
+         categoryCache = applyWeightToSize(categoryCache)
+         nodeWeightCache = applyNodeWeight(categoryCache)
+         edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+         layoutCache = edgeWeightCache
+         updateScreen
 
         case ('getNodeAttributes, uuid: String) =>
           println("Server: asked for 'getNodeAttributes " + uuid)
@@ -97,7 +102,7 @@ object Pipeline extends node.util.Actor {
 
         case('selectByPattern,pattern:String) =>
           layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
-              case label => if (pattern.isEmpty) false else (label contains pattern)
+              case label => if (pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
             })
           
           val selection = layoutCache.selectionAttributes
@@ -109,7 +114,7 @@ object Pipeline extends node.util.Actor {
             
         case('highlightByPattern,pattern:String) =>
           layoutCache = layoutCache + ("highlighted" -> layoutCache.label.map {
-              case label => if (pattern.isEmpty) false else (label contains pattern)
+              case label => if (pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
             })
           //Browser ! "_callbackSelectionChanged" -> "left"
           self ! "filter.view" -> data.get[String]("filter.view")

@@ -195,4 +195,17 @@ object Metrics  {
     }
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
   }
+
+  /**
+   * Compute a graph's selection center
+   */
+  def selectionCenter (g:Graph) : (Double,Double) = {
+    var p = (0.0, 0.0)
+    val N = g.position.size.toDouble
+    g.position.zipWithIndex foreach {
+      case ((x, y),i) =>
+        if (g.selected(i)) p = (p._1 + x, p._2 + y)
+    }
+    if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
+  }
 }

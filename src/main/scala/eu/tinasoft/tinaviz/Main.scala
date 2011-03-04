@@ -96,7 +96,7 @@ class Main extends TApplet with Client {
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-           //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+          //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
           "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
           //"file:///home/jbilcke/Desktop/mini.gexf"
@@ -115,17 +115,8 @@ class Main extends TApplet with Client {
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
-    scene.graph.get[Symbol]("camera.target") match {
-      case 'all =>
-        println("recentering to all")
-      case 'selection =>
-        println("recentering to selection")
-        // move it
-      case 'none =>
-        println("recentering to none")
-      case err =>
-        println("error")
-    }
+    _recenter(scene.graph, scene.graph.get[Symbol]("camera.target"))
+
     // val centering = scene.graph.get[Boolean]("centering")
 
     // we need to manually move the camera
@@ -137,14 +128,14 @@ class Main extends TApplet with Client {
       setColor(scene.foreground)
       setFontSize(9)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + scene.nbNodes + " nodes ("+scene.graph.nbSingles+" singles), " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
+      text("drawing " + scene.nbNodes + " nodes (" + scene.graph.nbSingles + " singles), " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
 
-    setupCamera// TODO use an immutable Camera (this is the reason for the selection disk bug)
+    setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
     setLod(32)
     lineThickness(1)
     noFill
-    
+
     val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter {
       case (position, i) => isVisible(screenPosition(position))
     }
@@ -166,7 +157,7 @@ class Main extends TApplet with Client {
           }
           // lineThickness(weight * getScale)
           if (visibleNodes.size < 100000) {
-             drawCurve(source, target)
+            drawCurve(source, target)
           }
         }
     }
@@ -174,7 +165,7 @@ class Main extends TApplet with Client {
     setLod(16)
     lineThickness(0)
     noStroke
-   
+
 
     visibleNodes.foreach {
       case (position, i) =>
@@ -193,7 +184,7 @@ class Main extends TApplet with Client {
         }
     }
 
-    def compare(i:Int, j: Int) : Boolean = {
+    def compare(i: Int, j: Int): Boolean = {
       val r1 = scene.nodeSizeLayer(i)
       val l1 = scene.nodeLabelLayer(i)
       val r2 = scene.nodeSizeLayer(j)
@@ -203,7 +194,9 @@ class Main extends TApplet with Client {
       rez
     }
 
-    val sortedLabelIDs = visibleNodes.map { _._2 }.toList.sort(compare).toArray
+    val sortedLabelIDs = visibleNodes.map {
+      _._2
+    }.toList.sort(compare).toArray
 
     setColor(scene.labelColor) // default color
     sortedLabelIDs.foreach {
@@ -230,51 +223,75 @@ class Main extends TApplet with Client {
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1)) || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2))) && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2)) || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
             val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (scene.nodeLabelLayer(j).compareTo(scene.nodeLabelLayer(i)) > 0))
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
-            if (i==j) false else (weTouchSomething && whichIsLarger)
+            if (i == j) false else (weTouchSomething && whichIsLarger)
         }
         setFontSize((r1 * getZoom).toInt)
-        if (!weHaveACollision) text(l1, np1._1, (np1._2 + (h1/ 2.0)).toInt)
+        if (!weHaveACollision) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
     }
 
     showSelectionCircle(selectionRadius)
   }
 
 
-  private def _recenter(g:Graph) = {
-       val w = width.toDouble
-       val h = height.toDouble
-       val cz = g.cameraZoom
-       val cp = g.cameraPosition
-       def model2screen(p: (Double,
-                            Double)): (Int,
-                                       Int) = (((p._1 + cp._1) * cz).toInt,
-                                               ((p._2 + cp._2) * cz).toInt)
-       def screen2model(p: (Double,
-                            Double)): (Double,
-                                       Double) = ((p._1 - cp._1) / cz,
-                                                  (p._2 - cp._2) / cz)
+  private def _recenter(g: Graph, mode : Symbol) {
 
-       // first we normalize the graph (although optional - this might interfer with the layout)
-       //val h = normalizePositions(g)
-       val (xMin,yMin,
-            xMax,yMax) = (g.get[Double]("xMin"),g.get[Double]("yMin"),
-                          g.get[Double]("xMax"),g.get[Double]("yMax"))
-       // now we want the coordinate within the screen
-       val (a,b) = (model2screen(xMin,yMin), model2screen(xMax,yMax))
-       val (sxMin,syMin,
-            sxMax,syMax) = (a._1.toDouble,a._1.toDouble,
-                            b._2.toDouble,b._2.toDouble)
-       println("sxMin,syMin,sxMax,syMax = "+(sxMin,syMin,sxMax,syMax))
+    mode match {
+      case 'all =>
+        println("recentering to all")
+      case 'selection =>
+        println("recentering to selection")
 
-       // then we want to compute the difference
-       val (xRatio,yRatio) = (abs(sxMax-sxMin) / width,
-                              abs(syMax-syMin) / height)
+      // move it
+      case 'none =>
+        println("recentering to none")
+        return
+      case err =>
+        println("error")
+        return
+    }
+    val w = width.toDouble
+    val h = height.toDouble
+    val cz = g.cameraZoom
+    val cp = g.cameraPosition
+    def model2screen(p: (Double,
+      Double)): (Int,
+      Int) = (((p._1 + cp._1) * cz).toInt,
+      ((p._2 + cp._2) * cz).toInt)
+    def screen2model(p: (Double,
+      Double)): (Double,
+      Double) = ((p._1 - cp._1) / cz,
+      (p._2 - cp._2) / cz)
 
-       println("xRatio: "+xRatio+" yRatio: "+yRatio)
-       val big = max(xRatio,yRatio)
+    // first we normalize the graph (although optional - this might interfer with the layout)
+    //val h = normalizePositions(g)
+    val (xMin, yMin,
+    xMax, yMax) = (g.get[Double]("xMin"), g.get[Double]("yMin"),
+      g.get[Double]("xMax"), g.get[Double]("yMax"))
+    // now we want the coordinate within the screen
+    val (a, b) = (model2screen(xMin, yMin), model2screen(xMax, yMax))
+    val (sxMin, syMin,
+    sxMax, syMax) = (a._1.toDouble, a._1.toDouble,
+      b._2.toDouble, b._2.toDouble)
+    println("sxMin,syMin,sxMax,syMax = " + (sxMin, syMin, sxMax, syMax))
 
-       println("big: "+big)
+    // then we want to compute the difference
+    val (xRatio, yRatio) = (abs(sxMax - sxMin) / width,
+      abs(syMax - syMin) / height)
+
+    println("xRatio: " + xRatio + " yRatio: " + yRatio)
+    val big = max(xRatio, yRatio)
+
+    println("big: " + big)
     // TODO should call the zoom updated callback as well
+    zoomWith(big)
+    val pos =  mode match {
+      case 'all =>
+        g.baryCenter
+      case 'selection =>
+        g.selectionCenter
+    }
+    println("position: "+pos)
+    updatePosition(pos)
   }
 
   /**
@@ -282,7 +299,7 @@ class Main extends TApplet with Client {
    * this is called whenever the zoom is updated
    * value contains here the new value of the camera zoom
    */
-  override def zoomUpdated (value: Double) {
+  override def zoomUpdated(value: Double) {
     Server ! "camera.target" -> 'none
     Server ! "camera.zoom" -> value
   }
@@ -291,12 +308,12 @@ class Main extends TApplet with Client {
    * We override the positionUpdated callback
    *
    */
-  override def positionUpdated (value: (Double, Double)) {
+  override def positionUpdated(value: (Double, Double)) {
     Server ! "camera.target" -> 'none
     Server ! "camera.position" -> value
   }
 
-  override def mouseUpdated (kind: Symbol,
+  override def mouseUpdated(kind: Symbol,
                             side: Symbol,
                             count: Symbol,
                             position: (Double, Double)) {
@@ -308,14 +325,14 @@ class Main extends TApplet with Client {
    * We use here the processing-provided "key" variable, which give us the key code
    *
    */
-  override def keyPressed () {
+  override def keyPressed() {
     key match {
       case 'p' => Server ! "pause" -> 'toggle
       case 'a' => Server ! "pause" -> 'toggle
       case 'n' => Server ! "drawing.nodes" -> 'toggle
       case 'l' => Server ! "drawing.edges" -> 'toggle
-      case 'e' => Server ! ("export","gexf")
-        
+      case 'e' => Server ! ("export", "gexf")
+
       case 'c' => Server ! "filter.node.category" -> 'toggle
       case 'v' => Server ! "filter.view" -> 'toggle
       case 'r' => Server ! "camera.target" -> 'all
@@ -332,7 +349,7 @@ class Main extends TApplet with Client {
 
         }
       case x =>
-        //
+    //
     }
   }
 }
