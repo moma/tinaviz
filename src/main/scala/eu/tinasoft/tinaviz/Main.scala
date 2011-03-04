@@ -15,7 +15,8 @@ import tinaviz.io.Browser
 import tinaviz.scene._
 import tinaviz.util._
 import tinaviz.util.Color._
-import math.Pi
+import tinaviz.graph._
+import math._
 
 
 /**
@@ -56,6 +57,8 @@ object Main {
  */
 class Main extends TApplet with Client {
 
+  var focus = 'none // 'all, 'selection, 'none
+
   override def setup(): Unit = {
     size(800, 600, PConstants.P2D)
     /*
@@ -95,9 +98,9 @@ class Main extends TApplet with Client {
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-          // "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+           "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
-          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
           //"file:///home/jbilcke/Desktop/mini.gexf"
           //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
           //"file:///home/jbilcke/test-graph.gexf"
@@ -234,7 +237,7 @@ class Main extends TApplet with Client {
     showSelectionCircle(selectionRadius)
   }
 
-  /*
+
   private def _recenter(g:Graph) = {
        val w = width.toDouble
        val h = height.toDouble
@@ -269,25 +272,39 @@ class Main extends TApplet with Client {
        val big = max(xRatio,yRatio)
 
        println("big: "+big)
+    // TODO should call the zoom updated callback as well
   }
-  */
-  override def zoomUpdated(value: Double) {
+
+  /**
+   * We override the zoomUpdated callback
+   * this is called whenever the zoom is updated
+   * value contains here the new value of the camera zoom
+   */
+  override def zoomUpdated (value: Double) {
     Server ! "camera.zoom" -> value
   }
 
-  override def positionUpdated(value: (Double, Double)) {
+  /**
+   * We override the positionUpdated callback
+   *
+   */
+  override def positionUpdated (value: (Double, Double)) {
     Server ! "camera.position" -> value
   }
 
-  override def mouseUpdated(kind: Symbol,
+  override def mouseUpdated (kind: Symbol,
                             side: Symbol,
                             count: Symbol,
                             position: (Double, Double)) {
     Server ! ("camera.mouse", kind, side, count, position)
   }
 
-
-  override def keyPressed() {
+  /**
+   * Called whenever a key is pressed by the user
+   * We use here the processing-provided "key" variable, which give us the key code
+   *
+   */
+  override def keyPressed () {
     key match {
       case 'p' => Server ! "pause" -> 'toggle
       case 'a' => Server ! "pause" -> 'toggle
