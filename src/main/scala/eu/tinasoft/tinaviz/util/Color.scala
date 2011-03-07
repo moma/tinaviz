@@ -45,7 +45,7 @@ object Samba extends Scheme (
   )
 )
 
-object Rio extends Scheme (
+object LePort extends Scheme (
   // blue
   new Palette(
     new Color (0.54722, 0.86, 0.79),
@@ -53,6 +53,31 @@ object Rio extends Scheme (
     new Color (0.54722, 0.92, 0.52),
     new Color (0.54722, 0.64, 0.89),
     new Color (0.54722, 0.47, 0.89)),
+
+// yellow
+  new Palette(
+    new Color (0.13055, 0.90, 1.00),
+    new Color (0.13055, 0.68, 0.76),
+    new Color (0.13055, 0.95, 0.67),
+    new Color (0.13055, 0.67, 1.00),
+    new Color (0.13055, 0.49, 1.00)),
+  // red
+  new Palette(
+    new Color (1.0, 0.89, 97),
+    new Color (1.0, 0.68, 0.74),
+    new Color (1.0, 0.95, 0.65),
+    new Color (1.0, 0.67, 0.98),
+    new Color (1.0, 0.49, 0.98))
+)
+
+object Rio extends Scheme (
+  // blue
+  new Palette(
+    new Color (0.247, 0.51, 0.75), // standard
+    new Color (0.247, 0.69, 0.73), // dark
+    new Color (0.247, 0.95, 0.67), // darker
+    new Color (0.23, 0.67, 0.87), // light
+    new Color (0.23, 0.47, 0.87)),// lighter
 
 // yellow
   new Palette(

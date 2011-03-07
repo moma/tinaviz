@@ -42,7 +42,7 @@ class GEXF extends node.util.Actor {
           }
 
         case graph: Graph =>
-          
+
           // yes, we have to duplicate work done by the Sketch actor here..
           // in the future, this will be fusioned to a single function working
           // on Graphs (no more Sketch/Scene)
@@ -50,7 +50,7 @@ class GEXF extends node.util.Actor {
           val newColors = graph.selected.zipWithIndex map {
             case (selected, i) =>
               val mode = if (selected) 'selected else if (graph.highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
-        
+
               val color = graph category i match {
                 case "Document" => Rio.primary
                 case "NGram" => Rio.tertiary
@@ -65,7 +65,7 @@ class GEXF extends node.util.Actor {
               val c = new java.awt.Color(java.awt.Color.HSBtoRGB(0.6f,0.5f,0.8f))
               (c.getRed,c.getGreen,c.getBlue)
           }
-          
+
           reply (
             <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
               <meta lastmodifieddate="1986-03-24">
@@ -76,10 +76,10 @@ class GEXF extends node.util.Actor {
                 <attributes class="node" type="static">
                   <attribute id="0" title="category" type="string"/>
                 </attributes>
-                <nodes>{ 
-                   for ((nodeUUID,nodeIndex) <- graph.uuid.zipWithIndex) yield 
+                <nodes>{
+                   for ((nodeUUID,nodeIndex) <- graph.uuid.zipWithIndex) yield
                      <node id={nodeUUID} label={ graph.label(nodeIndex) }>
-                       { val p = graph.position(nodeIndex) 
+                       { val p = graph.position(nodeIndex)
                         <viz:position x={ p._1.toString } y={ p._2.toString } z="0.0"/> }
                        { val (r,g,b) = newColors(nodeIndex)
                         <viz:color b={ r.toString } g={ g.toString } r={ b.toString }/> }
@@ -89,7 +89,7 @@ class GEXF extends node.util.Actor {
                         </attvalues>
                       </node>
                   }</nodes>
-                <edges>{ 
+                <edges>{
                    var edgeIndex = 0
                    for ((links,nodeIndex) <- graph.links.zipWithIndex; (target, weight) <- links) yield {
                      edgeIndex += 1
@@ -154,6 +154,7 @@ class GEXF extends node.util.Actor {
           case x: String => value.toString
           case x => value
         })
+
     }
     var g = new Graph()
     var id = -1
@@ -190,7 +191,7 @@ class GEXF extends node.util.Actor {
       g += (id, "highlighted", false)
       g += (id, "updateStatus", 'outdated ) // outdated, updating, updated, failure
       g += (id, "saveSatatus", 'saved ) // saving, saved
-     
+
       g += (id, "density", 1.0)
       g += (id, "rate", 1)
       g += (id, "size", 1.0)
@@ -200,12 +201,22 @@ class GEXF extends node.util.Actor {
       g += (id, "position", position)
       g += (id, "links", Map.empty[Int, Double])
 
-      for (a <- (n \\ "attvalue")) g += (id, attribute(a)._1, attribute(a)._2)
-      //println("added size "+g.getArray[Double]("weight")(id))
+      var keywords = List.empty[String]
+      for (a <- (n \\ "attvalue")) {
 
+          val at = attribute(a)
+             if (at._1.equalsIgnoreCase("keyword")) {
+                 keywords ::= (at._2 match { case s:String => s case a => ""})
+             } else {
+                 g += (id,at._1, at._2)
+            }
+      }
+      //println("added size "+g.getArray[Double]("weight")(id))
+      g += (id, "keywords", keywords.toList.toArray)
     }
 
-    
+
+
     for (e <- (root \\ "edge")) {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
@@ -220,7 +231,7 @@ class GEXF extends node.util.Actor {
     Graph.make(g.elements)
   }
 
-  
+
   /*
    implicit def urlToString(url: java.net.URL): String = {
    val b = new StringBuilder

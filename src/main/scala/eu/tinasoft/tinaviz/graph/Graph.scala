@@ -108,7 +108,8 @@ object Graph {
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
     "baryCenter" -> (0.0, 0.0),
-    "selectionCenter" -> (0.0, 0.0)
+    "selectionCenter" -> (0.0, 0.0),
+    "layout" -> "tinaforce"
 
   )
 }
@@ -163,6 +164,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val currentView = get[String]("filter.view")
   lazy val baryCenter = get[(Double,Double)]("baryCenter")
   lazy val selectionCenter = get[(Double,Double)]("selectionCenter")
+  lazy val layout = get[String]("layout")
 
   // hashcode will change if nodes/links are added/deleted
   lazy val hashed = (uuid.toList.mkString("") + links.map{ case mapID => mapID.hashCode }.toList.mkString("")).hashCode
@@ -208,10 +210,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case v: Color => List[Color](v).toArray
           case v: Symbol => List[Symbol](v).toArray
           case v: (Double, Double) => List[(Double, Double)](v).toArray
+          case v: Array[String] => List[Array[String]](v).toArray
           case v: Array[Symbol] => List[Array[Symbol]](v).toArray
           case v: Array[Double] => List[Array[Double]](v).toArray
           case v: Array[Int] => List[Array[Int]](v).toArray
           case v: List[Double] => List[List[Double]](v).toArray
+          case v: List[String] => List[List[String]](v).toArray
           case v: List[Int] => List[List[Int]](v).toArray
           case v: Set[Int] => List[Set[Int]](v).toArray
           case v: Map[Int, Double] => List[Map[Int, Double]](v).toArray
@@ -269,6 +273,14 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             var m = getArray[Array[Double]](k)
             if (id < m.size) m(id) = v else m = (m.toList ::: List[Array[Double]](v)).toArray
             m
+          case v: List[String] =>
+            var m = getArray[List[String]](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List[List[String]](v)).toArray
+            m
+          case v: Array[String] =>
+            var m = getArray[Array[String]](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List[Array[String]](v)).toArray
+            m
           case v: List[Int] =>
             var m = getArray[List[Int]](k)
             if (id < m.size) m(id) = v else m = (m.toList ::: List[List[Int]](v)).toArray
@@ -284,7 +296,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
           case v: Any =>
           // Actually, this is the only case called
-            throw new Exception("FATAL FATAL FATAL, got any: " + v)
+            throw new Exception("FATAL ERROR, GOT ANY FOR " + v)
         }
       }
     }
@@ -523,11 +535,11 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         (key, entries.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0
         }.map(_._1).toArray)
-      case (key: String, entries: Array[(Double, Double)]) =>
+      case (key: String, entries: Array[String]) =>
         (key, entries.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0
         }.map(_._1).toArray)
-      case (key: String, entries: Array[String]) =>
+      case (key: String, entries: Array[(Double, Double)]) =>
         (key, entries.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0
         }.map(_._1).toArray)
