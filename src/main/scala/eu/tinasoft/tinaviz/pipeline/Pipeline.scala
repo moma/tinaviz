@@ -203,7 +203,9 @@ object Pipeline extends node.util.Actor {
 
         case ("select", uuid: String) =>
           println("selecting node: '"+uuid+"'")
-          if (uuid.equals(" ") || uuid.isEmpty) {
+          if (uuid == null) {
+             data += "selected" -> data.selected.map(c => false)
+          } else if (uuid.equals(" ") || uuid.isEmpty) {
             data += "selected" -> data.selected.map(c => false)
           } else {
             data += (data.id(uuid), "select", true)

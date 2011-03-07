@@ -33,9 +33,7 @@ object Browser extends node.util.Actor {
     //             (if (state) "true" else "false"))
   }
 
-  private def graphImportedCallback(msg:String) = {
-    // callAndForget("_graphImportedCallback", msg)
-  }
+
 
   def replace(str:String) = {
      str.replaceAll("\"","\\\"").replace("'","\\'")
@@ -47,6 +45,9 @@ object Browser extends node.util.Actor {
 
     loop {
       react {
+
+        //   private def graphImportedCallback(msg:String) = {
+       // callAndForget("_graphImportedCallback", msg)
 
         // asynchronous call
         case func:String =>

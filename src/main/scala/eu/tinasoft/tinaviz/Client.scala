@@ -175,7 +175,15 @@ trait Client {
     }
     Server ! 'selectByPattern -> pattern
   }
-  
+
+  /**
+   * Select a node from its ID
+   *
+   * obsolete - replaced by JS code
+   *
+   * def select(uuid:String) : Unit = Server ! 'select -> uuid
+   */
+
   def highlightByPattern(pattern:String, patternMode:String) : Unit = {
     
     if (pattern == null || patternMode == null) {

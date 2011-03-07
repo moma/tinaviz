@@ -87,6 +87,7 @@ object Server extends node.util.Actor {
           properties = defaultProperties
           input = new Graph(properties ++ g.elements)
           Pipeline ! input
+          Browser ! "_graphImportedCallback" -> "success"
         //PipelineBusy = false
 
         case (graph: Graph, scene: Scene) =>
