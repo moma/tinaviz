@@ -6,12 +6,12 @@ package eu.tinasoft.tinaviz.graph
  * Date: 2/17/11
  * Time: 12:33 PM
  */
-object Metrics  {
+object Metrics {
 
   /**
    * compute the amount of information added to thiq by g
    */
-  def activity(g:Graph,f: Graph): Double = {
+  def activity(g: Graph, f: Graph): Double = {
     def max(x: Double, y: Double): Double = if (x < y) y else x
     var addNodes = 0.0
     var deletedNodes = 0.0
@@ -35,38 +35,44 @@ object Metrics  {
   /**
    * Compute the number of single nodes
    */
-  def nbSingles(g:Graph) : Int = {
+  def nbSingles(g: Graph): Int = {
     var s = 0
-    g.links.foreach { case lnk => if (lnk.size == 0) s += 1 }
+    g.links.foreach {
+      case lnk => if (lnk.size == 0) s += 1
+    }
     s
   }
 
   /**
    * Compute the number of edges
    */
-  def nbEdges(g:Graph) : Int = {
+  def nbEdges(g: Graph): Int = {
     var s = 0
-    g.links.foreach { case lnk => s += lnk.size }
+    g.links.foreach {
+      case lnk => s += lnk.size
+    }
     s
   }
 
   /**
    * Compute the number of nodes
    */
-  def nbNodes(g:Graph) : Int = g.uuid.size
+  def nbNodes(g: Graph): Int = g.uuid.size
 
   /**
    * Compute the out degree array
    */
-  def outDegree(g:Graph) : Array[Int] = {
-    val _outDegree = g.links.map { case m => m.size }
+  def outDegree(g: Graph): Array[Int] = {
+    val _outDegree = g.links.map {
+      case m => m.size
+    }
     _outDegree.toArray
   }
 
   /**
    * Compute the in degree array
    */
-  def inDegree(g:Graph) : Array[Int] = {
+  def inDegree(g: Graph): Array[Int] = {
 
     val _inDegree = g.uuid.zipWithIndex.map {
       case (n, i) =>
@@ -82,64 +88,64 @@ object Metrics  {
   /**
    * Compute the out degree extremums
    */
-  def outDegreeExtremums(g:Graph) : (Int,Int) = {
+  def outDegreeExtremums(g: Graph): (Int, Int) = {
     if (g.links.size == 0) {
-      (0,0)
+      (0, 0)
     } else {
-    var max = Int.MinValue
-    var min = Int.MaxValue
-    g.links foreach {
-      case n =>
-        val d = n.size
-        if (d < min) min = d
-        if (d > max) max = d
-    }
-   (min, max)
+      var max = Int.MinValue
+      var min = Int.MaxValue
+      g.links foreach {
+        case n =>
+          val d = n.size
+          if (d < min) min = d
+          if (d > max) max = d
+      }
+      (min, max)
     }
   }
 
   /**
    * Compute the in degree extremums
    */
-  def inDegreeExtremums(g:Graph) : (Int,Int) = {
+  def inDegreeExtremums(g: Graph): (Int, Int) = {
     if (g.links.size == 0) {
-      (0,0)
+      (0, 0)
     } else {
-    var max = Int.MinValue
-    var min = Int.MaxValue
+      var max = Int.MinValue
+      var min = Int.MaxValue
 
-    g.ids foreach {
-      case id =>
-        var d = 0
-        g.links foreach {
-          case m => if (m.contains(id)) d += 1
-        }
-        if (d < min) min = d
-        if (d > max) max = d
-    }
-      (min,max)
+      g.ids foreach {
+        case id =>
+          var d = 0
+          g.links foreach {
+            case m => if (m.contains(id)) d += 1
+          }
+          if (d < min) min = d
+          if (d > max) max = d
+      }
+      (min, max)
     }
   }
 
   /**
    * Compute the extremums (X min, X max, Y min, Y max)
    */
-  def extremums(g:Graph) : (Double,Double,Double,Double) = {
+  def extremums(g: Graph): (Double, Double, Double, Double) = {
     if (g.position.size == 0) {
-    (0.0,0.0,0.0,0.0)
+      (0.0, 0.0, 0.0, 0.0)
     } else {
-    var xMax = Double.MinValue
-    var xMin = Double.MaxValue
-    var yMax = Double.MinValue
-    var yMin = Double.MaxValue
-    g.position foreach {
-      case (x, y) =>
-        if (x < xMin) xMin = x
-        if (x > xMax) xMax = x
-        if (y < yMin) yMin = y
-        if (y > yMax) yMax = y
-    }
-     (xMax,xMin, yMax, yMin)
+      var xMax = Double.MinValue
+      var xMin = Double.MaxValue
+      var yMax = Double.MinValue
+      var yMin = Double.MaxValue
+      g.position foreach {
+        case (x, y) =>
+          if (x < xMin) xMin = x
+          if (x > xMax) xMax = x
+          if (y < yMin) yMin = y
+          if (y > yMax) yMax = y
+      }
+      (xMax, xMin, yMax, yMin)
     }
   }
 
@@ -147,18 +153,27 @@ object Metrics  {
    * Compute the node weight extremums (min node weight, max node weight)
    * return a Tuple of Double
    */
-  def nodeWeightExtremums (g:Graph) : (Double,Double) = {
+  def nodeWeightExtremums(g: Graph): (Double, Double, Double, Double) = {
     if (g.position.size == 0) {
-       (0.0,0.0)
+      (0.0, 0.0, 0.0, 0.0)
     } else {
-    var max = Double.MinValue
-    var min = Double.MaxValue
-    g.weight foreach {
-      case x =>
-        if (x < min) min = x
-        if (x > max) max = x
-    }
-    (min, max)
+      var amax = Double.MinValue
+      var amin = Double.MaxValue
+      var bmax = Double.MinValue
+      var bmin = Double.MaxValue
+      g.weight.zipWithIndex foreach {
+        case (x, i) =>
+          g.category(i) match {
+            case "NGram" =>
+              if (x < bmin) bmin = x
+              if (x > bmax) bmax = x
+            case "Document" =>
+              if (x < amin) amin = x
+              if (x > amax) amax = x
+          }
+
+      }
+      (amin, amax, bmin, bmax)
     }
   }
 
@@ -166,28 +181,36 @@ object Metrics  {
    * Compute the edge weight extremums (min edge weight, max edge weight)
    * return a Tuple of Double
    */
-  def edgeWeightExtremums (g:Graph) : (Double,Double) = {
-    if (g.links.size == 0)  {
-      (0.0,0.0)
+  def edgeWeightExtremums(g: Graph): (Double, Double, Double, Double) = {
+    if (g.links.size == 0) {
+      (0.0, 0.0, 0.0, 0.0)
     } else {
-    var max = Double.MinValue
-    var min = Double.MaxValue
-    g.links foreach {
-      case lnks =>
-        lnks.foreach {
-          case (id, weight) =>
-            if (weight < min) min = weight
-            if (weight > max) max = weight
-        }
-    }
-    (min, max)
+      var amax = Double.MinValue
+      var amin = Double.MaxValue
+      var bmax = Double.MinValue
+      var bmin = Double.MaxValue
+      g.links.zipWithIndex foreach {
+        case (lnks, i) =>
+          lnks.foreach {
+            case (id, weight) =>
+              g.category(i) match {
+                case "NGram" =>
+                  if (weight < bmin) bmin = weight
+                  if (weight > bmax) bmax = weight
+                case "Document" =>
+                  if (weight < amin) amin = weight
+                  if (weight > amax) amax = weight
+              }
+          }
+      }
+      (amin, amax, bmin, bmax)
     }
   }
 
   /**
    * Compute a graph's barycenter
    */
-  def baryCenter (g:Graph) : (Double,Double) = {
+  def baryCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
     val N = g.position.size.toDouble
     g.position foreach {
@@ -199,11 +222,11 @@ object Metrics  {
   /**
    * Compute a graph's selection center
    */
-  def selectionCenter (g:Graph) : (Double,Double) = {
+  def selectionCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
     val N = g.position.size.toDouble
     g.position.zipWithIndex foreach {
-      case ((x, y),i) =>
+      case ((x, y), i) =>
         if (g.selected(i)) p = (p._1 + x, p._2 + y)
     }
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)

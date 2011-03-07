@@ -30,9 +30,12 @@ object Server extends node.util.Actor {
     // current view settings
     "filter.view" -> "macro",
     "filter.node.category" -> "Document",
-    "filter.node.weight" -> (0.0, 1.0),
-    "filter.edge.weight" -> (0.0, 1.0),
-    "filter.node.size" -> .2,
+    "filter.a.node.weight" -> (0.0, 1.0),
+    "filter.a.edge.weight" -> (0.0, 1.0),
+    "filter.a.node.size" -> .2,
+    "filter.b.node.weight" -> (0.0, 1.0),
+    "filter.b.edge.weight" -> (0.0, 1.0),
+    "filter.b.node.size" -> .2,
     "layout.gravity" -> 1.3, // stronger means faster!
     "layout.attraction" -> 1.01,
     "layout.repulsion" -> 1.5,
@@ -128,29 +131,54 @@ object Server extends node.util.Actor {
           reply (Pipeline !? 'getNodesAttributes -> uuid)
 
         // TODO do something for this, it looks a bit creepy
-        case ("filter.node.weight.min", value: Double) =>
-          self ! (("filter.node.weight", (value, properties("filter.node.weight").asInstanceOf[(Double, Double)]._2)))
+        case ("filter.a.node.weight.min", value: Double) =>
+          self ! (("filter.a.node.weight", (value, properties("filter.a.node.weight").asInstanceOf[(Double, Double)]._2)))
 
-        case ("filter.node.weight.max", value: Double) =>
-          self ! (("filter.node.weight", (properties("filter.node.weight").asInstanceOf[(Double, Double)]._1, value)))
+        case ("filter.a.node.weight.max", value: Double) =>
+          self ! (("filter.a.node.weight", (properties("filter.a.node.weight").asInstanceOf[(Double, Double)]._1, value)))
 
-        case ("filter.edge.weight.min", value: Double) =>
-          self ! (("filter.edge.weight", (value, properties("filter.edge.weight").asInstanceOf[(Double, Double)]._2)))
+        case ("filter.a.edge.weight.min", value: Double) =>
+          self ! (("filter.a.edge.weight", (value, properties("filter.a.edge.weight").asInstanceOf[(Double, Double)]._2)))
 
-        case ("filter.edge.weight.max", value: Double) =>
-          self ! (("filter.edge.weight", (properties("filter.edge.weight").asInstanceOf[(Double, Double)]._1, value)))
+        case ("filter.a.edge.weight.max", value: Double) =>
+          self ! (("filter.a.edge.weight", (properties("filter.a.edge.weight").asInstanceOf[(Double, Double)]._1, value)))
 
-        case "filter.node.weight.min" =>
-          reply(properties("filter.node.weight").asInstanceOf[(Double, Double)]._1)
+        case "filter.a.node.weight.min" =>
+          reply(properties("filter.a.node.weight").asInstanceOf[(Double, Double)]._1)
 
-        case "filter.node.weight.max" =>
-          reply(properties("filter.node.weight").asInstanceOf[(Double, Double)]._2)
+        case "filter.a.node.weight.max" =>
+          reply(properties("filter.a.node.weight").asInstanceOf[(Double, Double)]._2)
 
-        case "filter.edge.weight.min" =>
-          reply(properties("filter.edge.weight").asInstanceOf[(Double, Double)]._1)
+        case "filter.a.edge.weight.min" =>
+          reply(properties("filter.a.edge.weight").asInstanceOf[(Double, Double)]._1)
 
-        case "filter.edge.weight.max" =>
-          reply(properties("filter.edge.weight").asInstanceOf[(Double, Double)]._2)
+        case "filter.a.edge.weight.max" =>
+          reply(properties("filter.a.edge.weight").asInstanceOf[(Double, Double)]._2)
+
+        // TODO do something for this, it looks a bit creepy
+        case ("filter.b.node.weight.min", value: Double) =>
+          self ! (("filter.b.node.weight", (value, properties("filter.b.node.weight").asInstanceOf[(Double, Double)]._2)))
+
+        case ("filter.b.node.weight.max", value: Double) =>
+          self ! (("filter.b.node.weight", (properties("filter.b.node.weight").asInstanceOf[(Double, Double)]._1, value)))
+
+        case ("filter.b.edge.weight.min", value: Double) =>
+          self ! (("filter.b.edge.weight", (value, properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._2)))
+
+        case ("filter.b.edge.weight.max", value: Double) =>
+          self ! (("filter.b.edge.weight", (properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._1, value)))
+
+        case "filter.b.node.weight.min" =>
+          reply(properties("filter.b.node.weight").asInstanceOf[(Double, Double)]._1)
+
+        case "filter.b.node.weight.max" =>
+          reply(properties("filter.b.node.weight").asInstanceOf[(Double, Double)]._2)
+
+        case "filter.b.edge.weight.min" =>
+          reply(properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._1)
+
+        case "filter.b.edge.weight.max" =>
+          reply(properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._2)
 
         case ("camera.mouse", kind, side, count, position) =>
           Pipeline ! ("camera.mouse", kind, side, count, position)

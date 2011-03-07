@@ -44,10 +44,10 @@ object Graph {
     g = g ++ Map[String,Any]("xMax" -> e._1, "xMin" -> e._2, "yMax" -> e._3, "yMin" -> e._4)
 
     val nwe = Metrics nodeWeightExtremums g
-    g = g ++ Map[String,Any]("minNodeWeight" -> nwe._1, "maxNodeWeight" -> nwe._2)
+    g = g ++ Map[String,Any]("minANodeWeight" -> nwe._1, "maxANodeWeight" -> nwe._2, "minBNodeWeight" -> nwe._3, "maxBNodeWeight" -> nwe._4)
 
     val ewe = Metrics edgeWeightExtremums g
-    g = g ++ Map[String,Any]("minEdgeWeight" -> ewe._1, "maxEdgeWeight" -> ewe._2)
+    g = g ++ Map[String,Any]("minAEdgeWeight" -> ewe._1, "maxAEdgeWeight" -> ewe._2,"minBEdgeWeight" -> ewe._3, "maxBEdgeWeight" -> ewe._4)
 
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
@@ -78,25 +78,32 @@ object Graph {
     "nbSingles" -> 0,
     "camera.zoom" -> 1.0,
     "camera.position" -> (0.0,0.0),
-    "camera.target" -> 'none, //'all, 'none, or 'selection
+    "camera.target" -> 'all, //'all, 'none, or 'selection
     "filter.node.category" -> "Document",
     "filter.view" -> "macro",
     "selectionRadius" -> 10.0,
-    "filter.node.size" -> 0.2,
-    "filter.node.weight" -> (0.0, 1.0),
-    "filter.edge.weight" -> (0.0, 1.0),
-    "xMin" -> 0,
-    "yMin" -> 0,
-    "xMax" -> 0,
-    "yMax" -> 0,
+    "filter.a.node.size" -> 0.2,
+    "filter.a.node.weight" -> (0.0, 1.0),
+    "filter.a.edge.weight" -> (0.0, 1.0),
+    "filter.b.node.size" -> 0.2,
+    "filter.b.node.weight" -> (0.0, 1.0),
+    "filter.b.edge.weight" -> (0.0, 1.0),
+    "xMin" -> 0.0,
+    "yMin" -> 0.0,
+    "xMax" -> 0.0,
+    "yMax" -> 0.0,
     "minOutDegree" -> 0,
     "minInDegree" -> 0,
     "maxnOutDegree" -> 0,
     "maxInDegree" -> 0,
-    "minNodeWeight" -> 0.0,
-    "maxNodeWeight" -> 0.0,
-    "minEdgeWeight" -> 0.0,
-    "maxEdgeWeight" -> 0.0,
+    "minANodeWeight" -> 0.0,
+    "maxANodeWeight" -> 0.0,
+    "minAEdgeWeight" -> 0.0,
+    "maxAEdgeWeight" -> 0.0,
+    "minBNodeWeight" -> 0.0,
+    "maxBNodeWeight" -> 0.0,
+    "minBEdgeWeight" -> 0.0,
+    "maxBEdgeWeight" -> 0.0,
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,

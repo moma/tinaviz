@@ -43,8 +43,10 @@ object Layout {
    println("setting drag to "+drag)
     ps.setDrag( drag.toFloat )
     val barycenter = g.get[(Double, Double)]("baryCenter")
-    val minMaxWeights = (g.get[Double]("minEdgeWeight"),g.get[Double]("maxEdgeWeight"))
-    
+    val aMinMaxWeights =
+       (g.get[Double]("minAEdgeWeight"),g.get[Double]("maxAEdgeWeight"))
+   val bMinMaxWeights =
+       (g.get[Double]("minBEdgeWeight"),g.get[Double]("maxBEdgeWeight"))
   
     val GRAVITY = 30 // g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
@@ -84,7 +86,11 @@ object Layout {
               if (j != i) {
                 // if we have a link, we create a sprinf
                 if (g.hasThisLink(i, j)) {
-                  val d = Maths.map( g.links(i)(j), minMaxWeights, (3.0, 3.5))  // seems pretty small..
+                  val d = Maths.map( g.links(i)(j), g.category(i) match {
+                    case "Document" => aMinMaxWeights
+                    case "NGram" => bMinMaxWeights
+
+                  }, (3.0, 3.5))  // seems pretty small..
                   //
                   ps.makeSpring(p1, p2, springFactor, springFactor, d.toFloat) // 10.0f
                 }

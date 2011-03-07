@@ -248,14 +248,16 @@ case class Sketch( var graph : Graph = new Graph,
    * Update the edges' colors layer
    *
    */
-  def updateEdgeColors(graph: Graph) {
+  def updateEdgeColors(g: Graph) {
     var tmpColor = List.empty[Color]
     //println(" node color size: "+nodeColorLayer.size)
     //println("graph links size: "+graph.links.size)
-    val extremums = (graph.get[Double]("minEdgeWeight"),
-                     graph.get[Double]("maxEdgeWeight"))
+    val aextremums = (g.get[Double]("minAEdgeWeight"),
+                     g.get[Double]("maxAEdgeWeight"))
+    val bextremums = (g.get[Double]("minBEdgeWeight"),
+                     g.get[Double]("maxBEdgeWeight"))
     val target = (0.4,1.0)
-    graph.links.zipWithIndex map {
+    g.links.zipWithIndex map {
       case (mapIntDouble, from) =>
         mapIntDouble foreach {
           // todo: use weight to ponderate the color?
@@ -267,7 +269,10 @@ case class Sketch( var graph : Graph = new Graph,
             val b = nodeColorLayer(to)
             val c = a.blend(b)
             //val d = c.saturateBy(0.4)
-            val d = c.saturation(Maths.map(weight, extremums, (0.3,1.0)))
+            val d = c.saturation(Maths.map(weight, g.category(from) match {
+              case "Document" => aextremums
+              case "NGram" => bextremums
+            }, (0.3,1.0)))
             //val d = c.alpha(Maths.map(weight, extremums, (1.0,0.3)))
             tmpColor ::= d
         }
@@ -283,10 +288,12 @@ case class Sketch( var graph : Graph = new Graph,
 
     //val min
 
-
-    val min = graph.get[Double]("minEdgeWeight")
-    val max = graph.get[Double]("maxEdgeWeight")
-
+    /*
+    val amin = graph.get[Double]("minAEdgeWeight")
+    val amax = graph.get[Double]("maxAEdgeWeight")
+    val bmin = graph.get[Double]("minBEdgeWeight")
+    val bmax = graph.get[Double]("maxBEdgeWeight")
+    */
 
     edgeWeightLayer = (for ((links, i) <- graph.links.zipWithIndex; (j, weight) <- links) yield {
       val sizes = (graph.size(i), graph.size(j))

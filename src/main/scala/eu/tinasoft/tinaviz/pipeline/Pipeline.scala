@@ -239,7 +239,7 @@ object Pipeline extends node.util.Actor {
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
-            case "filter.node.weight" =>
+            case "filter.a.node.weight" =>
               //println("nodeWeightCache = applyNodeWeight(categoryCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
@@ -247,7 +247,7 @@ object Pipeline extends node.util.Actor {
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
-            case "filter.edge.weight" =>
+            case "filter.a.edge.weight" =>
               //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
@@ -255,7 +255,32 @@ object Pipeline extends node.util.Actor {
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
-            case "filter.node.size" =>
+           case "filter.b.node.weight" =>
+              //println("nodeWeightCache = applyNodeWeight(categoryCache)")
+              data = data.updatePositionWithCategory(layoutCache)
+              categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = applyCategory(edgeWeightCache)
+              updateScreen
+            case "filter.b.edge.weight" =>
+              //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+              data = data.updatePositionWithCategory(layoutCache)
+              categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = applyCategory(edgeWeightCache)
+              updateScreen
+            case "filter.a.node.size" =>
+              //println("categoryCache = applyWeightToSize(categoryCache)")
+              data = data.updatePositionWithCategory(layoutCache)
+              categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
+              categoryCache = applyWeightToSize(categoryCache)
+              nodeWeightCache = applyNodeWeight(categoryCache)
+              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+              layoutCache = applyCategory(edgeWeightCache)
+              updateScreen
+            case "filter.b.node.size" =>
               //println("categoryCache = applyWeightToSize(categoryCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)

@@ -51,14 +51,22 @@ object Filters {
    */
   def nodeWeight(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val range = Maths.map(
-      g.get[(Double, Double)]("filter.node.weight"),
+    val rangeA = Maths.map(
+      g.get[(Double, Double)]("filter.a.node.weight"),
       (0.0, 1.0),
-      (g.get[Double]("minNodeWeight"), g.get[Double]("maxNodeWeight")))
+      (g.get[Double]("minANodeWeight"), g.get[Double]("maxANodeWeight")))
+    val rangeB = Maths.map(
+      g.get[(Double, Double)]("filter.b.node.weight"),
+      (0.0, 1.0),
+      (g.get[Double]("minBNodeWeight"), g.get[Double]("maxBNodeWeight")))
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map { 
-      case (weight, i) => 
-        if (!(range._1 <= weight && weight <= range._2)) 
+      case (weight, i) =>
+        val r = g.category(i) match {
+          case "Document" => rangeA
+          case "NGram" => rangeB
+        }
+        if (!(r._1 <= weight && weight <= r._2))
           if (!g.selected(i)) removeMe += i 
     }  
     val h = g.remove(removeMe)
@@ -70,10 +78,15 @@ object Filters {
    */
   def edgeWeight(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val range = Maths.map(
-      g.get[(Double, Double)]("filter.edge.weight"),
+    val arange = Maths.map(
+      g.get[(Double, Double)]("filter.a.edge.weight"),
       (0.0, 1.0),
-      (g.get[Double]("minEdgeWeight"), g.get[Double]("maxEdgeWeight")))
+      (g.get[Double]("minAEdgeWeight"), g.get[Double]("maxAEdgeWeight")))
+    val brange = Maths.map(
+      g.get[(Double, Double)]("filter.b.edge.weight"),
+      (0.0, 1.0),
+      (g.get[Double]("minBEdgeWeight"), g.get[Double]("maxBEdgeWeight")))
+
     //println("applyEdgeWeight: " + range + " (" + g.get[(Double, Double)]("filter.edge.weight") + ")")
     val newLinks = g.links.zipWithIndex map {
       case (links,i) => 
@@ -84,8 +97,12 @@ object Filters {
             } else {
               //if (g.hasThisLink(j,i))
               //  true // always keep mutual links
-              // else 
-              (range._1 <= weight && weight <= range._2) // else we filter
+              // else
+              g.category(i) match {
+                case "NGram" => (brange._1 <= weight && weight <= brange._2)
+                case "Document" => (arange._1 <= weight && weight <= arange._2)
+              }
+
             }
         }
     }
@@ -95,11 +112,19 @@ object Filters {
   
   def weightToSize(g: Graph) : Graph = {
     if (g.nbNodes == 0) return g
-    val ratio = 1.0 * g.get[Double]("filter.node.size")
-    val minmaxweight =  (g.get[Double]("minNodeWeight"), g.get[Double]("maxNodeWeight"))
+    val aratio = 1.0 * g.get[Double]("filter.a.node.size")
+    val bratio = 1.0 * g.get[Double]("filter.b.node.size")
+    val aminmaxweight =  (g.get[Double]("minANodeWeight"), g.get[Double]("maxANodeWeight"))
+    val bminmaxweight =  (g.get[Double]("minBNodeWeight"), g.get[Double]("maxBNodeWeight"))
     //println("applyWeightToSize: " + ratio)
-    val newSize = g.weight map {
-      case weight => Maths.map(weight,minmaxweight,(1.0, 50.0)) * ratio
+    val newSize = g.weight.zipWithIndex map {
+      case (weight,i) => Maths.map(weight, g.category(i) match {
+                                      case "NGram" => bminmaxweight
+                                      case "Document" => aminmaxweight
+                                   }, (1.0, 50.0)) * (g.category(i) match {
+                                      case "NGram" => bratio
+                                      case "Document" => aratio
+                                   })
     }
     g + ("size" -> newSize)
   }
