@@ -237,13 +237,13 @@ class Main extends TApplet with Client {
 
     mode match {
       case 'all =>
-        println("recentering to all")
+        //println("recentering to all")
       case 'selection =>
-        println("recentering to selection")
+        //println("recentering to selection")
 
       // move it
       case 'none =>
-        println("recentering to none")
+        //println("recentering to none")
         return
       case err =>
         println("error")
@@ -264,14 +264,11 @@ class Main extends TApplet with Client {
 
     // first we normalize the graph (although optional - this might interfer with the layout)
     //val h = normalizePositions(g)
-    val (xMin, yMin,
-    xMax, yMax) = (g.get[Double]("xMin"), g.get[Double]("yMin"),
+    val (xMin, yMin, xMax, yMax) = (g.get[Double]("xMin"), g.get[Double]("yMin"),
       g.get[Double]("xMax"), g.get[Double]("yMax"))
     // now we want the coordinate within the screen
     val (a, b) = (model2screen(xMin, yMin), model2screen(xMax, yMax))
-    val (sxMin, syMin,
-    sxMax, syMax) = (a._1.toDouble, a._1.toDouble,
-      b._2.toDouble, b._2.toDouble)
+    val (sxMin, syMin, sxMax, syMax) = (a._1.toDouble, a._1.toDouble, b._2.toDouble, b._2.toDouble)
     println("sxMin,syMin,sxMax,syMax = " + (sxMin, syMin, sxMax, syMax))
 
     // then we want to compute the difference
@@ -291,7 +288,11 @@ class Main extends TApplet with Client {
         g.selectionCenter
     }
     println("position: "+pos)
-    updatePosition(pos)
+    var translate = new PVector()
+    translate.add(new PVector(width / 2.0f, height / 2.0f, 0))
+    val tmp = PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), big.toFloat)
+    translate.sub(tmp)
+    updatePosition(translate)
   }
 
   /**
