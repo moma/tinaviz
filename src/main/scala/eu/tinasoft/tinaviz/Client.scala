@@ -108,6 +108,10 @@ trait Client {
       Server ! 'open -> str
     true
   }
+  def recenter() = {
+    Server ! "camera.target" -> 'all
+    true
+  }
   def set(key:String, value:Any) = {
     println("JavaScript asked for set("+key+","+value+")")
     Server ! key -> value

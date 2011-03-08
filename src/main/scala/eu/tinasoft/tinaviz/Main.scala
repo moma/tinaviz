@@ -96,9 +96,9 @@ class Main extends TApplet with Client {
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
-          //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+          "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
-          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
+          //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
           //"file:///home/jbilcke/Desktop/mini.gexf"
           //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
           //"file:///home/jbilcke/test-graph.gexf"
@@ -198,7 +198,8 @@ class Main extends TApplet with Client {
       _._2
     }.toList.sort(compare).toArray
 
-    setColor(scene.labelColor) // default color
+    val col = scene.labelColor//.alpha(..)
+    setColor(col)
     sortedLabelIDs.foreach {
       case (i) =>
         val p1 = scene.nodePositionLayer(i)
@@ -210,6 +211,7 @@ class Main extends TApplet with Client {
         val h1 = setFontSize((r1 * getZoom).toInt)
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
+        val weAreSelected = scene.graph.selected(i)
         val weHaveACollision = sortedLabelIDs.exists {
           case (j) =>
             val p2 = scene.nodePositionLayer(j)
@@ -220,13 +222,16 @@ class Main extends TApplet with Client {
             val l2 = scene.nodeLabelLayer(j)
             val h2 = setFontSize((r2 * getZoom).toInt)
             val w2 = textWidth(l2) /// getZoom //
+            val whichIsSelected = scene.graph.selected(j)
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1)) || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2))) && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2)) || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
             val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (scene.nodeLabelLayer(j).compareTo(scene.nodeLabelLayer(i)) > 0))
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
-            if (i == j) false else (weTouchSomething && whichIsLarger)
+            if (i == j) false else (weTouchSomething && (whichIsLarger || whichIsSelected))
         }
         setFontSize((r1 * getZoom).toInt)
-        if (!weHaveACollision) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
+
+        // we can show the label if we are selected, or if we do not collide with a bigger one
+        if ((!weHaveACollision) || weAreSelected) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
     }
 
     showSelectionCircle(selectionRadius)

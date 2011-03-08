@@ -250,29 +250,26 @@ case class Sketch( var graph : Graph = new Graph,
    */
   def updateEdgeColors(g: Graph) {
     var tmpColor = List.empty[Color]
-    //println(" node color size: "+nodeColorLayer.size)
-    //println("graph links size: "+graph.links.size)
-    val aextremums = (g.get[Double]("minAEdgeWeight"),
-                     g.get[Double]("maxAEdgeWeight"))
-    val bextremums = (g.get[Double]("minBEdgeWeight"),
-                     g.get[Double]("maxBEdgeWeight"))
+    val aextremums = (g.get[Double]("minAEdgeWeight"),  g.get[Double]("maxAEdgeWeight"))
+    val bextremums = (g.get[Double]("minBEdgeWeight"), g.get[Double]("maxBEdgeWeight"))
     val target = (0.4,1.0)
     g.links.zipWithIndex map {
       case (mapIntDouble, from) =>
         mapIntDouble foreach {
-          // todo: use weight to ponderate the color?
           case (to, weight) =>
-          // FEATURE we want the edge color to be a mix of source node and target node color
-          // FEATURE we want the edge color to be less saturated
-            //val v = graph.
             val a = nodeColorLayer(from)
             val b = nodeColorLayer(to)
-            val c = a.blend(b)
+            val c = if (g.category(from).equals(to)) {
+               a.blend(b)
+            } else {
+               new Color(0.5, 0.0, 0.5)
+            }
             //val d = c.saturateBy(0.4)
             val d = c.saturation(Maths.map(weight, g.category(from) match {
               case "Document" => aextremums
               case "NGram" => bextremums
             }, (0.3,1.0)))
+
             //val d = c.alpha(Maths.map(weight, extremums, (1.0,0.3)))
             tmpColor ::= d
         }

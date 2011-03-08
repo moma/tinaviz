@@ -285,8 +285,8 @@ class TApplet extends PApplet with MouseWheelListener {
    * Are the given coordinate invisible?
    */
   def isVisible(p: (Int, Int)) = {
-    val w = width / 4.
-    val h = height / 4.
+    val w = width / 16.
+    val h = height / 16.
     ((p._1 > -w) && (p._1 < (width + w))
       && (p._2 > -h) && (p._2 < (height + h)))
   }

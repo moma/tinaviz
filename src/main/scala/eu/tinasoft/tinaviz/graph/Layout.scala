@@ -244,9 +244,13 @@ object Layout {
     //var activ = 0.0
     g + ("position" -> (g.position.zipWithIndex map {
       case (nodePosition, i) =>
+        //if (g.links(i).size > 0) {
         val v = ps.getParticle(i)
         v.position().setY(nodePosition._2.toFloat)
         (v.position().x().toDouble, nodePosition._2)
+        //} else {
+        //  (0.0, 0.0)
+        //}
     }))
   }
 }
