@@ -198,8 +198,7 @@ class Main extends TApplet with Client {
       _._2
     }.toList.sort(compare).toArray
 
-    val col = scene.labelColor//.alpha(..)
-    setColor(col)
+
     sortedLabelIDs.foreach {
       case (i) =>
         val p1 = scene.nodePositionLayer(i)
@@ -223,13 +222,17 @@ class Main extends TApplet with Client {
             val h2 = setFontSize((r2 * getZoom).toInt)
             val w2 = textWidth(l2) /// getZoom //
             val whichIsSelected = scene.graph.selected(j)
-            val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1)) || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2))) && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2)) || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
+            val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1))
+                                  || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
+                                 && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
+                                  || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
             val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (scene.nodeLabelLayer(j).compareTo(scene.nodeLabelLayer(i)) > 0))
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
             if (i == j) false else (weTouchSomething && (whichIsLarger || whichIsSelected))
         }
         setFontSize((r1 * getZoom).toInt)
-
+        val col = if (weAreSelected) { scene.labelColor.alpha(1.0) } else { scene.labelColor.alpha(0.8) }
+        setColor(col)
         // we can show the label if we are selected, or if we do not collide with a bigger one
         if ((!weHaveACollision) || weAreSelected) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
     }
