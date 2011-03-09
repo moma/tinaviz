@@ -125,7 +125,7 @@ object Server extends node.util.Actor {
           reply(Pipeline !? ('getNodes,view,category))
 
         case ('getNeighbourhood,view,todoList) =>
-          reply(Pipeline !? ('getNeighbourhood,view,todoList))
+          Pipeline ! ('getNeighbourhood,view,todoList)
 
         case ('getNodeAttributes,uuid:String) =>
           reply (Pipeline !? 'getNodesAttributes -> uuid)

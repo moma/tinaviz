@@ -14,6 +14,7 @@ import tinaviz.Server
 import tinaviz.sketch.Sketch
 import tinaviz.sketch.Sketch._
 import tinaviz.scene.Scene
+import tinaviz.io.json.Json
 import tinaviz.io.Browser
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
@@ -49,13 +50,13 @@ object Pipeline extends node.util.Actor {
     def schedule(msg: Any, ms: Long) = {
       val ct = Platform.currentTime
       sched.schedule(new Runnable {
-          def run = actors.Scheduler.execute({
-              Actor.actor {
-                me ! (msg, ct - ms)
-              };
-              ()
-            })
-        }, ms, TimeUnit.MILLISECONDS)
+        def run = actors.Scheduler.execute({
+          Actor.actor {
+            me ! (msg, ct - ms)
+          };
+          ()
+        })
+      }, ms, TimeUnit.MILLISECONDS)
     }
 
     schedule('ping, 500)
@@ -64,13 +65,13 @@ object Pipeline extends node.util.Actor {
       receive {
         // reset
         case g: Graph =>
-         data = g
-         categoryCache = applyCategory(data)
-         categoryCache = applyWeightToSize(categoryCache)
-         nodeWeightCache = applyNodeWeight(categoryCache)
-         edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-         layoutCache = edgeWeightCache
-         updateScreen
+          data = g
+          categoryCache = applyCategory(data)
+          categoryCache = applyWeightToSize(categoryCache)
+          nodeWeightCache = applyNodeWeight(categoryCache)
+          edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+          layoutCache = edgeWeightCache
+          updateScreen
 
         case ('getNodeAttributes, uuid: String) =>
           println("Server: asked for 'getNodeAttributes " + uuid)
@@ -78,32 +79,37 @@ object Pipeline extends node.util.Actor {
 
         case ('getNeighbourhood, view: String, todoList: List[String]) =>
           val container = (view match {
-              case "meso" => layoutCache
-              case any => data
+            case "meso" => layoutCache
+            case any => data
           })
-          val results = todoList.map {
-              case uuid => (uuid, container.neighbours(container.id(uuid)))
-          }
-          println("getNeighbourhood of "+todoList+": " + results)
-          reply(results)
+          val results = todoList.map { case uuid => container.neighbours(container.id(uuid)).map{_._2} }
+          val nodeList =  layoutCache.selectionUUID.toList
+          val neighbourList =  results
+
+          System.out.println("calling callback with this data: " + (nodeList, neighbourList))
+          Browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
 
         case ('getNeighbourhood, view: String, "selection") =>
           val container = (view match {
-              case "meso" => layoutCache
-              case any => data
-            })
-          val results = layoutCache.selectionUUID.map{
-              case uuid => (uuid, container.neighbours(container.id(uuid)))
-          }
-          println("getNeighbourhood of selection: " + results)
-          reply(results)
+            case "meso" => layoutCache
+            case any => data
+          })
+          val results = layoutCache.selectionUUID.map { case uuid => container.neighbours(container.id(uuid)).map{_._2} }
+          //println("getNeighbourhood of selection: " + results)
+
+          val nodeList = layoutCache.selectionUUID.toList
+          val neighbourList =  results.toList
+
+          //System.out.println("calling callback with this data: " + (nodeList, neighbourList))
+          Browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
+
 
         case ('getNodes, view: String, category: String) =>
           println("Server: asked for 'getNodes " + view + " " + category)
           val all = (view match {
-              case "meso" => layoutCache
-              case any => data
-            }).allNodes
+            case "meso" => layoutCache
+            case any => data
+          }).allNodes
           val result = if (category.equalsIgnoreCase("none")) {
             all
           } else {
@@ -113,25 +119,25 @@ object Pipeline extends node.util.Actor {
           }
           reply(result)
 
-        case("selectByPattern",pattern:String) =>
+        case ("selectByPattern", pattern: String) =>
           layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
-              case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
-            })
-          
+            case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
+          })
+
           val selection = layoutCache.selectionAttributes
           // todo: update everything
 
           Browser ! "_callbackSelectionChanged" -> (selection, "left")
 
           self ! "filter.view" -> data.get[String]("filter.view")
-            
-        case("highlightByPattern",pattern:String) =>
+
+        case ("highlightByPattern", pattern: String) =>
           layoutCache = layoutCache + ("highlighted" -> layoutCache.label.map {
-              case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
-            })
+            case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
+          })
           //Browser ! "_callbackSelectionChanged" -> "left"
           self ! "filter.view" -> data.get[String]("filter.view")
-          
+
         case "recenter" =>
           println("recentering now..")
           layoutCache = Functions.recenter(layoutCache)
@@ -150,80 +156,80 @@ object Pipeline extends node.util.Actor {
               var changed = false
               // TODO a selection counter
               layoutCache += ("highlighted" -> layoutCache.highlighted.zipWithIndex.map {
-                  case (before, i) =>
-                    val l = layoutCache.size(i)   // maths hack
-                    val p = layoutCache.position(i)
-                    val ggg = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
-                    if (ggg != before) changed = true
-                    ggg
-                }.toArray)
+                case (before, i) =>
+                  val l = layoutCache.size(i) // maths hack
+                  val p = layoutCache.position(i)
+                  val ggg = (p.isInRange(o, r) || p.isInRange(o, l + (l / 2.0))) // maths
+                  if (ggg != before) changed = true
+                  ggg
+              }.toArray)
               if (changed) updateScreen
 
             case 'Click =>
               var in = false
               // TODO a selection counter
               layoutCache += ("selected" -> layoutCache.selected.zipWithIndex.map {
-                  case (before, i) =>
-                    val l = layoutCache.size(i)   // maths hack
-                    val p = layoutCache.position(i)
-                    val touched = (p.isInRange(o,r) || p.isInRange(o,l+(l/2.0))) // maths
-                    if (touched) in = true
-                    (before, touched)
-                }.map {
-                  case (before, touched) =>
-                    if (touched) {
-                      count match {
-                        case 'Simple => !before
-                        case 'Double => true
-                      }
+                case (before, i) =>
+                  val l = layoutCache.size(i) // maths hack
+                  val p = layoutCache.position(i)
+                  val touched = (p.isInRange(o, r) || p.isInRange(o, l + (l / 2.0))) // maths
+                  if (touched) in = true
+                  (before, touched)
+              }.map {
+                case (before, touched) =>
+                  if (touched) {
+                    count match {
+                      case 'Simple => !before
+                      case 'Double => true
+                    }
+                  } else {
+                    if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
+                      if (in) before else false
                     } else {
-                      if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
-                        if (in) before else false
-                      } else {
-                        count match {
-                          case 'Simple => before
-                          case 'Double => false
-                        }
+                      count match {
+                        case 'Simple => before
+                        case 'Double => false
                       }
                     }
-                }.toArray)
+                  }
+              }.toArray)
               Browser ! "_callbackSelectionChanged" -> (layoutCache.selectionAttributes, side match {
-                  case 'Left => "left"
-                  case 'Right => "right"
-                  case any => "none"
-                })
+                case 'Left => "left"
+                case 'Right => "right"
+                case any => "none"
+              })
 
-             // check if we need to recompute the meso field
-             count match {
-                  case 'Double =>  self ! "filter.view" -> "meso"
-                  case 'Simple => updateScreen
+              // check if we need to recompute the meso field
+              count match {
+                case 'Double => self ! "filter.view" -> "meso"
+                case 'Simple => updateScreen
               }
 
             case 'Drag =>
-              val pause = try {
-                data.get[Boolean]("pause")
-              } catch {
-                case x => true
-              }
-              //self ! "pause" -> true
+            val pause = try {
+              data.get[Boolean]("pause")
+            } catch {
+              case x => true
+            }
+            //self ! "pause" -> true
             case 'Release =>
-              //pauseBugger = false
-              //self ! "pause" -> pauseBuffer
+            //pauseBugger = false
+            //self ! "pause" -> pauseBuffer
             case any =>
           }
 
         case ("select", uuid: String) =>
-          println("selecting node: '"+uuid+"'")
+          println("selecting node: '" + uuid + "'")
 
-         if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
-             layoutCache += ("selected" -> layoutCache.selected.map(c => false))
-         else
-             layoutCache += (layoutCache.id(uuid), "select", true)
+          if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
+            layoutCache += ("selected" -> layoutCache.selected.map(c => false))
+          else
+            layoutCache += (layoutCache.id(uuid), "select", true)
 
           Browser ! "_callbackSelectionChanged" -> (layoutCache.selectionAttributes, "left")
 
         case (key: String, value: Any) =>
-          //println("updating graph attribute " + key + " -> " + value)
+        //println("updating graph attribute " + key + " -> " + value)
           data += key -> value
           categoryCache += key -> value
           nodeWeightCache += key -> value
@@ -231,7 +237,7 @@ object Pipeline extends node.util.Actor {
           layoutCache += key -> value
           key match {
             case "filter.view" =>
-              //println("filter.view")
+            //println("filter.view")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = applyCategory(data)
               categoryCache = applyWeightToSize(categoryCache)
@@ -240,7 +246,7 @@ object Pipeline extends node.util.Actor {
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.node.category" =>
-              //println("filter.node.category")
+            //println("filter.node.category")
               println("we store the positions")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = applyCategory(data)
@@ -250,7 +256,7 @@ object Pipeline extends node.util.Actor {
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.a.node.weight" =>
-              //println("nodeWeightCache = applyNodeWeight(categoryCache)")
+            //println("nodeWeightCache = applyNodeWeight(categoryCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
@@ -258,15 +264,15 @@ object Pipeline extends node.util.Actor {
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.a.edge.weight" =>
-              //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+            //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
               edgeWeightCache = applyEdgeWeight(nodeWeightCache)
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
-           case "filter.b.node.weight" =>
-              //println("nodeWeightCache = applyNodeWeight(categoryCache)")
+            case "filter.b.node.weight" =>
+            //println("nodeWeightCache = applyNodeWeight(categoryCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
@@ -274,7 +280,7 @@ object Pipeline extends node.util.Actor {
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.b.edge.weight" =>
-              //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
+            //println("edgeWeightCache = applyEdgeWeight(nodeWeightCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               nodeWeightCache = applyNodeWeight(categoryCache)
@@ -282,7 +288,7 @@ object Pipeline extends node.util.Actor {
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.a.node.size" =>
-              //println("categoryCache = applyWeightToSize(categoryCache)")
+            //println("categoryCache = applyWeightToSize(categoryCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               categoryCache = applyWeightToSize(categoryCache)
@@ -291,7 +297,7 @@ object Pipeline extends node.util.Actor {
               layoutCache = applyCategory(edgeWeightCache)
               updateScreen
             case "filter.b.node.size" =>
-              //println("categoryCache = applyWeightToSize(categoryCache)")
+            //println("categoryCache = applyWeightToSize(categoryCache)")
               data = data.updatePositionWithCategory(layoutCache)
               categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
               categoryCache = applyWeightToSize(categoryCache)
@@ -330,15 +336,16 @@ object Pipeline extends node.util.Actor {
   }
 
   def genericWorkflow {
-              //println("categoryCache = applyWeightToSize(categoryCache)")
-              data = data.updatePositionWithCategory(layoutCache)
-              categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
-              categoryCache = applyWeightToSize(categoryCache)
-              nodeWeightCache = applyNodeWeight(categoryCache)
-              edgeWeightCache = applyEdgeWeight(nodeWeightCache)
-              layoutCache = applyCategory(edgeWeightCache)
-              updateScreen
+    //println("categoryCache = applyWeightToSize(categoryCache)")
+    data = data.updatePositionWithCategory(layoutCache)
+    categoryCache = categoryCache.updatePositionWithCategory(layoutCache)
+    categoryCache = applyWeightToSize(categoryCache)
+    nodeWeightCache = applyNodeWeight(categoryCache)
+    edgeWeightCache = applyEdgeWeight(nodeWeightCache)
+    layoutCache = applyCategory(edgeWeightCache)
+    updateScreen
   }
+
   /**
    * Do some pre-processing, then send the final scene to the View
    * TODO: keep the Graph?
@@ -347,21 +354,21 @@ object Pipeline extends node.util.Actor {
     // TODO: do that in another Actor, which will reply directly to our master
     val graph = layoutCache
     val f = graph + ("links" -> graph.links.zipWithIndex.map {
-        case (links, i) =>
-          links.filter {
-            case (j, weight) =>
-              // in the case of mutual link, we have a bit of work to remove the link
-              if (graph.hasThisLink(j, i)) {
-                // if i is bigger than j, we keep
-                Functions.isBiggerThan(graph,i,j)
-                // in the case of non-mutual link (directed), there is nothing to do; we keep the link
-              } else {
-                true
-              }
-          }
+      case (links, i) =>
+        links.filter {
+          case (j, weight) =>
+          // in the case of mutual link, we have a bit of work to remove the link
+            if (graph.hasThisLink(j, i)) {
+              // if i is bigger than j, we keep
+              Functions.isBiggerThan(graph, i, j)
+              // in the case of non-mutual link (directed), there is nothing to do; we keep the link
+            } else {
+              true
+            }
+        }
 
-      }.toArray)
-    
+    }.toArray)
+
     sketch.update(f)
     val msg = (f, sketch: Scene)
     Server ! msg
@@ -369,11 +376,15 @@ object Pipeline extends node.util.Actor {
 
 
   def applyCategory(g: Graph) = Filters.category(g)
+
   def applyNodeWeight(g: Graph) = Filters.nodeWeight(g)
+
   def applyEdgeWeight(g: Graph) = Filters.edgeWeight(g)
+
   def applyLayout(g: Graph) = Layout.layout(g)
+
   def applyWeightToSize(g: Graph): Graph = Filters.weightToSize(g)
-  
+
   /*  */
   def transformColumn[T](column: String, filter: T => T) = {
     var dataArray = data.getArray[T](column)
