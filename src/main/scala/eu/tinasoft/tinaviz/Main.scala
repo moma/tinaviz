@@ -153,7 +153,8 @@ class Main extends TApplet with Client {
           //Maths.map(weight, scene.)
           //println("weight: "+weight)
           if (visibleNodes.size < 80) {
-            //lineThickness(Maths.map(weight,()) * getScale)
+            //lineThickness(scene.graph.thickness(i))
+            //lineThickness(Maths.map(scene.edgeWeightLayer(i),()) * getScale)
           }
           // lineThickness(weight * getScale)
           if (visibleNodes.size < 100000) {
@@ -162,25 +163,24 @@ class Main extends TApplet with Client {
         }
     }
 
+    /**
+     * Print the shapes (with color and size)
+     */
     setLod(16)
     lineThickness(0)
     noStroke
-
-
     visibleNodes.foreach {
       case (position, i) =>
-        val size = scene.nodeSizeLayer(i)
-        val color = scene.nodeColorLayer(i)
         setColor(scene.nodeBorderColorLayer(i))
         scene.nodeShapeLayer(i) match {
           case 'Disk =>
-            drawDisk(position, size)
-            setColor(color)
-            drawDisk(position, size * 0.8)
+            drawDisk(position, scene.nodeSizeLayer(i))
+            setColor(scene.nodeColorLayer(i))
+            drawDisk(position, scene.nodeSizeLayer(i) * 0.8)
           case x =>
-            drawSquare(position, size)
-            setColor(color)
-            drawSquare(position, size * 0.8)
+            drawSquare(position, scene.nodeSizeLayer(i))
+            setColor(scene.nodeColorLayer(i))
+            drawSquare(position, scene.nodeSizeLayer(i) * 0.8)
         }
     }
 
@@ -189,15 +189,10 @@ class Main extends TApplet with Client {
       val l1 = scene.nodeLabelLayer(i)
       val r2 = scene.nodeSizeLayer(j)
       val l2 = scene.nodeLabelLayer(j)
-      val rez = if (r1 > r2) true else (if (r1 < r2) false else (scene.nodeLabelLayer(i).compareTo(scene.nodeLabelLayer(j)) < 0))
-      //println("compare("+l1+","+l2+")="+rez)
-      rez
+      if (r1 > r2) true else (if (r1 < r2) false else (l1.compareTo(l2) < 0))
     }
 
-    val sortedLabelIDs = visibleNodes.map {
-      _._2
-    }.toList.sort(compare).toArray
-
+    val sortedLabelIDs = visibleNodes.map { _._2 }.toList.sort(compare).toArray
 
     sortedLabelIDs.foreach {
       case (i) =>

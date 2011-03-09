@@ -150,21 +150,28 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val outDegree = getArray[Int]("outDegree")
   lazy val degree = inDegree zip outDegree map { case (a,b) => a+b }
   lazy val density = getArray[Double]("density")
+
+  lazy val ids = 0 until nbNodes
+
+  // metrics  & properties
   lazy val nbNodes = get[Int]("nbNodes")
   lazy val nbEdges = get[Int]("nbEdges")
   lazy val nbSingles = get[Int]("nbSingles")
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
-  lazy val pause = get[Boolean]("pause")
-  lazy val ids = 0 until nbNodes
+  lazy val baryCenter = get[(Double,Double)]("baryCenter")
+  lazy val selectionCenter = get[(Double,Double)]("selectionCenter")
+
+  // camera settings
   lazy val cameraZoom = get[Double]("camera.zoom")
   lazy val cameraPosition = get[(Double,Double)]("camera.position")
   lazy val cameraSymbol = get[Symbol]("camera.target")
+
+  // filters and view settings
   lazy val currentCategory = get[String]("filter.node.category")
   lazy val currentView = get[String]("filter.view")
-  lazy val baryCenter = get[(Double,Double)]("baryCenter")
-  lazy val selectionCenter = get[(Double,Double)]("selectionCenter")
   lazy val layout = get[String]("layout")
+  lazy val pause = get[Boolean]("pause")
 
   // hashcode will change if nodes/links are added/deleted
   lazy val hashed = (uuid.toList.mkString("") + links.map{ case mapID => mapID.hashCode }.toList.mkString("")).hashCode
@@ -611,4 +618,5 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "selected"  -> tmp2) // need to recompute things
     )
   }
+
 }

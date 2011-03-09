@@ -167,10 +167,10 @@ object Pipeline extends node.util.Actor {
                       if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
                         if (in) before else false
                       } else {
-                      count match {
-                        case 'Simple => before
-                        case 'Double => false
-                      }
+                        count match {
+                          case 'Simple => before
+                          case 'Double => false
+                        }
                       }
                     }
                 }.toArray)
@@ -180,10 +180,11 @@ object Pipeline extends node.util.Actor {
                   case any => "none"
                 })
 
-              self ! "filter.view" -> (count match {
-                  case 'Simple => data.get[String]("filter.view")
-                  case 'Double => "meso"
-                })
+             // check if we need to recompute the meso field
+             count match {
+                  case 'Double =>  self ! "filter.view" -> "meso"
+                  case 'Simple => updateScreen
+              }
 
             case 'Drag =>
               val pause = try {
@@ -201,17 +202,12 @@ object Pipeline extends node.util.Actor {
         case ("select", uuid: String) =>
           println("selecting node: '"+uuid+"'")
 
-          if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
-            val t = data.selected.map(c => false)
-            // TODO refactor this, seems to fail from time to time
-            data        += ("selected" -> data.selected.map(c => false))
-            layoutCache += ("selected" -> layoutCache.selected.map(c => false))
-          } else  {
-            layoutCache += (data.id(uuid), "select", true)
-          }
-          println("updating selection")
+         if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
+             layoutCache += ("selected" -> layoutCache.selected.map(c => false))
+         else
+             layoutCache += (layoutCache.id(uuid), "select", true)
+
           Browser ! "_callbackSelectionChanged" -> (layoutCache.selectionAttributes, "left")
-          self ! "filter.view" -> data.get[String]("filter.view")
 
         case (key: String, value: Any) =>
           //println("updating graph attribute " + key + " -> " + value)
