@@ -88,6 +88,11 @@ object Graph {
     "filter.b.node.size" -> 0.2,
     "filter.b.node.weight" -> (0.0, 1.0),
     "filter.b.edge.weight" -> (0.0, 1.0),
+    "filter.map.node.color.hue" -> "category",
+    "filter.map.node.color.saturation" -> "weight",
+    "filter.map.node.color.brightness" -> "weight",
+    "filter.map.node.size" -> "weight",
+    "filter.map.node.shape" -> "category",
     "xMin" -> 0.0,
     "yMin" -> 0.0,
     "xMax" -> 0.0,
@@ -109,7 +114,7 @@ object Graph {
     "maxDrawedNodes" -> 10,
     "baryCenter" -> (0.0, 0.0),
     "selectionCenter" -> (0.0, 0.0),
-    "layout" -> "tinaforce"
+    "layout" -> "phyloforce"
 
   )
 }
