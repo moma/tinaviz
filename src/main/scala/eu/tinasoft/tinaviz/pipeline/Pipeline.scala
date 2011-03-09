@@ -203,8 +203,9 @@ object Pipeline extends node.util.Actor {
 
           if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
             val t = data.selected.map(c => false)
-            data        += data.selected.map(c => false)
-            layoutCache += layoutCache.selected.map(c => false)
+            // TODO refactor this, seems to fail from time to time
+            data        += ("selected" -> data.selected.map(c => false))
+            layoutCache += ("selected" -> layoutCache.selected.map(c => false))
           } else  {
             layoutCache += (data.id(uuid), "select", true)
           }
