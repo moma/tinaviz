@@ -76,8 +76,8 @@ object Rio extends Scheme (
     new Color (0.247, 0.51, 0.75), // standard
     new Color (0.247, 0.69, 0.73), // dark
     new Color (0.247, 0.95, 0.67), // darker
-    new Color (0.23, 0.67, 0.87), // light
-    new Color (0.23, 0.47, 0.87)),// lighter
+    new Color (0.247, 0.53, 0.82), // light
+    new Color (0.247, 0.26, 0.84)),// lighter
 
 // yellow
   new Palette(

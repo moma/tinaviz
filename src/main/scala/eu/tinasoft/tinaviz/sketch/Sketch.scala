@@ -267,7 +267,7 @@ case class Sketch( var graph : Graph = new Graph,
             tmpColor ::= d.alpha(Maths.map(weight, g.category(from) match {
               case "Document" => aextremums
               case "NGram" => bextremums
-            }, (0.5,1.0)))
+            }, (0.25,1.0)))
         }
     }
     edgeColorLayer = tmpColor.toArray
