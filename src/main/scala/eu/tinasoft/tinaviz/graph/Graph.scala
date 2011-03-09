@@ -324,6 +324,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       selection.map{ case i => lessAttributes(i) }.toList
     }
 
+
   /**
    * Return the current selection as a list of UUID:String
    */

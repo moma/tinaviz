@@ -223,24 +223,27 @@ trait Client {
     attributes
   }
 
+  /**
+   * Problem: this is called with a list of 'selection' id (always 0, 1, 2, 3..)
+   */
   def getNeighbourhood(view:String, rawJSONList:String) : String = {
 
-    val todoList = Json.parse(rawJSONList)
+    val todoList = "selection" //Json.parse(rawJSONList)
 
-    println("TODO get the neighbourListof "+todoList+"")
+    println("TODO get the neighbourListof "+todoList+" ("+rawJSONList+")")
+
     val neighbours = (Server !? ('getNeighbourhood,view,todoList)) match {
       case m:Map[Any,Map[String,Any]] =>
-          println("TODO building neighbours JSON reply..")
-         Json.build(m).toString
-
+          println("TODO building neighbours JSON reply: "+m)
+          Json.build(m).toString
       case any =>
         throw new Exception("couldn't find neighbourList for any of "+rawJSONList)
     }
     // neighbourList
     // Browser ! "_callbackGetNeighbourhood" -> (todoList, neighbours)
-
+    System.out.println("calling callback with this data: "+neighbours)
     // _callbackGetNeighbourhood = function(selection_list_str,neighbour_node_list_str) {
-    ""
+    neighbours
   }
   
   // TODO should be asynchronous

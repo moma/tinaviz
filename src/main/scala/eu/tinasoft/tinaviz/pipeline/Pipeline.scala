@@ -76,14 +76,27 @@ object Pipeline extends node.util.Actor {
           println("Server: asked for 'getNodeAttributes " + uuid)
           reply(data.lessAttributes(uuid))
 
-        case ('getNeighbourhood, view: String, todoList: List[Any]) =>
-
-          val result = (view match {
+        case ('getNeighbourhood, view: String, todoList: List[String]) =>
+          val container = (view match {
               case "meso" => layoutCache
               case any => data
-            }).selectionNeighbours
-          println("built selection neighbours: " + result)
-          reply(result)
+          })
+          val results = todoList.map {
+              case uuid => (uuid, container.neighbours(container.id(uuid)))
+          }
+          println("getNeighbourhood of "+todoList+": " + results)
+          reply(results)
+
+        case ('getNeighbourhood, view: String, "selection") =>
+          val container = (view match {
+              case "meso" => layoutCache
+              case any => data
+            })
+          val results = layoutCache.selectionUUID.map{
+              case uuid => (uuid, container.neighbours(container.id(uuid)))
+          }
+          println("getNeighbourhood of selection: " + results)
+          reply(results)
 
         case ('getNodes, view: String, category: String) =>
           println("Server: asked for 'getNodes " + view + " " + category)
