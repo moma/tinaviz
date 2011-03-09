@@ -259,19 +259,15 @@ case class Sketch( var graph : Graph = new Graph,
           case (to, weight) =>
             val a = nodeColorLayer(from)
             val b = nodeColorLayer(to)
-            val c = if (g.category(from).equals(to)) {
-               a.blend(b)
-            } else {
-               new Color(0.5, 0.0, 0.5)
-            }
-            //val d = c.saturateBy(0.4)
-            val d = c.saturation(Maths.map(weight, g.category(from) match {
+           val d = if (g.category(from).equals(g.category(to)))
+             a.blend(b)
+           else
+             new Color(0.0, 0.0, 0.5)
+
+            tmpColor ::= d.alpha(Maths.map(weight, g.category(from) match {
               case "Document" => aextremums
               case "NGram" => bextremums
-            }, (0.3,1.0)))
-
-            //val d = c.alpha(Maths.map(weight, extremums, (1.0,0.3)))
-            tmpColor ::= d
+            }, (0.5,1.0)))
         }
     }
     edgeColorLayer = tmpColor.toArray
