@@ -100,9 +100,9 @@ object Pipeline extends node.util.Actor {
           }
           reply(result)
 
-        case('selectByPattern,pattern:String) =>
+        case("selectByPattern",pattern:String) =>
           layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
-              case label => if (pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
+              case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
             })
           
           val selection = layoutCache.selectionAttributes
@@ -112,9 +112,9 @@ object Pipeline extends node.util.Actor {
 
           self ! "filter.view" -> data.get[String]("filter.view")
             
-        case('highlightByPattern,pattern:String) =>
+        case("highlightByPattern",pattern:String) =>
           layoutCache = layoutCache + ("highlighted" -> layoutCache.label.map {
-              case label => if (pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
+              case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
             })
           //Browser ! "_callbackSelectionChanged" -> "left"
           self ! "filter.view" -> data.get[String]("filter.view")
@@ -136,7 +136,7 @@ object Pipeline extends node.util.Actor {
             case 'Move =>
               var changed = false
               // TODO a selection counter
-              layoutCache = layoutCache + ("highlighted" -> layoutCache.highlighted.zipWithIndex.map {
+              layoutCache += ("highlighted" -> layoutCache.highlighted.zipWithIndex.map {
                   case (before, i) =>
                     val l = layoutCache.size(i)   // maths hack
                     val p = layoutCache.position(i)
@@ -149,7 +149,7 @@ object Pipeline extends node.util.Actor {
             case 'Click =>
               var in = false
               // TODO a selection counter
-              layoutCache = layoutCache + ("selected" -> layoutCache.selected.zipWithIndex.map {
+              layoutCache += ("selected" -> layoutCache.selected.zipWithIndex.map {
                   case (before, i) =>
                     val l = layoutCache.size(i)   // maths hack
                     val p = layoutCache.position(i)
@@ -174,10 +174,7 @@ object Pipeline extends node.util.Actor {
                       }
                     }
                 }.toArray)
-              val selection = layoutCache.selectionAttributes
-              // todo: update everything
-
-              Browser ! "_callbackSelectionChanged" -> (selection, side match {
+              Browser ! "_callbackSelectionChanged" -> (layoutCache.selectionAttributes, side match {
                   case 'Left => "left"
                   case 'Right => "right"
                   case any => "none"
@@ -203,14 +200,17 @@ object Pipeline extends node.util.Actor {
 
         case ("select", uuid: String) =>
           println("selecting node: '"+uuid+"'")
-          if (uuid == null) {
-             data += "selected" -> data.selected.map(c => false)
-          } else if (uuid.equals(" ") || uuid.isEmpty) {
-            data += "selected" -> data.selected.map(c => false)
-          } else {
-            data += (data.id(uuid), "select", true)
+
+          if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
+            val t = data.selected.map(c => false)
+            data        += data.selected.map(c => false)
+            layoutCache += layoutCache.selected.map(c => false)
+          } else  {
+            layoutCache += (data.id(uuid), "select", true)
           }
-          self ! "filter.node.category" -> data.get[String]("filter.node.category")
+          println("updating selection")
+          Browser ! "_callbackSelectionChanged" -> (layoutCache.selectionAttributes, "left")
+          self ! "filter.view" -> data.get[String]("filter.view")
 
         case (key: String, value: Any) =>
           //println("updating graph attribute " + key + " -> " + value)

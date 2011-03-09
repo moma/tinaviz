@@ -114,11 +114,11 @@ object Server extends node.util.Actor {
         case ("select", uuid) =>
           Pipeline ! "select" -> uuid
           
-        case('selectByPattern,pattern:String) =>
-          Pipeline ! 'selectByPattern -> pattern
+        case("selectByPattern",pattern:String) =>
+          Pipeline ! "selectByPattern" -> pattern
           
-        case('highlightByPattern,pattern:String) =>
-          Pipeline ! 'highlightByPattern -> pattern
+        case("highlightByPattern",pattern:String) =>
+          Pipeline ! "highlightByPattern" -> pattern
 
         case ('getNodes,view,category) =>
           println("Server: asekd for 'getNodes "+view+" "+category)

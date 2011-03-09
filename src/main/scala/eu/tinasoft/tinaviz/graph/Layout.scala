@@ -60,7 +60,7 @@ object Layout {
     } else {
       0.3
     }
-    println("setting drag to " + drag)
+    //println("setting drag to " + drag)
     ps.setDrag(drag.toFloat)
     val barycenter = g.get[(Double, Double)]("baryCenter")
     val aMinMaxWeights =
@@ -135,7 +135,7 @@ object Layout {
         if (p.x != x || p.y != y) p.set(x, y, z)
     }
 
-    println("running step (" + ps.numberOfParticles + " particles)..")
+    //println("running step (" + ps.numberOfParticles + " particles)..")
     ps.tick(1.0f)
 
     //var activ = 0.0
@@ -163,7 +163,7 @@ object Layout {
     } else {
       0.2
     }
-    println("setting drag to " + drag)
+    //println("setting drag to " + drag)
     ps.setDrag(drag.toFloat)
     val barycenter = g.get[(Double, Double)]("baryCenter")
     val aMinMaxWeights =
@@ -238,7 +238,7 @@ object Layout {
         if (p.x != x || p.y != y) p.set(x, y, z)
     }
 
-    println("running step (" + ps.numberOfParticles + " particles)..")
+    //println("running step (" + ps.numberOfParticles + " particles)..")
     ps.tick(1.0f)
 
     //var activ = 0.0

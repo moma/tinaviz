@@ -241,6 +241,9 @@ class Main extends TApplet with Client {
   }
 
 
+  /**
+   * Recenter
+   */
   private def _recenter(g: Graph, mode : Symbol) {
 
     mode match {
@@ -346,6 +349,7 @@ class Main extends TApplet with Client {
       case 'v' => Server ! "filter.view" -> 'toggle
       case 'r' => Server ! "camera.target" -> 'all
       case 's' => Server ! "camera.target" -> 'selection
+      case 'u' => Server ! "select" -> ""
 
       case PConstants.CODED =>
         val amount = 15

@@ -67,15 +67,20 @@ trait Client {
     }
   }
 
+  /*
   def select(id:String) = {
     println("JavaScript asked for select("+id+")")
-    Server ! 'select -> id
+    Server ! "select" -> id
     true
   }
-  def unselect = {
-    Server ! 'unselect
+   */
+
+  /*
+  def unselect() = {
+    Server ! 'select -> ""
     true
   }
+  */
 
   // var Map[String]
   /**
@@ -177,7 +182,7 @@ trait Client {
     if (pattern.isEmpty()) {
       return;
     }
-    Server ! 'selectByPattern -> pattern
+    Server ! "selectByPattern" -> pattern
   }
 
   /**
@@ -199,7 +204,7 @@ trait Client {
     if (pattern.isEmpty()) {
       return;
     }
-    Server ! 'highlightByPattern -> pattern
+    Server ! "highlightByPattern" -> pattern
   }
   
   /**
