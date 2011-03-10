@@ -51,9 +51,9 @@ object Layout {
     if (g.nbNodes == 0) return g
 
      val springFactor = if (g.nbEdges > 20000) {
-      0.002f
+      0.005f
     } else {
-      0.002f
+      0.01f// 0.02 is better..
     }
     val drag = if (g.nbEdges > 20000) {
       0.3
