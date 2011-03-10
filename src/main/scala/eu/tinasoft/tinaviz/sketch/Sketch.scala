@@ -168,7 +168,7 @@ case class Sketch( var graph : Graph = new Graph,
         mode match {
           case 'selected => new Color(0.0, 0.0, 0.23)
           case 'highlighted => new Color(0.0, 0.0, 0.23)
-          case 'unselected => color.darker.saturation(0.3)
+          case 'unselected => color.darker.saturation(0.12)
           case 'default => color.darker
         }
     }
