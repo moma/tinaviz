@@ -112,16 +112,16 @@ object Filters {
   
   def weightToSize(g: Graph) : Graph = {
     if (g.nbNodes == 0) return g
-    val aratio = 1.0 * g.get[Double]("filter.a.node.size")
-    val bratio = 1.0 * g.get[Double]("filter.b.node.size")
-    val aminmaxweight =  (g.get[Double]("minANodeWeight"), g.get[Double]("maxANodeWeight"))
-    val bminmaxweight =  (g.get[Double]("minBNodeWeight"), g.get[Double]("maxBNodeWeight"))
+    val aratio = 0.3 * g.get[Double]("filter.a.node.size") // Document
+    val bratio = 1.0 * g.get[Double]("filter.b.node.size") // NGram
+    val aminmaxweight =  (g.get[Double]("minANodeWeight"), g.get[Double]("maxANodeWeight"))  // Document
+    val bminmaxweight =  (g.get[Double]("minBNodeWeight"), g.get[Double]("maxBNodeWeight"))  // NGram
     //println("applyWeightToSize: " + ratio)
     val newSize = g.weight.zipWithIndex map {
       case (weight,i) => Maths.map(weight, g.category(i) match {
                                       case "NGram" => bminmaxweight
                                       case "Document" => aminmaxweight
-                                   }, (1.0, 50.0)) * (g.category(i) match {
+                                   }, (5.0, 40.0)) * (g.category(i) match {
                                       case "NGram" => bratio
                                       case "Document" => aratio
                                    })

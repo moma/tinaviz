@@ -193,7 +193,7 @@ trait Client {
 
   def highlightByPattern(pattern:String, patternMode:String) : Unit = {
     
-    if (pattern == null || patternMode == null) {
+    if (pattern == null | patternMode == null) {
       System.out.println("highlightByPattern(" + pattern + ", " + patternMode + ")");
       return;
     }
