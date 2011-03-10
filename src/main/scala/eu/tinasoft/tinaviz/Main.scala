@@ -116,7 +116,7 @@ class Main extends TApplet with Client {
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
-    _recenter(scene.graph, scene.graph.get[Symbol]("camera.target"))
+    _recenter(scene.graph, scene.graph.get[String]("camera.target"))
 
     // val centering = scene.graph.get[Boolean]("centering")
 
@@ -240,16 +240,16 @@ class Main extends TApplet with Client {
   /**
    * Recenter
    */
-  private def _recenter(g: Graph, mode : Symbol) {
+  private def _recenter(g: Graph, mode : String) {
 
     mode match {
-      case 'all =>
+      case "all" =>
         //println("recentering to all")
-      case 'selection =>
+      case "selection" =>
         //println("recentering to selection")
 
       // move it
-      case 'none =>
+      case "none" =>
         //println("recentering to none")
         return
       case err =>
@@ -288,12 +288,9 @@ class Main extends TApplet with Client {
     println("big: " + big)
     // TODO should call the zoom updated callback as well
     //zoomWith(big)
-    val pos =  mode match {
-      case 'all =>
-        g.baryCenter
-      case 'selection =>
-        g.selectionCenter
-    }
+
+    val pos =  if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.baryCenter
+
     println("position: "+pos)
     var translate = new PVector()
     translate.add(new PVector(width / 2.0f, height / 2.0f, 0))
@@ -308,7 +305,7 @@ class Main extends TApplet with Client {
    * value contains here the new value of the camera zoom
    */
   override def zoomUpdated(value: Double) {
-    Server ! "camera.target" -> 'none
+    Server ! "camera.target" -> "none"
     Server ! "camera.zoom" -> value
   }
 
@@ -317,7 +314,7 @@ class Main extends TApplet with Client {
    *
    */
   override def positionUpdated(value: (Double, Double)) {
-    Server ! "camera.target" -> 'none
+    Server ! "camera.target" -> "none"
     Server ! "camera.position" -> value
   }
 
@@ -343,8 +340,8 @@ class Main extends TApplet with Client {
 
       case 'c' => Server ! "filter.node.category" -> 'toggle
       case 'v' => Server ! "filter.view" -> 'toggle
-      case 'r' => Server ! "camera.target" -> 'all
-      case 's' => Server ! "camera.target" -> 'selection
+      case 'r' => Server ! "camera.target" -> "all"
+      case 's' => Server ! "camera.target" -> "selection"
       case 'u' => Server ! "select" -> ""
 
       case PConstants.CODED =>
