@@ -152,7 +152,7 @@ case class Sketch( var graph : Graph = new Graph,
         mode match {
           case 'selected => color.standard
           case 'highlighted => color.standard
-          case 'unselected => color.lighter.saturation(0.3)
+          case 'unselected => color.lighter.saturation(0.12)
           case 'default => color.light
         }
     }

@@ -99,8 +99,13 @@ class Main extends TApplet with Client {
           //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
           //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
-          "file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/phylo.gexf"
-          //"file:///home/jbilcke/Desktop/mini.gexf"
+
+          // standard one
+          //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/phylo.gexf"
+
+          // seems buggy
+          "file:///home/jbilcke/Desktop/from_Batch_10_to_FET-graph.gexf"
+
           //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
           //"file:///home/jbilcke/test-graph.gexf"
         )
@@ -206,7 +211,7 @@ class Main extends TApplet with Client {
         val h1 = setFontSize((r1 * getZoom).toInt)
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
-        val weAreSelected = scene.graph.selected(i)
+        val weAreSelected = false// we don't care. else, use: scene.graph.selected(i)
         val weHaveACollision = sortedLabelIDs.exists {
           case (j) =>
             val p2 = scene.nodePositionLayer(j)
@@ -217,7 +222,7 @@ class Main extends TApplet with Client {
             val l2 = scene.nodeLabelLayer(j)
             val h2 = setFontSize((r2 * getZoom).toInt)
             val w2 = textWidth(l2) /// getZoom //
-            val whichIsSelected = scene.graph.selected(j)
+            val whichIsSelected = false// we don't care. else, use: scene.graph.selected(j)
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1))
                                   || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
                                  && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
