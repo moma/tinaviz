@@ -134,7 +134,7 @@ class Main extends TApplet with Client {
     if (scene.graph.get[Boolean]("pause"))
       smooth
     else
-      (if (scene.graph.nbNodes < 100) smooth else noSmooth)
+      (if (scene.graph.nbNodes < 300) smooth else noSmooth)
 
     setBackground(scene.background)
     if (debug) {
