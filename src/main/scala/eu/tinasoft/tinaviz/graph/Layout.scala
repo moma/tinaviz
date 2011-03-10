@@ -50,15 +50,15 @@ object Layout {
 
     if (g.nbNodes == 0) return g
 
-    val springFactor = if (g.nbEdges > 20000) {
+     val springFactor = if (g.nbEdges > 20000) {
       0.002f
     } else {
-      0.02f
+      0.002f
     }
     val drag = if (g.nbEdges > 20000) {
-      0.2
+      0.3
     } else {
-      0.1
+      0.2
     }
     //println("setting drag to " + drag)
     ps.setDrag(drag.toFloat)

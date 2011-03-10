@@ -223,10 +223,16 @@ object Pipeline extends node.util.Actor {
 
           if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
             layoutCache += ("selected" -> layoutCache.selected.map(c => false))
-          else
+          else {
             layoutCache += (layoutCache.id(uuid), "select", true)
+          }
 
-          Browser ! "_callbackSelectionChanged" -> (layoutCache.selectionAttributes, "left")
+          val selection = layoutCache.selectionAttributes
+          // todo: update everything
+
+          Browser ! "_callbackSelectionChanged" -> (selection, "left")
+
+          self ! "filter.view" -> data.get[String]("filter.view")
 
         case (key: String, value: Any) =>
         //println("updating graph attribute " + key + " -> " + value)

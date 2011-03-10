@@ -75,7 +75,7 @@ class Main extends TApplet with Client {
      }
      )*/
     frameRate(30)
-    smooth
+
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
@@ -104,7 +104,10 @@ class Main extends TApplet with Client {
           //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/phylo.gexf"
 
           // seems buggy
-          "file:///home/jbilcke/Desktop/from_Batch_10_to_FET-graph.gexf"
+          // "file:///home/jbilcke/Desktop/from_Batch_10_to_FET-graph.gexf"
+
+         // "file:///home/jbilcke/Desktop/largescalegraph.gexf"
+           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/fetXX/gexf/FET-graph.gexf"
 
           //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
           //"file:///home/jbilcke/test-graph.gexf"
@@ -128,6 +131,10 @@ class Main extends TApplet with Client {
     // we need to manually move the camera
     // to the graph's center
 
+    if (scene.graph.get[Boolean]("pause"))
+      smooth
+    else
+      (if (scene.graph.nbNodes < 100) smooth else noSmooth)
 
     setBackground(scene.background)
     if (debug) {
