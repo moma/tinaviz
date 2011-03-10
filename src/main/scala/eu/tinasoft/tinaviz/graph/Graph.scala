@@ -116,7 +116,7 @@ object Graph {
     "baryCenter" -> (0.0, 0.0),
     "selectionCenter" -> (0.0, 0.0),
     "singlesCenter" -> (0.0, 0.0),
-    "layout" -> "phyloforce"
+    "layout" -> "tinaforce" // phyloforce
 
   )
 }
