@@ -447,8 +447,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "label" -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
       //"rate" -> (if (rate.size > i) rate(i) else 0),
       "id" -> (if (uuid.size > i) uuid(i) else 0),
-      "inDegree" -> (if (inDegree.size > i) inDegree(i) else 0),
-      "outDegree" -> (if(outDegree.size > i) outDegree(i) else 0)
+      "degree" -> ((if (inDegree.size > i) inDegree(i) else 0) + (if(outDegree.size > i) outDegree(i) else 0))
 
       //"density" -> density(i)
     )
