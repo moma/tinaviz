@@ -62,7 +62,7 @@ object Layout {
     }
     //println("setting drag to " + drag)
     ps.setDrag(drag.toFloat)
-    val barycenter = g.get[(Double, Double)]("baryCenter")
+
     val aMinMaxWeights =
       (g.get[Double]("minAEdgeWeight"), g.get[Double]("maxAEdgeWeight"))
     val bMinMaxWeights =
@@ -165,7 +165,7 @@ object Layout {
     }
     //println("setting drag to " + drag)
     ps.setDrag(drag.toFloat)
-    val barycenter = g.get[(Double, Double)]("baryCenter")
+
     val aMinMaxWeights =
       (g.get[Double]("minAEdgeWeight"), g.get[Double]("maxAEdgeWeight"))
     val bMinMaxWeights =

@@ -51,6 +51,7 @@ object Graph {
 
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+    g = g + ("singlesCenter" -> Metrics.singlesCenter(g))
     g
   }
 
@@ -114,6 +115,7 @@ object Graph {
     "maxDrawedNodes" -> 10,
     "baryCenter" -> (0.0, 0.0),
     "selectionCenter" -> (0.0, 0.0),
+    "singlesCenter" -> (0.0, 0.0),
     "layout" -> "phyloforce"
 
   )
@@ -166,6 +168,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val activity = get[Double]("activity")
   lazy val baryCenter = get[(Double,Double)]("baryCenter")
   lazy val selectionCenter = get[(Double,Double)]("selectionCenter")
+  lazy val singlesCenter = get[(Double,Double)]("singlesCenter")
 
   // camera settings
   lazy val cameraZoom = get[Double]("camera.zoom")
@@ -194,6 +197,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    * Check if a graph has a directed link (from i to j)
    */
   def hasThisLink(i: Int, j: Int) = if (links.size > i) links(i).contains(j) else false
+
+  def isSingle(i: Int) = (inDegree(i) > 0 && outDegree(i) > 0)
 
   /**
    * Create a new Graph with an updated column
