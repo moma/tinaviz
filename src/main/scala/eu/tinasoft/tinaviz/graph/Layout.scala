@@ -56,9 +56,9 @@ object Layout {
       0.01f// 0.02 is better..
     }
     val drag = if (g.nbEdges > 20000) {
-      0.3
-    } else {
       0.2
+    } else {
+      0.4
     }
     //println("setting drag to " + drag)
     ps.setDrag(drag.toFloat)
