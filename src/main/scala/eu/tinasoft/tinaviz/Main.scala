@@ -95,7 +95,7 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-          //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf"
+          "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/current.gexf"
           //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
           //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
@@ -107,7 +107,7 @@ class Main extends TApplet with Client {
           // "file:///home/jbilcke/Desktop/from_Batch_10_to_FET-graph.gexf"
 
          // "file:///home/jbilcke/Desktop/largescalegraph.gexf"
-           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/fetXX/gexf/FET-graph.gexf"
+         // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/fetXX/gexf/FET-graph.gexf"
 
           //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
           //"file:///home/jbilcke/test-graph.gexf"
