@@ -191,7 +191,10 @@ object Pipeline extends node.util.Actor {
                     }
                   } else {
                     if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
-                      if (in) before else false
+
+                      // if (in) before else false  // uncomment to enable unselection with single click
+                     before
+
                     } else {
                       count match {
                         case 'Simple => before
