@@ -82,25 +82,32 @@ object Pipeline extends node.util.Actor {
             case "meso" => layoutCache
             case any => data
           })
-          val results = todoList.map { case uuid => container.neighbours(container.id(uuid)).map{_._2} }
+          val neighbourList = Map(todoList.zipWithIndex:_*).map{
+              case (uuid,i) => (uuid, container.neighbours(container.id(uuid)))
+          }
           val nodeList =  layoutCache.selectionUUID.toList
-          val neighbourList =  results
 
-          System.out.println("calling callback with this data: " + (nodeList, neighbourList))
+
+          //System.out.println("calling callback with this data: " + (nodeList, neighbourList))
           Browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
 
         case ('getNeighbourhood, view: String, "selection") =>
           val container = (view match {
-            case "meso" => layoutCache
-            case any => data
+            case "meso" => {
+              println("taking the current (bad) neighbourhood graph")
+              layoutCache
+            }
+            case any => {
+              println("taking neighbourhood from original (good) data graph")
+              data
+            }
           })
-          val results = layoutCache.selectionUUID.map { case uuid => container.neighbours(container.id(uuid)).map{_._2} }
-          //println("getNeighbourhood of selection: " + results)
-
-          val nodeList = layoutCache.selectionUUID.toList
-          val neighbourList =  results.toList
-
-          //System.out.println("calling callback with this data: " + (nodeList, neighbourList))
+          //val neighbourListTmp = layoutCache.selectionUUID.map { case uuid => (uuid,container.neighbours(container.id(uuid))) }
+          val nodeList =  layoutCache.selectionUUID.toList
+          val neighbourList = Map(layoutCache.selectionUUID.zipWithIndex:_*).map{
+              case (uuid,i) => (uuid, container.neighbours(container.id(uuid)))
+          }
+          System.out.println("calling callback with this data: " + (nodeList, neighbourList))
           Browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
 
 

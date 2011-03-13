@@ -58,7 +58,7 @@ object Main {
 class Main extends TApplet with Client {
 
   override def setup(): Unit = {
-    size(800, 600, PConstants.P2D)
+    size(1400, 900, PConstants.P2D)
     /*
      frame.setResizable(true)
      frame.addComponentListener(new ComponentAdapter() { 
@@ -115,6 +115,8 @@ class Main extends TApplet with Client {
     }
   }
 
+  var nbVisibleNodes = 0
+
   override def draw(): Unit = {
 
     // send some values
@@ -124,6 +126,8 @@ class Main extends TApplet with Client {
     val scene = getIfPossible[Scene]("scene")
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
+
+
     _recenter(scene.graph, scene.graph.get[String]("camera.target"))
 
     // val centering = scene.graph.get[Boolean]("centering")
@@ -134,14 +138,14 @@ class Main extends TApplet with Client {
     if (scene.graph.get[Boolean]("pause"))
       smooth
     else
-      (if (scene.graph.nbNodes < 300) smooth else noSmooth)
+      (if (nbVisibleNodes < 300) smooth else noSmooth)
 
     setBackground(scene.background)
     if (debug) {
       setColor(scene.foreground)
       setFontSize(9)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + scene.nbNodes + " nodes (" + scene.graph.nbSingles + " singles), " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
+      text("drawing " + nbVisibleNodes + "/" + scene.nbNodes + " nodes (" + scene.graph.nbSingles + " singles), " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
 
     setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
@@ -152,6 +156,12 @@ class Main extends TApplet with Client {
     val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter {
       case (position, i) => isVisible(screenPosition(position))
     }
+    nbVisibleNodes = visibleNodes.size
+
+    //def compareBySelection(i: Int, j: Int): Boolean = ( !scene.graph.selected(i) && scene.graph.selected(j) )
+
+    //val visibleNodes = visibleNodesTmp.map { _._2 }.toList.sort(compareBySelection).toArray
+
     // TODO filter by weight, and show only the N biggers
     scene.edgePositionLayer.zipWithIndex foreach {
       case ((source, target), i) =>
@@ -165,16 +175,18 @@ class Main extends TApplet with Client {
           lineColor(scene.edgeColorLayer(i))
           //Maths.map(weight, scene.)
           //println("weight: "+weight)
-          if (visibleNodes.size < 80) {
+          if (nbVisibleNodes < 80) {
             //lineThickness(scene.graph.thickness(i))
             //lineThickness(Maths.map(scene.edgeWeightLayer(i),()) * getScale)
           }
           // lineThickness(weight * getScale)
-          if (visibleNodes.size < 100000) {
+          if (nbVisibleNodes < 30000) {
             drawCurve(source, target)
           }
         }
     }
+
+
 
     /**
      * Print the shapes (with color and size)
@@ -197,15 +209,16 @@ class Main extends TApplet with Client {
         }
     }
 
-    def compare(i: Int, j: Int): Boolean = {
+
+    def compareBySize(i: Int, j: Int): Boolean = {
       val r1 = scene.nodeSizeLayer(i)
       val l1 = scene.nodeLabelLayer(i)
       val r2 = scene.nodeSizeLayer(j)
       val l2 = scene.nodeLabelLayer(j)
       if (r1 > r2) true else (if (r1 < r2) false else (l1.compareTo(l2) < 0))
     }
+    val sortedLabelIDs = visibleNodes.map { _._2 }.toList.sort(compareBySize).toArray
 
-    val sortedLabelIDs = visibleNodes.map { _._2 }.toList.sort(compare).toArray
 
     sortedLabelIDs.foreach {
       case (i) =>
@@ -288,22 +301,22 @@ class Main extends TApplet with Client {
     // now we want the coordinate within the screen
     val (a, b) = (model2screen(xMin, yMin), model2screen(xMax, yMax))
     val (sxMin, syMin, sxMax, syMax) = (a._1.toDouble, a._1.toDouble, b._2.toDouble, b._2.toDouble)
-    println("sxMin,syMin,sxMax,syMax = " + (sxMin, syMin, sxMax, syMax))
+    //println("sxMin,syMin,sxMax,syMax = " + (sxMin, syMin, sxMax, syMax))
 
     // then we want to compute the difference
     val (xRatio, yRatio) = (abs(sxMax - sxMin) / width,
       abs(syMax - syMin) / height)
 
-    println("xRatio: " + xRatio + " yRatio: " + yRatio)
+    //println("xRatio: " + xRatio + " yRatio: " + yRatio)
     val big = max(xRatio, yRatio)
 
-    println("big: " + big)
+    //println("big: " + big)
     // TODO should call the zoom updated callback as well
     //zoomWith(big)
 
     val pos =  if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.baryCenter
 
-    println("position: "+pos)
+    //println("position: "+pos)
     var translate = new PVector()
     translate.add(new PVector(width / 2.0f, height / 2.0f, 0))
     val tmp = PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), big.toFloat)

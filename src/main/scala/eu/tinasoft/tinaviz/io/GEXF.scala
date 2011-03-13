@@ -220,11 +220,20 @@ class GEXF extends node.util.Actor {
     for (e <- (root \\ "edge")) {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
+      val weight =  (e \ "@weight" text).toDouble
+      val undirected = (e \ "@type" text) match {
+        case "undirected" => true
+        case "directed" => false
+        case any => false
+      }
+      val lnks = g.getArray[Map[Int, Double]]("links")
 
       if (!node1uuid.equals(node2uuid)) {
         val node1id = g.id(node1uuid)
         val node2id = g.id(node2uuid)
-        g += (node1id, "links", g.getArray[Map[Int, Double]]("links")(node1id) + (node2id -> (e \ "@weight").text.toDouble))
+        g += (node1id, "links", lnks(node1id) + (node2id -> weight))
+        if (undirected)
+           g += (node2id, "links", lnks(node2id) + (node1id -> weight))
       }
     }
 

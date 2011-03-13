@@ -384,7 +384,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       (if (links.size > i) {
         // println("  - mapping neighbours of node "+i+"..")
         links(i).map{ case (i,w) =>
-          (getUuid(i),minimalAttributes(i)) }
+          (getUuid(i),minimalAttributes(i))
+        }
       }
        else
         Map.empty[String,Map[String,Any]])

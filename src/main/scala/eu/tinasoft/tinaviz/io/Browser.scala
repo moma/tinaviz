@@ -93,7 +93,7 @@ object Browser extends node.util.Actor {
           val args = Array[Object] (
             Json.build(any).toString,
             new java.lang.Integer(0))
-          println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
+          println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+Json.build(any).toString+")")
           if (_window!=null) {
            // _window.call(_subPrefix + _apiPrefix + func, args)
             _window.call("setTimeout", Array[Object] (_subPrefix + _apiPrefix +func+"('"+replace(Json.build(any).toString)+"')",new java.lang.Integer(0)))
