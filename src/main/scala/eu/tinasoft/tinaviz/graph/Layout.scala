@@ -108,13 +108,14 @@ object Layout {
               if (j != i) {
                 // if we have a link, we create a sprinf
                 if (g.hasThisLink(i, j)) {
-                  val d = Maths.map(g.links(i)(j), g.category(i) match {
+                  val d = 3.0
+                  Maths.map(g.links(i)(j), g.category(i) match {
                     case "Document" => aMinMaxWeights
                     case "NGram" => bMinMaxWeights
 
                   }, (3.0, 3.5)) // seems pretty small..
                   //
-                  ps.makeSpring(p1, p2, springFactor, springFactor, d.toFloat) // 10.0f
+                  ps.makeSpring(p1, p2,  0.04f, 0.01f, d.toFloat) // 10.0f
                 }
                 // we repulse unrelated nodes
                 else if (!g.hasAnyLink(i, j)) ps.makeAttraction(p1, p2, -1000f, 10f)

@@ -211,6 +211,7 @@ class GEXF extends node.util.Actor {
                  g += (id,at._1, at._2)
             }
       }
+      g += (id, "content", g.content(id).replaceAll("\"","&quot;").replaceAll("'", "&#39;"))
       //println("added size "+g.getArray[Double]("weight")(id))
       g += (id, "keywords", keywords.toList.toArray)
     }

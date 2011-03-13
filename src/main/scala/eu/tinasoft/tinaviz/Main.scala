@@ -95,7 +95,7 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-          "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/current.gexf"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/current.gexf"
           //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
           //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
@@ -116,7 +116,7 @@ class Main extends TApplet with Client {
   }
 
   var nbVisibleNodes = 0
-
+  var nbVisibleEdges = 0
   override def draw(): Unit = {
 
     // send some values
@@ -145,7 +145,7 @@ class Main extends TApplet with Client {
       setColor(scene.foreground)
       setFontSize(9)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + nbVisibleNodes + "/" + scene.nbNodes + " nodes (" + scene.graph.nbSingles + " singles), " + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
+      text("drawing " + nbVisibleNodes + "/" + scene.nbNodes + " nodes (" + scene.graph.nbSingles + " singles), " + nbVisibleEdges + "/" + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
 
     setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
@@ -163,24 +163,57 @@ class Main extends TApplet with Client {
     //val visibleNodes = visibleNodesTmp.map { _._2 }.toList.sort(compareBySelection).toArray
 
     // TODO filter by weight, and show only the N biggers
-    scene.edgePositionLayer.zipWithIndex foreach {
+    //  (Boolean, Int, (Double,Double),(Double,Double),Double, Color, Int)
+    val edgeTmp = scene.edgePositionLayer.zipWithIndex map {
       case ((source, target), i) =>
         val psource = screenPosition(source)
         val ptarget = screenPosition(target)
+        val visible = (isVisible(psource) || isVisible(ptarget))
+        if (visible) {
+        val powd = distance(psource, ptarget)
+        (true,
+         i,
+         source,
+         target,
+         scene.edgeWeightLayer(i),
+         scene.edgeColorLayer(i),
+         if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, scene.maxLod), 1, scene.maxLod).toInt else 1)
 
-        val weight = scene.edgeWeightLayer(i)
-        if (isVisible(psource) || isVisible(ptarget)) {
-          val powd = distance(psource, ptarget)
-          setLod(if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, scene.maxLod), 1, scene.maxLod).toInt else 1)
-          lineColor(scene.edgeColorLayer(i))
+        } else {
+          (false,
+           i,
+           source,
+           target,
+           0.0,
+          new Color (0.0,0.0,0.0),
+           0)
+        }
+    }
+
+
+    nbVisibleEdges = edgeTmp.filter{case (visible, i, source, target, weight, color, lod) => visible}.size
+    edgeTmp foreach {
+      case (visible, i, source, target, weight, color, lod) =>
+        if (visible) {
+          setLod(lod)
+          lineColor(color)
           //Maths.map(weight, scene.)
           //println("weight: "+weight)
-          if (nbVisibleNodes < 80) {
-            //lineThickness(scene.graph.thickness(i))
-            //lineThickness(Maths.map(scene.edgeWeightLayer(i),()) * getScale)
-          }
+
           // lineThickness(weight * getScale)
-          if (nbVisibleNodes < 30000) {
+            if (nbVisibleNodes < 30000) {
+             val th = if (nbVisibleEdges < 4000) {
+              //lineThickness(scene.graph.thickness(i))
+              //lineThickness(Maths.map(scene.edgeWeightLayer(i),()) * getScale)
+               //Maths.map(weight,())
+                //math.max(math.min(weight, 1.0),100.0)
+               val wz = weight * scene.graph.cameraZoom * 0.5
+               if (wz < 1.0) 1.0 else wz
+            } else {
+                1.0
+             }
+
+             lineThickness(th)
             drawCurve(source, target)
           }
         }

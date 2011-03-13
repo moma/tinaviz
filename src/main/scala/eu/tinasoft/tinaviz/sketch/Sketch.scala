@@ -293,10 +293,11 @@ case class Sketch( var graph : Graph = new Graph,
       val avgSize = (sizes._1 + sizes._2) / 2.0
       val w = Maths.limit(avgSize, Maths.min(sizes), Maths.max(sizes))
       // print("  w: "+w)
-      //val r = weight * 1.0
-      val r = 1.0 * 1.0
+      //val r = weight * :1.0
+      //val r = 1.0 * 1.0
       //println("  r: "+r)
-      r
+      //val
+      w
     }).toArray
   }
 
