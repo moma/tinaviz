@@ -115,6 +115,8 @@ class Main extends TApplet with Client {
     }
   }
 
+  var doZoom : Symbol = 'none
+
   var nbVisibleNodes = 0
   var nbVisibleEdges = 0
   override def draw(): Unit = {
@@ -127,6 +129,15 @@ class Main extends TApplet with Client {
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
 
+    doZoom match {
+      case 'in =>
+        zoom(true)
+        doZoom = 'none
+      case 'out =>
+        zoom(false)
+         doZoom = 'none
+      case any =>
+    }
 
     _recenter(scene.graph, scene.graph.get[String]("camera.target"))
 
@@ -140,7 +151,11 @@ class Main extends TApplet with Client {
     else
       (if (nbVisibleEdges < 900) smooth else noSmooth)
 
-    setBackground(scene.background)
+    setBackground(scene.graph.currentView match {
+        case "macro" => scene.background
+        case "meso" => new Color (0.1416, 0.08, 1.0) // jaunâtre
+        case any => scene.background
+    })
     if (debug) {
       setColor(scene.foreground)
       setFontSize(9)
@@ -436,17 +451,25 @@ class Main extends TApplet with Client {
    */
   override def keyPressed() {
     key match {
-      case 'p' => Server ! "pause" -> 'toggle
+      //case 'p' => Server ! "pause" -> 'toggle
       case 'a' => Server ! "pause" -> 'toggle
+
       case 'n' => Server ! "drawing.nodes" -> 'toggle
       case 'l' => Server ! "drawing.edges" -> 'toggle
-      case 'e' => Server ! ("export", "gexf")
+
+      case 'x' => Server ! ("export", "gexf")
 
       case 'c' => Server ! "filter.node.category" -> 'toggle
       case 'v' => Server ! "filter.view" -> 'toggle
+
       case 'r' => Server ! "camera.target" -> "all"
       case 's' => Server ! "camera.target" -> "selection"
       case 'u' => Server ! "select" -> ""
+
+      case 'p' =>
+        doZoom = 'in
+      case 'm' =>
+        doZoom = 'out
 
       case PConstants.CODED =>
         val amount = 15

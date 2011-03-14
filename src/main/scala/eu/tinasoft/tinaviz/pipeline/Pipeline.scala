@@ -234,7 +234,12 @@ object Pipeline extends node.util.Actor {
 
               // check if we need to recompute the meso field
               count match {
-                case 'Double => self ! "filter.view" -> "meso"
+                case 'Double =>
+                  if (in) {
+                    self ! "filter.view" -> "meso"
+                  } else {
+                     // zoom?
+                  }
                 case 'Simple => updateScreen
               }
 
