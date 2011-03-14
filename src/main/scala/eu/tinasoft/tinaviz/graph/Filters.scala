@@ -112,7 +112,7 @@ object Filters {
   
   def weightToSize(g: Graph) : Graph = {
     if (g.nbNodes == 0) return g
-    val sliderRange = (1.0, 10.0) //node size range
+    val sliderRange = (1.5, 10.0) //node size range
     val aratio = 0.3 * g.get[Double]("filter.a.node.size") // Document
     val bratio = 1.0 * g.get[Double]("filter.b.node.size") // NGram
     val aminmaxweight =  (g.get[Double]("minANodeWeight"), g.get[Double]("maxANodeWeight"))  // Document

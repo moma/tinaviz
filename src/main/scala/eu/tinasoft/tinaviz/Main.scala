@@ -239,11 +239,11 @@ class Main extends TApplet with Client {
           case 'Disk =>
             drawDisk(position, scene.nodeSizeLayer(i))
             setColor(scene.nodeColorLayer(i))
-            drawDisk(position, scene.nodeSizeLayer(i) * 0.8)
+            drawDisk(position, scene.nodeSizeLayer(i) * 0.75)
           case x =>
             drawSquare(position, scene.nodeSizeLayer(i))
             setColor(scene.nodeColorLayer(i))
-            drawSquare(position, scene.nodeSizeLayer(i) * 0.8)
+            drawSquare(position, scene.nodeSizeLayer(i) * 0.75)
         }
     }
 
