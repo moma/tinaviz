@@ -138,7 +138,7 @@ class Main extends TApplet with Client {
     if (scene.graph.get[Boolean]("pause"))
       smooth
     else
-      (if (nbVisibleNodes < 300) smooth else noSmooth)
+      (if (nbVisibleEdges < 900) smooth else noSmooth)
 
     setBackground(scene.background)
     if (debug) {
@@ -158,7 +158,7 @@ class Main extends TApplet with Client {
     }
     nbVisibleNodes = visibleNodes.size
 
-    //def compareBySelection(i: Int, j: Int): Boolean = ( !scene.graph.selected(i) && scene.graph.selected(j) )
+    def compareBySelection(i: Int, j: Int): Boolean = ( !scene.graph.selected(i) && scene.graph.selected(j) )
 
     //val visibleNodes = visibleNodesTmp.map { _._2 }.toList.sort(compareBySelection).toArray
 
@@ -200,15 +200,19 @@ class Main extends TApplet with Client {
           //Maths.map(weight, scene.)
           //println("weight: "+weight)
 
-          // lineThickness(weight * getScale)
+          // lineThickness(weight * getZoom)
             if (nbVisibleNodes < 30000) {
-             val th = if (nbVisibleEdges < 4000) {
+             val th = if (nbVisibleEdges < 2000) {
               //lineThickness(scene.graph.thickness(i))
-              //lineThickness(Maths.map(scene.edgeWeightLayer(i),()) * getScale)
+              //lineThickness(Maths.map(scene.edgeWeightLayer(i),()) * getZoom)
                //Maths.map(weight,())
                 //math.max(math.min(weight, 1.0),100.0)
-               val wz = weight * scene.graph.cameraZoom * 0.5
-               if (wz < 1.0) 1.0 else wz
+               // take the two nodes and
+               val (a,b) = scene.edgeIndexLayer(i)
+               val m = math.min(scene.nodeSizeLayer(a),
+                                scene.nodeSizeLayer(b))
+               val wz = m * getZoom * 0.4 // half of a node radius
+               if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
             } else {
                 1.0
              }

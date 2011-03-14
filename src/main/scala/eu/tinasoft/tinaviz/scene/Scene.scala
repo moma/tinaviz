@@ -31,7 +31,8 @@ case class Scene(
   val nodeSizeLayer: Array[Double] = Array.empty[Double],
 
   val nodeLabelLayer: Array[String] = Array.empty[String],
-
+     // edges
+  val edgeIndexLayer: Array[(Int,Int)] = Array.empty[(Int,Int)],
   // edges
   val edgePositionLayer: Array[((Double, Double),
                                 (Double, Double))] = Array.empty[((Double, Double),

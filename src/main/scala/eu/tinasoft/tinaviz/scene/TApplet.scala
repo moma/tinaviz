@@ -176,10 +176,6 @@ class TApplet extends PApplet with MouseWheelListener {
     moveCameraAt(_camera.position._1, _camera.position._2, _camera.zoom)
   }
 
-  protected def getScale = {
-    _camera.zoom
-  }
-
   /**
    * Set the Background color
    */

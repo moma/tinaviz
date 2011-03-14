@@ -126,6 +126,29 @@ object Pipeline extends node.util.Actor {
           }
           reply(result)
 
+        case ("select", uuid: String) =>
+          println("selecting node: '" + uuid + "'")
+
+          if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
+            layoutCache += ("selected" -> layoutCache.selected.map(c => false))
+          else {
+             layoutCache = layoutCache + ("selected" -> layoutCache.uuid.map {
+              case _uuid =>
+                val res = if (uuid == null | uuid.isEmpty) false else (_uuid equals uuid)
+                  println("match: "+res)
+               res
+            })
+            //layoutCache += (layoutCache.id(uuid), "select", true)
+          }
+
+          val selection = layoutCache.selectionAttributes
+          println("selection: "+selection)
+          // todo: update everything
+
+          Browser ! "_callbackSelectionChanged" -> (selection, "left")
+
+          self ! "filter.view" -> data.get[String]("filter.view")
+
         case ("selectByPattern", pattern: String) =>
           layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
             case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
@@ -227,22 +250,6 @@ object Pipeline extends node.util.Actor {
             //self ! "pause" -> pauseBuffer
             case any =>
           }
-
-        case ("select", uuid: String) =>
-          println("selecting node: '" + uuid + "'")
-
-          if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
-            layoutCache += ("selected" -> layoutCache.selected.map(c => false))
-          else {
-            layoutCache += (layoutCache.id(uuid), "select", true)
-          }
-
-          val selection = layoutCache.selectionAttributes
-          // todo: update everything
-
-          Browser ! "_callbackSelectionChanged" -> (selection, "left")
-
-          self ! "filter.view" -> data.get[String]("filter.view")
 
         case (key: String, value: Any) =>
         //println("updating graph attribute " + key + " -> " + value)

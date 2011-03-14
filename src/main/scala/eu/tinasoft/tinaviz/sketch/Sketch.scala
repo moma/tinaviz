@@ -37,8 +37,11 @@ object Sketch {
       sketch.nodeSizeLayer,
 
       sketch.nodeLabelLayer,
+
+      sketch.edgeIndexLayer,
       // edges
       sketch.edgePositionLayer,
+
       sketch.edgeColorLayer,
       sketch.edgeWeightLayer
     )
@@ -61,6 +64,8 @@ case class Sketch( var graph : Graph = new Graph,
 
                    var nodeLabelLayer: Array[String] = Array.empty[String],
                    // edges
+                   var edgeIndexLayer : Array[(Int,Int)] = Array.empty[(Int,Int)],
+
                    var edgePositionLayer: Array[((Double, Double),
                      (Double, Double))] = Array.empty[((Double, Double),
                      (Double, Double))],
@@ -117,6 +122,7 @@ case class Sketch( var graph : Graph = new Graph,
     nodeLabelLayer = Array.empty[String]
     // edges
     edgePositionLayer = Array.empty[((Double, Double), (Double, Double))]
+    edgeIndexLayer = Array.empty[(Int,Int)]
     edgeColorLayer = Array.empty[Color]
     edgeWeightLayer = Array.empty[Double]
   }
@@ -152,7 +158,7 @@ case class Sketch( var graph : Graph = new Graph,
         mode match {
           case 'selected => color.standard
           case 'highlighted => color.standard
-          case 'unselected => color.lighter.saturation(0.12)
+          case 'unselected => color.lighter.saturation(0.25)
           case 'default => color.light
         }
     }
@@ -168,7 +174,7 @@ case class Sketch( var graph : Graph = new Graph,
         mode match {
           case 'selected => new Color(0.0, 0.0, 0.23)
           case 'highlighted => new Color(0.0, 0.0, 0.23)
-          case 'unselected => color.darker.saturation(0.12)
+          case 'unselected => color.darker.saturation(0.3)
           case 'default => color.darker
         }
     }
@@ -219,6 +225,7 @@ case class Sketch( var graph : Graph = new Graph,
     //var tmpEdges = List.empty[((Double,Double),(Double,Double),Double,Color)]
     var tmpPosition = List.empty[((Double, Double), (Double, Double))]
     var tmpColor = List.empty[Color]
+    var tmpIndex = List.empty[(Int,Int)]
     var tmpWeight = List.empty[Double]
 
     //println("updateEdgePositions of "+graph)
@@ -235,9 +242,10 @@ case class Sketch( var graph : Graph = new Graph,
             tmpPosition ::= (src, trg)
             tmpColor ::= color
             tmpWeight ::= weight
+            tmpIndex ::= (i,j)
         }
     }
-
+    edgeIndexLayer = tmpIndex.toArray
     edgePositionLayer = tmpPosition.toArray
     edgeWeightLayer = tmpWeight.toArray
     edgeColorLayer = tmpColor.toArray
@@ -252,17 +260,28 @@ case class Sketch( var graph : Graph = new Graph,
     var tmpColor = List.empty[Color]
     val aextremums = (g.get[Double]("minAEdgeWeight"),  g.get[Double]("maxAEdgeWeight"))
     val bextremums = (g.get[Double]("minBEdgeWeight"), g.get[Double]("maxBEdgeWeight"))
+    val selectionValid = (graph.selection.size > 0)
     val target = (0.4,1.0)
     g.links.zipWithIndex map {
       case (mapIntDouble, from) =>
+        val mode = if (g.selected(from)) 'selected else if (graph.highlighted(from)) 'highlighted else if (selectionValid) 'unselected else 'default
         mapIntDouble foreach {
           case (to, weight) =>
             val a = nodeColorLayer(from)
             val b = nodeColorLayer(to)
-           val d = if (g.category(from).equals(g.category(to)))
-             a.blend(b)
-           else
-             new Color(0.0, 0.0, 0.5)
+            val ab = nodeBorderColorLayer(from)
+            val bb = nodeBorderColorLayer(to)
+
+           val d = if (g.category(from).equals(g.category(to))) {
+               mode match {
+                case 'selected => a.blend(b)//color.standard
+                case 'highlighted => a.blend(b)//color.standard
+                case 'unselected => ab.blend(bb)//color.lighter.saturation(0.25)
+                case 'default => a.blend(b)//color.light
+               }
+            } else {
+             new Color(0.0, 0.0, 0.6)
+           }
 
             tmpColor ::= d.alpha(Maths.map(weight, g.category(from) match {
               case "Document" => aextremums
