@@ -271,22 +271,32 @@ case class Sketch( var graph : Graph = new Graph,
             val b = nodeColorLayer(to)
             val ab = nodeBorderColorLayer(from)
             val bb = nodeBorderColorLayer(to)
+            val alph = Maths.map(weight, g.category(from) match {
+              case "Document" => aextremums
+              case "NGram" => bextremums
+            }, (0.25,1.0))
 
            val d = if (g.category(from).equals(g.category(to))) {
                mode match {
-                case 'selected => a.blend(b)//color.standard
-                case 'highlighted => a.blend(b)//color.standard
-                case 'unselected => ab.blend(bb)//color.lighter.saturation(0.25)
-                case 'default => a.blend(b)//color.light
+                case 'selected =>
+
+                  a.blend(b)//color.standard
+                case 'highlighted =>
+
+                  a.blend(b)//color.standard
+                case 'unselected =>
+
+                  ab.blend(bb).saturateBy(0.8).alpha(alph)//color.lighter.saturation(0.25)
+                case 'default =>
+
+                  a.blend(b).alpha(alph)//color.light
                }
+
             } else {
-             new Color(0.0, 0.0, 0.6)
+             new Color(0.0, 0.0, 0.6).alpha(alph)
            }
 
-            tmpColor ::= d.alpha(Maths.map(weight, g.category(from) match {
-              case "Document" => aextremums
-              case "NGram" => bextremums
-            }, (0.25,1.0)))
+            tmpColor ::= d
         }
     }
     edgeColorLayer = tmpColor.toArray
