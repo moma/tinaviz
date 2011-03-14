@@ -231,6 +231,7 @@ object Metrics {
       case ((x, y), i) =>
         if (g.selected(i)) p = (p._1 + x, p._2 + y)
     }
+    println("N: "+N+" p: "+p)
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
   }
 
