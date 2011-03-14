@@ -190,6 +190,7 @@ class Main extends TApplet with Client {
         }
     }
 
+    val edgeWeightIsPercentOfNodeSize = 0.3 // half of a node radius
 
     nbVisibleEdges = edgeTmp.filter{case (visible, i, source, target, weight, color, lod) => visible}.size
     edgeTmp foreach {
@@ -211,7 +212,7 @@ class Main extends TApplet with Client {
                val (a,b) = scene.edgeIndexLayer(i)
                val m = math.min(scene.nodeSizeLayer(a),
                                 scene.nodeSizeLayer(b))
-               val wz = m * getZoom * 0.4 // half of a node radius
+               val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
                if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
             } else {
                 1.0

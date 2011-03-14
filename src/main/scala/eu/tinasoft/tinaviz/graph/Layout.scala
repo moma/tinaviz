@@ -72,6 +72,12 @@ object Layout {
     val ATTRACTION = g.get[Double]("layout.attraction")
     val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
 
+
+    val maxDistance =  Maths.map(g.nbEdges.toDouble,
+                                 (0.0, math.min(g.nbEdges.toDouble,4000.0)),
+                                 (12.0,280.0)) // typical should be 180mm for 4000 edges
+    val minDistance = 6.0
+
     //println("running forceVector on "+nbNodes+" nodes")
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
     val cooling = 1.0
@@ -108,16 +114,17 @@ object Layout {
               if (j != i) {
                 // if we have a link, we create a sprinf
                 if (g.hasThisLink(i, j)) {
+
                   val d =  Maths.map(g.links(i)(j), g.category(i) match {
                     case "Document" => aMinMaxWeights
                     case "NGram" => bMinMaxWeights
 
-                  }, (3.0, 3.5)) // seems pretty small..
+                  }, (maxDistance,minDistance))
                   //
                   ps.makeSpring(p1, p2,  0.04f, 0.01f, d.toFloat) // 10.0f
                 }
                 // we repulse unrelated nodes
-                else if (!g.hasAnyLink(i, j)) ps.makeAttraction(p1, p2, -1000f, 10f)
+                else if (!g.hasAnyLink(i, j)) ps.makeAttraction(p1, p2, -3000f, 10f)
 
               }
           }
