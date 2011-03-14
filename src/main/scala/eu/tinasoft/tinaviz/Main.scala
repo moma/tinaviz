@@ -190,7 +190,7 @@ class Main extends TApplet with Client {
         }
     }
 
-    val edgeWeightIsPercentOfNodeSize = 0.3 // half of a node radius
+    val edgeWeightIsPercentOfNodeSize = 0.3 // 1/3 of a node radius for good looking edges
 
     nbVisibleEdges = edgeTmp.filter{case (visible, i, source, target, weight, color, lod) => visible}.size
     edgeTmp foreach {
@@ -246,7 +246,12 @@ class Main extends TApplet with Client {
             drawSquare(position, scene.nodeSizeLayer(i) * 0.75)
         }
     }
-
+    setColor(new Color(0.3, 1.0, 1.0))
+    drawDisk((0.0,0.0), 10.0 / getZoom)
+    setColor(new Color(0.0, 1.0, 1.0))
+    drawDisk( scene.graph.baryCenter, 10.0 / getZoom)
+    setColor(new Color(0.6, 1.0, 1.0))
+    drawDisk( scene.graph.selectionCenter, 10.0 / getZoom)
 
     def compareBySize(i: Int, j: Int): Boolean = {
       val r1 = scene.nodeSizeLayer(i)
@@ -319,6 +324,30 @@ class Main extends TApplet with Client {
         println("error")
         return
     }
+
+
+    /*
+          float graphHeight = metrics.graphHeight * v.sceneScale;
+            float graphWidth = metrics.graphWidth * v.sceneScale;
+
+            if ((graphWidth * height) / (graphHeight) < (width * 1.0f)) {
+                v.tryToSetZoom(v.sceneScale * height / graphHeight / v.RECENTERING_MARGIN);
+            } else {
+                v.tryToSetZoom(v.sceneScale * width / graphWidth / v.RECENTERING_MARGIN);
+            }
+            PVector center = new PVector();
+            if (Visualization.centerOnSelection) {
+                center = v.getOutputGraph().getSelectedNodesCenter();
+            } else {
+                center = metrics.center;
+            }
+            PVector translate = new PVector();
+            translate.add(new PVector(width / 2.0f, height / 2.0f, 0));
+            translate.sub(PVector.mult(center, v.sceneScale));
+            v.translation.set(translate);
+     */
+
+
     val w = width.toDouble
     val h = height.toDouble
     val cz = g.cameraZoom
@@ -336,31 +365,40 @@ class Main extends TApplet with Client {
     //val h = normalizePositions(g)
     val (xMin, yMin, xMax, yMax) = (g.get[Double]("xMin"), g.get[Double]("yMin"),
       g.get[Double]("xMax"), g.get[Double]("yMax"))
+    val gwidth = abs(xMin - xMax) * getZoom // size to screen
+    val gheight = abs(yMax - yMin)  * getZoom  // size to screen
+    val graphSize = (gwidth, gheight) // size to screen
+    println("graph size on screen: "+graphSize)
     // now we want the coordinate within the screen
-    val (a, b) = (model2screen(xMin, yMin), model2screen(xMax, yMax))
-    val (sxMin, syMin, sxMax, syMax) = (a._1.toDouble, a._1.toDouble, b._2.toDouble, b._2.toDouble)
-    println("sxMin,syMin,sxMax,syMax = " + (sxMin, syMin, sxMax, syMax))
+    //val (a, b) = (model2screen(xMin, yMin), model2screen(xMax, yMax))
+    //val (sxMin, syMin, sxMax, syMax) = (a._1.toDouble, a._1.toDouble, b._2.toDouble, b._2.toDouble)
+    //println("sxMin,syMin,sxMax,syMax = " + (sxMin, syMin, sxMax, syMax))
 
     // then we want to compute the difference
-    val (xRatio, yRatio) = (abs(sxMax - sxMin) / width,
-      abs(syMax - syMin) / height)
+    //val (xRatio, yRatio) = (abs(sxMax - sxMin) / width,  abs(syMax - syMin) / height)
+    val (xRatio, yRatio) = (gwidth / width,  gheight / height)
+    println("(gwidth / width,  gheight / height) =  ("+gwidth+" / "+width+",  "+gheight+" / "+height+") = "+(xRatio, yRatio))
+    val ratio = max(xRatio, yRatio)
 
-    println("xRatio: " + xRatio + " yRatio: " + yRatio)
-    val big = max(xRatio, yRatio)
-
-    println("big: " + big)
-    // TODO should call the zoom updated callback as well
+    println("biggest ratio difference: " + ratio+"    zoom: "+getZoom)
+    // TODO should call the zoom updated ratio as well
     //zoomWith(big)
 
-    val pos =  if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.baryCenter
+    val pos =  g.baryCenter//if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.baryCenter
 
-    println("position: "+pos)
-    var translate = new PVector()
-    translate.add(new PVector(width / 2.0f, height / 2.0f, 0))
-    val tmp = PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), big.toFloat)
-    println("tmp: "+tmp)
-    translate.sub(tmp)
+    println("Center: "+pos)
+    // we want the graph to be at the center of the screen
+    var translate = new PVector(width / 2.0f, height / 2.0f, 0)
+
+
+    val tmp = new PVector(pos._1.toFloat, pos._2.toFloat)
+    val tmp2 = PVector.mult(tmp, getZoom.toFloat)
+
+    //val tmp = PVector.mult(new PVector(0.0f,0.0f), big.toFloat)
+    println("tmp2: "+tmp2)
+    translate.sub(tmp2)
     updatePosition(translate)
+    //updateZoom(getZoom * ratio)
     println("\n")
   }
 
