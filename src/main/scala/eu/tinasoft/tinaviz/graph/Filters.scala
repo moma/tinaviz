@@ -121,7 +121,7 @@ object Filters {
       case (weight,i) => Maths.map(weight, g.category(i) match {
                                       case "NGram" => bminmaxweight
                                       case "Document" => aminmaxweight
-                                   }, (1.0, 15.0)) * (g.category(i) match {
+                                   }, (1.0, 10.0)) * (g.category(i) match {
                                       case "NGram" => bratio
                                       case "Document" => aratio
                                    })
