@@ -339,27 +339,29 @@ class Main extends TApplet with Client {
     // now we want the coordinate within the screen
     val (a, b) = (model2screen(xMin, yMin), model2screen(xMax, yMax))
     val (sxMin, syMin, sxMax, syMax) = (a._1.toDouble, a._1.toDouble, b._2.toDouble, b._2.toDouble)
-    //println("sxMin,syMin,sxMax,syMax = " + (sxMin, syMin, sxMax, syMax))
+    println("sxMin,syMin,sxMax,syMax = " + (sxMin, syMin, sxMax, syMax))
 
     // then we want to compute the difference
     val (xRatio, yRatio) = (abs(sxMax - sxMin) / width,
       abs(syMax - syMin) / height)
 
-    //println("xRatio: " + xRatio + " yRatio: " + yRatio)
+    println("xRatio: " + xRatio + " yRatio: " + yRatio)
     val big = max(xRatio, yRatio)
 
-    //println("big: " + big)
+    println("big: " + big)
     // TODO should call the zoom updated callback as well
     //zoomWith(big)
 
     val pos =  if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.baryCenter
 
-    //println("position: "+pos)
+    println("position: "+pos)
     var translate = new PVector()
     translate.add(new PVector(width / 2.0f, height / 2.0f, 0))
     val tmp = PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), big.toFloat)
+    println("tmp: "+tmp)
     translate.sub(tmp)
     updatePosition(translate)
+    println("\n")
   }
 
   /**

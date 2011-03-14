@@ -73,13 +73,13 @@ object Layout {
     val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
 
     val nbEdges = g.nbEdges.toDouble / 2.0
-    println("nbEdges: "+nbEdges)
+    //println("nbEdges: "+nbEdges)
     val maxD = 100.0
     val minD = 6.0
     val maxEdges = 3000.0
     val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
 
-    println("distInterval: "+distInterval)
+    //println("distInterval: "+distInterval)
 
     //println("running forceVector on "+nbNodes+" nodes")
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
