@@ -153,7 +153,7 @@ class Main extends TApplet with Client {
 
     setBackground(scene.graph.currentView match {
         case "macro" => scene.background
-        case "meso" => new Color (0.1416, 0.08, 1.0) // jaunâtre
+        case "meso" => new Color (0.1416, 0.1, 1.0) // jaunâtre
         case any => scene.background
     })
     if (debug) {

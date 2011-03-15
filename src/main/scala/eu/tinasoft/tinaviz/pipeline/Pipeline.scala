@@ -81,10 +81,10 @@ object Pipeline extends node.util.Actor {
             case "meso" => layoutCache
             case any => data
           })
-          val neighbourList = Map(todoList.zipWithIndex:_*).map{
-              case (uuid,i) => (uuid, container.neighbours(container.id(uuid)))
+          val neighbourList = Map(todoList.zipWithIndex: _*).map {
+            case (uuid, i) => (uuid, container.neighbours(container.id(uuid)))
           }
-          val nodeList =  layoutCache.selectionUUID.toList
+          val nodeList = layoutCache.selectionUUID.toList
 
 
           //System.out.println("calling callback with this data: " + (nodeList, neighbourList))
@@ -102,9 +102,9 @@ object Pipeline extends node.util.Actor {
             }
           })
           //val neighbourListTmp = layoutCache.selectionUUID.map { case uuid => (uuid,container.neighbours(container.id(uuid))) }
-          val nodeList =  layoutCache.selectionUUID.toList
-          val neighbourList = Map(layoutCache.selectionUUID.zipWithIndex:_*).map{
-              case (uuid,i) => (uuid, container.neighbours(container.id(uuid)))
+          val nodeList = layoutCache.selectionUUID.toList
+          val neighbourList = Map(layoutCache.selectionUUID.zipWithIndex: _*).map {
+            case (uuid, i) => (uuid, container.neighbours(container.id(uuid)))
           }
           System.out.println("calling callback with this data: " + (nodeList, neighbourList))
           Browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
@@ -131,17 +131,17 @@ object Pipeline extends node.util.Actor {
           if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
             layoutCache += ("selected" -> layoutCache.selected.map(c => false))
           else {
-             layoutCache = layoutCache + ("selected" -> layoutCache.uuid.map {
-              case _uuid =>
-                val res = if (uuid == null | uuid.isEmpty) false else (_uuid equals uuid)
-                  println("match: "+res)
-               res
+            layoutCache = layoutCache + ("selected" -> layoutCache.uuid.zipWithIndex.map {
+              case (_uuid, i) =>
+                val res = if (_uuid equals uuid) true else layoutCache.selected(i)
+                println("match: " + res)
+                res
             })
             //layoutCache += (layoutCache.id(uuid), "select", true)
           }
 
           val selection = layoutCache.selectionAttributes
-          println("selection: "+selection)
+          println("selection: " + selection)
           // todo: update everything
 
           Browser ! "_callbackSelectionChanged" -> (selection, "left")
@@ -149,9 +149,13 @@ object Pipeline extends node.util.Actor {
           self ! "filter.view" -> data.get[String]("filter.view")
 
         case ("selectByPattern", pattern: String) =>
-          layoutCache = layoutCache + ("selected" -> layoutCache.label.map {
-            case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
-          })
+          if (pattern == null | (pattern.equals(" ") || pattern.isEmpty))
+            layoutCache += ("selected" -> layoutCache.selected.map(c => false))
+          else {
+            layoutCache = layoutCache + ("selected" -> layoutCache.label.zipWithIndex.map {
+              case (label, i) => if (label.toLowerCase contains pattern.toLowerCase) true else layoutCache.selected(i)
+            })
+          }
 
           val selection = layoutCache.selectionAttributes
           // todo: update everything
@@ -215,7 +219,7 @@ object Pipeline extends node.util.Actor {
                     if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro")) {
 
                       // if (in) before else false  // uncomment to enable unselection with single click
-                     before
+                      before
 
                     } else {
                       count match {
@@ -237,7 +241,7 @@ object Pipeline extends node.util.Actor {
                   if (in) {
                     self ! "filter.view" -> "meso"
                   } else {
-                     // zoom?
+                    // zoom?
                   }
                 case 'Simple => updateScreen
               }
@@ -397,7 +401,7 @@ object Pipeline extends node.util.Actor {
     }.toArray)
 
     sketch.update(f)
-    val msg = (f,sketch: Scene)
+    val msg = (f, sketch: Scene)
     Server ! msg
   }
 
