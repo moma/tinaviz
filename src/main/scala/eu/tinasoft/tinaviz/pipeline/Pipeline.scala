@@ -93,11 +93,11 @@ object Pipeline extends node.util.Actor {
         case ('getNeighbourhood, view: String, "selection") =>
           val container = (view match {
             case "meso" => {
-              println("taking the current (bad) neighbourhood graph")
+              //println("taking the current (bad) neighbourhood graph")
               layoutCache
             }
             case any => {
-              println("taking neighbourhood from original (good) data graph")
+              //println("taking neighbourhood from original (good) data graph")
               data
             }
           })
@@ -106,7 +106,7 @@ object Pipeline extends node.util.Actor {
           val neighbourList = Map(layoutCache.selectionUUID.zipWithIndex: _*).map {
             case (uuid, i) => (uuid, container.neighbours(container.id(uuid)))
           }
-          System.out.println("calling callback with this data: " + (nodeList, neighbourList))
+          //System.out.println("calling callback with this data: " + (nodeList, neighbourList))
           Browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
 
 

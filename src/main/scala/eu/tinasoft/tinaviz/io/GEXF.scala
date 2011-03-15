@@ -62,7 +62,7 @@ class GEXF extends node.util.Actor {
                 case 'unselected => color.lighter.saturation(0.3)
                 case 'default => color.light
               }
-              val c = new java.awt.Color(java.awt.Color.HSBtoRGB(0.6f,0.5f,0.8f))
+              val c = new java.awt.Color(java.awt.Color.HSBtoRGB(color2.h.toFloat,color2.s.toFloat,color2.b.toFloat))
               (c.getRed,c.getGreen,c.getBlue)
           }
 
