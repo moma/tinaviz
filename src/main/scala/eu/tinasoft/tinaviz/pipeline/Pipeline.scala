@@ -31,7 +31,6 @@ object Pipeline extends node.util.Actor {
 
   start
 
-  var nextState = 'output
   var data = new Graph()
   var categoryCache = new Graph()
   var nodeWeightCache = new Graph()
@@ -398,7 +397,7 @@ object Pipeline extends node.util.Actor {
     }.toArray)
 
     sketch.update(f)
-    val msg = (f, sketch: Scene)
+    val msg = (f,sketch: Scene)
     Server ! msg
   }
 

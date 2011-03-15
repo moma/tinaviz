@@ -20,6 +20,9 @@ import Actor._
 
 case class Step(val step: Symbol)
 
+/**
+ * This class need a big refactoring..
+ */
 object Server extends node.util.Actor {
 
   val defaultProperties: Map[String, Any] = Map(
@@ -40,7 +43,7 @@ object Server extends node.util.Actor {
     "layout.attraction" -> 1.01,
     "layout.repulsion" -> 1.5,
     "pause" -> false,
-    "debug" -> true,
+    "debug" -> false,
 
     // global selection disk settings
     "selectionRadius" -> 10.0,
@@ -48,6 +51,7 @@ object Server extends node.util.Actor {
     // TODO real-time camera settings
     "camera.zoom" -> 0.0,
     "camera.position" -> (0.0, 0.0),
+    "camera.target" -> "all",
 
     "views.macro.pause" -> false,
     "views.macro.debug" -> false,

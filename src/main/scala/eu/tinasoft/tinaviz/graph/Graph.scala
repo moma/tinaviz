@@ -52,6 +52,7 @@ object Graph {
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
     g = g + ("singlesCenter" -> Metrics.singlesCenter(g))
+    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
     g
   }
 
@@ -116,8 +117,9 @@ object Graph {
     "baryCenter" -> (0.0, 0.0),
     "selectionCenter" -> (0.0, 0.0),
     "singlesCenter" -> (0.0, 0.0),
-    "layout" -> "tinaforce" // phyloforce
-
+    "notSinglesCenter" -> (0.0, 0.0),
+    "layout" -> "tinaforce", // phyloforce
+    "debug" -> false
   )
 }
 
@@ -169,6 +171,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val baryCenter = get[(Double,Double)]("baryCenter")
   lazy val selectionCenter = get[(Double,Double)]("selectionCenter")
   lazy val singlesCenter = get[(Double,Double)]("singlesCenter")
+  lazy val notSinglesCenter = get[(Double,Double)]("notSinglesCenter")
 
   // camera settings
   lazy val cameraZoom = get[Double]("camera.zoom")
@@ -198,7 +201,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def hasThisLink(i: Int, j: Int) = if (links.size > i) links(i).contains(j) else false
 
-  def isSingle(i: Int) = (inDegree(i) > 0 && outDegree(i) > 0)
+  def isSingle(i: Int) = (inDegree(i) == 0 && outDegree(i) == 0)
 
   /**
    * Create a new Graph with an updated column

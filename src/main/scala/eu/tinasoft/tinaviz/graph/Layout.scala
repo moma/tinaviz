@@ -31,12 +31,12 @@ object Layout {
         g.currentView match {
           case "macro" =>
             g.currentCategory match {
-              case "NGram"    => tinaforce(g)
+              case "NGram" => tinaforce(g)
               case "Document" => tinaforce(g)
             }
           case "meso" =>
             g.currentCategory match {
-              case "NGram"    => phyloforce(g)
+              case "NGram" => phyloforce(g)
               case "Document" => phyloforce(g)
             }
         }
@@ -50,10 +50,10 @@ object Layout {
 
     if (g.nbNodes == 0) return g
 
-     val springFactor = if (g.nbEdges > 20000) {
+    val springFactor = if (g.nbEdges > 20000) {
       0.005f
     } else {
-      0.01f// 0.02 is better..
+      0.01f // 0.02 is better..
     }
     val drag = if (g.nbEdges > 20000) {
       0.2
@@ -87,7 +87,7 @@ object Layout {
 
     if (g.hashed != lastHash) {
       lastHash = g.hashed
-      println("hash changed, regenerating a particle system..")
+      //println("hash changed, regenerating a particle system..")
 
       //g.position.zipWithIndex map {
 
@@ -102,9 +102,9 @@ object Layout {
       */
       ps.clear
       val tmp = g.position.zipWithIndex map {
-        case (node1, i) =>
+        case ((x, y), i) =>
         // g.weight(i).toFloat
-          val p = ps.makeParticle(1.0f, node1._1.toFloat, node1._2.toFloat, 0.0f)
+          val p = if (g.isSingle(i)) null else ps.makeParticle(1.0f, x.toFloat, y.toFloat, 0.0f)
           //ps.makeSpring(gravity, p, 0.3f, 1.0f, 1.0f)    
           (p, i)
       }
@@ -112,47 +112,58 @@ object Layout {
       // every node are repulsing each other (negative attraction)
       tmp foreach {
         case (p1, i) =>
-          tmp foreach {
-            case (p2, j) =>
-              if (j != i) {
-                // if we have a link, we create a sprinf
-                if (g.hasThisLink(i, j)) {
+          if (p1 != null) {
+            tmp foreach {
+              case (p2, j) =>
+                if (p2 != null) {
+                  if (j != i) {
+                    // if we have a link, we create a sprinf
+                    if (g.hasThisLink(i, j)) {
 
-                  val d =  Maths.map(g.links(i)(j), g.category(i) match {
-                    case "Document" => aMinMaxWeights
-                    case "NGram" => bMinMaxWeights
+                      val d = Maths.map(g.links(i)(j), g.category(i) match {
+                        case "Document" => aMinMaxWeights
+                        case "NGram" => bMinMaxWeights
 
-                  }, distInterval)
-                  //
-                  ps.makeSpring(p1, p2,  0.04f, 0.01f, d.toFloat) // 10.0f
+                      }, distInterval)
+                      //
+                      ps.makeSpring(p1, p2, 0.04f, 0.01f, d.toFloat) // 10.0f
+                    }
+                    // we repulse unrelated nodes
+                    else if (!g.hasAnyLink(i, j)) ps.makeAttraction(p1, p2, -1000f, 10f)
+
+                  }
                 }
-                // we repulse unrelated nodes
-                else if (!g.hasAnyLink(i, j)) ps.makeAttraction(p1, p2, -1000f, 10f)
-
-              }
+            }
           }
       }
     }
 
-    // if a position has changed 
+    // if a position has changed
     // (eg. after a normalization), we update the engine
     g.position.zipWithIndex foreach {
-      case (nodePosition, i) =>
-        val (x, y, z) = (nodePosition._1.toFloat,
-          nodePosition._2.toFloat,
-          0.0f)
-        val p = ps.getParticle(i).position()
-        if (p.x != x || p.y != y) p.set(x, y, z)
+      case ((_x,_y), i) =>
+        val (x, y, z) = (_x.toFloat, _y.toFloat, 0.0f)
+        if (!g.isSingle(i)) {
+          val p = ps.getParticle(i).position()
+          if (p.x != x || p.y != y) p.set(x, y, z)
+        }
     }
 
     //println("running step (" + ps.numberOfParticles + " particles)..")
     ps.tick(1.0f)
-
+    val dim = Metrics.notSingleNodesDimension(g)
+    val gDiameter = math.max(dim._1, dim._2)
     //var activ = 0.0
     g + ("position" -> (g.position.zipWithIndex map {
       case (nodePosition, i) =>
-        val v = ps.getParticle(i)
-        (v.position().x().toDouble, v.position().y().toDouble)
+        if (g.isSingle(i)) {
+          (g.notSinglesCenter._1 + gDiameter * math.cos(math.Pi / 2 + 2 * math.Pi * i / g.nbNodes),
+            g.notSinglesCenter._2 + gDiameter * math.sin(math.Pi / 2 + 2 * math.Pi * i / g.nbNodes))
+        }
+        else {
+          val v = ps.getParticle(i)
+          (v.position().x().toDouble, v.position().y().toDouble)
+        }
     }))
   }
 
@@ -191,7 +202,7 @@ object Layout {
 
     if (g.hashed != lastHash) {
       lastHash = g.hashed
-      println("hash changed, regenerating a particle system..")
+      //println("hash changed, regenerating a particle system..")
 
       //g.position.zipWithIndex map {
 
@@ -254,13 +265,13 @@ object Layout {
     //var activ = 0.0
     g + ("position" -> (g.position.zipWithIndex map {
       case (nodePosition, i) =>
-        //if (g.links(i).size > 0) {
+      //if (g.links(i).size > 0) {
         val v = ps.getParticle(i)
         v.position().setY(nodePosition._2.toFloat)
         (v.position().x().toDouble, nodePosition._2)
-        //} else {
-        //  (0.0, 0.0)
-        //}
+      //} else {
+      //  (0.0, 0.0)
+      //}
     }))
   }
 }

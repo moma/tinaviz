@@ -1,5 +1,7 @@
 package eu.tinasoft.tinaviz.graph
 
+import math._
+
 /**
  * Created by IntelliJ IDEA.
  * User: jbilcke
@@ -151,6 +153,28 @@ object Metrics {
     }
   }
 
+  def notSingleNodesDimension(g: Graph) : (Double, Double) = {
+    if (g.position.size == 0) {
+      (0.0, 0.0)
+    } else {
+          val notSingles = g.position.zipWithIndex filter { case (pos,i) => !g.isSingle(i) }
+    val N = notSingles.size.toDouble
+
+      var xMax = Double.MinValue
+      var xMin = Double.MaxValue
+      var yMax = Double.MinValue
+      var yMin = Double.MaxValue
+      notSingles foreach {
+        case ((x, y),i) =>
+          if (x < xMin) xMin = x
+          if (x > xMax) xMax = x
+          if (y < yMin) yMin = y
+          if (y > yMax) yMax = y
+      }
+      (abs(xMax - xMin), abs(yMax - yMin))
+
+    }
+  }
   /**
    * Compute the node weight extremums (min node weight, max node weight)
    * return a Tuple of Double
@@ -226,12 +250,11 @@ object Metrics {
    */
   def selectionCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
-    val N = g.position.size.toDouble
-    g.position.zipWithIndex foreach {
-      case ((x, y), i) =>
-        if (g.selected(i)) p = (p._1 + x, p._2 + y)
+    val _selectedNodes = g.position.zipWithIndex filter { case (p,i) => g.selected(i) }
+    val N = _selectedNodes.size.toDouble
+    _selectedNodes foreach {
+      case ((x, y), i) => p = (p._1 + x, p._2 + y)
     }
-    println("N: "+N+" p: "+p)
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
   }
 
@@ -240,10 +263,23 @@ object Metrics {
    */
   def singlesCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
-    val N = g.position.size.toDouble
-    g.position.zipWithIndex foreach {
-      case ((x, y), i) =>
-        if (g.isSingle(i)) p = (p._1 + x, p._2 + y)
+    val singles = g.position.zipWithIndex filter { case (p,i) => g.isSingle(i) }
+    val N = singles.size.toDouble
+    singles foreach {
+      case ((x, y), i) => p = (p._1 + x, p._2 + y)
+    }
+    if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
+  }
+
+    /**
+   * Compute a graph's bary center, taking only nodes not singles in account
+   */
+  def notSinglesCenter(g: Graph): (Double, Double) = {
+    var p = (0.0, 0.0)
+    val notSingles = g.position.zipWithIndex filter { case (p,i) => !g.isSingle(i) }
+    val N = notSingles.size.toDouble
+    notSingles foreach {
+      case ((x, y), i) => p = (p._1 + x, p._2 + y)
     }
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
   }
