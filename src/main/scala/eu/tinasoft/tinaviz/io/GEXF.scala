@@ -61,7 +61,7 @@ class GEXF extends node.util.Actor {
                        { val p = graph.position(nodeIndex)
                         <viz:position x={ p._1.toString } y={ p._2.toString } z="0.0"/> }
                        { val (r,g,b) = newColors(nodeIndex)
-                        <viz:color b={ r.toString } g={ g.toString } r={ b.toString }/> }
+                        <viz:color b={ r.toInt.toString } g={ g.toInt.toString } r={ b.toInt.toString }/> }
                         <viz:size value={ graph.size(nodeIndex).toString }/>
                         <attvalues>
                           <attvalue id="0" value={ graph.category(nodeIndex) }/>

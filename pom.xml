@@ -26,6 +26,16 @@
             <version>1.2.1</version>
         </dependency>
         <dependency>
+            <groupId>org.processing</groupId>
+            <artifactId>itext</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.processing</groupId>
+            <artifactId>pdf</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>traer</groupId>
             <artifactId>physics</artifactId>
             <version>3.0</version>

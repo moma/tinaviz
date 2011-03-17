@@ -8,6 +8,7 @@ import javax.swing.JFrame
 import netscape.javascript.JSException
 
 import processing.core._
+import processing.pdf.PGraphicsPDF
 
 import org.daizoru._
 import eu.tinasoft._
@@ -118,6 +119,7 @@ class Main extends TApplet with Client {
   }
 
   var doZoom : Symbol = 'none
+  var export : Symbol = 'none
 
   var nbVisibleNodes = 0
   var nbVisibleEdges = 0
@@ -131,6 +133,25 @@ class Main extends TApplet with Client {
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
 
+    // we need to manually move the camera
+    // to the graph's center
+
+    if (g.get[Boolean]("pause"))
+      smooth
+    else
+      (if (nbVisibleEdges < 900) smooth else noSmooth)
+
+    export match {
+      case 'pdf =>
+        smooth
+        beginRecord(PConstants.PDF, "graph.pdf")
+      case 'png =>
+        smooth
+
+      case any =>
+    }
+
+
     doZoom match {
       case 'in =>
         zoom(true)
@@ -143,13 +164,6 @@ class Main extends TApplet with Client {
 
     _recenter(g, g.get[String]("camera.target"))
 
-    // we need to manually move the camera
-    // to the graph's center
-
-    if (g.get[Boolean]("pause"))
-      smooth
-    else
-      (if (nbVisibleEdges < 900) smooth else noSmooth)
 
     setBackground(g.currentView match {
         case "macro" => new Color(0.0, 0.0, 1.0)
@@ -333,7 +347,17 @@ class Main extends TApplet with Client {
         if ((!weHaveACollision) || weAreSelected) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
     }
 
+
+    export match {
+      case 'pdf => endRecord()
+      case 'png => save("graph.png")
+      case any =>
+    }
+    export = 'none
+
     showSelectionCircle(selectionRadius)
+
+
   }
 
 
@@ -422,6 +446,8 @@ class Main extends TApplet with Client {
       case 'l' => Server ! "drawing.edges" -> 'toggle
 
       case 'x' => Server ! ("export", "gexf")
+      case 'f' => export = 'pdf
+      case 'g' => export = 'png
 
       case 'c' => Server ! "filter.node.category" -> 'toggle
       case 'v' => Server ! "filter.view" -> 'toggle
