@@ -210,7 +210,7 @@ class Main extends TApplet with Client {
     nbVisibleEdges = edgeTmp.filter{case (visible, i, source, target, weight, color, lod) => visible}.size
     edgeTmp foreach {
       case (visible, i, source, target, weight, color, lod) =>
-        if (visible) {
+        if (visible && !g.selected(g.renderEdgeIndex(i)._1)) {
           setLod(lod)
           lineColor(color)
             if (nbVisibleNodes < 30000) {
@@ -229,6 +229,29 @@ class Main extends TApplet with Client {
           }
         }
     }
+
+        nbVisibleEdges = edgeTmp.filter{case (visible, i, source, target, weight, color, lod) => visible}.size
+        edgeTmp foreach {
+          case (visible, i, source, target, weight, color, lod) =>
+            if (visible && g.selected(g.renderEdgeIndex(i)._1))  {
+              setLod(lod)
+              lineColor(color)
+                if (nbVisibleNodes < 30000) {
+                 val th = if (nbVisibleEdges < 2000) {
+                   val (a,b) = g.renderEdgeIndex(i)
+                   val m = math.min(g.size(a),
+                                    g.size(b))
+                   val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
+                   if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
+                } else {
+                    1.0
+                 }
+
+                 lineThickness(th)
+                drawCurve(source, target)
+              }
+            }
+        }
 
 
 
