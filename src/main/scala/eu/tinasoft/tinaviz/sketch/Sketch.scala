@@ -258,8 +258,8 @@ case class Sketch( var graph : Graph = new Graph,
    */
   def updateEdgeColors(g: Graph) {
     var tmpColor = List.empty[Color]
-    val aextremums = (g.get[Double]("minAEdgeWeight"),  g.get[Double]("maxAEdgeWeight"))
-    val bextremums = (g.get[Double]("minBEdgeWeight"), g.get[Double]("maxBEdgeWeight"))
+    val aextremums = (g.minAEdgeWeight,  g.maxAEdgeWeight)
+    val bextremums = (g.minBEdgeWeight, g.maxBEdgeWeight)
     val selectionValid = (graph.selection.size > 0)
     val target = (0.4,1.0)
     g.links.zipWithIndex map {

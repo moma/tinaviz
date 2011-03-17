@@ -42,30 +42,9 @@ class GEXF extends node.util.Actor {
           }
 
         case graph: Graph =>
-
-          // yes, we have to duplicate work done by the Sketch actor here..
-          // in the future, this will be fusioned to a single function working
-          // on Graphs (no more Sketch/Scene)
-          val selectionValid = (graph.selection.size > 0)
-          val newColors = graph.selected.zipWithIndex map {
-            case (selected, i) =>
-              val mode = if (selected) 'selected else if (graph.highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
-
-              val color = graph category i match {
-                case "Document" => Rio.primary
-                case "NGram" => Rio.tertiary
-                case other => Rio.secondary
-              }
-              val color2 = mode match {
-                case 'selected => color.standard
-                case 'highlighted => color.standard
-                case 'unselected => color.lighter.saturation(0.3)
-                case 'default => color.light
-              }
-              val c = new java.awt.Color(java.awt.Color.HSBtoRGB(color2.h.toFloat,color2.s.toFloat,color2.b.toFloat))
-              (c.getRed,c.getGreen,c.getBlue)
+          val newColors = graph.renderNodeColor map {
+            case (col) => col.toRGBTuple3
           }
-
           reply (
             <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
               <meta lastmodifieddate="1986-03-24">
@@ -93,7 +72,7 @@ class GEXF extends node.util.Actor {
                    var edgeIndex = 0
                    for ((links,nodeIndex) <- graph.links.zipWithIndex; (target, weight) <- links) yield {
                      edgeIndex += 1
-                     <edge id={ nodeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } weight={ weight.toString }>
+                     <edge id={ nodeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } type="undirected" weight={ weight.toString }>
                      </edge>
                     }
                   }</edges>

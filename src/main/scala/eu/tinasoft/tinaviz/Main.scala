@@ -356,10 +356,8 @@ class Main extends TApplet with Client {
       Double) = ((p._1 - cp._1) / cz,
       (p._2 - cp._2) / cz)
 
-    val (xMin, yMin, xMax, yMax) = (g.get[Double]("xMin"), g.get[Double]("yMin"),
-      g.get[Double]("xMax"), g.get[Double]("yMax"))
-    val gwidth = abs(xMin - xMax) * getZoom // size to screen
-    val gheight = abs(yMax - yMin)  * getZoom  // size to screen
+    val gwidth = abs(g.xMin - g.xMax) * getZoom // size to screen
+    val gheight = abs(g.yMax - g.yMin)  * getZoom  // size to screen
     val graphSize = (gwidth, gheight) // size to screen
     val (xRatio, yRatio) = (gwidth / width,  gheight / height)
     val ratio = max(xRatio, yRatio)

@@ -54,11 +54,11 @@ object Filters {
     val rangeA = Maths.map(
       g.get[(Double, Double)]("filter.a.node.weight"),
       (0.0, 1.0),
-      (g.get[Double]("minANodeWeight"), g.get[Double]("maxANodeWeight")))
+      (g.minANodeWeight, g.maxANodeWeight))
     val rangeB = Maths.map(
       g.get[(Double, Double)]("filter.b.node.weight"),
       (0.0, 1.0),
-      (g.get[Double]("minBNodeWeight"), g.get[Double]("maxBNodeWeight")))
+      (g.minBNodeWeight, g.maxBNodeWeight))
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map { 
       case (weight, i) =>
@@ -81,11 +81,11 @@ object Filters {
     val arange = Maths.map(
       g.get[(Double, Double)]("filter.a.edge.weight"),
       (0.0, 1.0),
-      (g.get[Double]("minAEdgeWeight"), g.get[Double]("maxAEdgeWeight")))
+      (g.minAEdgeWeight, g.maxAEdgeWeight))
     val brange = Maths.map(
       g.get[(Double, Double)]("filter.b.edge.weight"),
       (0.0, 1.0),
-      (g.get[Double]("minBEdgeWeight"), g.get[Double]("maxBEdgeWeight")))
+      (g.minBEdgeWeight, g.maxBEdgeWeight))
 
     //println("applyEdgeWeight: " + range + " (" + g.get[(Double, Double)]("filter.edge.weight") + ")")
     val newLinks = g.links.zipWithIndex map {
@@ -115,8 +115,8 @@ object Filters {
     val sliderRange = (1.5, 16.0) //node size range
     val aratio = 0.3 * g.get[Double]("filter.a.node.size") // Document
     val bratio = 1.0 * g.get[Double]("filter.b.node.size") // NGram
-    val aminmaxweight =  (g.get[Double]("minANodeWeight"), g.get[Double]("maxANodeWeight"))  // Document
-    val bminmaxweight =  (g.get[Double]("minBNodeWeight"), g.get[Double]("maxBNodeWeight"))  // NGram
+    val aminmaxweight =  (g.minANodeWeight, g.maxANodeWeight)  // Document
+    val bminmaxweight =  (g.minBNodeWeight, g.maxBNodeWeight)  // NGram
     //println("applyWeightToSize: " + ratio)
     val newSize = g.weight.zipWithIndex map {
       case (weight,i) => Maths.map(weight, g.category(i) match {

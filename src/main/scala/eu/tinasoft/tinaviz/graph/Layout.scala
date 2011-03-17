@@ -50,11 +50,13 @@ object Layout {
 
     if (g.nbNodes == 0) return g
 
+
     val springFactor = if (g.nbEdges > 20000) {
       0.005f
     } else {
       0.01f // 0.02 is better..
     }
+    //since I can't normalize weight, it seems I have to adapt the drag myself
     val drag = if (g.nbEdges > 20000) {
       0.2
     } else {
@@ -63,10 +65,8 @@ object Layout {
     //println("setting drag to " + drag)
     ps.setDrag(drag.toFloat)
 
-    val aMinMaxWeights =
-      (g.get[Double]("minAEdgeWeight"), g.get[Double]("maxAEdgeWeight"))
-    val bMinMaxWeights =
-      (g.get[Double]("minBEdgeWeight"), g.get[Double]("maxBEdgeWeight"))
+    val aMinMaxWeights = (g.minAEdgeWeight, g.maxAEdgeWeight)
+    val bMinMaxWeights = (g.minBEdgeWeight, g.maxBEdgeWeight)
 
     val GRAVITY = 30 // g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")
@@ -191,10 +191,8 @@ object Layout {
     //println("setting drag to " + drag)
     ps.setDrag(drag.toFloat)
 
-    val aMinMaxWeights =
-      (g.get[Double]("minAEdgeWeight"), g.get[Double]("maxAEdgeWeight"))
-    val bMinMaxWeights =
-      (g.get[Double]("minBEdgeWeight"), g.get[Double]("maxBEdgeWeight"))
+    val aMinMaxWeights = (g.minAEdgeWeight, g.maxAEdgeWeight)
+    val bMinMaxWeights = (g.minBEdgeWeight, g.maxBEdgeWeight)
 
     val GRAVITY = 30 // g.get[Double]("layout.gravity") // stronger means faster!
     val ATTRACTION = g.get[Double]("layout.attraction")

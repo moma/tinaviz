@@ -105,10 +105,12 @@ object Color {
     new Color(c._1,c._2,c._3,c._4)
   }
   def toRGBTuple3(c:Color) : (Double,Double,Double) = {
-    (c.h,c.s,c.b)
+    val d = new java.awt.Color( java.awt.Color.HSBtoRGB(c.h.toFloat,c.s.toFloat,c.b.toFloat))
+    (d.getRed,d.getGreen,d.getBlue)
   }
   def toRGBTuple4(c:Color) : (Double,Double,Double,Double) = {
-    (c.h,c.s,c.b,c.a)
+    val d = new java.awt.Color( java.awt.Color.HSBtoRGB(c.h.toFloat,c.s.toFloat,c.b.toFloat))
+    (d.getRed,d.getGreen,d.getBlue, 1.0)
   }
 }
 class Color(val h:Double=1.0,
@@ -143,5 +145,9 @@ class Color(val h:Double=1.0,
   }
   def alphaBy(f:Double) : Color = {
     new Color(h,s,b,a*f)
+  }
+  def toRGBTuple3 : (Double,Double,Double) = {
+    val c = new java.awt.Color( java.awt.Color.HSBtoRGB(h.toFloat,s.toFloat,b.toFloat))
+    (c.getRed,c.getGreen,c.getBlue)
   }
 }

@@ -6,7 +6,8 @@
 package eu.tinasoft.tinaviz.graph
 
 import eu.tinasoft._
-import tinaviz.util.Color
+import tinaviz.util._
+import tinaviz.util.Color._
 import tinaviz.util.Vector
 import tinaviz.io.json.Base64
 import collection.mutable.LinkedList
@@ -21,40 +22,11 @@ object Graph {
                oldElements: Map[String, Array[Any]]) = {
 
   }
+
   /**
    * Default, dumb factory
    */
-  def make(elements: Map[String, Any]) = {
-    var g = new Graph(elements)
-
-    // g + ("activity" -> a)
-    g = g + ("nbNodes" -> Metrics.nbNodes(g))
-    g = g + ("nbEdges" -> Metrics.nbEdges(g))
-    g = g + ("nbSingles" -> Metrics.nbSingles(g))
-    g = g + ("outDegree" -> Metrics.outDegree(g))
-    g = g + ("inDegree" -> Metrics.inDegree(g))
-
-    val ode = Metrics outDegreeExtremums g
-    g = g ++ Map[String,Any]("minOutDegree" -> ode._1, "maxOutDegree" -> ode._2)
-
-    val ide = Metrics inDegreeExtremums g
-    g = g ++ Map[String,Any]("minInDegree" -> ide._1, "maxInDegree" -> ide._2)
-
-    val e = Metrics extremums g
-    g = g ++ Map[String,Any]("xMax" -> e._1, "xMin" -> e._2, "yMax" -> e._3, "yMin" -> e._4)
-
-    val nwe = Metrics nodeWeightExtremums g
-    g = g ++ Map[String,Any]("minANodeWeight" -> nwe._1, "maxANodeWeight" -> nwe._2, "minBNodeWeight" -> nwe._3, "maxBNodeWeight" -> nwe._4)
-
-    val ewe = Metrics edgeWeightExtremums g
-    g = g ++ Map[String,Any]("minAEdgeWeight" -> ewe._1, "maxAEdgeWeight" -> ewe._2,"minBEdgeWeight" -> ewe._3, "maxBEdgeWeight" -> ewe._4)
-
-    g = g + ("baryCenter" -> Metrics.baryCenter(g))
-    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
-    g = g + ("singlesCenter" -> Metrics.singlesCenter(g))
-    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
-    g
-  }
+  def make(elements: Map[String, Any]) = new Graph(elements)
 
   val defaults: Map[String, Any] = Map(
     "pause" -> false,
@@ -64,7 +36,7 @@ object Graph {
     "selected" -> Array.empty[Boolean],
     "highlighted" -> Array.empty[Boolean],
     "updateStatus" -> Array.empty[Symbol], // outdated, updating, updated
-    "saveStatus" -> Array.empty[Symbol],  // saving, saved
+    "saveStatus" -> Array.empty[Symbol], // saving, saved
     "density" -> Array.empty[Double],
     "rate" -> Array.empty[Int],
     "size" -> Array.empty[Double],
@@ -73,13 +45,8 @@ object Graph {
     "content" -> Array.empty[String],
     "position" -> Array.empty[(Double, Double)],
     "links" -> Array.empty[Map[Int, Double]],
-    "inDegree" -> Array.empty[Int],
-    "outDegree" -> Array.empty[Int],
-    "nbNodes" -> 0,
-    "nbEdges" -> 0,
-    "nbSingles" -> 0,
     "camera.zoom" -> 1.0,
-    "camera.position" -> (0.0,0.0),
+    "camera.position" -> (0.0, 0.0),
     "camera.target" -> "all", //'all, 'none, or 'selection
     "filter.node.category" -> "Document",
     "filter.view" -> "macro",
@@ -95,29 +62,9 @@ object Graph {
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
     "filter.map.node.shape" -> "category",
-    "xMin" -> 0.0,
-    "yMin" -> 0.0,
-    "xMax" -> 0.0,
-    "yMax" -> 0.0,
-    "minOutDegree" -> 0,
-    "minInDegree" -> 0,
-    "maxnOutDegree" -> 0,
-    "maxInDegree" -> 0,
-    "minANodeWeight" -> 0.0,
-    "maxANodeWeight" -> 0.0,
-    "minAEdgeWeight" -> 0.0,
-    "maxAEdgeWeight" -> 0.0,
-    "minBNodeWeight" -> 0.0,
-    "maxBNodeWeight" -> 0.0,
-    "minBEdgeWeight" -> 0.0,
-    "maxBEdgeWeight" -> 0.0,
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
-    "baryCenter" -> (0.0, 0.0),
-    "selectionCenter" -> (0.0, 0.0),
-    "singlesCenter" -> (0.0, 0.0),
-    "notSinglesCenter" -> (0.0, 0.0),
     "layout" -> "tinaforce", // phyloforce
     "debug" -> false
   )
@@ -150,32 +97,37 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val content = getArray[String]("content")
   lazy val selected = getArray[Boolean]("selected")
   lazy val highlighted = getArray[Boolean]("highlighted")
-  lazy val updateStatus = getArray[Symbol]("updateStatus") // outdated, updating, updated
-  lazy val saveStatus = getArray[Symbol]("saveStatus") // saving, saved
+  lazy val updateStatus = getArray[Symbol]("updateStatus")
+  // outdated, updating, updated
+  lazy val saveStatus = getArray[Symbol]("saveStatus")
+  // saving, saved
   lazy val label = getArray[String]("label")
   lazy val rate = getArray[Int]("rate")
   lazy val uuid = getArray[String]("uuid")
-  lazy val inDegree = getArray[Int]("inDegree")
-  lazy val outDegree = getArray[Int]("outDegree")
-  lazy val degree = inDegree zip outDegree map { case (a,b) => a+b }
+
+  lazy val outDegree = Metrics outDegree this
+  lazy val inDegree = Metrics inDegree this
+
+  lazy val degree = inDegree zip outDegree map {
+    case (a, b) => a + b
+  }
   lazy val density = getArray[Double]("density")
 
   lazy val ids = 0 until nbNodes
 
   // metrics  & properties
-  lazy val nbNodes = get[Int]("nbNodes")
-  lazy val nbEdges = get[Int]("nbEdges")
-  lazy val nbSingles = get[Int]("nbSingles")
+  lazy val nbNodes = Metrics nbNodes this
+  lazy val nbEdges = Metrics nbEdges this
+  lazy val nbSingles = Metrics nbSingles this
+
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
-  lazy val baryCenter = get[(Double,Double)]("baryCenter")
-  lazy val selectionCenter = get[(Double,Double)]("selectionCenter")
-  lazy val singlesCenter = get[(Double,Double)]("singlesCenter")
-  lazy val notSinglesCenter = get[(Double,Double)]("notSinglesCenter")
+
+  lazy val colorScheme = Rio
 
   // camera settings
   lazy val cameraZoom = get[Double]("camera.zoom")
-  lazy val cameraPosition = get[(Double,Double)]("camera.position")
+  lazy val cameraPosition = get[(Double, Double)]("camera.position")
   lazy val cameraSymbol = get[Symbol]("camera.target")
 
   // filters and view settings
@@ -184,11 +136,82 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val layout = get[String]("layout")
   lazy val pause = get[Boolean]("pause")
 
+  lazy val baryCenter = Metrics baryCenter this
+  lazy val selectionCenter = Metrics selectionCenter this
+  lazy val singlesCenter = Metrics singlesCenter this
+  lazy val notSinglesCenter = Metrics notSinglesCenter this
+
+  lazy val outDegreeExtremums = Metrics outDegreeExtremums this
+  lazy val minOutDegree = outDegreeExtremums._1
+  lazy val maxOutDegree = outDegreeExtremums._2
+
+  lazy val inDegreeExtremums = Metrics inDegreeExtremums this
+  lazy val minInDegree = inDegreeExtremums._1
+  lazy val maxInDegree = inDegreeExtremums._2
+
+  lazy val extremums = Metrics extremums this
+  lazy val xMax = extremums._1
+  lazy val xMin = extremums._2
+  lazy val yMax = extremums._3
+  lazy val yMin = extremums._4
+
+  lazy val nodeWeightExtremums = Metrics nodeWeightExtremums this
+  lazy val minANodeWeight = nodeWeightExtremums._1
+  lazy val maxANodeWeight = nodeWeightExtremums._2
+  lazy val minBNodeWeight = nodeWeightExtremums._3
+  lazy val maxBNodeWeight = nodeWeightExtremums._4
+
+  lazy val edgeWeightExtremums = Metrics edgeWeightExtremums this
+  lazy val minAEdgeWeight = edgeWeightExtremums._1
+  lazy val maxAEdgeWeight = edgeWeightExtremums._2
+  lazy val minBEdgeWeight = edgeWeightExtremums._3
+  lazy val maxBEdgeWeight = edgeWeightExtremums._4
+
+  lazy val selectionValid = (selection.size > 0)
+
+  lazy val renderNodeColor = {
+    selected.zipWithIndex map {
+      case (s, i) =>
+        val mode = if (s) 'selected else if (highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
+        val color = category(i) match {
+          case "Document" => colorScheme.primary
+          case "NGram" => colorScheme.tertiary
+          case other => colorScheme.secondary
+        }
+        mode match {
+          case 'selected => color.standard
+          case 'highlighted => color.standard
+          case 'unselected => color.lighter.saturation(0.25)
+          case 'default => color.light
+        }
+    }
+  }
+
+  lazy val renderNodeBorderColor = {
+    selected.zipWithIndex map {
+      case (s, i) =>
+        val mode = if (s) 'selected else if (highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
+        val color = category(i) match {
+          case "Document" => colorScheme.primary
+          case "NGram" => colorScheme.tertiary
+          case other => colorScheme.secondary
+        }
+        mode match {
+          case 'selected => new Color(0.0, 0.0, 0.23)
+          case 'highlighted => new Color(0.0, 0.0, 0.23)
+          case 'unselected => color.darker.saturation(0.3)
+          case 'default => color.darker
+        }
+    }
+  }
+
   // hashcode will change if nodes/links are added/deleted
-  lazy val hashed = (uuid.toList.mkString("") + links.map{ case mapID => mapID.hashCode }.toList.mkString("")).hashCode
-  
+  lazy val hashed = (uuid.toList.mkString("") + links.map {
+    case mapID => mapID.hashCode
+  }.toList.mkString("")).hashCode
+
   lazy val debugStats = {
-    "**DEBUG**\nlinks.size: "+links.size+"\nposition.size: "+position.size+"\ncolor.size: "+color.size+"\nuuid.size: "+uuid.size+"\ncategory.size: "+category.size+"\nselected.size: "+selected.size+"\nselection.size: "+selection.size+"\n**END DEBUG**"
+    "**DEBUG**\nlinks.size: " + links.size + "\nposition.size: " + position.size + "\ncolor.size: " + color.size + "\nuuid.size: " + uuid.size + "\ncategory.size: " + category.size + "\nselected.size: " + selected.size + "\nselection.size: " + selection.size + "\n**END DEBUG**"
   }
 
   /**
@@ -211,9 +234,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   def +(id: Int, k: String, v: Any) = set(id, k, v)
 
   def ++(kv: Map[String, Any]) = new Graph(elements ++ kv)
+
   /**
-    * Set a column and create a new Graph
-    */
+   * Set a column and create a new Graph
+   */
   def set(kv: (String, Any)) = new Graph(elements + kv)
 
   def set(id: Int, k: String, value: Any) = {
@@ -324,35 +348,45 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
 
-    /**
-     * List of selected nodes' IDs
-     */
-    lazy val selection : List[Int] = selected.zipWithIndex.filter { case (selected,i) => selected }.map{ case (s,i) => i }.toList
+  /**
+   * List of selected nodes' IDs
+   */
+  lazy val selection: List[Int] = selected.zipWithIndex.filter {
+    case (selected, i) => selected
+  }.map {
+    case (s, i) => i
+  }.toList
 
-    /**
-     * List of selected nodes' attributes
-     */
-    lazy val selectionAttributes = {
-      //println("mapping selection attributes: "+selection)
-      selection.map{ case i => lessAttributes(i) }.toList
-    }
+  /**
+   * List of selected nodes' attributes
+   */
+  lazy val selectionAttributes = {
+    //println("mapping selection attributes: "+selection)
+    selection.map {
+      case i => lessAttributes(i)
+    }.toList
+  }
 
 
   /**
    * Return the current selection as a list of UUID:String
    */
-  lazy val selectionUUID = selection.map{case i => getUuid(i)}.toList
+  lazy val selectionUUID = selection.map {
+    case i => getUuid(i)
+  }.toList
 
   // { UUID : {neighbours}, UUID2; {neighbours}, ... }
-   lazy  val selectionNeighbours = {
-      Map(selectionUUID.zipWithIndex:_*).map{ case (uuid,i) => (uuid, neighbours(i)) }
+  lazy val selectionNeighbours = {
+    Map(selectionUUID.zipWithIndex: _*).map {
+      case (uuid, i) => (uuid, neighbours(i))
     }
+  }
 
   /**
    * Get attributes of a node from it's UUID (Unique ID, arbitrary-length String)
    */
   def attributes(uuid: String): Map[String, Any] = {
-     attributes(id(uuid))
+    attributes(id(uuid))
   }
 
 
@@ -361,20 +395,20 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def attributes(i: Int): Map[String, Any] = {
     Map[String, Any](
-      "links"      -> (if (links.size > i) links(i) else Map.empty[Int,Double]),
-      "position"   -> (if (position.size > i) position(i) else (0.0,0.0)),
-      "color"      -> (if (color.size > i) color(i) else new Color(0.0,0.0,0.0)),
-      "weight"     -> (if (weight.size > i) weight(i) else 1.0),
-      "size"       -> (if (size.size > i) size(i) else 1.0),
-      "category"   -> (if (category.size > i) category(i) else ""),
-      "content"    -> (if (content.size > i) content(i) else ""),//Base64.encode(content(i)),
-      "selected"   -> (if (selected.size > i) selected(i) else false),
-      "label"      -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
-      "rate"       -> (if (rate.size > i) rate(i) else 0),
-      "id"         -> (if (uuid.size > i) uuid(i) else 0),
-      "inDegree"   -> (if (inDegree.size > i) inDegree(i) else 0),
-      "outDegree"  -> (if(outDegree.size > i) outDegree(i) else 0),
-      "density"    -> (if (density.size > i) density(i) else 0)
+      "links" -> (if (links.size > i) links(i) else Map.empty[Int, Double]),
+      "position" -> (if (position.size > i) position(i) else (0.0, 0.0)),
+      "color" -> (if (color.size > i) color(i) else new Color(0.0, 0.0, 0.0)),
+      "weight" -> (if (weight.size > i) weight(i) else 1.0),
+      "size" -> (if (size.size > i) size(i) else 1.0),
+      "category" -> (if (category.size > i) category(i) else ""),
+      "content" -> (if (content.size > i) content(i) else ""), //Base64.encode(content(i)),
+      "selected" -> (if (selected.size > i) selected(i) else false),
+      "label" -> (if (label.size > i) label(i) else ""), // Base64.encode(label(i)),
+      "rate" -> (if (rate.size > i) rate(i) else 0),
+      "id" -> (if (uuid.size > i) uuid(i) else 0),
+      "inDegree" -> (if (inDegree.size > i) inDegree(i) else 0),
+      "outDegree" -> (if (outDegree.size > i) outDegree(i) else 0),
+      "density" -> (if (density.size > i) density(i) else 0)
     )
   }
 
@@ -383,26 +417,27 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    * Return neighbours of a node ID
    *
    */
-  def neighbours(i:Int) : Map[String,Map[String,Any]] = {
-      (if (links.size > i) {
-        // println("  - mapping neighbours of node "+i+"..")
-        links(i).map{ case (i,w) =>
-          (getUuid(i),minimalAttributes(i))
-        }
+  def neighbours(i: Int): Map[String, Map[String, Any]] = {
+    (if (links.size > i) {
+      // println("  - mapping neighbours of node "+i+"..")
+      links(i).map {
+        case (i, w) =>
+          (getUuid(i), minimalAttributes(i))
       }
-       else
-        Map.empty[String,Map[String,Any]])
+    }
+    else
+      Map.empty[String, Map[String, Any]])
   }
 
   /**
    * Get "less" attributes (only the most important, for data transfert and talking with the visualization client)
    * of a node from it's UUID (Unique ID, arbitrary-length String)
    */
-     def lessAttributes(uuid: String): Map[String, Any] = {
-       lessAttributes(id(uuid))
+  def lessAttributes(uuid: String): Map[String, Any] = {
+    lessAttributes(id(uuid))
   }
 
-   /**
+  /**
    * Get "less" attributes (only the most important, for data transfert and talking with the visualization client)
    * of a node from it's index in the graph
    */
@@ -419,16 +454,17 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "weight" -> (if (weight.size > i) weight(i) else 0),
       //"size" -> size(i),
       "category" -> (if (category.size > i) category(i) else ""),
-      "content" -> (if (content.size > i) content(i) else ""),//Base64.encode(content(i)),
+      "content" -> (if (content.size > i) content(i) else ""), //Base64.encode(content(i)),
       "selected" -> (if (selected.size > i) selected(i) else false),
-      "label" -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
+      "label" -> (if (label.size > i) label(i) else ""), // Base64.encode(label(i)),
       "rate" -> (if (rate.size > i) rate(i) else 0),
       "id" -> (if (uuid.size > i) uuid(i) else 0),
-      "degree" -> ((if (inDegree.size > i) inDegree(i) else 0)+ (if(outDegree.size > i) outDegree(i) else 0))
+      "degree" -> ((if (inDegree.size > i) inDegree(i) else 0) + (if (outDegree.size > i) outDegree(i) else 0))
       //"density" -> density(i)
     )
   }
-     /**
+
+  /**
    * Get "mininal" attributes (only the most important, for neighbourhood data)
    * of a node from it's index in the graph
    */
@@ -447,19 +483,20 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "category" -> (if (category.size > i) category(i) else ""),
       //"content" -> (if (content.size > i) content(i) else ""),//Base64.encode(content(i)),
       // "selected" -> (if (selected.size > i) selected(i) else false),
-      "label" -> (if (label.size > i) label(i) else ""),// Base64.encode(label(i)),
+      "label" -> (if (label.size > i) label(i) else ""), // Base64.encode(label(i)),
       //"rate" -> (if (rate.size > i) rate(i) else 0),
       "id" -> (if (uuid.size > i) uuid(i) else 0),
-      "degree" -> ((if (inDegree.size > i) inDegree(i) else 0) + (if(outDegree.size > i) outDegree(i) else 0))
+      "degree" -> ((if (inDegree.size > i) inDegree(i) else 0) + (if (outDegree.size > i) outDegree(i) else 0))
 
       //"density" -> density(i)
     )
   }
+
   /**
    * Get the map of all nodes
    */
-  def allNodes: Map[String, Map[String,Any]] = {
-    var nodeData = Map.empty[String,Map[String,Any]]
+  def allNodes: Map[String, Map[String, Any]] = {
+    var nodeData = Map.empty[String, Map[String, Any]]
     for (i <- ids) nodeData += getUuid(i) -> lessAttributes(i)
     nodeData
   }
@@ -484,7 +521,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }*/
 
 
-
   def map[T](id: Int, column: String, filter: T => T): Graph = {
     set(id, column, filter(getArray[T](column)(id)))
   }
@@ -497,11 +533,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   def filterNodeVisible[T](column: String, filter: T => Boolean) = {
-    this + ( "visible" -> getArray[T](column).map { x => filter(x) })
+    this + ("visible" -> getArray[T](column).map {
+      x => filter(x)
+    })
   }
 
   def _filterNodeVisible[T](column: String, filter: T => Boolean) = {
-     this + ( "visible" -> getArray[T](column).map {  x => filter(x) })
+    this + ("visible" -> getArray[T](column).map {
+      x => filter(x)
+    })
   }
 
   def converter(removed: Set[Int]): Array[Int] = {
@@ -593,11 +633,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         if (id == -1) s else g.selected(id)
     }.toArray
 
-    Graph.make(elements ++ Map[String,Any](
+    Graph.make(elements ++ Map[String, Any](
       "position" -> tmp1,
-      "selected"  -> tmp2) // need to recompute things
+      "selected" -> tmp2) // need to recompute things
     )
   }
+
   /**
    * TODO refactor to use a generic field update function
    */
@@ -609,7 +650,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         if (id == -1) {
           elem
         } else if (g.category(id).equalsIgnoreCase(category(i))) {
-        g.position(id)
+          g.position(id)
         } else {
           elem
         }
@@ -621,15 +662,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         if (id == -1) {
           s
         } else if (g.category(id).equalsIgnoreCase(category(i))) {
-        g.selected(id)
+          g.selected(id)
         } else {
           s
         }
     }.toArray
 
-    Graph.make(elements ++ Map[String,Any](
+    Graph.make(elements ++ Map[String, Any](
       "position" -> tmp1,
-      "selected"  -> tmp2) // need to recompute things
+      "selected" -> tmp2) // need to recompute things
     )
   }
 

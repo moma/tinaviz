@@ -32,11 +32,8 @@ object Functions  {
     
     // first we normalize the graph (although optional - this might interfer with the layout)
     //val h = normalizePositions(g)
-    val (xMin,yMin,
-         xMax,yMax) = (g.get[Double]("xMin"),g.get[Double]("yMin"),
-                       g.get[Double]("xMax"),g.get[Double]("yMax"))
     // now we want the coordinate within the screen
-    val (a,b) = (model2screen(xMin,yMin), model2screen(xMax,yMax))
+    val (a,b) = (model2screen(g.xMin,g.yMin), model2screen(g.xMax,g.yMax))
     val (sxMin,syMin,
          sxMax,syMax) = (a._1.toDouble,a._1.toDouble,
                          b._2.toDouble,b._2.toDouble)
