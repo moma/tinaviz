@@ -187,6 +187,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     }
   }
 
+  /**
+   * Lazy computation of the node border
+   */
   lazy val renderNodeBorderColor = {
     selected.zipWithIndex map {
       case (s, i) =>
@@ -203,6 +206,134 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case 'default => color.darker
         }
     }
+  }
+
+
+  /**
+   * Lazy computation of the edge size to screen
+   */
+  lazy val renderEdgeSize = {
+    (for ((links, i) <- links.zipWithIndex; (j, weight) <- links) yield {
+      val sizes = (size(i), size(j))
+      val avgSize = (sizes._1 + sizes._2) / 2.0
+      val w = Maths.limit(avgSize, Maths.min(sizes), Maths.max(sizes))
+      // print("  w: "+w)
+      //val r = weight * :1.0
+      //val r = 1.0 * 1.0
+      //println("  r: "+r)
+      //val
+      w
+    }).toArray
+  }
+
+  /**
+   * Lazy computation of the edge color to screen
+   */
+  lazy val renderEdgeColor = {
+    var tmpColor = List.empty[Color]
+    val aextremums = (minAEdgeWeight, maxAEdgeWeight)
+    val bextremums = (minBEdgeWeight, maxBEdgeWeight)
+    val target = (0.4,1.0)
+    links.zipWithIndex map {
+      case (mapIntDouble, from) =>
+        val mode = if (selected(from)) 'selected else if (highlighted(from)) 'highlighted else if (selectionValid) 'unselected else 'default
+        mapIntDouble foreach {
+          case (to, weight) =>
+            val a = renderNodeColor(from)
+            val b = renderNodeColor(to)
+            val ab = renderNodeBorderColor(from)
+            val bb = renderNodeBorderColor(to)
+            val alph = Maths.map(weight, category(from) match {
+              case "Document" => aextremums
+              case "NGram" => bextremums
+            }, (0.25,1.0))
+
+           val d = if (category(from).equals(category(to))) {
+               mode match {
+                case 'selected =>
+
+                  a.blend(b)//color.standard
+                case 'highlighted =>
+
+                  a.blend(b)//color.standard
+                case 'unselected =>
+
+                  ab.blend(bb).saturateBy(0.8).alpha(alph)//color.lighter.saturation(0.25)
+                case 'default =>
+
+                  a.blend(b).alpha(alph)//color.light
+               }
+
+            } else {
+             new Color(0.0, 0.0, 0.6).alpha(alph)
+           }
+
+            tmpColor ::= d
+        }
+    }
+    tmpColor.toArray
+  }
+
+  /**
+   * Lazy computation of the edge position to screen
+   */
+  lazy val renderEdgePosition = {
+    var t = List.empty[((Double, Double), (Double, Double))]
+    links.zipWithIndex foreach {
+      case (links, i) =>
+        links.zipWithIndex foreach {
+          case ((j, weight), _j) => t ::= (position(i), position(j))
+        }
+    }
+   t.toArray
+  }
+      /**
+   * Lazy computation of the edge position to screen
+   */
+  lazy val renderEdgeIndex = {
+    var t = List.empty[(Int,Int)]
+    links.zipWithIndex foreach {
+      case (links, i) =>
+        links.zipWithIndex foreach {
+          case ((j, weight), _j) => t ::= (i,j)
+        }
+    }
+    t.toArray
+  }
+    /**
+   * Lazy computation of the edge weights
+   */
+  lazy val renderEdgeWeight = {
+    var t = List.empty[Double]
+    links.zipWithIndex foreach {
+      case (links, i) =>
+        links.zipWithIndex foreach {
+          case ((j, weight), _j) => t ::= weight
+        }
+    }
+    t.toArray
+  }
+
+  lazy val renderNodeShape = category.map {
+      case "Document" => 'Square
+      case "NGram" => 'Disk
+      case any => 'Square
+  }
+
+  /**
+   * Warm-up the lazy vals
+   */
+  def warm {
+   position
+   renderNodeColor
+   renderNodeBorderColor
+   renderEdgeSize
+   renderEdgeColor
+   renderEdgePosition
+   renderEdgeIndex
+   renderEdgeWeight
+   renderNodeShape
+
   }
 
   // hashcode will change if nodes/links are added/deleted

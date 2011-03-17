@@ -1,5 +1,6 @@
 package eu.tinasoft.tinaviz
 
+import    java.util.concurrent.atomic.AtomicReference
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JFrame
@@ -26,6 +27,7 @@ import math._
  */
 object Main {
 
+  val graph = new AtomicReference(new Graph)
 
   /**
    * main method
@@ -80,7 +82,7 @@ class Main extends TApplet with Client {
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
     bezierDetail(18)
-    setDefault("scene", new Scene)
+    setDefault("output", new Graph)
     setDefault("debug", false)
     setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
@@ -125,7 +127,7 @@ class Main extends TApplet with Client {
     Server ! "frameRate" -> frameRate.toInt
 
     // get some values in a non-blocking way (using futures)
-    val scene = getIfPossible[Scene]("scene")
+    val g = Main.graph.get
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
 
@@ -139,28 +141,26 @@ class Main extends TApplet with Client {
       case any =>
     }
 
-    _recenter(scene.graph, scene.graph.get[String]("camera.target"))
-
-    // val centering = scene.graph.get[Boolean]("centering")
+    _recenter(g, g.get[String]("camera.target"))
 
     // we need to manually move the camera
     // to the graph's center
 
-    if (scene.graph.get[Boolean]("pause"))
+    if (g.get[Boolean]("pause"))
       smooth
     else
       (if (nbVisibleEdges < 900) smooth else noSmooth)
 
-    setBackground(scene.graph.currentView match {
-        case "macro" => scene.background
+    setBackground(g.currentView match {
+        case "macro" => new Color(0.0, 0.0, 1.0)
         case "meso" => new Color (0.1416, 0.1, 1.0) // jaunâtre
-        case any => scene.background
+        case any => new Color(0.0, 0.0, 1.0)
     })
     if (debug) {
-      setColor(scene.foreground)
+      setColor(new Color(0.0, 0.0, 0.0))
       setFontSize(9)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + nbVisibleNodes + "/" + scene.nbNodes + " nodes (" + scene.graph.nbSingles + " singles), " + nbVisibleEdges + "/" + scene.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
+      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
 
     setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
@@ -168,18 +168,18 @@ class Main extends TApplet with Client {
     lineThickness(1)
     noFill
 
-    val visibleNodes = scene.nodePositionLayer.zipWithIndex.filter {
+    val visibleNodes = g.position.zipWithIndex.filter {
       case (position, i) => isVisible(screenPosition(position))
     }
     nbVisibleNodes = visibleNodes.size
 
-    def compareBySelection(i: Int, j: Int): Boolean = ( !scene.graph.selected(i) && scene.graph.selected(j) )
+    def compareBySelection(i: Int, j: Int): Boolean = ( !g.selected(i) && g.selected(j) )
 
     //val visibleNodes = visibleNodesTmp.map { _._2 }.toList.sort(compareBySelection).toArray
 
     // TODO filter by weight, and show only the N biggers
     //  (Boolean, Int, (Double,Double),(Double,Double),Double, Color, Int)
-    val edgeTmp = scene.edgePositionLayer.zipWithIndex map {
+    val edgeTmp = g.renderEdgePosition.zipWithIndex map {
       case ((source, target), i) =>
         val psource = screenPosition(source)
         val ptarget = screenPosition(target)
@@ -190,9 +190,9 @@ class Main extends TApplet with Client {
          i,
          source,
          target,
-         scene.edgeWeightLayer(i),
-         scene.edgeColorLayer(i),
-         if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, scene.maxLod), 1, scene.maxLod).toInt else 1)
+         g.renderEdgeWeight(i),
+         g.renderEdgeColor(i),
+         if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 120), 1, 120).toInt else 1)
 
         } else {
           (false,
@@ -213,20 +213,11 @@ class Main extends TApplet with Client {
         if (visible) {
           setLod(lod)
           lineColor(color)
-          //Maths.map(weight, scene.)
-          //println("weight: "+weight)
-
-          // lineThickness(weight * getZoom)
             if (nbVisibleNodes < 30000) {
              val th = if (nbVisibleEdges < 2000) {
-              //lineThickness(scene.graph.thickness(i))
-              //lineThickness(Maths.map(scene.edgeWeightLayer(i),()) * getZoom)
-               //Maths.map(weight,())
-                //math.max(math.min(weight, 1.0),100.0)
-               // take the two nodes and
-               val (a,b) = scene.edgeIndexLayer(i)
-               val m = math.min(scene.nodeSizeLayer(a),
-                                scene.nodeSizeLayer(b))
+               val (a,b) = g.renderEdgeIndex(i)
+               val m = math.min(g.size(a),
+                                g.size(b))
                val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
                if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
             } else {
@@ -249,16 +240,16 @@ class Main extends TApplet with Client {
     noStroke
     visibleNodes.foreach {
       case (position, i) =>
-        setColor(scene.nodeBorderColorLayer(i))
-        scene.nodeShapeLayer(i) match {
+        setColor(g.renderNodeBorderColor(i))
+        g.renderNodeShape(i) match {
           case 'Disk =>
-            drawDisk(position, scene.nodeSizeLayer(i))
-            setColor(scene.nodeColorLayer(i))
-            drawDisk(position, scene.nodeSizeLayer(i) * 0.75)
+            drawDisk(position, g.size(i))
+            setColor(g.renderNodeColor(i))
+            drawDisk(position, g.size(i) * 0.75)
           case x =>
-            drawSquare(position, scene.nodeSizeLayer(i))
-            setColor(scene.nodeColorLayer(i))
-            drawSquare(position, scene.nodeSizeLayer(i) * 0.75)
+            drawSquare(position, g.size(i))
+            setColor(g.renderNodeColor(i))
+            drawSquare(position, g.size(i) * 0.75)
         }
     }
 
@@ -266,16 +257,16 @@ class Main extends TApplet with Client {
     setColor(new Color(0.3, 1.0, 1.0))
     drawDisk((0.0,0.0), 10.0 / getZoom)
     setColor(new Color(0.0, 1.0, 1.0))
-    drawDisk( scene.graph.baryCenter, 10.0 / getZoom)
+    drawDisk( g.baryCenter, 10.0 / getZoom)
     setColor(new Color(0.6, 1.0, 1.0))
-    drawDisk( scene.graph.selectionCenter, 10.0 / getZoom)
+    drawDisk( g.selectionCenter, 10.0 / getZoom)
     */
 
     def compareBySize(i: Int, j: Int): Boolean = {
-      val r1 = scene.nodeSizeLayer(i)
-      val l1 = scene.nodeLabelLayer(i)
-      val r2 = scene.nodeSizeLayer(j)
-      val l2 = scene.nodeLabelLayer(j)
+      val r1 = g.size(i)
+      val l1 = g.label(i)
+      val r2 = g.size(j)
+      val l2 = g.label(j)
       if (r1 > r2) true else (if (r1 < r2) false else (l1.compareTo(l2) < 0))
     }
     val sortedLabelIDs = visibleNodes.map { _._2 }.toList.sort(compareBySize).toArray
@@ -283,24 +274,24 @@ class Main extends TApplet with Client {
 
     sortedLabelIDs.foreach {
       case (i) =>
-        val p1 = scene.nodePositionLayer(i)
-        val r1 = scene.nodeSizeLayer(i)
+        val p1 = g.position(i)
+        val r1 = g.size(i)
         val x1 = p1._1 + r1
         val y1 = p1._2
         val np1 = screenPosition(x1, y1)
-        val l1 = scene.nodeLabelLayer(i)
+        val l1 = g.label(i)
         val h1 = setFontSize((r1 * getZoom).toInt)
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
-        val weAreSelected = false// we don't care. else, use: scene.graph.selected(i)
+        val weAreSelected = false// we don't care. else, use: g.selected(i)
         val weHaveACollision = sortedLabelIDs.exists {
           case (j) =>
-            val p2 = scene.nodePositionLayer(j)
-            val r2 = scene.nodeSizeLayer(j)
+            val p2 = g.position(j)
+            val r2 = g.size(j)
             val x2 = p2._1 + r2
             val y2 = p2._2
             val np2 = screenPosition(x2, y2)
-            val l2 = scene.nodeLabelLayer(j)
+            val l2 = g.label(j)
             val h2 = setFontSize((r2 * getZoom).toInt)
             val w2 = textWidth(l2) /// getZoom //
             val whichIsSelected = false// we don't care. else, use: scene.graph.selected(j)
@@ -308,12 +299,12 @@ class Main extends TApplet with Client {
                                   || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
                                  && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
                                   || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
-            val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (scene.nodeLabelLayer(j).compareTo(scene.nodeLabelLayer(i)) > 0))
+            val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (g.label(j).compareTo(g.label(i)) > 0))
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
             if (i == j) false else (weTouchSomething && (whichIsLarger || whichIsSelected))
         }
         setFontSize((r1 * getZoom).toInt)
-        val col = if (weAreSelected) { scene.labelColor.alpha(1.0) } else { scene.labelColor.alpha(0.8) }
+        val col = if (weAreSelected) { new Color(0.0, 1.0, 0.0).alpha(1.0) } else { new Color(0.0, 1.0, 0.0).alpha(0.8) }
         setColor(col)
         // we can show the label if we are selected, or if we do not collide with a bigger one
         if ((!weHaveACollision) || weAreSelected) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)

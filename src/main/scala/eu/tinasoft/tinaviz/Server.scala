@@ -11,9 +11,7 @@ import eu.tinasoft._
 import tinaviz.io._
 import tinaviz.graph._
 import tinaviz.scene._
-import tinaviz.sketch._
 import tinaviz.pipeline._
-import Sketch._
 
 import actors._
 import Actor._
@@ -62,15 +60,11 @@ object Server extends node.util.Actor {
     "screen.width" -> 100,
     "screen.height" -> 100,
     // final scene
-    "scene" -> new Scene()
+    "input" -> new Graph(),
+    "output" -> new Graph()
   )
 
   var properties: Map[String, Any] = defaultProperties
-
-
-  var input = new Graph()
-  var output = new Graph()
-  // used for some stats
 
   start
 
@@ -92,16 +86,12 @@ object Server extends node.util.Actor {
         case g: Graph =>
         //if (sender.receiver == sketcher) {
           properties = defaultProperties
-          input = new Graph(properties ++ g.elements)
-          Pipeline ! input
+          val in = new Graph(properties ++ g.elements)
+          properties += "input" -> in
+          Pipeline ! in
           Browser ! "_graphImportedCallback" -> "success"
         //PipelineBusy = false
 
-        case (graph: Graph, scene: Scene) =>
-          properties += "scene" -> scene
-          output = graph
-        //PipelineBusy = false
-        //self ! "frameRate" -> properties("frameRate") // force relaunching
 
         case x:scala.xml.Elem =>
           //println("Got XML: "+x)
@@ -109,8 +99,11 @@ object Server extends node.util.Actor {
           
         // import/export functions
         case ("export","gexf") => 
-          (new GEXF) ! output
+          (new GEXF) ! properties("output")
         case ('open, pathOrURL: Any) => (new GEXF) ! pathOrURL
+
+        case ('output, graph:Graph) =>
+          properties += "output" -> graph
 
         case "recenter" =>
           Pipeline ! "recenter"

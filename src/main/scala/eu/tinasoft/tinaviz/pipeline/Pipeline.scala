@@ -10,10 +10,8 @@ import eu.tinasoft._
 import tinaviz.graph.Graph
 import tinaviz.graph.Metrics
 import tinaviz.graph.Functions
+import tinaviz.Main
 import tinaviz.Server
-import tinaviz.sketch.Sketch
-import tinaviz.sketch.Sketch._
-import tinaviz.scene.Scene
 import tinaviz.io.json.Json
 import tinaviz.io.Browser
 import tinaviz.util.Vector._
@@ -23,6 +21,7 @@ import eu.tinasoft.tinaviz.graph.Layout
 import java.util.concurrent.{ScheduledFuture, TimeUnit, Executors}
 import actors.Actor
 import compat.Platform
+
 
 /**
  *
@@ -36,8 +35,6 @@ object Pipeline extends node.util.Actor {
   var nodeWeightCache = new Graph()
   var edgeWeightCache = new Graph()
   var layoutCache = new Graph()
-  var sketch = new Sketch()
-  var scene = new Scene()
   var framedelay = 200
 
   def act() {
@@ -400,9 +397,15 @@ object Pipeline extends node.util.Actor {
 
     }.toArray)
 
-    sketch.update(f)
-    val msg = (f, sketch: Scene)
-    Server ! msg
+    //f.position
+    //f.size
+   // precompute stuff
+
+   f.warm
+
+
+    Main.graph.set(f)
+    Server ! 'output -> f
   }
 
 
