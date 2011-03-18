@@ -1,6 +1,6 @@
 package eu.tinasoft.tinaviz
 
-import    java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicReference
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JFrame
@@ -40,6 +40,17 @@ object Main {
     applet.init
     frame.pack
     frame.setVisible(true)
+    /*
+    frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
+    frame.addWindowListener(new WindowAdapter {
+      public void windowClosing(e:WindowEvent) {
+        Server -> 'quit
+        Browser -> 'quit
+        System.exit(0)
+      }
+    })
+    */
+
   }
 }
 
@@ -61,31 +72,15 @@ object Main {
 class Main extends TApplet with Client {
 
   override def setup(): Unit = {
-    size(1400, 900, PConstants.P2D)
-    /*
-     frame.setResizable(true)
-     frame.addComponentListener(new ComponentAdapter() { 
-     override def componentResized(e:ComponentEvent) { 
-     if(e.getSource()==frame) { 
-                     
-     // HACK we need to update the screen ratio for recentering..
-     // TODO put the following two calls in a "screen resized" callback"
-     println("RESIZE CALLBACK")
-     Server ! "screen.width" -> width
-     Server ! "screen.height" -> height
-     } 
-     } 
-     }
-     )*/
-    frameRate(30)
-
+    size(800,600, PConstants.P2D)
+    frameRate(35)
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
     bezierDetail(18)
     setDefault("output", new Graph)
     setDefault("debug", false)
-    setDefault("pause", true)
+    setDefault("pause", false)
     setDefault("selectionRadius", 10.0)
 
     addMouseWheelListener(this)
@@ -98,7 +93,8 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/current.gexf"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/badgraph/gexf/PseudoInclusion_logJaccard_FET-graph.gexf"
+         // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
           //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
           //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
@@ -109,8 +105,8 @@ class Main extends TApplet with Client {
           // seems buggy
           // "file:///home/jbilcke/Desktop/from_Batch_10_to_FET-graph.gexf"
 
-         // "file:///home/jbilcke/Desktop/largescalegraph.gexf"
-         // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/fetXX/gexf/FET-graph.gexf"
+          // "file:///home/jbilcke/Desktop/largescalegraph.gexf"
+          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/fetXX/gexf/FET-graph.gexf"
 
           //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
           //"file:///home/jbilcke/test-graph.gexf"
@@ -118,11 +114,12 @@ class Main extends TApplet with Client {
     }
   }
 
-  var doZoom : Symbol = 'none
-  var export : Symbol = 'none
+  var doZoom: Symbol = 'none
+  var export: Symbol = 'none
 
   var nbVisibleNodes = 0
   var nbVisibleEdges = 0
+
   override def draw(): Unit = {
 
     // send some values
@@ -158,7 +155,7 @@ class Main extends TApplet with Client {
         doZoom = 'none
       case 'out =>
         zoom(false)
-         doZoom = 'none
+        doZoom = 'none
       case any =>
     }
 
@@ -166,9 +163,9 @@ class Main extends TApplet with Client {
 
 
     setBackground(g.currentView match {
-        case "macro" => new Color(0.0, 0.0, 1.0)
-        case "meso" => new Color (0.1416, 0.1, 1.0) // jaunâtre
-        case any => new Color(0.0, 0.0, 1.0)
+      case "macro" => new Color(0.0, 0.0, 1.0)
+      case "meso" => new Color(0.1416, 0.1, 1.0) // jaunâtre
+      case any => new Color(0.0, 0.0, 1.0)
     })
     if (debug) {
       setColor(new Color(0.0, 0.0, 0.0))
@@ -187,7 +184,7 @@ class Main extends TApplet with Client {
     }
     nbVisibleNodes = visibleNodes.size
 
-    def compareBySelection(i: Int, j: Int): Boolean = ( !g.selected(i) && g.selected(j) )
+    def compareBySelection(i: Int, j: Int): Boolean = (!g.selected(i) && g.selected(j))
 
     //val visibleNodes = visibleNodesTmp.map { _._2 }.toList.sort(compareBySelection).toArray
 
@@ -199,74 +196,77 @@ class Main extends TApplet with Client {
         val ptarget = screenPosition(target)
         val visible = (isVisible(psource) || isVisible(ptarget))
         if (visible) {
-        val powd = distance(psource, ptarget)
-        (true,
-         i,
-         source,
-         target,
-         g.renderEdgeWeight(i),
-         g.renderEdgeColor(i),
-         if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 120), 1, 120).toInt else 1)
+          val powd = distance(psource, ptarget)
+          (true,
+            i,
+            source,
+            target,
+            g.renderEdgeWeight(i),
+            g.renderEdgeColor(i),
+            if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 120), 1, 120).toInt else 1)
 
         } else {
           (false,
-           i,
-           source,
-           target,
-           0.0,
-          new Color (0.0,0.0,0.0),
-           0)
+            i,
+            source,
+            target,
+            0.0,
+            new Color(0.0, 0.0, 0.0),
+            0)
         }
     }
 
     val edgeWeightIsPercentOfNodeSize = 0.3 // 1/3 of a node radius for good looking edges
 
-    nbVisibleEdges = edgeTmp.filter{case (visible, i, source, target, weight, color, lod) => visible}.size
+    nbVisibleEdges = edgeTmp.filter {
+      case (visible, i, source, target, weight, color, lod) => visible
+    }.size
     edgeTmp foreach {
       case (visible, i, source, target, weight, color, lod) =>
         if (visible && !g.selected(g.renderEdgeIndex(i)._1)) {
           setLod(lod)
           lineColor(color)
-            if (nbVisibleNodes < 30000) {
-             val th = if (nbVisibleEdges < 2000) {
-               val (a,b) = g.renderEdgeIndex(i)
-               val m = math.min(g.size(a),
-                                g.size(b))
-               val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
-               if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
+          if (nbVisibleNodes < 30000) {
+            val th = if (nbVisibleEdges < 2000) {
+              val (a, b) = g.renderEdgeIndex(i)
+              val m = math.min(g.size(a),
+                g.size(b))
+              val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
+              if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
             } else {
-                1.0
-             }
+              1.0
+            }
 
-             lineThickness(th)
+            lineThickness(th)
             drawCurve(source, target)
           }
         }
     }
 
-        nbVisibleEdges = edgeTmp.filter{case (visible, i, source, target, weight, color, lod) => visible}.size
-        edgeTmp foreach {
-          case (visible, i, source, target, weight, color, lod) =>
-            if (visible && g.selected(g.renderEdgeIndex(i)._1))  {
-              setLod(lod)
-              lineColor(color)
-                if (nbVisibleNodes < 30000) {
-                 val th = if (nbVisibleEdges < 2000) {
-                   val (a,b) = g.renderEdgeIndex(i)
-                   val m = math.min(g.size(a),
-                                    g.size(b))
-                   val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
-                   if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
-                } else {
-                    1.0
-                 }
-
-                 lineThickness(th)
-                drawCurve(source, target)
-              }
+    nbVisibleEdges = edgeTmp.filter {
+      case (visible, i, source, target, weight, color, lod) => visible
+    }.size
+    edgeTmp foreach {
+      case (visible, i, source, target, weight, color, lod) =>
+        if (visible && g.selected(g.renderEdgeIndex(i)._1)) {
+          setLod(lod)
+          lineColor(color)
+          if (nbVisibleNodes < 30000) {
+            val th = if (nbVisibleEdges < 2000) {
+              val (a, b) = g.renderEdgeIndex(i)
+              val m = math.min(g.size(a),
+                g.size(b))
+              val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
+              if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
+            } else {
+              1.0
             }
-        }
 
+            lineThickness(th)
+            drawCurve(source, target)
+          }
+        }
+    }
 
 
     /**
@@ -290,14 +290,12 @@ class Main extends TApplet with Client {
         }
     }
 
-    /*
     setColor(new Color(0.3, 1.0, 1.0))
-    drawDisk((0.0,0.0), 10.0 / getZoom)
+    drawDisk((0.0, 0.0), 10.0 / getZoom)
     setColor(new Color(0.0, 1.0, 1.0))
-    drawDisk( g.baryCenter, 10.0 / getZoom)
+    drawDisk(g.baryCenter, 10.0 / getZoom)
     setColor(new Color(0.6, 1.0, 1.0))
-    drawDisk( g.selectionCenter, 10.0 / getZoom)
-    */
+    drawDisk(g.selectionCenter, 10.0 / getZoom)
 
     def compareBySize(i: Int, j: Int): Boolean = {
       val r1 = g.size(i)
@@ -306,8 +304,9 @@ class Main extends TApplet with Client {
       val l2 = g.label(j)
       if (r1 > r2) true else (if (r1 < r2) false else (l1.compareTo(l2) < 0))
     }
-    val sortedLabelIDs = visibleNodes.map { _._2 }.toList.sort(compareBySize).toArray
-
+    val sortedLabelIDs = visibleNodes.map {
+      _._2
+    }.toList.sort(compareBySize).toArray
 
     sortedLabelIDs.foreach {
       case (i) =>
@@ -320,7 +319,7 @@ class Main extends TApplet with Client {
         val h1 = setFontSize((r1 * getZoom).toInt)
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
-        val weAreSelected = false// we don't care. else, use: g.selected(i)
+        val weAreSelected = false // we don't care. else, use: g.selected(i)
         val weHaveACollision = sortedLabelIDs.exists {
           case (j) =>
             val p2 = g.position(j)
@@ -331,17 +330,21 @@ class Main extends TApplet with Client {
             val l2 = g.label(j)
             val h2 = setFontSize((r2 * getZoom).toInt)
             val w2 = textWidth(l2) /// getZoom //
-            val whichIsSelected = false// we don't care. else, use: scene.graph.selected(j)
+            val whichIsSelected = false // we don't care. else, use: scene.graph.selected(j)
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1))
-                                  || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
-                                 && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
-                                  || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
+              || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
+              && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
+              || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
             val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (g.label(j).compareTo(g.label(i)) > 0))
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
             if (i == j) false else (weTouchSomething && (whichIsLarger || whichIsSelected))
         }
         setFontSize((r1 * getZoom).toInt)
-        val col = if (weAreSelected) { new Color(0.0, 1.0, 0.0).alpha(1.0) } else { new Color(0.0, 1.0, 0.0).alpha(0.8) }
+        val col = if (weAreSelected) {
+          new Color(0.0, 1.0, 0.0).alpha(1.0)
+        } else {
+          new Color(0.0, 1.0, 0.0).alpha(0.8)
+        }
         setColor(col)
         // we can show the label if we are selected, or if we do not collide with a bigger one
         if ((!weHaveACollision) || weAreSelected) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
@@ -356,25 +359,17 @@ class Main extends TApplet with Client {
     export = 'none
 
     showSelectionCircle(selectionRadius)
-
-
   }
-
 
   /**
    * Recenter
    */
-  private def _recenter(g: Graph, mode : String) {
+  private def _recenter(g: Graph, mode: String) {
 
     mode match {
       case "all" =>
-        //println("recentering to all")
       case "selection" =>
-        //println("recentering to selection")
-
-      // move it
       case "none" =>
-        //println("recentering to none")
         return
       case err =>
         println("error")
@@ -383,8 +378,10 @@ class Main extends TApplet with Client {
 
     val w = width.toDouble
     val h = height.toDouble
-    val cz = g.cameraZoom
-    val cp = g.cameraPosition
+
+    val cz = getZoom
+    val cp = getPosition
+
     def model2screen(p: (Double,
       Double)): (Int,
       Int) = (((p._1 + cp._1) * cz).toInt,
@@ -395,11 +392,11 @@ class Main extends TApplet with Client {
       (p._2 - cp._2) / cz)
 
     val gwidth = abs(g.xMin - g.xMax) * getZoom // size to screen
-    val gheight = abs(g.yMax - g.yMin)  * getZoom  // size to screen
+    val gheight = abs(g.yMax - g.yMin) * getZoom // size to screen
     val graphSize = (gwidth, gheight) // size to screen
-    val (xRatio, yRatio) = (gwidth / width,  gheight / height)
+    val (xRatio, yRatio) = (gwidth / width, gheight / height)
     val ratio = max(xRatio, yRatio)
-    val pos = if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.baryCenter
+    val pos = if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.notSinglesCenter
     var translate = new PVector(width / 2.0f, height / 2.0f, 0)
     translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
     updatePosition(translate)
@@ -439,7 +436,7 @@ class Main extends TApplet with Client {
    */
   override def keyPressed() {
     key match {
-      //case 'p' => Server ! "pause" -> 'toggle
+    //case 'p' => Server ! "pause" -> 'toggle
       case 'a' => Server ! "pause" -> 'toggle
 
       case 'n' => Server ! "drawing.nodes" -> 'toggle

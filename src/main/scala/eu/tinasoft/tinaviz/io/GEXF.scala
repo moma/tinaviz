@@ -217,7 +217,7 @@ class GEXF extends node.util.Actor {
       }
     }
 
-    Graph.make(g.elements)
+    Graph.make(g.elements)//.normalizePositions
   }
 
 

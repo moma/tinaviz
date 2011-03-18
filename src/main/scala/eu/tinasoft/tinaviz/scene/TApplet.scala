@@ -277,6 +277,8 @@ class TApplet extends PApplet with MouseWheelListener {
     updatePosition(position)
   }
 
+
+
   /**
    * Are the given coordinate invisible?
    */

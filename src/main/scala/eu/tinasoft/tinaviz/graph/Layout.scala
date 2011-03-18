@@ -19,7 +19,7 @@ object Layout {
   //ps.setIntegrator( ParticleSystem.MODIFIED_EULER )
   //
   // ps.setGravity( 1.3f ) // between 0.0 and 5.0
-  ps.setDrag(0.1f)
+  //ps.setDrag(0.1f) // was 0.1 before
 
   var lastHash = 0
 
@@ -63,7 +63,7 @@ object Layout {
       0.4
     }
     //println("setting drag to " + drag)
-    ps.setDrag(drag.toFloat)
+    //ps.setDrag(drag.toFloat)
 
     val aMinMaxWeights = (g.minAEdgeWeight, g.maxAEdgeWeight)
     val bMinMaxWeights = (g.minBEdgeWeight, g.maxBEdgeWeight)
@@ -74,7 +74,7 @@ object Layout {
 
     val nbEdges = g.nbEdges.toDouble / 2.0
     //println("nbEdges: "+nbEdges)
-    val maxD = 50.0
+    val maxD = 50.0 // 50 seems too big
     val minD = 6.0
     val maxEdges = 3000.0
     val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
@@ -119,13 +119,23 @@ object Layout {
                   // if we have a link, we create a sprinf
                   if (g.hasThisLink(i1, i2)) {
 
-                    val d = Maths.map(g.links(i1)(i2), g.category(i1) match {
+                    val minMaxInterval = g.category(i1) match {
                       case "Document" => aMinMaxWeights
                       case "NGram" => bMinMaxWeights
 
-                    }, distInterval)
-                    //
-                    ps.makeSpring(p1, p2, 0.04f, 0.01f, d.toFloat) // 10.0f
+                    }
+                    // Rest Length - the spring wants to be at this length and acts on the particles to push or pull them exactly this far apart at all times.
+                    val l = Maths.map(g.links(i1)(i2), minMaxInterval, distInterval).toFloat
+
+                    // Strength - If they are strong they act like a stick. If they are weak they take a long time to return to their rest length.
+                    val s = 0.005f//Maths.map(g.links(i1)(i2), minMaxInterval, (0.1, 0.03)).toFloat // default 0.04
+
+                    // Damping - If springs have high damping they don't overshoot and they settle down quickly, with low damping springs oscillate.
+                    val d = Maths.map(g.links(i1)(i2), minMaxInterval, (0.01,0.015)).toFloat
+
+
+                    //  (float strength, float damping, float restLength)
+                    ps.makeSpring(p1, p2, s, d, l) // 10.0f
                   }
                   // we repulse unrelated nodes
                   else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f)
@@ -141,15 +151,19 @@ object Layout {
     } // end hash changed
 
     // if a position has changed
-    /*
-    positionIndexSingle.filter(case (p,s,i) => !s).foreach {
-      case ((_x, _y), i) =>
-        val (x, y, z) = (_x.toFloat, _y.toFloat, 0.0f)
+     /*
+    positionIndexSingleParticle.filter(case (pos, i, s, p) => !s).foreach {
+      case (pos, i, s, p) =>
+        val (x, y, z) = (Maths.limit(pos._1, -2000, 2000).toFloat,
+                         Maths.limit(pos._2,-2000,2000).toFloat,
+                         0.0f)
         val p = ps.getParticle(i).position()
         if (p.x != x || p.y != y) p.set(x, y, z)
-    }
-    */
+    }*/
+
+    // fix the center
     ps.getParticle(0).position().set( g.notSinglesCenter._1.toFloat, g.notSinglesCenter._2.toFloat, 0.0f )
+
     //println("running step (" + ps.numberOfParticles + " particles)..")
     ps.tick(1.0f)
     val dim = Metrics.notSingleNodesDimension(g)
@@ -166,7 +180,12 @@ object Layout {
         } else {
           cj += 1 // okay to not start with zero here, because slot 0 is already used by gravity
           val p = ps.getParticle(cj).position()
-          (p.x().toDouble, p.y().toDouble)
+          val (x,y) = (p.x().toDouble,p.y().toDouble)
+          val v = ps.getParticle(cj).velocity()
+          v.setX(Maths.limit(v.x().toDouble, -10, 10).toFloat)
+          v.setY(Maths.limit(v.y().toDouble, -10, 10).toFloat)
+
+          (x,y)
         }
     }))
   }

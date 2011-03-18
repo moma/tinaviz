@@ -246,7 +246,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             val alph = Maths.map(weight, category(from) match {
               case "Document" => aextremums
               case "NGram" => bextremums
-            }, (0.25,1.0))
+            }, (0.23,0.85)) // minimum alpha <-->  maximum alpha
 
            val d = if (category(from).equals(category(to))) {
                mode match {
@@ -770,10 +770,13 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     )
   }
 
+  def normalizePositions : Graph = this + ("visible" -> position.map { case (x, y) => (x - baryCenter._1, y - baryCenter._2) } )
+
+
   /**
    * TODO refactor to use a generic field update function
    */
-  def updatePositionWithCategory(g: Graph): Graph = {
+  def updatePositionWithCategory(g: Graph) : Graph = {
 
     val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
       case (elem, i) =>
