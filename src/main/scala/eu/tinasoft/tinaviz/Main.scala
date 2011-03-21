@@ -72,7 +72,7 @@ object Main {
 class Main extends TApplet with Client {
 
   override def setup(): Unit = {
-    size(800,600, PConstants.P2D)
+    size(1200,800, PConstants.P2D)
     frameRate(35)
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
@@ -124,6 +124,7 @@ class Main extends TApplet with Client {
 
     // send some values
     Server ! "frameRate" -> frameRate.toInt
+    //Server ! "camera.zoom" ->camera
 
     // get some values in a non-blocking way (using futures)
     val g = Main.graph.get
@@ -173,7 +174,7 @@ class Main extends TApplet with Client {
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
       text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
-
+    //updateCameraEngine
     setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
     setLod(32)
     lineThickness(1)
@@ -359,6 +360,7 @@ class Main extends TApplet with Client {
     export = 'none
 
     showSelectionCircle(selectionRadius)
+
   }
 
   /**
@@ -409,7 +411,7 @@ class Main extends TApplet with Client {
    * value contains here the new value of the camera zoom
    */
   override def zoomUpdated(value: Double) {
-    Server ! "camera.target" -> "none"
+    //Server ! "camera.target" -> "none"
     Server ! "camera.zoom" -> value
   }
 
@@ -418,7 +420,7 @@ class Main extends TApplet with Client {
    *
    */
   override def positionUpdated(value: (Double, Double)) {
-    Server ! "camera.target" -> "none"
+    //Server ! "camera.target" -> "none"
     Server ! "camera.position" -> value
   }
 

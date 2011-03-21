@@ -52,6 +52,11 @@ class TApplet extends PApplet with MouseWheelListener {
   //
   val ps = new ParticleSystem(0f, 0.1f)
 
+  val psRoof =   ps.makeParticle( 1.0f,    0.00f,   0.0f,   0.0f)
+  psRoof.makeFixed() // don't touch this
+  val psCamera = ps.makeParticle( 1.0f,    0.05f,   0.0f,   0.0f)
+  val psSpring = ps.makeSpring(psRoof, psCamera, 0.01f,  0.01f,  0.05f )
+
   val minZoom = 0.05
   val maxZoom = 500.0
 
@@ -361,6 +366,12 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.dragged = true
     updatePosition(t)
     updateMouse('Drag)
+    Résultat des votes :
+Oui - 5
+Non - 0
+Blanc - 0
+
+Les nouveaux statuts sont donc adoptés à la majorité complète, et seront enregistrées dans le registre spécial de l'association en la date du 8 septembre 2010.
   }
 
   override def mouseClicked = updateMouse('Click)
