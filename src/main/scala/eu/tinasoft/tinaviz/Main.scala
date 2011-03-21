@@ -291,12 +291,14 @@ class Main extends TApplet with Client {
         }
     }
 
-    setColor(new Color(0.3, 1.0, 1.0))
-    drawDisk((0.0, 0.0), 10.0 / getZoom)
-    setColor(new Color(0.0, 1.0, 1.0))
-    drawDisk(g.baryCenter, 10.0 / getZoom)
-    setColor(new Color(0.6, 1.0, 1.0))
-    drawDisk(g.selectionCenter, 10.0 / getZoom)
+    if (debug) {
+      setColor(new Color(0.3, 1.0, 1.0))
+      drawDisk((0.0, 0.0), 10.0 / getZoom)
+      setColor(new Color(0.0, 1.0, 1.0))
+      drawDisk(g.baryCenter, 10.0 / getZoom)
+      setColor(new Color(0.6, 1.0, 1.0))
+      drawDisk(g.selectionCenter, 10.0 / getZoom)
+    }
 
     def compareBySize(i: Int, j: Int): Boolean = {
       val r1 = g.size(i)
@@ -411,7 +413,12 @@ class Main extends TApplet with Client {
    * value contains here the new value of the camera zoom
    */
   override def zoomUpdated(value: Double) {
-    //Server ! "camera.target" -> "none"
+
+
+    // TODO use the nap
+   Server ! "camera.target" -> "none"
+
+
     Server ! "camera.zoom" -> value
   }
 
@@ -420,7 +427,12 @@ class Main extends TApplet with Client {
    *
    */
   override def positionUpdated(value: (Double, Double)) {
-    //Server ! "camera.target" -> "none"
+
+
+    // TODO use the nap
+   Server ! "camera.target" -> "none"
+
+
     Server ! "camera.position" -> value
   }
 

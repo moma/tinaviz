@@ -366,12 +366,7 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.dragged = true
     updatePosition(t)
     updateMouse('Drag)
-    Résultat des votes :
-Oui - 5
-Non - 0
-Blanc - 0
-
-Les nouveaux statuts sont donc adoptés à la majorité complète, et seront enregistrées dans le registre spécial de l'association en la date du 8 septembre 2010.
+    //Server ! "camera.target" -> "none"
   }
 
   override def mouseClicked = updateMouse('Click)
