@@ -265,7 +265,12 @@ object Pipeline extends node.util.Actor {
               count match {
                 case 'Double =>
                   if (in) {
+
+                    if (layoutCache.get[String]("filter.view").equalsIgnoreCase("macro"))
+                       Browser ! "_callbackSelectionChanged" -> "meso"
+
                     self ! "filter.view" -> "meso"
+
                   } else {
                     // zoom?
                   }
