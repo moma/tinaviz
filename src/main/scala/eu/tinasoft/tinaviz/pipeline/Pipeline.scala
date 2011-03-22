@@ -28,8 +28,6 @@ import compat.Platform
  */
 object Pipeline extends node.util.Actor {
 
-  start
-
   var data = new Graph()
   var categoryCache = new Graph()
   var nodeWeightCache = new Graph()
@@ -59,6 +57,11 @@ object Pipeline extends node.util.Actor {
 
     while (true) {
       receive {
+
+        case 'exit =>
+          println("exiting pipeline")
+          exit()
+
         // reset
         case g: Graph =>
           data = g

@@ -40,7 +40,7 @@ object Server extends node.util.Actor {
     "layout.gravity" -> 1.3, // stronger means faster!
     "layout.attraction" -> 1.01,
     "layout.repulsion" -> 1.5,
-    "pause" -> false,
+    "pause" -> true,
     "debug" -> false,
 
     // global selection disk settings
@@ -66,8 +66,6 @@ object Server extends node.util.Actor {
 
   var properties: Map[String, Any] = defaultProperties
 
-  start
-
 
   def act() {
 
@@ -78,6 +76,12 @@ object Server extends node.util.Actor {
 
     while (true) {
       receive {
+        case 'exit =>
+          println("exiting server")
+          Browser ! 'exit
+          Pipeline ! 'exit
+          exit()
+
 
         case ('updateNode, value) =>
         //context ! 'updateNode -> value
@@ -98,9 +102,17 @@ object Server extends node.util.Actor {
           Browser ! 'forceDownload -> x.toString
           
         // import/export functions
-        case ("export","gexf") => 
-          (new GEXF) ! properties("output")
-        case ('open, pathOrURL: Any) => (new GEXF) ! pathOrURL
+        case ("export","gexf") =>
+
+          val gexfLoader = new GEXF
+          gexfLoader.start
+          gexfLoader ! properties("output")
+
+        case ('open, pathOrURL: Any) =>
+
+          val gexfLoader = new GEXF
+          gexfLoader.start
+          gexfLoader ! pathOrURL
 
         case ('output, graph:Graph) =>
           properties += "output" -> graph

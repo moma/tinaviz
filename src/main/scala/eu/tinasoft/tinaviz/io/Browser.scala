@@ -44,7 +44,12 @@ object Browser extends node.util.Actor {
     //var model = new Model()
 
     loop {
+
       react {
+        case 'exit =>
+          println("exiting browser")
+          exit()
+
 
         //   private def graphImportedCallback(msg:String) = {
        // callAndForget("_graphImportedCallback", msg)

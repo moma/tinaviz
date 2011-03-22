@@ -15,6 +15,7 @@ import eu.tinasoft._
 
 import tinaviz.io.Browser
 import tinaviz.scene._
+import tinaviz.pipeline._
 import tinaviz.util._
 import tinaviz.util.Color._
 import tinaviz.graph._
@@ -80,11 +81,19 @@ class Main extends TApplet with Client {
     bezierDetail(18)
     setDefault("output", new Graph)
     setDefault("debug", false)
-    setDefault("pause", false)
+    setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
 
     addMouseWheelListener(this)
+
+    /* In the JDK's appletviewer, selecting the Restart menu item calls stop() and then start().
+     * Selecting the Reload menu item calls stop(), destroy(), and init(), in that order.
+     *  (Normally the byte codes will also be reloaded and the HTML file reread though Netscape has a problem with this.)
+     */
     Browser.start
+    Pipeline.start
+    Server.start
+
 
     try {
       Browser.init(this, getParameter("js_context"))
@@ -488,5 +497,23 @@ class Main extends TApplet with Client {
       case x =>
     //
     }
+  }
+
+  override def start() {
+    super.start()
+    println("started..")
+    Server ! "pause" -> 'toggle
+  }
+
+  override def stop() {
+    super.stop()
+    println("stopped..")
+    Server ! "pause" -> 'toggle
+  }
+  override def destroy() {
+    println("sending exit signal to server")
+     Server ! 'exit
+    println("calling destroy() on super")
+    super.destroy()
   }
 }

@@ -25,10 +25,9 @@ import xml._
 import java.net.{URLConnection, URL, Authenticator, PasswordAuthentication}
 
 class GEXF extends node.util.Actor {
-  start
 
   def act() {
-    while (true) {
+
       receive {
         case url: URL => {
             println("Connecting to " + url)
@@ -80,7 +79,6 @@ class GEXF extends node.util.Actor {
             </gexf>
           )
       }
-    }
   }
 
 
