@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gephi.org/gexf/viz" version="1.1">
+ <meta lastmodifieddate="24-Nov-2010 03:25:37">
+ </meta>
+<graph type="static">
+<attributes class="node" type="static">
+ <attribute id="0" title="category" type="string">  </attribute>
+ <attribute id="1" title="weight" type="float">   </attribute>
+</attributes>
+<attributes class="edge" type="float">
+ <attribute id="0" title="cooc" type="float"> </attribute>
+ <attribute id="1" title="type" type="string"> </attribute>
+ </attributes>
+<nodes>
+<node id="1" label="A Very Large Weight">
+<viz:color b="255" g="0"  r="0"/>
+<attvalues> <attvalue for="0" value="Document"/>
+<attvalue for="0" value="Document"/>
+<attvalue for="1" value="10"/>
+</attvalues></node>
+<node id="2" label="Smaller One">
+<viz:color b="0" g="0"  r="255"/>
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="0" value="Document"/>
+<attvalue for="1" value="1"/>
+</attvalues></node>
+<node id="3" label="A Medium Weight">
+<viz:color b="0" g="255"  r=""/>
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="0" value="Document"/>
+<attvalue for="1" value="5"/>
+</attvalues></node>
+</nodes><edges>
+<edge id="1" source="1" target="2" weight="0.06">
+<attvalues> <attvalue for="0" value="0.06"/><attvalue for="1" value="nodes1"/></attvalues>
+</edge><edge id="2" source="2" target="3" weight="0.17">
+<attvalues> <attvalue for="0" value="0.17"/><attvalue for="1" value="nodes1"/></attvalues>
+</edge><edge id="3" source="3" target="1" weight="0.92">
+<attvalues> <attvalue for="0" value="0.92"/><attvalue for="1" value="nodes1"/></attvalues>
+</edge></edges>
+</graph>
+</gexf>
