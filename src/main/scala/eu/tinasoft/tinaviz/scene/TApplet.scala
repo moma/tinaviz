@@ -11,7 +11,7 @@ import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 
 import eu.tinasoft._
-
+import tinaviz.Server
 import tinaviz.util._
 import tinaviz.util.Vector._
 
@@ -256,12 +256,18 @@ class TApplet extends PApplet with MouseWheelListener {
         updatePosition(p)
     }
   }
-  
+  def updateZoomSilent(value: Double) {
+    _camera.zoom = value
+  }
+
   def updateZoom(value: Double) {
     _camera.zoom = value
     zoomUpdated(value)
   }
 
+  def updatePositionSilent(value: (Double, Double)) {
+    _camera.position = value
+  }
 
   def updatePosition(value: (Double, Double)) {
     _camera.position = value
@@ -366,7 +372,7 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.dragged = true
     updatePosition(t)
     updateMouse('Drag)
-    //Server ! "camera.target" -> "none"
+    Server ! "camera.target" -> "none"
   }
 
   override def mouseClicked = updateMouse('Click)
@@ -390,6 +396,7 @@ class TApplet extends PApplet with MouseWheelListener {
         zoom(e.getWheelRotation < 0)
       }
     }
+    Server ! "camera.target" -> "none"
   }
 
   def moveUp(amount: Double = 10) = _camera.position = (_camera.position._1, _camera.position._2 + amount)

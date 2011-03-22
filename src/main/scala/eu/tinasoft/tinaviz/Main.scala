@@ -73,7 +73,7 @@ object Main {
 class Main extends TApplet with Client {
 
   override def setup(): Unit = {
-    size(1200,800, PConstants.P2D)
+    size(1200, 800, PConstants.P2D)
     frameRate(35)
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
@@ -102,9 +102,9 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-         // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/badgraph/gexf/PseudoInclusion_logJaccard_FET-graph.gexf"
-         // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
-         "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/badgraph/gexf/PseudoInclusion_logJaccard_FET-graph.gexf"
+          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+          "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
           //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
 
@@ -124,7 +124,7 @@ class Main extends TApplet with Client {
   }
 
   var doZoom: Symbol = 'none
-  var export: Symbol = 'none
+  var export: String = "none"
 
   var nbVisibleNodes = 0
   var nbVisibleEdges = 0
@@ -149,13 +149,14 @@ class Main extends TApplet with Client {
       (if (nbVisibleEdges < 900) smooth else noSmooth)
 
     export match {
-      case 'pdf =>
+      case "PDF" =>
         smooth
         beginRecord(PConstants.PDF, "graph.pdf")
-      case 'png =>
+
+      case "PNG" =>
         smooth
 
-      case any =>
+      case any => Server ! ("export", "GEXF")
     }
 
 
@@ -171,12 +172,20 @@ class Main extends TApplet with Client {
 
     _recenter(g, g.get[String]("camera.target"))
 
+    export match {
+      case "PDF" =>
+        // no background for PDF files (translucent)
+      case "PNG" =>
+        // no background for PNG files (translucent)
+      case any =>
+        setBackground(g.currentView match {
+          case "macro" => new Color(0.0, 0.0, 1.0)
+          case "meso" => new Color(0.1416, 0.1, 1.0) // jaunâtre
+          case any => new Color(0.0, 0.0, 1.0)
+        })
+    }
 
-    setBackground(g.currentView match {
-      case "macro" => new Color(0.0, 0.0, 1.0)
-      case "meso" => new Color(0.1416, 0.1, 1.0) // jaunâtre
-      case any => new Color(0.0, 0.0, 1.0)
-    })
+
     if (debug) {
       setColor(new Color(0.0, 0.0, 0.0))
       setFontSize(9)
@@ -364,11 +373,11 @@ class Main extends TApplet with Client {
 
 
     export match {
-      case 'pdf => endRecord()
-      case 'png => save("graph.png")
+      case "PDF" => endRecord()
+      case "PNG" => save("graph.png")
       case any =>
     }
-    export = 'none
+    export = "none"
 
     showSelectionCircle(selectionRadius)
 
@@ -379,16 +388,18 @@ class Main extends TApplet with Client {
    */
   private def _recenter(g: Graph, mode: String) {
 
+    //println("recentering? " + mode)
+
     mode match {
       case "all" =>
       case "selection" =>
       case "none" =>
         return
       case err =>
-        println("error")
+        //println("error")
         return
     }
-    println("recentering: "+mode)
+    //println("recentering will be done!")
     val w = width.toDouble
     val h = height.toDouble
 
@@ -409,11 +420,13 @@ class Main extends TApplet with Client {
     val graphSize = (gwidth, gheight) // size to screen
     val (xRatio, yRatio) = (gwidth / width, gheight / height)
     val ratio = max(xRatio, yRatio)
-    val pos = if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.notSinglesCenter
-    var translate = new PVector(width / 2.0f, height / 2.0f, 0)
-    translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
-    updatePosition(translate)
-    if (ratio != 0.0) updateZoom(getZoom / ratio)
+    if (abs(ratio) > 0.001) {
+      val pos = if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.notSinglesCenter
+      var translate = new PVector(width / 2.0f, height / 2.0f, 0)
+      translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
+      updatePositionSilent(translate)
+      if (ratio != 0.0) updateZoomSilent(getZoom / ratio)
+    }
   }
 
   /**
@@ -425,7 +438,7 @@ class Main extends TApplet with Client {
 
 
     // TODO use the nap
-   Server ! "camera.target" -> "none"
+    //Server ! "camera.target" -> "none"
 
 
     Server ! "camera.zoom" -> value
@@ -439,7 +452,7 @@ class Main extends TApplet with Client {
 
 
     // TODO use the nap
-   Server ! "camera.target" -> "none"
+    //Server ! "camera.target" -> "none"
 
 
     Server ! "camera.position" -> value
@@ -465,15 +478,16 @@ class Main extends TApplet with Client {
       case 'n' => Server ! "drawing.nodes" -> 'toggle
       case 'l' => Server ! "drawing.edges" -> 'toggle
 
-      case 'x' => Server ! ("export", "gexf")
-      case 'f' => export = 'pdf
-      case 'g' => export = 'png
+      case 'x' => export = "GEXF"
+      case 'f' => export = "PDF"
+      case 'g' => export = "PNG"
 
       case 'c' => Server ! "filter.node.category" -> 'toggle
       case 'v' => Server ! "filter.view" -> 'toggle
 
       case 'r' => Server ! "camera.target" -> "all"
       case 's' => Server ! "camera.target" -> "selection"
+      case 'h' => Server ! "camera.target" -> "none"
       case 'u' => Server ! "select" -> ""
 
       case 'd' =>
@@ -510,6 +524,7 @@ class Main extends TApplet with Client {
     //println("stopped..")
     //Server ! "pause" -> false
   }
+
   override def destroy() {
     println("Main.scala: sending exit signal to Server")
     Server ! 'exit
