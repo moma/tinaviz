@@ -29,7 +29,7 @@ object Graph {
   def make(elements: Map[String, Any]) = new Graph(elements)
 
   val defaults: Map[String, Any] = Map(
-    "pause" -> true,
+    "pause" -> false,
     "uuid" -> Array.empty[String],
     "label" -> Array.empty[String],
     "color" -> Array.empty[Color],

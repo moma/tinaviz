@@ -501,19 +501,19 @@ class Main extends TApplet with Client {
 
   override def start() {
     super.start()
-    println("started..")
-    Server ! "pause" -> 'toggle
+    //println("started..")
+    //Server ! "pause" -> 'toggle
   }
 
   override def stop() {
     super.stop()
-    println("stopped..")
-    Server ! "pause" -> 'toggle
+    //println("stopped..")
+    //Server ! "pause" -> false
   }
   override def destroy() {
-    println("sending exit signal to server")
-     Server ! 'exit
-    println("calling destroy() on super")
+    println("Main.scala: sending exit signal to Server")
+    Server ! 'exit
+    println("Main.scala: calling super.destroy()")
     super.destroy()
   }
 }
