@@ -198,7 +198,11 @@ class GEXF extends node.util.Actor {
     for (e <- (root \\ "edge")) {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
-      val weight =  (e \ "@weight" text).toDouble
+      val weight = ((e \ "@weight" text) match {
+          case "" => "0"
+          case s:String => s
+          case any => "0"
+      }).toDouble
       val undirected = (e \ "@type" text) match {
         case "undirected" => true
         case "directed" => false
