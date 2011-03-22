@@ -108,13 +108,13 @@ object Server extends node.util.Actor {
         case "recenter" =>
           Pipeline ! "recenter"
 
-        case ("select", uuid) =>
-          Pipeline ! "select" -> uuid
+        case ("select", toBeSelected) =>
+          Pipeline ! "select" -> toBeSelected
           
-        case("selectByPattern",pattern:String) =>
+        case("selectByPattern",pattern) =>
           Pipeline ! "selectByPattern" -> pattern
           
-        case("highlightByPattern",pattern:String) =>
+        case("highlightByPattern",pattern) =>
           Pipeline ! "highlightByPattern" -> pattern
 
         case ('getNodes,view,category) =>
@@ -124,7 +124,7 @@ object Server extends node.util.Actor {
         case ('getNeighbourhood,view,todoList) =>
           Pipeline ! ('getNeighbourhood,view,todoList)
 
-        case ('getNodeAttributes,uuid:String) =>
+        case ('getNodeAttributes,uuid) =>
           reply (Pipeline !? 'getNodesAttributes -> uuid)
 
         // TODO do something for this, it looks a bit creepy

@@ -115,14 +115,13 @@ trait Client {
     true
   }
 
-  def set(key:String, value:Any) = {
-    println("JavaScript asked for set("+key+","+value+")")
+  def set(key:String, value:Any) : Unit = {
+    println("-> set("+key+","+value+")")
     Server ! key -> value
-    true
   }
 
-  def setAs(key:String, value:java.lang.Object, t:String) = {
-    println("JavaScript asked for setAs(key:"+key+", value:"+value+", t:"+t+")")
+  def setAs(key:String, value:java.lang.Object, t:String) : Unit = {
+    println("-> setAs(key:"+key+", value:"+value+", t:"+t+")")
     t match {
        case "Int" => 
        Server ! key -> value.toString.toInt
@@ -134,13 +133,16 @@ trait Client {
         println("converting "+key+" : "+value+" to Boolean")
         Server ! key -> value.toString.toBoolean
        case "String" => Server ! key -> value.toString
+       case "Json" =>
+         val data = Json.parse(value.toString)
+         println("parsed Json to "+data)
+         Server ! key -> data
        case x => Server ! key -> value
     }
-    null
   }
-  def get(key:String) = {
-    println("JavaScript asked of get("+key+")")
-    (Server !? key)
+  def get(key:String) : java.lang.Object = {
+    println("-> get("+key+")")
+    (Server !? key).asInstanceOf[AnyRef]
   }
   /*
    def msgCb(action:String, args:String, cbId:Int) {

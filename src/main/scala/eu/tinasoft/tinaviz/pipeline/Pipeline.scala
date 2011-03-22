@@ -122,15 +122,21 @@ object Pipeline extends node.util.Actor {
           }
           reply(result)
 
-        case ("select", uuid: String) =>
-          println("selecting node: '" + uuid + "'")
+        case ("select", uuids: Array[String]) =>
+          println("selecting nodes: '" + uuids + "'")
 
-          if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
+          if (uuids == null | uuids.length == 0)
             layoutCache += ("selected" -> layoutCache.selected.map(c => false))
           else {
+            val uuidList = uuids.toList
             layoutCache = layoutCache + ("selected" -> layoutCache.uuid.zipWithIndex.map {
               case (_uuid, i) =>
-                val res = if (_uuid equals uuid) true else layoutCache.selected(i)
+                // quick & dirty..I  don't remember name of a better function, and I need to release tomorrow
+                var found = false
+                uuidList.foreach {
+                  case uuid =>  if (_uuid equals uuid)  found = true
+                }
+                val res = if (found) true else layoutCache.selected(i)
                 println("match: " + res)
                 res
             })
@@ -139,6 +145,27 @@ object Pipeline extends node.util.Actor {
 
           val selection = layoutCache.selectionAttributes
           println("selection: " + selection)
+          // todo: update everything
+
+          Browser ! "_callbackSelectionChanged" -> (selection, "left")
+
+          self ! "filter.view" -> data.get[String]("filter.view")
+
+        case ("select", uuid: String) =>
+
+          if (uuid == null | (uuid.equals(" ") || uuid.isEmpty))
+            layoutCache += ("selected" -> layoutCache.selected.map(c => false))
+          else {
+            layoutCache = layoutCache + ("selected" -> layoutCache.uuid.zipWithIndex.map {
+              case (_uuid, i) =>
+                val res = if (_uuid equals uuid) true else layoutCache.selected(i)
+                res
+            })
+            //layoutCache += (layoutCache.id(uuid), "select", true)
+          }
+
+          val selection = layoutCache.selectionAttributes
+          //println("selection: " + selection)
           // todo: update everything
 
           Browser ! "_callbackSelectionChanged" -> (selection, "left")
