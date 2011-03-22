@@ -73,7 +73,7 @@ object Pipeline extends node.util.Actor {
           updateScreen
 
         case ('getNodeAttributes, uuid: String) =>
-          println("Server: asked for 'getNodeAttributes " + uuid)
+        //println("Server: asked for 'getNodeAttributes " + uuid)
           reply(data.lessAttributes(uuid))
 
         case ('getNeighbourhood, view: String, todoList: List[String]) =>
@@ -111,7 +111,7 @@ object Pipeline extends node.util.Actor {
 
 
         case ('getNodes, view: String, category: String) =>
-          println("Server: asked for 'getNodes " + view + " " + category)
+        //println("Server: asked for 'getNodes " + view + " " + category)
           val all = (view match {
             case "meso" => layoutCache
             case any => data
@@ -125,19 +125,18 @@ object Pipeline extends node.util.Actor {
           }
           reply(result)
 
-        case ("select", uuids: Array[String]) =>
-          println("selecting nodes: '" + uuids + "'")
+        case ("select", uuidList: List[String]) =>
+        //println("selecting nodes: '" + uuidList + "'")
 
-          if (uuids == null | uuids.length == 0)
+          if (uuidList.size == 0)
             layoutCache += ("selected" -> layoutCache.selected.map(c => false))
           else {
-            val uuidList = uuids.toList
             layoutCache = layoutCache + ("selected" -> layoutCache.uuid.zipWithIndex.map {
               case (_uuid, i) =>
-                // quick & dirty..I  don't remember name of a better function, and I need to release tomorrow
+              // quick & dirty..I  don't remember name of a better function, and I need to release tomorrow
                 var found = false
                 uuidList.foreach {
-                  case uuid =>  if (_uuid equals uuid)  found = true
+                  case uuid => if (_uuid equals uuid) found = true
                 }
                 val res = if (found) true else layoutCache.selected(i)
                 println("match: " + res)
@@ -147,7 +146,7 @@ object Pipeline extends node.util.Actor {
           }
 
           val selection = layoutCache.selectionAttributes
-          println("selection: " + selection)
+          //println("selection: " + selection)
           // todo: update everything
 
           Browser ! "_callbackSelectionChanged" -> (selection, "left")
@@ -199,7 +198,7 @@ object Pipeline extends node.util.Actor {
           self ! "filter.view" -> data.get[String]("filter.view")
 
         case "recenter" =>
-          println("recentering now..")
+        //println("recentering now..")
           layoutCache = Functions.recenter(layoutCache)
           updateScreen
 
@@ -429,9 +428,9 @@ object Pipeline extends node.util.Actor {
 
     //f.position
     //f.size
-   // precompute stuff
+    // precompute stuff
 
-   f.warm
+    f.warm
 
 
     Main.graph.set(f)
