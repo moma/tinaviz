@@ -182,8 +182,8 @@ object PhysicLayout {
           val p = ps.getParticle(cj).position()
           val (x,y) = (p.x().toDouble,p.y().toDouble)
           val v = ps.getParticle(cj).velocity()
-          v.setX(Maths.limit(v.x().toDouble, -40, 40).toFloat)
-          v.setY(Maths.limit(v.y().toDouble, -40, 40).toFloat)
+          v.setX(Maths.limit(v.x().toDouble, -100, 100).toFloat)
+          v.setY(Maths.limit(v.y().toDouble, -100, 100).toFloat)
 
           (x,y)
         }
