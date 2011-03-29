@@ -93,8 +93,10 @@ object Server extends node.util.Actor {
           properties = defaultProperties
           val in = new Graph(properties ++ g.elements)
           properties += "input" -> in
+          println("Server: Pipeline.setInput(in)")
           Pipeline.setInput(in)
-          Workflow ! "filter.view" -> in.currentView
+          println("Server: Workflow ! 'graphImported")
+          Workflow ! 'graphImported
           Browser ! "_graphImportedCallback" -> "success"
         //PipelineBusy = false
 
@@ -107,13 +109,11 @@ object Server extends node.util.Actor {
         case ("export","gexf") =>
 
           val gexfExporter = new GEXF
-          gexfExporter.start
           gexfExporter ! Pipeline.output
 
         case ('open, pathOrURL: Any) =>
 
           val gexfLoader = new GEXF
-          gexfLoader.start
           gexfLoader ! pathOrURL
 
         case "recenter" =>

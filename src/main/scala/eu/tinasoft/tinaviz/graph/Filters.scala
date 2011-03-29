@@ -130,4 +130,27 @@ object Filters {
     }
     g + ("size" -> newSize)
   }
+
+      /**
+   * Do some pre-processing, then send the final scene to the View
+   * TODO: keep the Graph?
+   */
+  def clean(g:Graph) = {
+    // TODO: do that in another Actor, which will reply directly to our master
+    g + ("links" -> g.links.zipWithIndex.map {
+      case (links, i) =>
+        links.filter {
+          case (j, weight) =>
+          // in the case of mutual link, we have a bit of work to remove the link
+            if (g.hasThisLink(j, i)) {
+              // if i is bigger than j, we keep
+              Functions.isBiggerThan(g, i, j)
+              // in the case of non-mutual link (directed), there is nothing to do; we keep the link
+            } else {
+              true
+            }
+        }
+
+    }.toArray)
+  }
 }

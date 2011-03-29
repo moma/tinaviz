@@ -770,9 +770,16 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         if (id == -1) s else g.selected(id)
     }.toArray
 
+    val tmp3: Array[Boolean] = highlighted.zipWithIndex.map {
+      case (s, i) =>
+        val id = g.id(uuid(i))
+        if (id == -1) s else g.highlighted(id)
+    }.toArray
+
     Graph.make(elements ++ Map[String, Any](
       "position" -> tmp1,
-      "selected" -> tmp2) // need to recompute things
+      "selected" -> tmp2,
+      "highlighted" -> tmp3) // need to recompute things
     )
   }
 
@@ -808,9 +815,22 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         }
     }.toArray
 
+    val tmp3: Array[Boolean] = highlighted.zipWithIndex.map {
+      case (s, i) =>
+        val id = g.id(uuid(i))
+        if (id == -1) {
+          s
+        } else if (g.category(id).equalsIgnoreCase(category(i))) {
+          g.highlighted(id)
+        } else {
+          s
+        }
+    }.toArray
+
     Graph.make(elements ++ Map[String, Any](
       "position" -> tmp1,
-      "selected" -> tmp2) // need to recompute things
+      "selected" -> tmp2,
+      "highlighted" -> tmp3) // need to recompute things
     )
   }
 

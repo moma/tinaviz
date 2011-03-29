@@ -26,6 +26,8 @@ import java.net.{URLConnection, URL, Authenticator, PasswordAuthentication}
 
 class GEXF extends node.util.Actor {
 
+   start
+
   def act() {
 
       receive {

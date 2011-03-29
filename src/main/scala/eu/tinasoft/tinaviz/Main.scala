@@ -140,6 +140,7 @@ class Main extends TApplet with Client {
     //Server ! "camera.zoom" ->camera
 
     val g = Pipeline.output
+    //println("Main: Pipeline.output.nbNodes: "+Pipeline.output.nbNodes)
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
 

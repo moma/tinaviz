@@ -12,6 +12,7 @@ import org.daizoru._
 import eu.tinasoft._
 import tinaviz.graph.Graph
 import tinaviz.pipeline.Pipeline
+import tinaviz.pipeline.Workflow
 
 import tinaviz.Main
 import tinaviz.Server
@@ -27,11 +28,18 @@ object Layout extends node.util.Actor {
       while (true) {
         receive {
           case 'run =>
-              println("Layout: running")
-              // take current output (viewed graph), run a layout, then evaluate it to "warm up" the lazy's cache
-              Pipeline.setOutput(
-                    PhysicLayout.layout(Pipeline.output).toGraph
-              )
+              Workflow ! ('setLayout,
+                PhysicLayout.layout(
+                   ((Workflow !? 'getLayout) match {
+                       case g:Graph =>
+                         //println("Layout: got graph ("+g.nbNodes+")")
+                         g
+                       case any =>
+                         //println("Layout: empty graph..")
+                         new Graph
+                   })
+                ).toGraph )
+
               this ! 'run  // run layout as fast as possible
           case 'exit =>
               exit()
