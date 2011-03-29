@@ -99,7 +99,7 @@ object PhysicLayout {
 
       ps.clear
 
-      val gravity =  ps.makeParticle(1.0f, g.notSinglesCenter._1.toFloat, g.notSinglesCenter._2.toFloat, 0.0f)
+      val gravity =  ps.makeParticle(1.0f, 0.0f, 0.0f, 0.0f)
       //gravity.makeFixed
 
       val positionIndexSingleParticle = positionIndexSingle.filter {
@@ -143,7 +143,7 @@ object PhysicLayout {
                 }
 
             }
-            ps.makeAttraction(p1, gravity, 800f, 100f)
+            ps.makeAttraction(gravity, p1, 800f, 100f)
           }
       }
 
