@@ -135,6 +135,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val currentView = get[String]("filter.view")
   lazy val layout = get[String]("layout")
   lazy val pause = get[Boolean]("pause")
+  lazy val selectionRadius : Double = get[Double]("selectionRadius")
 
   lazy val baryCenter = Metrics baryCenter this
   lazy val selectionCenter = Metrics selectionCenter this
