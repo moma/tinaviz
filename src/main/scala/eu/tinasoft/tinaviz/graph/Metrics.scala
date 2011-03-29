@@ -152,6 +152,28 @@ object Metrics {
       (xMax, xMin, yMax, yMin)
     }
   }
+  /**
+   * Compute the extremums (X min, X max, Y min, Y max)
+   */
+  def extremumsSelection(g: Graph): (Double, Double, Double, Double) = {
+    if (g.position.size == 0) {
+      (0.0, 0.0, 0.0, 0.0)
+    } else {
+      var xMax = Double.MinValue
+      var xMin = Double.MaxValue
+      var yMax = Double.MinValue
+      var yMin = Double.MaxValue
+      val _selectedNodes = g.position.zipWithIndex filter { case (p,i) => g.selected(i) }
+      _selectedNodes foreach {
+        case ((x, y),i) =>
+          if (x < xMin) xMin = x
+          if (x > xMax) xMax = x
+          if (y < yMin) yMin = y
+          if (y > yMax) yMax = y
+      }
+      (xMax, xMin, yMax, yMin)
+    }
+  }
 
   def notSingleNodesDimension(g: Graph) : (Double, Double) = {
     if (g.position.size == 0) {

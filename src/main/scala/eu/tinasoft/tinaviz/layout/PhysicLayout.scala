@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package eu.tinasoft.tinaviz.graph
+package eu.tinasoft.tinaviz.layout
 
 import org.daizoru._
 import eu.tinasoft._
@@ -11,8 +11,9 @@ import traer.physics._
 
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
+import tinaviz.graph._
 
-object Layout {
+object PhysicLayout {
 
   val ps = new ParticleSystem(0f, 0.1f)
 
@@ -95,7 +96,6 @@ object Layout {
       //g.position.zipWithIndex map {
 
       // }
-
 
       ps.clear
 

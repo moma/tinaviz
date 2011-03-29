@@ -19,6 +19,7 @@ import tinaviz.pipeline._
 import tinaviz.util._
 import tinaviz.util.Color._
 import tinaviz.graph._
+import tinaviz.layout.Layout
 import math._
 
 
@@ -28,8 +29,6 @@ import math._
  * Only used when run from the command-line
  */
 object Main {
-
-  val graph = new AtomicReference(new Graph)
 
   /**
    * main method
@@ -53,6 +52,7 @@ object Main {
     */
 
   }
+
 }
 
 /**
@@ -91,8 +91,9 @@ class Main extends TApplet with Client {
      *  (Normally the byte codes will also be reloaded and the HTML file reread though Netscape has a problem with this.)
      */
     Browser.start
-    Pipeline.start
+    Workflow.start
     Server.start
+    Layout.start
 
 
     try {
@@ -104,7 +105,10 @@ class Main extends TApplet with Client {
         Server ! 'open -> new java.net.URL(
           // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/badgraph/gexf/PseudoInclusion_logJaccard_FET-graph.gexf"
           // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
-          "file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+          //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
+
+          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/package_test/gexf/Cooccurrences_sharedNGrams_FET-graph.gexf"
+
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
           //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
 
@@ -135,8 +139,7 @@ class Main extends TApplet with Client {
     Server ! "frameRate" -> frameRate.toInt
     //Server ! "camera.zoom" ->camera
 
-    // get some values in a non-blocking way (using futures)
-    val g = Main.graph.get
+    val g = Pipeline.output
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
 
@@ -188,7 +191,7 @@ class Main extends TApplet with Client {
 
     if (debug) {
       setColor(new Color(0.0, 0.0, 0.0))
-      setFontSize(9)
+      setFontSize(9, false)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
       text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
     }
@@ -337,7 +340,7 @@ class Main extends TApplet with Client {
         val y1 = p1._2
         val np1 = screenPosition(x1, y1)
         val l1 = g.label(i)
-        val h1 = setFontSize((r1 * getZoom).toInt)
+        val h1 = setFontSize((r1 * getZoom).toInt, g.selected(i))
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
         val weAreSelected = false // we don't care. else, use: g.selected(i)
@@ -349,7 +352,7 @@ class Main extends TApplet with Client {
             val y2 = p2._2
             val np2 = screenPosition(x2, y2)
             val l2 = g.label(j)
-            val h2 = setFontSize((r2 * getZoom).toInt)
+            val h2 = setFontSize((r2 * getZoom).toInt, g.selected(j))
             val w2 = textWidth(l2) /// getZoom //
             val whichIsSelected = false // we don't care. else, use: scene.graph.selected(j)
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1))
@@ -360,7 +363,7 @@ class Main extends TApplet with Client {
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
             if (i == j) false else (weTouchSomething && (whichIsLarger || whichIsSelected))
         }
-        setFontSize((r1 * getZoom).toInt)
+        setFontSize((r1 * getZoom).toInt, g.selected(i))
         val col = if (weAreSelected) {
           new Color(0.0, 1.0, 0.0).alpha(1.0)
         } else {
@@ -415,8 +418,8 @@ class Main extends TApplet with Client {
       Double) = ((p._1 - cp._1) / cz,
       (p._2 - cp._2) / cz)
 
-    val gwidth = abs(g.xMin - g.xMax) * getZoom // size to screen
-    val gheight = abs(g.yMax - g.yMin) * getZoom // size to screen
+    val gwidth = abs(if (mode.equals("selection") && g.selection.size > 0) (g.xMinSelection - g.xMaxSelection) else  (g.xMin - g.xMax)) * getZoom // size to screen
+    val gheight = abs(if (mode.equals("selection") && g.selection.size > 0) (g.yMinSelection - g.yMaxSelection) else  (g.yMin - g.yMax)) * getZoom // size to screen
     val graphSize = (gwidth, gheight) // size to screen
     val (xRatio, yRatio) = (gwidth / width, gheight / height)
     val ratio = max(xRatio, yRatio)

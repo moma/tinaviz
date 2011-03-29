@@ -155,6 +155,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val yMax = extremums._3
   lazy val yMin = extremums._4
 
+  lazy val extremumsSelection = Metrics extremumsSelection this
+  lazy val xMaxSelection = extremumsSelection._1
+  lazy val xMinSelection = extremumsSelection._2
+  lazy val yMaxSelection = extremumsSelection._3
+  lazy val yMinSelection = extremumsSelection._4
+
   lazy val nodeWeightExtremums = Metrics nodeWeightExtremums this
   lazy val minANodeWeight = nodeWeightExtremums._1
   lazy val maxANodeWeight = nodeWeightExtremums._2
@@ -323,7 +329,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   /**
    * Warm-up the lazy vals
    */
-  def warm {
+  def toGraph = {
    position
    renderNodeColor
    renderNodeBorderColor
@@ -333,7 +339,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    renderEdgeIndex
    renderEdgeWeight
    renderNodeShape
-
+   this
   }
 
   // hashcode will change if nodes/links are added/deleted

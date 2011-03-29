@@ -12,6 +12,7 @@ import tinaviz.io._
 import tinaviz.graph._
 import tinaviz.scene._
 import tinaviz.pipeline._
+import tinaviz.layout._
 
 import actors._
 import Actor._
@@ -60,8 +61,7 @@ object Server extends node.util.Actor {
     "screen.width" -> 100,
     "screen.height" -> 100,
     // final scene
-    "input" -> new Graph(),
-    "output" -> new Graph()
+    "input" -> new Graph()
   )
 
   var properties: Map[String, Any] = defaultProperties
@@ -79,7 +79,8 @@ object Server extends node.util.Actor {
         case 'exit =>
           println("exiting server")
           Browser ! 'exit
-          Pipeline ! 'exit
+          Layout ! 'exit
+          Workflow ! 'exit
           exit()
 
 
@@ -92,7 +93,8 @@ object Server extends node.util.Actor {
           properties = defaultProperties
           val in = new Graph(properties ++ g.elements)
           properties += "input" -> in
-          Pipeline ! in
+          Pipeline.setInput(in)
+          Workflow ! "filter.view" -> in.currentView
           Browser ! "_graphImportedCallback" -> "success"
         //PipelineBusy = false
 
@@ -104,9 +106,9 @@ object Server extends node.util.Actor {
         // import/export functions
         case ("export","gexf") =>
 
-          val gexfLoader = new GEXF
-          gexfLoader.start
-          gexfLoader ! properties("output")
+          val gexfExporter = new GEXF
+          gexfExporter.start
+          gexfExporter ! Pipeline.output
 
         case ('open, pathOrURL: Any) =>
 
@@ -114,30 +116,27 @@ object Server extends node.util.Actor {
           gexfLoader.start
           gexfLoader ! pathOrURL
 
-        case ('output, graph:Graph) =>
-          properties += "output" -> graph
-
         case "recenter" =>
-          Pipeline ! "recenter"
+          Workflow ! "recenter"
 
         case ("select", toBeSelected) =>
-          Pipeline ! "select" -> toBeSelected
+          Workflow ! "select" -> toBeSelected
           
         case("selectByPattern",pattern) =>
-          Pipeline ! "selectByPattern" -> pattern
+          Workflow ! "selectByPattern" -> pattern
           
         case("highlightByPattern",pattern) =>
-          Pipeline ! "highlightByPattern" -> pattern
+          Workflow ! "highlightByPattern" -> pattern
 
         case ('getNodes,view,category) =>
           println("Server: asekd for 'getNodes "+view+" "+category)
-          reply(Pipeline !? ('getNodes,view,category))
+          reply(Workflow !? ('getNodes,view,category))
 
         case ('getNeighbourhood,view,todoList) =>
-          Pipeline ! ('getNeighbourhood,view,todoList)
+          Workflow ! ('getNeighbourhood,view,todoList)
 
         case ('getNodeAttributes,uuid) =>
-          reply (Pipeline !? 'getNodesAttributes -> uuid)
+          reply (Workflow !? 'getNodesAttributes -> uuid)
 
         // TODO do something for this, it looks a bit creepy
         case ("filter.a.node.weight.min", value: Double) =>
@@ -190,7 +189,7 @@ object Server extends node.util.Actor {
           reply(properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._2)
 
         case ("camera.mouse", kind, side, count, position) =>
-          Pipeline ! ("camera.mouse", kind, side, count, position)
+          Workflow ! ("camera.mouse", kind, side, count, position)
 
         case ('updated, key: String, value: Any, previous: Any) =>
         // log("ignoring update of "+key)
@@ -199,7 +198,7 @@ object Server extends node.util.Actor {
             //case "camera.zoom" =>
             //case "camera.position" =>
             case "frameRate" =>
-            case any => Pipeline ! key -> value // update the Pipeline
+            case any => Workflow ! key -> value // update the Pipeline
           }
 
 

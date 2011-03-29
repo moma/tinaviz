@@ -29,6 +29,11 @@ class GEXF extends node.util.Actor {
   def act() {
 
       receive {
+
+        case 'exit =>
+          println("GEXF: exiting..")
+          exit()
+
         case url: URL => {
             println("Connecting to " + url)
             val conn = url.openConnection

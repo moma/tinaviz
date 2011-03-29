@@ -24,12 +24,13 @@ class Fonts(val p: PApplet,
             val min: Int = 8) {
 
   val fonts = for (i <- List.range(1, size+1)) yield p.createFont(fontName, i, true)
+  val boldFonts = for (i <- List.range(1, size+1)) yield p.createFont(fontName+" Bold", i, true)
 
   val defaultFont = fonts(defaultFontSize)
 
-  def get(s: Int) = {
+  def get(s: Int, bold: Boolean) = {
     val sz = if (s < min) min else (if (s >= size) (size - 1) else s)
-    (fonts(sz),sz)
+    ((if (bold) boldFonts(sz) else fonts(sz)), sz)
   }
 
 }
@@ -188,13 +189,13 @@ class TApplet extends PApplet with MouseWheelListener {
     background(c.h.toFloat, c.s.toFloat, c.b.toFloat, c.a.toFloat)
   }
 
-  protected def setFontSize(size: Int) : Int = {
-    val fsz = _fonts.get(size.toInt)
+  protected def setFontSize(size: Int, bold: Boolean) : Int = {
+    val fsz = _fonts.get(size.toInt, bold)
     textFont(fsz._1)
     fsz._2
   }
-  protected def tryFontSize(size: Int) : Int = {
-    val fsz = _fonts.get(size.toInt)
+  protected def tryFontSize(size: Int, bold: Boolean) : Int = {
+    val fsz = _fonts.get(size.toInt, bold)
     //textFont(fsz._1)
     fsz._2
   }
