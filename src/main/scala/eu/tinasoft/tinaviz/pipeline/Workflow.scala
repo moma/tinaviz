@@ -115,6 +115,7 @@ object Workflow extends node.util.Actor {
 
         case ("select", uuidList: List[String]) =>
         //println("selecting nodes: '" + uuidList + "'")
+          val in = Pipeline.input
           val out = Pipeline.output
           Pipeline.setOutput(
           if (uuidList.size == 0) {
@@ -132,9 +133,8 @@ object Workflow extends node.util.Actor {
                   res
               })
           })
-            //layoutCache += (layoutCache.id(uuid), "select", true)
           Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
-          self ! "filter.view" -> Pipeline.input.currentView
+          self ! "filter.view" -> in.currentView
 
         case ("select", uuid: String) =>
           val out = Pipeline.output
@@ -148,10 +148,9 @@ object Workflow extends node.util.Actor {
                   res
               })
             })
-            //layoutCache += (layoutCache.id(uuid), "select", true)
 
           Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
-          self ! "filter.view" -> Pipeline.input.currentView
+          //self ! "filter.view" -> Pipeline.input.currentView
 
         case ("selectByPattern", pattern: String) =>
           val out = Pipeline.output
