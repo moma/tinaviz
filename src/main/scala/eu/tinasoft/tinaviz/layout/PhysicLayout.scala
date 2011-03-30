@@ -115,7 +115,7 @@ object PhysicLayout {
                   else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f) // we repulse unrelated nodes
                 }
             }
-            ps.makeAttraction(gravity, p1, 400f, 10f) // apply the gravity
+            // ps.makeAttraction(p1, gravity, 300f, 10f) // apply the gravity
           }
       }
     } // end hash changed
@@ -133,13 +133,13 @@ object PhysicLayout {
 
 
     // fix the center
-    ps.getParticle(0).position().set( 0.0f, 0.0f, 0.0f )
+    ps.getParticle(0).position().set(0.0f, 0.0f, 0.0f )
 
     //println("running step (" + ps.numberOfParticles + " particles)..")
     ps.tick(1.0f)
     val dim = Metrics.notSingleNodesDimension(g)
-    System.out.println("dim: "+dim)
-    val gDiameter = math.max(dim._1, dim._2) * 0.7
+
+    val gDiameter = math.max(dim._1, dim._2) * 0.6
     //var activ = 0.0
     var ci = 0
     var cj = 0

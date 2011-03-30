@@ -391,9 +391,6 @@ class Main extends TApplet with Client {
    * Recenter
    */
   private def _recenter(g: Graph, mode: String) {
-
-    //println("recentering? " + mode)
-
     mode match {
       case "all" =>
       case "selection" =>
@@ -404,30 +401,22 @@ class Main extends TApplet with Client {
         return
     }
     //println("recentering will be done!")
-    val w = width.toDouble - 40
-    val h = height.toDouble - 40
+    val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
+    val (cz,cp) = (getZoom,getPosition)
 
-    val cz = getZoom
-    val cp = getPosition
-
-    def model2screen(p: (Double,
-      Double)): (Int,
-      Int) = (((p._1 + cp._1) * cz).toInt,
-      ((p._2 + cp._2) * cz).toInt)
-    def screen2model(p: (Double,
-      Double)): (Double,
-      Double) = ((p._1 - cp._1) / cz,
-      (p._2 - cp._2) / cz)
+    def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
+    def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
 
     val gwidth = abs(if (mode.equals("selection") && g.selection.size > 0) (g.xMinSelection - g.xMaxSelection) else  (g.xMin - g.xMax)) * getZoom // size to screen
     val gheight = abs(if (mode.equals("selection") && g.selection.size > 0) (g.yMinSelection - g.yMaxSelection) else  (g.yMin - g.yMax)) * getZoom // size to screen
     val graphSize = (gwidth, gheight) // size to screen
-    val (xRatio, yRatio) = (gwidth / width, gheight / height)
+    val (xRatio, yRatio) = (gwidth / w, gheight / h)
     val ratio = max(xRatio, yRatio)
     if (abs(ratio) > 0.001) {
       val pos = if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.notSinglesCenter
-      var translate = new PVector(width / 2.0f, height / 2.0f, 0)
+      var translate = new PVector(w.toFloat / 2.0f, h.toFloat / 2.0f, 0)
       translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
+      translate.set(translate.x, translate.y, 0) // FIXME ugly hack, seems a bugs from the browser..
       updatePositionSilent(translate)
       if (ratio != 0.0) updateZoomSilent(getZoom / ratio)
     }
