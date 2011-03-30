@@ -48,21 +48,11 @@ object PhysicLayout {
    * Compute the layout
    */
   def tinaforce(g: Graph): Graph = {
-
     if (g.nbNodes == 0) return g
+    val springFactor = if (g.nbEdges > 20000) { 0.005f  } else {  0.01f } // 0.02 is better..
 
-
-    val springFactor = if (g.nbEdges > 20000) {
-      0.005f
-    } else {
-      0.01f // 0.02 is better..
-    }
     //since I can't normalize weight, it seems I have to adapt the drag myself
-    val drag = if (g.nbEdges > 20000) {
-      0.2
-    } else {
-      0.4
-    }
+    val drag = if (g.nbEdges > 20000) { 0.2 } else { 0.4 }
     //println("setting drag to " + drag)
     //ps.setDrag(drag.toFloat)
 
@@ -80,27 +70,21 @@ object PhysicLayout {
     val maxEdges = 3000.0
     val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
 
-    //println("distInterval: "+distInterval)
-
     //println("running forceVector on "+nbNodes+" nodes")
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
     val cooling = 1.0
-    val positionIndexSingle = g.position.zipWithIndex map {
-      case (p, i) => (p, i, g.isSingle(i))
-    }
+    val positionIndexSingle = g.position.zipWithIndex map { case (p, i) => (p, i, g.isSingle(i)) }
 
     if (g.hashed != lastHash) {
       lastHash = g.hashed
       //println("hash changed, regenerating a particle system..")
-
       //g.position.zipWithIndex map {
 
       // }
 
-      ps.clear
-
+      ps.clear // we clean everything, actually.. this could be optimized
       val gravity =  ps.makeParticle(1.0f, 0.0f, 0.0f, 0.0f)
-      //gravity.makeFixed
+      gravity.makeFixed
 
       val positionIndexSingleParticle = positionIndexSingle.filter {
         case (p, i, s) => !s
@@ -109,20 +93,14 @@ object PhysicLayout {
       }
 
       // every node are repulsing each other (negative attraction)
-      positionIndexSingleParticle foreach {
-        case (pos1, i1, s1, p1) =>
-          if (!s1) {
-            positionIndexSingleParticle foreach {
-              case (pos2, i2, s2, p2) =>
-
+      positionIndexSingleParticle foreach { case (pos1, i1, s1, p1) =>
+            if (!s1) {
+            positionIndexSingleParticle foreach { case (pos2, i2, s2, p2) =>
                 if (!s2 && i2 != i1) {
-                  // if we have a link, we create a sprinf
-                  if (g.hasThisLink(i1, i2)) {
-
+                  if (g.hasThisLink(i1, i2)) { // if we have a link, we create a spring
                     val minMaxInterval = g.category(i1) match {
                       case "Document" => aMinMaxWeights
                       case "NGram" => bMinMaxWeights
-
                     }
                     // Rest Length - the spring wants to be at this length and acts on the particles to push or pull them exactly this far apart at all times.
                     val l = Maths.map(g.links(i1)(i2), minMaxInterval, distInterval).toFloat
@@ -132,22 +110,14 @@ object PhysicLayout {
 
                     // Damping - If springs have high damping they don't overshoot and they settle down quickly, with low damping springs oscillate.
                     val d = Maths.map(g.links(i1)(i2), minMaxInterval, (0.01,0.015)).toFloat
-
-
-                    //  (float strength, float damping, float restLength)
-                    ps.makeSpring(p1, p2, s, d, l) // 10.0f
+                    ps.makeSpring(p1, p2, s, d, l) // 10.0f (float strength, float damping, float restLength)
                   }
-                  // we repulse unrelated nodes
-                  else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f)
-
+                  else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f) // we repulse unrelated nodes
                 }
-
             }
-             ps.makeAttraction(gravity, p1, 800f, 100f)
+            ps.makeAttraction(gravity, p1, 400f, 10f) // apply the gravity
           }
       }
-
-
     } // end hash changed
 
     // if a position has changed
@@ -161,8 +131,9 @@ object PhysicLayout {
         if (p.x != x || p.y != y) p.set(x, y, z)
     }*/
 
+
     // fix the center
-    ps.getParticle(0).position().set( g.notSinglesCenter._1.toFloat, g.notSinglesCenter._2.toFloat, 0.0f )
+    ps.getParticle(0).position().set( 0.0f, 0.0f, 0.0f )
 
     //println("running step (" + ps.numberOfParticles + " particles)..")
     ps.tick(1.0f)
@@ -172,7 +143,7 @@ object PhysicLayout {
     //var activ = 0.0
     var ci = 0
     var cj = 0
-    g + ("position" -> (positionIndexSingle map {
+    val h = g + ("position" -> (positionIndexSingle map {
       case (nodePosition, i, s) =>
         if (s) {
           ci += 1
@@ -194,6 +165,18 @@ object PhysicLayout {
           (x,y)
         }
     }))
+
+    h + ("position" -> (h.position.zipWithIndex map {
+          case (position,i) =>
+          val r = (position._1 - h.baryCenter._1, position._2 - h.baryCenter._2)
+
+          // now we "patch" the physical engine to fix the positions
+          val p = ps.getParticle(cj).position()
+          p.setX(r._1.toFloat)
+          p.setY(r._2.toFloat)
+
+          r
+     }))
   }
 
   /**

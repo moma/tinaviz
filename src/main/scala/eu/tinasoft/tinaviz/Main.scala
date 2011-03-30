@@ -404,8 +404,8 @@ class Main extends TApplet with Client {
         return
     }
     //println("recentering will be done!")
-    val w = width.toDouble
-    val h = height.toDouble
+    val w = width.toDouble - 40
+    val h = height.toDouble - 40
 
     val cz = getZoom
     val cp = getPosition
