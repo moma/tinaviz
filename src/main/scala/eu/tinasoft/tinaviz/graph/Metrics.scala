@@ -46,7 +46,6 @@ object Metrics {
   }
 
 
-
   /**
    * Compute the number of edges
    */
@@ -152,6 +151,7 @@ object Metrics {
       (xMax, xMin, yMax, yMin)
     }
   }
+
   /**
    * Compute the extremums (X min, X max, Y min, Y max)
    */
@@ -159,50 +159,60 @@ object Metrics {
     if (g.position.size == 0) {
       (0.0, 0.0, 0.0, 0.0)
     } else {
-      var xMax = Double.MinValue
-      var xMin = Double.MaxValue
-      var yMax = Double.MinValue
-      var yMin = Double.MaxValue
-      val _selectedNodes = g.position.zipWithIndex filter { case (p,i) => g.selected(i) }
-      _selectedNodes foreach {
-        case ((x, y),i) =>
-          if (x < xMin) xMin = x
-          if (x > xMax) xMax = x
-          if (y < yMin) yMin = y
-          if (y > yMax) yMax = y
+      val _selectedNodes = g.position.zipWithIndex filter {
+        case (p, i) => g.selected(i)
       }
-      (xMax, xMin, yMax, yMin)
+      if (_selectedNodes.size == 0) {
+        (0.0, 0.0, 0.0, 0.0)
+      } else {
+        var xMax = Double.MinValue
+        var xMin = Double.MaxValue
+        var yMax = Double.MinValue
+        var yMin = Double.MaxValue
+        _selectedNodes foreach {
+          case ((x, y), i) =>
+            if (x < xMin) xMin = x
+            if (x > xMax) xMax = x
+            if (y < yMin) yMin = y
+            if (y > yMax) yMax = y
+        }
+        (xMax, xMin, yMax, yMin)
+      }
     }
   }
 
-  def notSingleNodesDimension(g: Graph) : (Double, Double) = {
+  def notSingleNodesDimension(g: Graph): (Double, Double) = {
     if (g.position.size == 0) {
       (0.0, 0.0)
     } else {
-          val notSingles = g.position.zipWithIndex filter { case (pos,i) => !g.isSingle(i) }
-    val N = notSingles.size.toDouble
-
-      var xMax = Double.MinValue
-      var xMin = Double.MaxValue
-      var yMax = Double.MinValue
-      var yMin = Double.MaxValue
-      notSingles foreach {
-        case ((x, y),i) =>
-          if (x < xMin) xMin = x
-          if (x > xMax) xMax = x
-          if (y < yMin) yMin = y
-          if (y > yMax) yMax = y
+      val notSingles = g.position.zipWithIndex filter {
+        case (pos, i) => !g.isSingle(i)
       }
-      (abs(xMax - xMin), abs(yMax - yMin))
-
+      if (notSingles.size == 0.0) {
+        (0.0, 0.0)
+      } else {
+        var xMax = Double.MinValue
+        var xMin = Double.MaxValue
+        var yMax = Double.MinValue
+        var yMin = Double.MaxValue
+        notSingles foreach {
+          case ((x, y), i) =>
+            if (x < xMin) xMin = x
+            if (x > xMax) xMax = x
+            if (y < yMin) yMin = y
+            if (y > yMax) yMax = y
+        }
+        (abs(xMax - xMin), abs(yMax - yMin))
+      }
     }
   }
+
   /**
    * Compute the node weight extremums (min node weight, max node weight)
    * return a Tuple of Double
    */
   def nodeWeightExtremums(g: Graph): (Double, Double, Double, Double) = {
-    if (g.position.size == 0) {
+    if (g.weight.size == 0) {
       (0.0, 0.0, 0.0, 0.0)
     } else {
       var amax = Double.MinValue
@@ -272,7 +282,9 @@ object Metrics {
    */
   def selectionCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
-    val _selectedNodes = g.position.zipWithIndex filter { case (p,i) => g.selected(i) }
+    val _selectedNodes = g.position.zipWithIndex filter {
+      case (p, i) => g.selected(i)
+    }
     val N = _selectedNodes.size.toDouble
     _selectedNodes foreach {
       case ((x, y), i) => p = (p._1 + x, p._2 + y)
@@ -280,12 +292,14 @@ object Metrics {
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
   }
 
-    /**
+  /**
    * Compute a graph's bary center, taking only single nodes in account
    */
   def singlesCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
-    val singles = g.position.zipWithIndex filter { case (p,i) => g.isSingle(i) }
+    val singles = g.position.zipWithIndex filter {
+      case (p, i) => g.isSingle(i)
+    }
     val N = singles.size.toDouble
     singles foreach {
       case ((x, y), i) => p = (p._1 + x, p._2 + y)
@@ -293,12 +307,14 @@ object Metrics {
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
   }
 
-    /**
+  /**
    * Compute a graph's bary center, taking only nodes not singles in account
    */
   def notSinglesCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
-    val notSingles = g.position.zipWithIndex filter { case (p,i) => !g.isSingle(i) }
+    val notSingles = g.position.zipWithIndex filter {
+      case (p, i) => !g.isSingle(i)
+    }
     val N = notSingles.size.toDouble
     notSingles foreach {
       case ((x, y), i) => p = (p._1 + x, p._2 + y)

@@ -35,6 +35,26 @@ class Fonts(val p: PApplet,
 
 }
 
+/*
+class PDFFonts(val p: PApplet,
+            val fontName: String = PGraphicsPDF.list()(0),//"Arial",
+            val size: Int = 100,
+            val defaultFontSize: Int = 12,
+            val min: Int = 8) {
+
+  val fonts = for (i <- List.range(1, size+1)) yield p.createFont(fontName, i, true)
+  val boldFonts = for (i <- List.range(1, size+1)) yield p.createFont(fontName, i, true)
+
+  val defaultFont = fonts(defaultFontSize)
+
+  def get(s: Int, bold: Boolean) = {
+    val sz = if (s < min) min else (if (s >= size) (size - 1) else s)
+    ((if (bold) boldFonts(sz) else fonts(sz)), sz)
+  }
+
+}
+*/
+
 /**
  * Main class
  *

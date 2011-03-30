@@ -143,7 +143,7 @@ object PhysicLayout {
                 }
 
             }
-            ps.makeAttraction(gravity, p1, 800f, 100f)
+             ps.makeAttraction(gravity, p1, 800f, 100f)
           }
       }
 
@@ -167,6 +167,7 @@ object PhysicLayout {
     //println("running step (" + ps.numberOfParticles + " particles)..")
     ps.tick(1.0f)
     val dim = Metrics.notSingleNodesDimension(g)
+    System.out.println("dim: "+dim)
     val gDiameter = math.max(dim._1, dim._2) * 0.7
     //var activ = 0.0
     var ci = 0
@@ -175,8 +176,13 @@ object PhysicLayout {
       case (nodePosition, i, s) =>
         if (s) {
           ci += 1
+          if (g.nbNodes > 0) {
           (g.notSinglesCenter._1 + gDiameter * math.cos(math.Pi / 2 + 2 * math.Pi * ci / g.nbNodes),
             g.notSinglesCenter._2 + gDiameter * math.sin(math.Pi / 2 + 2 * math.Pi * ci / g.nbNodes))
+          }  else {
+          (g.notSinglesCenter._1 + gDiameter * math.cos(math.Pi / 2 + 2 * math.Pi * ci),
+            g.notSinglesCenter._2 + gDiameter * math.sin(math.Pi / 2 + 2 * math.Pi * ci))
+          }
         } else {
           cj += 1 // okay to not start with zero here, because slot 0 is already used by gravity
           val p = ps.getParticle(cj).position()
