@@ -143,7 +143,8 @@ object PhysicLayout {
     //var activ = 0.0
     var ci = 0
     var cj = 0
-    val h = g + ("position" -> (positionIndexSingle map {
+
+    val h = if (g.pause) g else { g + ("position" -> (positionIndexSingle map {
       case (nodePosition, i, s) =>
         if (s) {
           ci += 1
@@ -164,7 +165,8 @@ object PhysicLayout {
 
           (x,y)
         }
-    }))
+      }))
+    }
 
     h + ("position" -> (h.position.zipWithIndex map {
           case (position,i) =>

@@ -254,7 +254,7 @@ object Workflow extends node.util.Actor {
                     // zoom?
                   }
                 case 'Simple =>
-                  println("Workflow: updating view (is it OK?)")
+                  //println("Workflow: updating view (is it OK?)")
                   //self ! "filter.view" -> out2.currentView
               }
 

@@ -116,12 +116,12 @@ trait Client {
   }
 
   def set(key:String, value:Any) : Unit = {
-    println("-> set("+key+","+value+")")
+    //println("-> set("+key+","+value+")")
     Server ! key -> value
   }
 
   def setAs(key:String, value:java.lang.Object, t:String) : Unit = {
-    println("-> setAs(key:"+key+", value:"+value+", t:"+t+")")
+    //println("-> setAs(key:"+key+", value:"+value+", t:"+t+")")
     t match {
        case "Int" => 
        Server ! key -> value.toString.toInt
@@ -135,13 +135,13 @@ trait Client {
        case "String" => Server ! key -> value.toString
        case "Json" =>
          val data = Json.parse(value.toString)
-         println("parsed Json to "+data)
+         //println("parsed Json to "+data)
          Server ! key -> data
        case x => Server ! key -> value
     }
   }
   def get(key:String) : java.lang.Object = {
-    println("-> get("+key+")")
+    //println("-> get("+key+")")
     (Server !? key).asInstanceOf[AnyRef]
   }
   /*
