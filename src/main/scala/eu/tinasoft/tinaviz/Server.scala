@@ -101,32 +101,15 @@ object Server extends node.util.Actor {
         //PipelineBusy = false
 
 
-        case x:scala.xml.Elem =>
-          //println("Got XML: "+x)
-          Browser ! 'forceDownload -> x.toString
-          
-        // import/export functions
-        case ("export","gexf") =>
+        case x:scala.xml.Elem => Browser ! 'forceDownload -> x.toString
 
-          val gexfExporter = new GEXF
-          gexfExporter ! Pipeline.output
+        case ("export","gexf") =>  (new GEXF) ! Pipeline.output
+        case ('open, pathOrURL: Any) => (new GEXF) ! pathOrURL
 
-        case ('open, pathOrURL: Any) =>
-
-          val gexfLoader = new GEXF
-          gexfLoader ! pathOrURL
-
-        case "recenter" =>
-          Workflow ! "recenter"
-
-        case ("select", toBeSelected) =>
-          Workflow ! "select" -> toBeSelected
-          
-        case("selectByPattern",pattern) =>
-          Workflow ! "selectByPattern" -> pattern
-          
-        case("highlightByPattern",pattern) =>
-          Workflow ! "highlightByPattern" -> pattern
+        case "recenter"                      => Workflow ! "recenter"
+        case ("select", toBeSelected)        => Workflow ! "select"              -> toBeSelected
+        case ("selectByPattern", pattern)    => Workflow ! "selectByPattern"     -> pattern
+        case ("highlightByPattern", pattern) => Workflow ! "highlightByPattern"  -> pattern
 
         case ('getNodes,view,category) =>
           println("Server: asekd for 'getNodes "+view+" "+category)
@@ -137,56 +120,6 @@ object Server extends node.util.Actor {
 
         case ('getNodeAttributes,uuid) =>
           reply (Workflow !? 'getNodesAttributes -> uuid)
-
-        // TODO do something for this, it looks a bit creepy
-        case ("filter.a.node.weight.min", value: Double) =>
-          self ! (("filter.a.node.weight", (value, properties("filter.a.node.weight").asInstanceOf[(Double, Double)]._2)))
-
-        case ("filter.a.node.weight.max", value: Double) =>
-          self ! (("filter.a.node.weight", (properties("filter.a.node.weight").asInstanceOf[(Double, Double)]._1, value)))
-
-        case ("filter.a.edge.weight.min", value: Double) =>
-          self ! (("filter.a.edge.weight", (value, properties("filter.a.edge.weight").asInstanceOf[(Double, Double)]._2)))
-
-        case ("filter.a.edge.weight.max", value: Double) =>
-          self ! (("filter.a.edge.weight", (properties("filter.a.edge.weight").asInstanceOf[(Double, Double)]._1, value)))
-
-        case "filter.a.node.weight.min" =>
-          reply(properties("filter.a.node.weight").asInstanceOf[(Double, Double)]._1)
-
-        case "filter.a.node.weight.max" =>
-          reply(properties("filter.a.node.weight").asInstanceOf[(Double, Double)]._2)
-
-        case "filter.a.edge.weight.min" =>
-          reply(properties("filter.a.edge.weight").asInstanceOf[(Double, Double)]._1)
-
-        case "filter.a.edge.weight.max" =>
-          reply(properties("filter.a.edge.weight").asInstanceOf[(Double, Double)]._2)
-
-        // TODO do something for this, it looks a bit creepy
-        case ("filter.b.node.weight.min", value: Double) =>
-          self ! (("filter.b.node.weight", (value, properties("filter.b.node.weight").asInstanceOf[(Double, Double)]._2)))
-
-        case ("filter.b.node.weight.max", value: Double) =>
-          self ! (("filter.b.node.weight", (properties("filter.b.node.weight").asInstanceOf[(Double, Double)]._1, value)))
-
-        case ("filter.b.edge.weight.min", value: Double) =>
-          self ! (("filter.b.edge.weight", (value, properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._2)))
-
-        case ("filter.b.edge.weight.max", value: Double) =>
-          self ! (("filter.b.edge.weight", (properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._1, value)))
-
-        case "filter.b.node.weight.min" =>
-          reply(properties("filter.b.node.weight").asInstanceOf[(Double, Double)]._1)
-
-        case "filter.b.node.weight.max" =>
-          reply(properties("filter.b.node.weight").asInstanceOf[(Double, Double)]._2)
-
-        case "filter.b.edge.weight.min" =>
-          reply(properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._1)
-
-        case "filter.b.edge.weight.max" =>
-          reply(properties("filter.b.edge.weight").asInstanceOf[(Double, Double)]._2)
 
         case ("camera.mouse", kind, side, count, position) =>
           Workflow ! ("camera.mouse", kind, side, count, position)

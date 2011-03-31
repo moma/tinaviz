@@ -115,12 +115,31 @@ trait Client {
     true
   }
 
-  def set(key:String, value:Any) : Unit = {
-    //println("-> set("+key+","+value+")")
-    Server ! key -> value
+  /**
+   * Set a tuple of size two (both elements must be of the same type)
+   */
+    def sendTuple2(key:String, value1:java.lang.Object, value2:java.lang.Object, t:String) : Unit = {
+    //println("-> setAs(key:"+key+", value:"+value+", t:"+t+")")
+    t match {
+       case "Int" =>
+       Server ! key -> (value1.toString.toInt, value2.toString.toInt)
+       case "Float" =>
+       Server ! key -> (value1.toString.toFloat, value2.toString.toFloat)
+       case "Double" =>
+       Server ! key -> (value1.toString.toDouble, value2.toString.toDouble)
+       case "Boolean" =>
+        println("converting "+key+" : ("+value1+","+value2+") to Boolean")
+        Server ! key -> (value1.toString.toBoolean,value2.toString.toBoolean)
+       case "String" => Server ! key -> (value1.toString, value2.toString)
+       case "Json" =>
+         val data = (Json.parse(value1.toString),Json.parse(value2.toString))
+         //println("parsed Json to "+data)
+         Server ! key -> data
+       case x => Server ! key -> (value1, value2)
+    }
   }
 
-  def setAs(key:String, value:java.lang.Object, t:String) : Unit = {
+  def send(key:String, value:java.lang.Object, t:String) : Unit = {
     //println("-> setAs(key:"+key+", value:"+value+", t:"+t+")")
     t match {
        case "Int" => 
