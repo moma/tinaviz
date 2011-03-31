@@ -189,7 +189,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case 'selected => color.standard
           case 'highlighted => color.standard
           case 'unselected => color.lighter.saturation(0.25)
-          case 'default => color.light
+          case 'default => color.lighter.saturation(0.25)
         }
     }
   }
@@ -210,7 +210,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case 'selected => new Color(0.0, 0.0, 0.23)
           case 'highlighted => new Color(0.0, 0.0, 0.23)
           case 'unselected => color.darker.saturation(0.3)
-          case 'default => color.darker
+          case 'default => color.darker.saturation(0.3)
         }
     }
   }
@@ -266,9 +266,14 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
                 case 'unselected =>
 
                   ab.blend(bb).saturateBy(0.8).alpha(alph)//color.lighter.saturation(0.25)
-                case 'default =>
 
-                  a.blend(b).alpha(alph)//color.light
+                case 'default =>
+                   ab.blend(bb).saturateBy(0.8).alpha(alph)
+                   // ab.blend(bb).saturateBy(0.8).alpha(alph)
+                   //a.blend(b)//.alpha(alph)//color.light
+
+                   // old mode
+                  //a.blend(b).alpha(alph)//color.light
                }
 
             } else {
@@ -805,9 +810,29 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     /**
    * TODO refactor to use a generic field update function
    */
+  def updateSizeWithCategory(g: Graph) : Graph = {
+
+    val tmp1: Array[Double] = size.zipWithIndex.map {
+      case (elem, i) =>
+        val id = g.id(uuid(i))
+        if (id == -1) {
+          elem
+        } else if (g.category(id).equalsIgnoreCase(category(i))) {
+          g.size(id)
+        } else {
+          elem
+        }
+    }.toArray
+
+    Graph.make(elements ++ Map[String, Any](
+      "size" -> tmp1) // need to recompute things
+    )
+  }
+
+    /**
+   * TODO refactor to use a generic field update function
+   */
   def updateSelectedWithCategory(g: Graph) : Graph = {
-
-
 
     val tmp2: Array[Boolean] = selected.zipWithIndex.map {
       case (s, i) =>
@@ -820,7 +845,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           s
         }
     }.toArray
-
 
     Graph.make(elements ++ Map[String, Any](
       "selected" -> tmp2) // need to recompute things

@@ -282,17 +282,25 @@ object Workflow extends node.util.Actor {
         case (key: String, value: Any) =>
            Pipeline.applyKey(key, value)
 
+           /*
+           object NodeSize {         
+               def unapply(v:String):Option[String] = { 
+                  if ()
+               }
+           }*/
+
+
           key match {
             case "filter.view" =>
               val out = Pipeline.output
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
+              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
             case "filter.node.category" =>
               val out = Pipeline.output
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
+              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
@@ -325,20 +333,24 @@ object Workflow extends node.util.Actor {
               Pipeline.setNodeWeightCache(Filters.nodeWeight(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+
             case "filter.a.node.size" =>
-              val out = Pipeline.output
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out)))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+              Pipeline.setOutput (
+                Pipeline.output.updateSizeWithCategory (
+                  Filters.weightToSize (
+                    Pipeline.categoryCache
+                  )
+                )
+              )
+
             case "filter.b.node.size" =>
-              val out = Pipeline.output
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out)))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+              Pipeline.setOutput (
+                Pipeline.output.updateSizeWithCategory (
+                  Filters.weightToSize (
+                    Pipeline.categoryCache
+                  )
+                )
+              )
 
             case any => // we don't need to update the scene for other attributes
           }

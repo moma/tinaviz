@@ -341,7 +341,8 @@ class Main extends TApplet with Client {
         val y1 = p1._2
         val np1 = screenPosition(x1, y1)
         val l1 = g.label(i)
-        val h1 = setFontSize((r1 * getZoom).toInt, g.selected(i))
+        val b1 =  (g.selected(i) || g.highlighted(i)) // F1 the text should be bold if node selected or highlighted
+        val h1 = setFontSize((r1 * getZoom).toInt, b1)
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
         val weAreSelected = false // we don't care. else, use: g.selected(i)
@@ -353,7 +354,8 @@ class Main extends TApplet with Client {
             val y2 = p2._2
             val np2 = screenPosition(x2, y2)
             val l2 = g.label(j)
-            val h2 = setFontSize((r2 * getZoom).toInt, g.selected(j))
+            val b2 = (g.selected(j) || g.highlighted(j)) // SIDE EFFECT of F1
+            val h2 = setFontSize((r2 * getZoom).toInt, b2)
             val w2 = textWidth(l2) /// getZoom //
             val whichIsSelected = false // we don't care. else, use: scene.graph.selected(j)
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1))
@@ -364,7 +366,7 @@ class Main extends TApplet with Client {
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
             if (i == j) false else (weTouchSomething && (whichIsLarger || whichIsSelected))
         }
-        setFontSize((r1 * getZoom).toInt, g.selected(i))
+        setFontSize((r1 * getZoom).toInt, b1)
         val col = if (weAreSelected) {
           new Color(0.0, 1.0, 0.0).alpha(1.0)
         } else {
