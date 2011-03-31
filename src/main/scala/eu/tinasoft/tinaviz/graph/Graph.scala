@@ -797,6 +797,18 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         }
     }.toArray
 
+    Graph.make(elements ++ Map[String, Any](
+      "position" -> tmp1) // need to recompute things
+    )
+  }
+
+    /**
+   * TODO refactor to use a generic field update function
+   */
+  def updateSelectedWithCategory(g: Graph) : Graph = {
+
+
+
     val tmp2: Array[Boolean] = selected.zipWithIndex.map {
       case (s, i) =>
         val id = g.id(uuid(i))
@@ -811,7 +823,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
 
     Graph.make(elements ++ Map[String, Any](
-      "position" -> tmp1,
       "selected" -> tmp2) // need to recompute things
     )
   }

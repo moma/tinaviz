@@ -146,15 +146,10 @@ object PhysicLayout {
 
     val h = if (g.pause) g else { g + ("position" -> (positionIndexSingle map {
       case (nodePosition, i, s) =>
-        if (s) {
+        if (s && g.nbNodes > 0) {
           ci += 1
-          if (g.nbNodes > 0) {
           (g.notSinglesCenter._1 + gDiameter * math.cos(math.Pi / 2 + 2 * math.Pi * ci / g.nbNodes),
             g.notSinglesCenter._2 + gDiameter * math.sin(math.Pi / 2 + 2 * math.Pi * ci / g.nbNodes))
-          }  else {
-          (g.notSinglesCenter._1 + gDiameter * math.cos(math.Pi / 2 + 2 * math.Pi * ci),
-            g.notSinglesCenter._2 + gDiameter * math.sin(math.Pi / 2 + 2 * math.Pi * ci))
-          }
         } else {
           cj += 1 // okay to not start with zero here, because slot 0 is already used by gravity
           val p = ps.getParticle(cj).position()

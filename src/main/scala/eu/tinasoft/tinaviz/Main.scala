@@ -239,7 +239,7 @@ class Main extends TApplet with Client {
         }
     }
 
-    val edgeWeightIsPercentOfNodeSize = 0.3 // 1/3 of a node radius for good looking edges
+    val edgeWeightIsPercentOfNodeSize = 0.35 // 1/3 of a node radius for good looking edges
 
     nbVisibleEdges = edgeTmp.filter {
       case (visible, i, source, target, weight, color, lod) => visible

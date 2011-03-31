@@ -117,8 +117,7 @@ object Workflow extends node.util.Actor {
         //println("selecting nodes: '" + uuidList + "'")
           val in = Pipeline.input
           val out = Pipeline.output
-          Pipeline.setOutput(
-          if (uuidList.size == 0) {
+          val out2 = if (uuidList.size == 0) {
               out + ("selected" -> out.selected.map(c => false))
           } else {
               out + ("selected" -> out.uuid.zipWithIndex.map {
@@ -132,14 +131,14 @@ object Workflow extends node.util.Actor {
                   println("match: " + res)
                   res
               })
-          })
-          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
+          }
+          Pipeline.setOutput(out2)
+          Browser ! "_callbackSelectionChanged" -> (out2.selectionAttributes, "left")
           self ! "filter.view" -> in.currentView
 
         case ("select", uuid: String) =>
           val out = Pipeline.output
-          Pipeline.setOutput(
-            if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
+          val out2 = if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
               out + ("selected" -> out.selected.map(c => false))
             } else {
               out + ("selected" -> out.uuid.zipWithIndex.map {
@@ -147,9 +146,15 @@ object Workflow extends node.util.Actor {
                   val res = if (_uuid equals uuid) true else out.selected(i)
                   res
               })
-            })
-
-          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
+            }
+          Pipeline.setOutput(out2)
+          println("calling Pipeline.output.updateSelectedWithCategory( g )")
+          /*Pipeline.output.updateSelectedWithCategory(
+              out2
+          ) */
+          println("out2.selection.size: " + out2.selection.size)
+          println("Pipeline.output.size: " + Pipeline.output.size)
+          Browser ! "_callbackSelectionChanged" -> (out2.selectionAttributes, "left")
           //self ! "filter.view" -> Pipeline.input.currentView
 
         case ("selectByPattern", pattern: String) =>
@@ -202,14 +207,15 @@ object Workflow extends node.util.Actor {
               if (changed) Pipeline.setOutput(out2)
 
             case 'Click =>
-              var in = false
+              println("Click!")
+              var isIn = false
               // TODO a selection counter
               val out2 = out + ("selected" -> out.selected.zipWithIndex.map {
                 case (before, i) =>
                   val l = out.size(i) // maths hack
                   val p = out.position(i)
                   val touched = (p.isInRange(o, r) || p.isInRange(o, l + (l / 2.0))) // maths
-                  if (touched) in = true
+                  if (touched) isIn = true
                   (before, touched)
               }.map {
                 case (before, touched) =>
@@ -232,8 +238,8 @@ object Workflow extends node.util.Actor {
                     }
                   }
               }.toArray)
-
-
+              println("selection count, before: "+out.selection.size+" after: "+out2.selection.size)
+              Pipeline.setOutput(out2)
               Browser ! "_callbackSelectionChanged" -> (out2.selectionAttributes, side match {
                 case 'Left => "left"
                 case 'Right => "right"
@@ -243,7 +249,7 @@ object Workflow extends node.util.Actor {
               // check if we need to recompute the meso field
               count match {
                 case 'Double =>
-                  if (in) {
+                  if (isIn) {
 
                     if (out.currentView.equalsIgnoreCase("macro"))
                        Browser ! "_callbackSelectionChanged" -> "meso"
@@ -258,7 +264,7 @@ object Workflow extends node.util.Actor {
                   //self ! "filter.view" -> out2.currentView
               }
 
-            Pipeline.setOutput(out2)
+
 
             case 'Drag =>
             val pause = try {
@@ -278,7 +284,6 @@ object Workflow extends node.util.Actor {
 
           key match {
             case "filter.view" =>
-            //println("filter.view")
               val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
@@ -286,8 +291,6 @@ object Workflow extends node.util.Actor {
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
             case "filter.node.category" =>
-            //println("filter.node.category")
-              println("Workflow: category updated")
               val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
@@ -295,8 +298,6 @@ object Workflow extends node.util.Actor {
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
             case "filter.a.node.weight" =>
-            //println("nodeWeightCache = Filters.nodeWeight(categoryCache)")
-              println("Workflow: document weight updated")
               val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out)))
@@ -304,8 +305,6 @@ object Workflow extends node.util.Actor {
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
             case "filter.a.edge.weight" =>
-            //println("edgeWeightCache = Filters.edgeWeight(nodeWeightCache)")
-              println("Workflow: document edge weight updated")
               val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out)))
@@ -313,7 +312,6 @@ object Workflow extends node.util.Actor {
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
             case "filter.b.node.weight" =>
-            //println("nodeWeightCache = Filters.nodeWeight(categoryCache)")
               val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out)))
@@ -321,7 +319,6 @@ object Workflow extends node.util.Actor {
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
             case "filter.b.edge.weight" =>
-            //println("edgeWeightCache = Filters.edgeWeight(nodeWeightCache)")
               val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out)))
@@ -329,8 +326,6 @@ object Workflow extends node.util.Actor {
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
             case "filter.a.node.size" =>
-            //println("categoryCache = Filters.weightToSize(categoryCache)")
-              println("Workflow: document size updated")
               val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out)))
@@ -338,14 +333,13 @@ object Workflow extends node.util.Actor {
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
             case "filter.b.node.size" =>
-            //println("categoryCache = Filters.weightToSize(categoryCache)")
-              println("Workflow: ngram size updated")
               val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+
             case any => // we don't need to update the scene for other attributes
           }
 
