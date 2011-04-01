@@ -86,17 +86,16 @@ object PhysicLayout {
       val gravity =  ps.makeParticle(1.0f, 0.0f, 0.0f, 0.0f)
       gravity.makeFixed
 
-      val positionIndexSingleParticle = positionIndexSingle.filter {
-        case (p, i, s) => !s
+      val positionIndexNotSingleParticle = positionIndexSingle.filter {
+        case (p, i, s) => !s // on garde si on est pas single
       }.map {
-        case ((x, y), i, s) => ((x,y), i, s, ps.makeParticle(1.0f, x.toFloat, y.toFloat, 0.0f))
+        case ((x, y), i, s) => ((x,y), i, ps.makeParticle(1.0f, x.toFloat, y.toFloat, 0.0f))
       }
 
       // every node are repulsing each other (negative attraction)
-      positionIndexSingleParticle foreach { case (pos1, i1, s1, p1) =>
-            if (!s1) {
-            positionIndexSingleParticle foreach { case (pos2, i2, s2, p2) =>
-                if (!s2 && i2 != i1) {
+      positionIndexNotSingleParticle foreach { case (pos1, i1,  p1) =>
+            positionIndexNotSingleParticle foreach { case (pos2, i2, p2) =>
+                if (i2 != i1) {
                   if (g.hasThisLink(i1, i2)) { // if we have a link, we create a spring
                     val minMaxInterval = g.category(i1) match {
                       case "Document" => aMinMaxWeights
@@ -116,8 +115,7 @@ object PhysicLayout {
                 }
             }
             // ps.makeAttraction(p1, gravity, 300f, 10f) // apply the gravity
-          }
-      }
+        }
     } // end hash changed
 
     // if a position has changed
@@ -146,19 +144,37 @@ object PhysicLayout {
 
     val h = if (g.pause) g else { g + ("position" -> (positionIndexSingle map {
       case (nodePosition, i, s) =>
-        if (s && g.nbNodes > 0) {
+
+        // if we have at least one single
+        if (s && g.nbSingles > 0) {
           ci += 1
-          (g.notSinglesCenter._1 + gDiameter * math.cos(math.Pi / 2 + 2 * math.Pi * ci / g.nbNodes),
-            g.notSinglesCenter._2 + gDiameter * math.sin(math.Pi / 2 + 2 * math.Pi * ci / g.nbNodes))
-        } else {
+
+          // we want to use non single nodes as reference for the circle
+          if (gDiameter >= 0) {
+          (g.notSinglesCenter._1 + gDiameter * math.cos(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles),
+            g.notSinglesCenter._2 + gDiameter * math.sin(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles))
+          }
+
+          // if we can't we will use an arbitrary, fixed-length
+          else {
+           (g.notSinglesCenter._1 + 10.0 * math.cos(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles),
+            g.notSinglesCenter._2 + 10.0  * math.sin(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles))
+          }
+        }
+
+        // if the node is not single, then we can safely get it's coordinates from the particle engline
+        else if (!s) {
           cj += 1 // okay to not start with zero here, because slot 0 is already used by gravity
           val p = ps.getParticle(cj).position()
           val (x,y) = (p.x().toDouble,p.y().toDouble)
           val v = ps.getParticle(cj).velocity()
-          v.setX(Maths.limit(v.x().toDouble, -100, 100).toFloat)
-          v.setY(Maths.limit(v.y().toDouble, -100, 100).toFloat)
+          v.setX(Maths.limit(v.x().toDouble, -10, 10).toFloat)
+          v.setY(Maths.limit(v.y().toDouble, -10, 10).toFloat)
 
           (x,y)
+        } else {
+          // node is not single
+          nodePosition
         }
       }))
     }

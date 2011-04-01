@@ -116,9 +116,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val ids = 0 until nbNodes
 
   // metrics  & properties
-  lazy val nbNodes = Metrics nbNodes this
-  lazy val nbEdges = Metrics nbEdges this
-  lazy val nbSingles = Metrics nbSingles this
+  lazy val nbNodes : Int = Metrics nbNodes this
+  lazy val nbEdges  : Int = Metrics nbEdges this
+  lazy val nbSingles  : Int = Metrics nbSingles this
 
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
@@ -826,6 +826,27 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
     Graph.make(elements ++ Map[String, Any](
       "size" -> tmp1) // need to recompute things
+    )
+  }
+      /**
+   * TODO refactor to use a generic field update function
+   */
+  def updateLinksWithCategory(g: Graph) : Graph = {
+
+    val tmp1: Array[Map[Int,Double]] = links.zipWithIndex.map {
+      case (elem, i) =>
+        val id = g.id(uuid(i))
+        if (id == -1) {
+          elem
+        } else if (g.category(id).equalsIgnoreCase(category(i))) {
+          g.links(id)
+        } else {
+          elem
+        }
+    }.toArray
+
+    Graph.make(elements ++ Map[String, Any](
+      "links" -> tmp1) // need to recompute things
     )
   }
 

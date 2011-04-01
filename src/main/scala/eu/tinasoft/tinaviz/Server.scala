@@ -55,24 +55,15 @@ object Server extends node.util.Actor {
     "views.macro.pause" -> false,
     "views.macro.debug" -> false,
 
-    //  workflow
-    //"Pipeline" -> List ("viewFilter", "nodeWeightFilter", "edgeWeightFilter"),
-
     "screen.width" -> 100,
     "screen.height" -> 100,
-    // final scene
+
     "input" -> new Graph()
   )
 
   var properties: Map[String, Any] = defaultProperties
 
-
   def act() {
-
-    // internal states: 'needUpdate 'updating  'upToDate
-    //var state = 'upToDate
-
-    var pauseBuffer = false
 
     while (true) {
       receive {
@@ -83,23 +74,13 @@ object Server extends node.util.Actor {
           Workflow ! 'exit
           exit()
 
-
-        case ('updateNode, value) =>
-        //context ! 'updateNode -> value
-
-        // receive a brand new graph
         case g: Graph =>
-        //if (sender.receiver == sketcher) {
           properties = defaultProperties
           val in = new Graph(properties ++ g.elements)
           properties += "input" -> in
-          println("Server: Pipeline.setInput(in)")
           Pipeline.setInput(in)
-          println("Server: Workflow ! 'graphImported")
           Workflow ! 'graphImported
           Browser ! "_graphImportedCallback" -> "success"
-        //PipelineBusy = false
-
 
         case x:scala.xml.Elem => Browser ! 'forceDownload -> x.toString
 
@@ -125,20 +106,13 @@ object Server extends node.util.Actor {
           Workflow ! ("camera.mouse", kind, side, count, position)
 
         case ('updated, key: String, value: Any, previous: Any) =>
-        // log("ignoring update of "+key)
-        //println("updating Pipeline with this data: "+key+" -> "+value)
           key match {
             //case "camera.zoom" =>
             //case "camera.position" =>
             case "frameRate" =>
-            case any => Workflow ! key -> value // update the Pipeline
+            case any => Workflow ! key -> value
           }
-
-
-
-        case key: String =>
-          reply(properties(key))
-
+        case key: String =>  reply(properties(key))
 
         case (key: String, pvalue: Any) =>
           var value = pvalue

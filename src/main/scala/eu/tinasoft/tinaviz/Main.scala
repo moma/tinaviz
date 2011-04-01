@@ -137,20 +137,13 @@ class Main extends TApplet with Client {
 
     // send some values
     Server ! "frameRate" -> frameRate.toInt
-    //Server ! "camera.zoom" ->camera
+    Server ! "camera.zoom" -> getZoom
 
     val g = Pipeline.output
     //println("Main: Pipeline.output.nbNodes: "+Pipeline.output.nbNodes)
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
-
-    // we need to manually move the camera
-    // to the graph's center
-
-    if (g.get[Boolean]("pause"))
-      smooth
-    else
-      (if (nbVisibleEdges < 900) smooth else noSmooth)
+    if (g.pause) smooth else if (nbVisibleEdges < 900) smooth else noSmooth
 
     export match {
       case "PDF" =>
@@ -194,7 +187,8 @@ class Main extends TApplet with Client {
       setColor(new Color(0.0, 0.0, 0.0))
       setFontSize(9, false)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec)", 10f, 13f)
+      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec) zoom: "+getZoom+" baryCenter: "+g.baryCenter, 10f, 13f)
+
     }
     //updateCameraEngine
     setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
@@ -406,21 +400,25 @@ class Main extends TApplet with Client {
     val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
     val (cz,cp) = (getZoom,getPosition)
 
-    def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
-    def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
+    //def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
+    //def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
 
     val gwidth = abs(if (mode.equals("selection") && g.selection.size > 0) (g.xMinSelection - g.xMaxSelection) else  (g.xMin - g.xMax)) * getZoom // size to screen
     val gheight = abs(if (mode.equals("selection") && g.selection.size > 0) (g.yMinSelection - g.yMaxSelection) else  (g.yMin - g.yMax)) * getZoom // size to screen
     val graphSize = (gwidth, gheight) // size to screen
     val (xRatio, yRatio) = (gwidth / w, gheight / h)
     val ratio = max(xRatio, yRatio)
-    if (abs(ratio) > 0.001) {
+    if (abs(ratio) > 1.0001 || abs(ratio) < 0.9999) {
       val pos = if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.notSinglesCenter
       var translate = new PVector(w.toFloat / 2.0f, h.toFloat / 2.0f, 0)
       translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
       translate.set(translate.x, translate.y, 0) // FIXME ugly hack, seems a bugs from the browser..
       updatePositionSilent(translate)
-      if (ratio != 0.0) updateZoomSilent(getZoom / ratio)
+      //println("ratio: "+ratio)
+      if (ratio != 0.0) updateZoomSilent(getZoom / (
+             // if (ratio < 1.0) (ratio * 2.0) else (ratio / 2.0)
+             ratio
+        ))
     }
   }
 

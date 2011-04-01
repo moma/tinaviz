@@ -15,7 +15,7 @@ object Filters {
     if (g.nbNodes == 0) return g
     var removeMe = Set.empty[Int]
     val category = g.currentCategory
-    g.get[String]("filter.view") match {
+    g.currentView match {
       case "macro" =>
         g.category.zipWithIndex map {
           case (cat, i) =>
@@ -49,7 +49,7 @@ object Filters {
   /**
    * Filter the Nodes weights
    */
-  def nodeWeight(g: Graph): Graph = {
+  def nodeWeight2(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
     val rangeA = Maths.map(
       g.get[(Double, Double)]("filter.a.node.weight"),
@@ -69,10 +69,35 @@ object Filters {
         if (!(r._1 <= weight && weight <= r._2))
           if (!g.selected(i)) removeMe += i 
     }  
-    val h = g.remove(removeMe)
-    h + ("activity" -> Metrics.activity(h,g))
+    g.remove(removeMe)
+    // h + ("activity" -> Metrics.activity(h,g))
   }
-
+    /**
+   * Filter the Nodes weights
+   */
+  def nodeWeight(g: Graph): Set[Int] = {
+    if (g.nbNodes == 0) return Set.empty[Int]
+    val rangeA = Maths.map(
+      g.get[(Double, Double)]("filter.a.node.weight"),
+      (0.0, 1.0),
+      (g.minANodeWeight, g.maxANodeWeight))
+    val rangeB = Maths.map(
+      g.get[(Double, Double)]("filter.b.node.weight"),
+      (0.0, 1.0),
+      (g.minBNodeWeight, g.maxBNodeWeight))
+    var removeMe = Set.empty[Int]
+    g.weight.zipWithIndex.map {
+      case (weight, i) =>
+        val r = g.category(i) match {
+          case "Document" => rangeA
+          case "NGram" => rangeB
+        }
+        if (!(r._1 <= weight && weight <= r._2))
+          if (!g.selected(i)) removeMe += i
+    }
+    removeMe
+    // h + ("activity" -> Metrics.activity(h,g))
+  }
   /**
    * Filter the Edge weights
    */
@@ -106,15 +131,19 @@ object Filters {
             }
         }
     }
-    val h = g + ("links" -> newLinks)
-    h + ("activity" -> Metrics.activity(h,g))
+    val h = clean(g + ("links" -> newLinks))
+
+    h// + ("activity" -> Metrics.activity(h,g))
   }
   
   def weightToSize(g: Graph) : Graph = {
     if (g.nbNodes == 0) return g
-    val sliderRange = (2.0, 20.0) //node size range
-    val aratio = 0.6 * g.get[Double]("filter.a.node.size") // Document
+    val sliderRange = (3.0, 30.0) //node size range
+
+    // small adjustement ("hack") to fit sliders to data from TinasoftPytextminer
+    val aratio = 0.35 * g.get[Double]("filter.a.node.size") // Document
     val bratio = 1.0 * g.get[Double]("filter.b.node.size") // NGram
+
     val aminmaxweight =  (g.minANodeWeight, g.maxANodeWeight)  // Document
     val bminmaxweight =  (g.minBNodeWeight, g.maxBNodeWeight)  // NGram
     //println("applyWeightToSize: " + ratio)
