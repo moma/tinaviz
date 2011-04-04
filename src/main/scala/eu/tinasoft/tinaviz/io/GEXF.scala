@@ -23,6 +23,10 @@ import io.Source
 
 import xml._
 import java.net.{URLConnection, URL, Authenticator, PasswordAuthentication}
+//import java.io.{FileInputStream,FileOutputStream,IOException}
+//import java.util.zip.InflaterInputStream
+import java.util.zip.GZIPInputStream
+import java.io.BufferedInputStream
 
 class GEXF extends node.util.Actor {
 
@@ -36,16 +40,38 @@ class GEXF extends node.util.Actor {
           println("GEXF: exiting..")
           exit()
 
-        case url: URL => {
+        case url: URL =>
             println("Connecting to " + url)
+            val BUFFER_SIZE = 2048
             val conn = url.openConnection
-            println("Reading graph stream, please wait..")
-            reply(load(XML.load(conn.getInputStream)))
-          }
-        case str: String => {
+            val ins = conn.getInputStream
+
+            reply(
+              load(
+              if (url.toString.endsWith(".gexf")||url.toString.endsWith(".xml")) {
+                 println("Reading raw graph stream, please wait..")
+                 XML.load(ins)
+              } else if (url.toString.endsWith(".zip")||url.toString.endsWith(".gz")||url.toString.endsWith(".tar.gz")) {
+               println("Reading gzipped graph stream, please wait..")
+                XML.load(
+                  new BufferedInputStream(
+                    new GZIPInputStream(
+                      ins,
+                      BUFFER_SIZE
+                    ),
+                    BUFFER_SIZE
+                  )
+                )
+              } else {
+                XML.load(ins)
+              }
+            )
+          )
+
+        case str: String =>
             println("Reading graph string, please wait..")
             reply(load(XML.load(str)))
-          }
+
 
         case graph: Graph =>
           val newColors = graph.renderNodeColor map {

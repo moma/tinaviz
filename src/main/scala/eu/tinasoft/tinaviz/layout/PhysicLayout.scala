@@ -66,7 +66,7 @@ object PhysicLayout {
     val nbEdges = g.nbEdges.toDouble / 2.0
     //println("nbEdges: "+nbEdges)
     val maxD = 50.0 // 50 seems too big
-    val minD = 6.0
+    val minD = 8.0 // min distance
     val maxEdges = 3000.0
     val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
 
