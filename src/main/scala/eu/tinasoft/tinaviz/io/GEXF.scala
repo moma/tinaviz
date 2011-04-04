@@ -53,15 +53,15 @@ class GEXF extends node.util.Actor {
                  XML.load(ins)
               } else if (url.toString.endsWith(".zip")||url.toString.endsWith(".gz")||url.toString.endsWith(".tar.gz")) {
                println("Reading gzipped graph stream, please wait..")
-                XML.load(
-                  new BufferedInputStream(
+                val ins2 = new BufferedInputStream(  // TO BE CLOSE
                     new GZIPInputStream(
                       ins,
                       BUFFER_SIZE
                     ),
                     BUFFER_SIZE
-                  )
                 )
+                try XML.load(ins2) finally ins2.close
+
               } else {
                 XML.load(ins)
               }

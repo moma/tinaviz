@@ -90,6 +90,8 @@
           </jvmArgs>
         </configuration>
             </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -104,8 +106,7 @@
                             <artifactSet>
                         <!-- signed jars-->
                                 <excludes>
-                                    <!-- liveconnect:plugin was included for
-                                    Netbeans, but browsers already have it -->
+                                    <!-- liveconnect:plugin was included for Netbeans, but browsers already have it -->
                                     <exclude>liveconnect:plugin</exclude>
                                 </excludes>
                             </artifactSet>
@@ -114,7 +115,7 @@
                                 <transformer
                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                 <!-- Main class -->
-                                    <mainClass>eu.tinasoft.app.tinaviz.Main</mainClass>
+                                    <mainClass>eu.tinasoft.tinaviz.Main</mainClass>
                                 </transformer>
                             <!-- Use resource transformers to prevent file overwrites -->
                                 <transformer
@@ -139,7 +140,24 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
+            <plugin>
+      	    <groupId>com.pyx4me</groupId>
+      	    <artifactId>proguard-maven-plugin</artifactId>
+      	    <executions>
+      	      <execution>
+      	        <phase>package</phase>
+      	        <goals><goal>proguard</goal></goals>
+      	      </execution>
+      	    </executions>
+          <configuration>
+      	      <includeDependency>false</includeDependency>
+      	      <injar>${project.build.finalName}.jar</injar>
+      	      <outjar>${project.build.finalName}-small.jar</outjar>
+      	      <proguardInclude>${basedir}/proguard.conf</proguardInclude>
+      	    </configuration>
+      	  </plugin>
+
             <plugin>
                 <artifactId>maven-jarsigner-plugin</artifactId>
                 <version>1.2</version>
@@ -151,6 +169,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <archive>target/${project.build.finalName}-small.jar</archive>
                     <keystore>${keystore.path}</keystore>
                     <storetype>${keystore.type}</storetype>
                     <alias>${keystore.alias}</alias>

@@ -23,16 +23,24 @@ import tinaviz.layout.Layout
 import math._
 
 
-/**
- * The Main object
- *
- * Only used when run from the command-line
- */
-object Main {
 
-  /**
-   * main method
-   */
+/**
+ * Main class
+ *
+ * This class inherits from TApplet, which itself inherits from PApplet,
+ * a Processing-powered Applet. TApplet wraps some of the PApplet functions
+ *
+ * This class is extended with the Tinaviz trait, which does the real business
+ * job: Tinaviz trait add a "tinaviz" actor, which act a bit like a master.
+ * Tinaviz also add some useful functions to get parameters by key string, in
+ * a cached and asynchronous way.
+ *
+ * @param
+ * @return
+ * @throws
+ */
+class Main extends TApplet with Client {
+
   def main(args: Array[String]): Unit = {
     var frame = new JFrame("TinaViz")
     var applet = new Main
@@ -52,25 +60,6 @@ object Main {
     */
 
   }
-
-}
-
-/**
- * Main class
- *
- * This class inherits from TApplet, which itself inherits from PApplet,
- * a Processing-powered Applet. TApplet wraps some of the PApplet functions
- *
- * This class is extended with the Tinaviz trait, which does the real business
- * job: Tinaviz trait add a "tinaviz" actor, which act a bit like a master.
- * Tinaviz also add some useful functions to get parameters by key string, in
- * a cached and asynchronous way.
- *
- * @param
- * @return
- * @throws
- */
-class Main extends TApplet with Client {
 
   override def setup(): Unit = {
     size(1200, 800, PConstants.P2D)
