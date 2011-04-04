@@ -143,7 +143,7 @@ class Main extends TApplet with Client {
     //println("Main: Pipeline.output.nbNodes: "+Pipeline.output.nbNodes)
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
-    if (g.pause) smooth else if (nbVisibleEdges < 900) smooth else noSmooth
+    if (g.pause) smooth else if (nbVisibleEdges < 600) smooth else noSmooth
 
     export match {
       case "PDF" =>

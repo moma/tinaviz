@@ -166,6 +166,9 @@ object PhysicLayout {
         else if (!s) {
           cj += 1 // okay to not start with zero here, because slot 0 is already used by gravity
           val p = ps.getParticle(cj).position()
+          p.setX(Maths.limit(p.x().toDouble, -2000, 2000).toFloat)
+          p.setY(Maths.limit(p.y().toDouble, -2000, 2000).toFloat)
+
           val (x,y) = (p.x().toDouble,p.y().toDouble)
           val v = ps.getParticle(cj).velocity()
           v.setX(Maths.limit(v.x().toDouble, -10, 10).toFloat)
