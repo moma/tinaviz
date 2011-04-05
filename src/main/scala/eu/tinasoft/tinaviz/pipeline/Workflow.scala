@@ -250,11 +250,7 @@ object Workflow extends node.util.Actor {
               count match {
                 case 'Double =>
                   if (isIn) {
-
-                    self ! "filter.view" -> "meso"
-                    if (out.currentView.equalsIgnoreCase("macro")) {
-                              Browser ! "_callbackViewChanged" -> "meso"
-                    }
+                    Server ! "filter.view" -> "meso"
 
                   } else {
                     // zoom?

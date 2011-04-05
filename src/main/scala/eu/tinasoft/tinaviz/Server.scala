@@ -107,6 +107,9 @@ object Server extends node.util.Actor {
 
         case ('updated, key: String, value: Any, previous: Any) =>
           key match {
+            case "filter.view" =>
+              Browser ! "_callbackViewChanged" -> value
+              Workflow ! key -> value
             //case "camera.zoom" =>
             //case "camera.position" =>
             case "frameRate" =>
