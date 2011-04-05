@@ -9,6 +9,7 @@ import processing.core._
 
 import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
+import java.awt.event.MouseListener
 
 import eu.tinasoft._
 import tinaviz.Server

@@ -236,11 +236,17 @@ class GEXF extends node.util.Actor {
           case s:String => s
           case any => "0"
       }).toDouble
-      val undirected = (e \ "@type" text) match {
-        case "undirected" => true
-        case "directed" => false
-        case any => false
+
+      val undirected = try {
+             (e \ "@type" text) match {
+                  case "undirected" => true
+                  case "directed" => false
+                  case any => false
+            }
+      } catch {
+         case e => false
       }
+
       val lnks = g.getArray[Map[Int, Double]]("links")
 
       if (!node1uuid.equals(node2uuid)) {

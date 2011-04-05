@@ -251,10 +251,12 @@ object Workflow extends node.util.Actor {
                 case 'Double =>
                   if (isIn) {
 
-                    if (out.currentView.equalsIgnoreCase("macro"))
-                       Browser ! "_callbackSelectionChanged" -> "meso"
 
                     self ! "filter.view" -> "meso"
+                    if (out.currentView.equalsIgnoreCase("macro")) {
+                              Browser ! "_callbackViewChanged" -> "meso"
+                    }
+
 
                   } else {
                     // zoom?

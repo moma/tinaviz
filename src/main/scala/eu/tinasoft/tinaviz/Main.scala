@@ -24,23 +24,17 @@ import math._
 
 
 
-/**
- * Main class
- *
- * This class inherits from TApplet, which itself inherits from PApplet,
- * a Processing-powered Applet. TApplet wraps some of the PApplet functions
- *
- * This class is extended with the Tinaviz trait, which does the real business
- * job: Tinaviz trait add a "tinaviz" actor, which act a bit like a master.
- * Tinaviz also add some useful functions to get parameters by key string, in
- * a cached and asynchronous way.
- *
- * @param
- * @return
- * @throws
- */
-class Main extends TApplet with Client {
 
+/**
+ * The Main object
+ *
+ * Only used when run from the command-line
+ */
+object Main {
+
+  /**
+   * main method
+   */
   def main(args: Array[String]): Unit = {
     var frame = new JFrame("TinaViz")
     var applet = new Main
@@ -60,6 +54,25 @@ class Main extends TApplet with Client {
     */
 
   }
+
+}
+
+/**
+ * Main class
+ *
+ * This class inherits from TApplet, which itself inherits from PApplet,
+ * a Processing-powered Applet. TApplet wraps some of the PApplet functions
+ *
+ * This class is extended with the Tinaviz trait, which does the real business
+ * job: Tinaviz trait add a "tinaviz" actor, which act a bit like a master.
+ * Tinaviz also add some useful functions to get parameters by key string, in
+ * a cached and asynchronous way.
+ *
+ * @param
+ * @return
+ * @throws
+ */
+class Main extends TApplet with Client {
 
   override def setup(): Unit = {
     size(1200, 800, PConstants.P2D)
@@ -328,7 +341,8 @@ class Main extends TApplet with Client {
         val h1 = setFontSize((r1 * getZoom).toInt, b1)
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
-        val weAreSelected = false // we don't care. else, use: g.selected(i)
+        //val weAreSelected = false // we don't care. else, use: g.selected(i)
+        val weAreSelected = g.selected(i)
         val weHaveACollision = sortedLabelIDs.exists {
           case (j) =>
             val p2 = g.position(j)
@@ -340,7 +354,8 @@ class Main extends TApplet with Client {
             val b2 = (g.selected(j) || g.highlighted(j)) // SIDE EFFECT of F1
             val h2 = setFontSize((r2 * getZoom).toInt, b2)
             val w2 = textWidth(l2) /// getZoom //
-            val whichIsSelected = false // we don't care. else, use: scene.graph.selected(j)
+            //val whichIsSelected = false // we don't care. else, use: scene.graph.selected(j)
+            val whichIsSelected = g.selected(j)
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1))
               || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
               && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
@@ -392,8 +407,12 @@ class Main extends TApplet with Client {
     //def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
     //def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
 
-    val gwidth = abs(if (mode.equals("selection") && g.selection.size > 0) (g.xMinSelection - g.xMaxSelection) else  (g.xMin - g.xMax)) * getZoom // size to screen
-    val gheight = abs(if (mode.equals("selection") && g.selection.size > 0) (g.yMinSelection - g.yMaxSelection) else  (g.yMin - g.yMax)) * getZoom // size to screen
+    val (gwidth,gheight) = if (mode.equals("selection") && g.selection.size > 0) {
+         if (g.selection.size == 1) (abs(g.xMinSelection - g.xMaxSelection),
+                                     abs(g.yMinSelection - g.yMaxSelection)) else (30.0, 30.0) // TODO g.selection(0)
+      } else  {
+         (abs(g.xMin - g.xMax) * getZoom, abs(g.yMin - g.yMax) * getZoom)  // size to screen
+      }
     val graphSize = (gwidth, gheight) // size to screen
     val (xRatio, yRatio) = (gwidth / w, gheight / h)
     val ratio = max(xRatio, yRatio)
