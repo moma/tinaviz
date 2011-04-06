@@ -93,7 +93,7 @@ object PhysicLayout {
       // }
 
       ps.clear // we clean everything, actually.. this could be optimized
-      val gravity = ps.makeParticle(1.0f, 0.0f, 0.0f, 0.0f)
+      val gravity = ps.makeParticle(10.0f, 0.0f, 0.0f, 0.0f)
       gravity.makeFixed
 
       val positionIndexNotSingleParticle = positionIndexSingle.filter {
@@ -127,7 +127,7 @@ object PhysicLayout {
                 else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f) // we repulse unrelated nodes
               }
           }
-        // ps.makeAttraction(p1, gravity, 300f, 10f) // apply the gravity
+          ps.makeAttraction(p1, gravity, 200f, 10f) // apply the gravity
       }
     } // end hash changed
 
@@ -144,6 +144,10 @@ object PhysicLayout {
 
 
     // fix the center
+
+    //ps.getParticle(0).position().set(g.notSinglesCenter._1.toFloat, g.notSinglesCenter._2.toFloat, 0.0f)
+    //ps.getParticle(0).position().set(g.baryCenter._1.toFloat, g.baryCenter._2.toFloat, 0.0f)
+
     ps.getParticle(0).position().set(0.0f, 0.0f, 0.0f)
 
     //println("running step (" + ps.numberOfParticles + " particles)..")
@@ -186,8 +190,8 @@ object PhysicLayout {
 
             val (x, y) = (p.x().toDouble, p.y().toDouble)
             val v = ps.getParticle(cj).velocity()
-            v.setX(Maths.limit(v.x().toDouble, -10, 10).toFloat)
-            v.setY(Maths.limit(v.y().toDouble, -10, 10).toFloat)
+            v.setX(Maths.limit(v.x().toDouble, -50, 50).toFloat)
+            v.setY(Maths.limit(v.y().toDouble, -50, 50).toFloat)
 
             (x, y)
           } else {
@@ -197,6 +201,7 @@ object PhysicLayout {
       }))
     }
 
+    /*
     h + ("position" -> (h.position.zipWithIndex map {
       case (position, i) =>
         val r = (position._1 - h.baryCenter._1, position._2 - h.baryCenter._2)
@@ -205,9 +210,9 @@ object PhysicLayout {
         val p = ps.getParticle(cj).position()
         p.setX(r._1.toFloat)
         p.setY(r._2.toFloat)
-
         r
-    }))
+    }))  */
+    h
   }
 
   /**

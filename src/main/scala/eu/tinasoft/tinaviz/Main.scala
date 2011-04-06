@@ -310,12 +310,21 @@ class Main extends TApplet with Client {
     }
 
     if (debug) {
-      setColor(new Color(0.3, 1.0, 1.0))
+      setColor(new Color(0.2, 1.0, 1.0, 0.7))
       drawDisk((0.0, 0.0), 10.0 / getZoom)
-      setColor(new Color(0.0, 1.0, 1.0))
-      drawDisk(g.baryCenter, 10.0 / getZoom)
-      setColor(new Color(0.6, 1.0, 1.0))
-      drawDisk(g.selectionCenter, 10.0 / getZoom)
+
+      //setColor(new Color(0.2, 1.0, 1.0, 0.8))
+      //drawDisk(g.baryCenter, 10.0 / getZoom)
+
+      setColor(new Color(0.5, 1.0, 1.0, 0.7))
+      drawDisk(g.notSinglesCenter, 12.0 / getZoom)
+
+      //
+      // setColor(new Color(0.5, 1.0, 1.0, 0.8))
+      //drawDisk(g.notSinglesCenter, 12.0 / getZoom)
+
+      setColor(new Color(0.8, 1.0, 1.0, 0.7))
+      drawDisk(g.selectionCenter, 14.0 / getZoom)
     }
 
     def compareBySize(i: Int, j: Int): Boolean = {
