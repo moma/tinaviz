@@ -127,7 +127,7 @@ object PhysicLayout {
                 else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f) // we repulse unrelated nodes
               }
           }
-          ps.makeAttraction(p1, gravity, 500f, 10f) // apply the gravity
+          ps.makeAttraction(p1, gravity, 100f, 10f) // apply the gravity
       }
     } // end hash changed
 

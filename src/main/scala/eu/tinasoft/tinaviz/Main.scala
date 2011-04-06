@@ -155,7 +155,10 @@ class Main extends TApplet with Client {
       case "PNG" =>
         smooth
 
-      case any => Server ! ("export", "GEXF")
+
+      case "GEXF" => Server ! ("export", "GEXF")
+
+      case any =>
     }
 
 

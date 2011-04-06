@@ -84,7 +84,10 @@ object Server extends node.util.Actor {
 
         case x:scala.xml.Elem => Browser ! 'forceDownload -> x.toString
 
-        case ("export","gexf") =>  (new GEXF) ! Pipeline.output
+        case ("export","GEXF") =>
+          val gx = new GEXF
+          gx ! Pipeline.output
+
         case ('open, pathOrURL: Any) => (new GEXF) ! pathOrURL
 
         case "recenter"                      => Workflow ! "recenter"
