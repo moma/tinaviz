@@ -420,8 +420,8 @@ class Main extends TApplet with Client {
     //def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
 
     val (gwidth,gheight) = if (mode.equals("selection") && g.selection.size > 0) {
-         if (g.selection.size == 1) (abs(g.xMin          - g.xMax) * getZoom*0.2,
-                                     abs(g.yMin          - g.yMax) * getZoom*0.2)
+         if (g.selection.size == 1) (abs(g.xMin          - g.xMax) * getZoom*0.3,
+                                     abs(g.yMin          - g.yMax) * getZoom*0.3)
          else                       (abs(g.xMinSelection - g.xMaxSelection) * getZoom,
                                      abs(g.yMinSelection - g.yMaxSelection) * getZoom) // TODO g.selection(0)
       } else  {

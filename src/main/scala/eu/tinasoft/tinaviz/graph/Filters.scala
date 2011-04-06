@@ -141,7 +141,7 @@ object Filters {
     val sliderRange = (3.0, 30.0) //node size range
 
     // small adjustement ("hack") to fit sliders to data from TinasoftPytextminer
-    val aratio = 0.35 * g.get[Double]("filter.a.node.size") // Document
+    val aratio = 0.6 * g.get[Double]("filter.a.node.size") // Document
     val bratio = 1.0 * g.get[Double]("filter.b.node.size") // NGram
 
     val aminmaxweight =  (g.minANodeWeight, g.maxANodeWeight)  // Document
