@@ -41,7 +41,7 @@ object Server extends node.util.Actor {
     "layout.gravity" -> 1.3, // stronger means faster!
     "layout.attraction" -> 1.01,
     "layout.repulsion" -> 1.5,
-    "pause" -> true,
+    "pause" -> false,
     "debug" -> false,
 
     // global selection disk settings

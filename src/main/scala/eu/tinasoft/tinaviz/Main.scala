@@ -311,12 +311,12 @@ class Main extends TApplet with Client {
 
     if (debug) {
       setColor(new Color(0.2, 1.0, 1.0, 0.7))
-      drawDisk((0.0, 0.0), 10.0 / getZoom)
+      drawDisk((0.0, 0.0), 10.0 / getZoom)    // JAUNE c'est en 0.0
 
       //setColor(new Color(0.2, 1.0, 1.0, 0.8))
       //drawDisk(g.baryCenter, 10.0 / getZoom)
 
-      setColor(new Color(0.5, 1.0, 1.0, 0.7))
+      setColor(new Color(0.5, 1.0, 1.0, 0.7))    // bleu c'est le centre not single
       drawDisk(g.notSinglesCenter, 12.0 / getZoom)
 
       //
@@ -324,7 +324,7 @@ class Main extends TApplet with Client {
       //drawDisk(g.notSinglesCenter, 12.0 / getZoom)
 
       setColor(new Color(0.8, 1.0, 1.0, 0.7))
-      drawDisk(g.selectionCenter, 14.0 / getZoom)
+      drawDisk(g.selectionCenter, 14.0 / getZoom)  // violet, la selection center
     }
 
     def compareBySize(i: Int, j: Int): Boolean = {

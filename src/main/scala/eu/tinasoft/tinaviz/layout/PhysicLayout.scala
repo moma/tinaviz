@@ -93,7 +93,7 @@ object PhysicLayout {
       // }
 
       ps.clear // we clean everything, actually.. this could be optimized
-      val gravity = ps.makeParticle(10.0f, 0.0f, 0.0f, 0.0f)
+      val gravity = ps.makeParticle(20.0f, 0.0f, 0.0f, 0.0f)
       gravity.makeFixed
 
       val positionIndexNotSingleParticle = positionIndexSingle.filter {
@@ -127,7 +127,7 @@ object PhysicLayout {
                 else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f) // we repulse unrelated nodes
               }
           }
-          ps.makeAttraction(p1, gravity, 200f, 10f) // apply the gravity
+          ps.makeAttraction(p1, gravity, 500f, 10f) // apply the gravity
       }
     } // end hash changed
 
