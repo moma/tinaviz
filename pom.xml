@@ -10,11 +10,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.daizoru</groupId>
-            <artifactId>node</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>netscape</groupId>
             <artifactId>javascript</artifactId>
             <version>1.6.0_22</version>

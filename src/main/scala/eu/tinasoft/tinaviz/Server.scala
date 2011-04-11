@@ -5,7 +5,6 @@
 
 package eu.tinasoft.tinaviz
 
-import org.daizoru._
 import eu.tinasoft._
 
 import tinaviz.io._
@@ -22,7 +21,7 @@ case class Step(val step: Symbol)
 /**
  * This class need a big refactoring..
  */
-object Server extends node.util.Actor {
+object Server extends Actor {
 
   val defaultProperties: Map[String, Any] = Map(
     // global real FPS

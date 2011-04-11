@@ -5,8 +5,6 @@
 
 package eu.tinasoft.tinaviz.io
 
-import org.daizoru._
-
 import eu.tinasoft._
 
 import tinaviz.util.Color
@@ -28,7 +26,7 @@ import java.net.{URLConnection, URL, Authenticator, PasswordAuthentication}
 import java.util.zip.GZIPInputStream
 import java.io.BufferedInputStream
 
-class GEXF extends node.util.Actor {
+class GEXF extends Actor {
 
    start
 

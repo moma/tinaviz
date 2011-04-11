@@ -10,7 +10,6 @@ import netscape.javascript.JSException
 import processing.core._
 import processing.pdf.PGraphicsPDF
 
-import org.daizoru._
 import eu.tinasoft._
 
 import tinaviz.io.Browser

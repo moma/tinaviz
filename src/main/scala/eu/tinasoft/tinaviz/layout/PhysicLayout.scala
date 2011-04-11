@@ -5,7 +5,6 @@
 
 package eu.tinasoft.tinaviz.layout
 
-import org.daizoru._
 import eu.tinasoft._
 import traer.physics._
 

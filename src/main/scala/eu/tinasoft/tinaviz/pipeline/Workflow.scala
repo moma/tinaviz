@@ -5,7 +5,6 @@
 
 package eu.tinasoft.tinaviz.pipeline
 
-import org.daizoru._
 import eu.tinasoft._
 import tinaviz.graph._
 import tinaviz.Main
@@ -15,13 +14,16 @@ import tinaviz.io.Browser
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import tinaviz.layout._
+
 import actors.Actor
+import actors.Actor._
+
 import compat.Platform
 
 /**
  *
  */
-object Workflow extends node.util.Actor {
+object Workflow extends Actor {
 
   def act() {
 

@@ -5,7 +5,6 @@
 
 package eu.tinasoft.tinaviz.pipeline
 
-import org.daizoru._
 import eu.tinasoft._
 import tinaviz.graph._
 

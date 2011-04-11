@@ -5,15 +5,16 @@
 
 package eu.tinasoft.tinaviz.io
 
-import org.daizoru._
 import eu.tinasoft.tinaviz._
 
 import eu.tinasoft.tinaviz.io.json.Json
 import java.applet.Applet
 import netscape.javascript.JSObject
 import eu.tinasoft.tinaviz.io.json.Base64
+import actors.Actor
+import actors.Actor._
 
-object Browser extends node.util.Actor {
+object Browser extends Actor {
 
   private var _window:JSObject = null
   private var _subPrefix = ""
@@ -112,7 +113,7 @@ object Browser extends node.util.Actor {
            _window.call(_subPrefix + _apiPrefix + func, args)
            }
            */
-        case msg => log("unknow msg: "+msg)
+        case msg => println("Browser: unknow msg: "+msg)
       }
     }
   }

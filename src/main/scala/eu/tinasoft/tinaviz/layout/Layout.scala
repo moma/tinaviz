@@ -8,7 +8,6 @@ package eu.tinasoft.tinaviz.layout
  * To change this template use File | Settings | File Templates.
  */
 
-import org.daizoru._
 import eu.tinasoft._
 import tinaviz.graph.Graph
 import tinaviz.pipeline.Pipeline
@@ -16,10 +15,14 @@ import tinaviz.pipeline.Workflow
 
 import tinaviz.Main
 import tinaviz.Server
+
+import actors.Actor
+import actors.Actor._
+
 /**
  * Layout Actor
  */
-object Layout extends node.util.Actor {
+object Layout extends Actor {
 
   def act() {
 
