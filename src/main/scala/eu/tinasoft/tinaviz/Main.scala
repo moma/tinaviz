@@ -191,7 +191,7 @@ class Main extends TApplet with Client {
       setColor(new Color(0.0, 0.0, 0.0))
       setFontSize(9, false)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec) zoom: "+getZoom+" baryCenter: "+g.baryCenter, 10f, 13f)
+      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec) zoom: "+getZoom, 10f, 13f)
 
     }
     //updateCameraEngine
@@ -419,8 +419,8 @@ class Main extends TApplet with Client {
     //def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
 
     val (gwidth,gheight) = if (mode.equals("selection") && g.selection.size > 0) {
-         if (g.selection.size == 1) (abs(g.xMin          - g.xMax) * getZoom*0.3,
-                                     abs(g.yMin          - g.yMax) * getZoom*0.3)
+         if (g.selection.size == 1) (abs(g.xMin          - g.xMax) * 0.3,
+                                     abs(g.yMin          - g.yMax) * 0.3)
          else                       (abs(g.xMinSelection - g.xMaxSelection) * getZoom,
                                      abs(g.yMinSelection - g.yMaxSelection) * getZoom) // TODO g.selection(0)
       } else  {
@@ -435,11 +435,15 @@ class Main extends TApplet with Client {
       translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
       translate.set(translate.x, translate.y, 0) // FIXME ugly hack, seems a bugs from the browser..
       updatePositionSilent(translate)
-      //println("ratio: "+ratio)
+      println("ratio: "+ratio)
+      if (g.selection.size != 1) {
       if (ratio != 0.0) updateZoomSilent(getZoom / (
              // if (ratio < 1.0) (ratio * 2.0) else (ratio / 2.0)
              ratio
         ))
+       } else {
+         updateZoomSilent(0.3)
+      }
     }
   }
 
