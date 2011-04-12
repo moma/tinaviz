@@ -76,6 +76,7 @@ object PhysicLayout {
     val minD = 8.0 // min distance
     val maxEdges = 3000.0
     val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
+    //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
 
     //println("running forceVector on "+nbNodes+" nodes")
     //if (g.activity < 0.005) return g + ("activity" -> 0.0)
@@ -84,6 +85,7 @@ object PhysicLayout {
       case (p, i) => (p, i, g.isSingle(i))
     }
 
+    // ou si on change l'attribut taille
     if (g.hashed != lastHash) {
       lastHash = g.hashed
       //println("hash changed, regenerating a particle system..")
