@@ -11,6 +11,7 @@ import tinaviz.Main
 import tinaviz.Server
 import tinaviz.io.json.Json
 import tinaviz.io.Browser
+import tinaviz.io.GEXF
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import tinaviz.layout._
@@ -276,6 +277,12 @@ object Workflow extends Actor {
             //self ! "pause" -> pauseBuffer
             case any =>
           }
+
+
+        case ("export","GEXF") =>
+           println("exporting "+Pipeline.output.nbEdges+" edges")
+          (new GEXF) ! Pipeline.output
+        case x:scala.xml.Elem => Browser ! 'forceDownload -> x.toString
 
         case (key: String, value: Any) =>
            Pipeline.applyKey(key, value)

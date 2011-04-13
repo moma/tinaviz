@@ -472,7 +472,6 @@ class Main extends TApplet with Client {
     // TODO use the nap
     //Server ! "camera.target" -> "none"
 
-
     Server ! "camera.position" -> value
   }
 
@@ -480,6 +479,7 @@ class Main extends TApplet with Client {
                             side: Symbol,
                             count: Symbol,
                             position: (Double, Double)) {
+    println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
     Server ! ("camera.mouse", kind, side, count, position)
   }
 

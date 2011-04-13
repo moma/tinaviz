@@ -297,6 +297,7 @@ class TApplet extends PApplet with MouseWheelListener {
   }
 
   def updateMouse(kind: Symbol) {
+    //zoomUpdated(_camera.zoom)
     _camera.lastMousePosition = mouseXY
     mouseUpdated(kind, whichButton, clickCount, mouseXY)
   }

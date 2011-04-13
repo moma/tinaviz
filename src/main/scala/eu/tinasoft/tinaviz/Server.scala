@@ -81,11 +81,8 @@ object Server extends Actor {
           Workflow ! 'graphImported
           Browser ! "_graphImportedCallback" -> "success"
 
-        case x:scala.xml.Elem => Browser ! 'forceDownload -> x.toString
-
-        case ("export","GEXF") =>  (new GEXF) ! Pipeline.output
-
-        case ('open, pathOrURL: Any) => (new GEXF) ! pathOrURL
+        case ("export","GEXF") =>  Workflow ! ("export","GEXF")
+        case ('open, pathOrURL: Any) =>  (new GEXF) ! pathOrURL
 
         case "recenter"                      => Workflow ! "recenter"
         case ("select", toBeSelected)        => Workflow ! "select"              -> toBeSelected

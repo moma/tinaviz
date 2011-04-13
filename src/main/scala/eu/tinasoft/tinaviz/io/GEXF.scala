@@ -88,11 +88,11 @@ class GEXF extends Actor {
                 <nodes>{
                    for ((nodeUUID,nodeIndex) <- graph.uuid.zipWithIndex) yield
                      <node id={nodeUUID} label={ graph.label(nodeIndex) }>
-                       { val p = graph.position(nodeIndex)
-                        <viz:position x={ p._1.toString } y={ p._2.toString } z="0.0"/> }
-                       { val (r,g,b) = newColors(nodeIndex)
-                        <viz:color b={ r.toInt.toString } g={ g.toInt.toString } r={ b.toInt.toString }/> }
-                        <viz:size value={ graph.size(nodeIndex).toString }/>
+                       { val (x,y) = graph.position(nodeIndex) match { case (x,y) => (x.toString, y.toString)  }
+                        <viz:position x={ x } y={ y } z="0.0" /> }
+                       { val (r,g,b) = newColors(nodeIndex) match { case (r,g,b) => (r.toInt.toString, g.toInt.toString, b.toInt.toString ) }
+                        <viz:color r={ r } g={ g } b={ b } /> }
+                        <viz:size value={ graph.size(nodeIndex).toString } />
                         <attvalues>
                           <attvalue id="0" value={ graph.category(nodeIndex) }/>
                         </attvalues>
@@ -102,8 +102,12 @@ class GEXF extends Actor {
                    var edgeIndex = 0
                    for ((links,nodeIndex) <- graph.links.zipWithIndex; (target, weight) <- links) yield {
                      edgeIndex += 1
-                     <edge id={ nodeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } type="undirected" weight={ weight.toString }>
-                     </edge>
+                     //if (graph.hasThisLink(target,nodeIndex)) {
+                         //<edge id={ nodeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } type="undirected" weight={ weight.toString }> </edge>
+                     // } else {
+                     //if (nodeIndex < target) {
+                         <edge id={ edgeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } type="undirected" weight={ weight.toString }> </edge>
+                     //}
                     }
                   }</edges>
               </graph>
