@@ -231,6 +231,10 @@ object Workflow extends Actor {
                     if (out.currentView.equalsIgnoreCase("macro")) {
 
                       // if (in) before else false  // uncomment to enable unselection with single click
+                       //count match {
+                       //  case 'Simple => before
+                       //  case 'Double => false
+                      //}
                       before
 
                     } else {
@@ -279,21 +283,11 @@ object Workflow extends Actor {
           }
 
 
-        case ("export","GEXF") =>
-           println("exporting "+Pipeline.output.nbEdges+" edges")
-          (new GEXF) ! Pipeline.output
+        case ("export","GEXF") => (new GEXF) ! Pipeline.output
         case x:scala.xml.Elem => Browser ! 'forceDownload -> x.toString
 
         case (key: String, value: Any) =>
            Pipeline.applyKey(key, value)
-
-           /*
-           object NodeSize {         
-               def unapply(v:String):Option[String] = { 
-                  if ()
-               }
-           }*/
-
 
           key match {
             case "filter.view" =>
