@@ -211,38 +211,30 @@ object Workflow extends Actor {
 
             case 'Click =>
               println("Click!")
-              var isIn = false
+              var somethingIsSelected = false
+              val doubleClicked = count match {
+                      case 'Simple => false
+                      case 'Double => true
+                      case any => true
+              }
               // TODO a selection counter
               val out2 = out + ("selected" -> out.selected.zipWithIndex.map {
-                case (before, i) =>
+                case (previousSelectionState, i) =>
                   val l = out.size(i) // maths hack
                   val p = out.position(i)
-                  val touched = (p.isInRange(o, r) || p.isInRange(o, l + (l / 2.0))) // maths
-                  if (touched) isIn = true
-                  (before, touched)
+                  val nodeHasBeenTouched = (p.isInRange(o, r) || p.isInRange(o, l + (l / 2.0))) // maths
+                  if (nodeHasBeenTouched) somethingIsSelected = true
+                  if (nodeHasBeenTouched) println("touched a node of degree "+out.degree(i))
+                  (previousSelectionState, nodeHasBeenTouched)
               }.map {
-                case (before, touched) =>
-                  if (touched) {
-                    count match {
-                      case 'Simple => !before
-                      case 'Double => true
-                    }
+                case (previousSelectionState, nodeHasBeenTouched) =>
+
+
+
+                  if (doubleClicked) {
+                      nodeHasBeenTouched
                   } else {
-                    if (out.currentView.equalsIgnoreCase("macro")) {
-
-                      // if (in) before else false  // uncomment to enable unselection with single click
-                       //count match {
-                       //  case 'Simple => before
-                       //  case 'Double => false
-                      //}
-                      before
-
-                    } else {
-                      count match {
-                        case 'Simple => before
-                        case 'Double => false
-                      }
-                    }
+                      if (nodeHasBeenTouched) !previousSelectionState else previousSelectionState
                   }
               }.toArray)
               println("selection count, before: "+out.selection.size+" after: "+out2.selection.size)
@@ -254,19 +246,17 @@ object Workflow extends Actor {
               })
 
               // check if we need to recompute the meso field
-              count match {
-                case 'Double =>
-                  if (isIn) {
+              if (doubleClicked) {
+                if (somethingIsSelected) {
                     Server ! "filter.view" -> "meso"
 
                   } else {
                     // zoom?
                   }
-                case 'Simple =>
+              } else {
                   //println("Workflow: updating view (is it OK?)")
                   //self ! "filter.view" -> out2.currentView
               }
-
 
 
             case 'Drag =>

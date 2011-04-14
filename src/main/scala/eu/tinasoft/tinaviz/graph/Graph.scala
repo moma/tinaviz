@@ -107,8 +107,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   lazy val outDegree = Metrics outDegree this
   lazy val inDegree = Metrics inDegree this
+  lazy val degree = Metrics degree this
 
-  lazy val degree = inDegree zip outDegree map {
+  lazy val totalDegree = inDegree zip outDegree map {
     case (a, b) => a + b
   }
   lazy val density = getArray[Double]("density")
