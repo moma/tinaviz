@@ -94,17 +94,31 @@ object Metrics {
   def degree(g: Graph): Array[Int] = {
     val _degree = g.links.zipWithIndex.map {
       case (aLinks, a) =>
-        var d = 0
-        var lst = Map.empty[(Int, Int), Boolean]
+      // var d = 0
+        var neighbourMap = Map.empty[Int, Boolean]
         aLinks.foreach {
           case (b, w) =>
+            if (b != a) {
+              val tpl: (Int, Boolean) = (b, true)
+              neighbourMap += tpl
+            }
 
-            if (a != b)  {
-              val key : (Int,Int) = if (a < b) (a, b) else (b, a)
-              val tpl : ((Int,Int),Boolean) = (key,true)
-              lst += tpl
+        }
+
+
+        g.links.zipWithIndex.map {
+          case (a2Links, a2) =>
+            a2Links.foreach {
+              case (b, w) =>
+                if (b == a && a != a2) {
+                  // inlink!
+                  val tpl: (Int, Boolean) = (a2, true)
+                  neighbourMap += tpl
+                }
             }
         }
+
+        /*
         g.links.zipWithIndex.map {
           case (bLinks, b) =>
             bLinks.foreach {
@@ -117,7 +131,8 @@ object Metrics {
               }
             }
         }
-        lst.size
+        */
+        neighbourMap.size
     }
     _degree.toArray
   }
