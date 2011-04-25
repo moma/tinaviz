@@ -230,6 +230,61 @@ object Metrics {
     }
   }
 
+  // a list of positions + ID
+  def selectionNeighbourhood(g:Graph) = {
+     val tmp = g.position.zipWithIndex filter {
+        case (p, i) => g.selected(i)
+     }
+     g.position.zipWithIndex filter {
+        case (p, i1) =>
+             tmp.find {
+               case (p2, i2) =>
+                 (g.hasAnyLink(i1,i2) || i1 == i2)
+             } match {
+                 case None => false
+                 case any => true
+             }
+      }
+  }
+
+    def selectionNeighbourhoodCenter(g:Graph) : (Double, Double) = {
+    var p = (0.0, 0.0)
+    val N = g.selectionNeighbourhood.size.toDouble
+    g.selectionNeighbourhood foreach {
+      case ((x, y), i) => p = (p._1 + x, p._2 + y)
+    }
+    if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
+    }
+
+
+
+  /**
+   * Compute the extremums (X min, X max, Y min, Y max)
+   */
+  def extremumsSelectionNeighbourhood(g: Graph): (Double, Double, Double, Double) = {
+    if (g.position.size == 0) {
+      (0.0, 0.0, 0.0, 0.0)
+    } else {
+
+      if (g.selectionNeighbourhood.size == 0) {
+        (0.0, 0.0, 0.0, 0.0)
+      } else {
+        var xMax = Double.MinValue
+        var xMin = Double.MaxValue
+        var yMax = Double.MinValue
+        var yMin = Double.MaxValue
+        g.selectionNeighbourhood foreach {
+          case ((x, y), i) =>
+            if (x < xMin) xMin = x
+            if (x > xMax) xMax = x
+            if (y < yMin) yMin = y
+            if (y > yMax) yMax = y
+        }
+        (xMax, xMin, yMax, yMin)
+      }
+    }
+  }
+
   def notSingleNodesDimension(g: Graph): (Double, Double) = {
     if (g.position.size == 0) {
       (0.0, 0.0)

@@ -140,6 +140,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   lazy val baryCenter = Metrics baryCenter this
   lazy val selectionCenter = Metrics selectionCenter this
+
+    // a list of positions + ID
+  lazy val selectionNeighbourhood = Metrics selectionNeighbourhood this
+
+ lazy val selectionNeighbourhoodCenter = Metrics selectionNeighbourhoodCenter this
+
   lazy val singlesCenter = Metrics singlesCenter this
   lazy val notSinglesCenter = Metrics notSinglesCenter this
 
@@ -162,6 +168,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val xMinSelection = extremumsSelection._2
   lazy val yMaxSelection = extremumsSelection._3
   lazy val yMinSelection = extremumsSelection._4
+
+  lazy val extremumsSelectionNeighbourhood = Metrics extremumsSelectionNeighbourhood this
+  lazy val xMaxSelectionNeighbourhood = extremumsSelectionNeighbourhood._1
+  lazy val xMinSelectionNeighbourhood = extremumsSelectionNeighbourhood._2
+  lazy val yMaxSelectionNeighbourhood = extremumsSelectionNeighbourhood._3
+  lazy val yMinSelectionNeighbourhood = extremumsSelectionNeighbourhood._4
 
   lazy val nodeWeightExtremums = Metrics nodeWeightExtremums this
   lazy val minANodeWeight = nodeWeightExtremums._1

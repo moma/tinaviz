@@ -412,37 +412,39 @@ class Main extends TApplet with Client {
         return
     }
     //println("recentering will be done!")
+    //val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
     val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
     val (cz,cp) = (getZoom,getPosition)
 
     //def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
     //def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
-
-    val (gwidth,gheight) = if (mode.equals("selection") && g.selection.size > 0) {
-         if (g.selection.size == 1) (abs(g.xMin          - g.xMax) * 0.3,
-                                     abs(g.yMin          - g.yMax) * 0.3)
-         else                       (abs(g.xMinSelection - g.xMaxSelection) * getZoom,
-                                     abs(g.yMinSelection - g.yMaxSelection) * getZoom) // TODO g.selection(0)
+     val centerOnSelection = mode.equalsIgnoreCase("selection") && g.currentView.equalsIgnoreCase("macro") && g.selectionNeighbourhood.size > 0
+      // spaghetti code
+    val ratio = (
+      if (centerOnSelection) {
+         (abs(g.xMinSelectionNeighbourhood - g.xMaxSelectionNeighbourhood) * getZoom,
+          abs(g.yMinSelectionNeighbourhood - g.yMaxSelectionNeighbourhood) * getZoom) // TODO we could use g.selection(0)
       } else  {
          (abs(g.xMin - g.xMax) * getZoom, abs(g.yMin - g.yMax) * getZoom)  // size to screen
       }
-    val graphSize = (gwidth, gheight) // size to screen
-    val (xRatio, yRatio) = (gwidth / w, gheight / h)
-    val ratio = max(xRatio, yRatio)
+    ) match { case (gwidth,gheight) => max(gwidth / w, gheight / h) }
+    val pos = if (centerOnSelection) g.selectionNeighbourhoodCenter else g.notSinglesCenter
+
     if (abs(ratio) > 1.0001 || abs(ratio) < 0.9999) {
-      val pos = if (mode.equals("selection") && g.selection.size > 0) g.selectionCenter else g.notSinglesCenter
+
+
       var translate = new PVector(w.toFloat / 2.0f, h.toFloat / 2.0f, 0)
       translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
       translate.set(translate.x, translate.y, 0) // FIXME ugly hack, seems a bugs from the browser..
       updatePositionSilent(translate)
-      println("ratio: "+ratio)
+      //println("ratio: "+ratio)
       if (g.selection.size != 1) {
       if (ratio != 0.0) updateZoomSilent(getZoom / (
              // if (ratio < 1.0) (ratio * 2.0) else (ratio / 2.0)
              ratio
         ))
        } else {
-         updateZoomSilent(0.3)
+         updateZoomSilent(0.3) // hack: we update the zoom but we do not trigger an event (the "zoom changed" event is reserved for actions induced by users)
       }
     }
   }
@@ -479,7 +481,7 @@ class Main extends TApplet with Client {
                             side: Symbol,
                             count: Symbol,
                             position: (Double, Double)) {
-    println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
+    //println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
     Server ! ("camera.mouse", kind, side, count, position)
   }
 
