@@ -274,7 +274,9 @@ object Workflow extends Actor {
 
 
         case ("export","GEXF") => (new GEXF) ! Pipeline.output
-        case x:scala.xml.Elem => Browser ! 'forceDownload -> x.toString
+        case x:scala.xml.Elem =>
+          Browser ! 'forceDownload -> x.toString
+         //  new ExportGraphDialog(x.toString)
 
         case (key: String, value: Any) =>
            Pipeline.applyKey(key, value)

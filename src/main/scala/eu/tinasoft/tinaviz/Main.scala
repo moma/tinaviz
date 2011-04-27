@@ -105,11 +105,11 @@ class Main extends TApplet with Client {
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
           // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/badgraph/gexf/PseudoInclusion_logJaccard_FET-graph.gexf"
-          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
           //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
 
          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/package_test/gexf/Cooccurrences_sharedNGrams_FET-graph.gexf"
-         "file:///home/jbilcke/Dropbox/Shared/Tina/test.gexf"
+        // "file:///home/jbilcke/Dropbox/Shared/Tina/test.gexf"
           //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
           //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
 
@@ -155,7 +155,8 @@ class Main extends TApplet with Client {
         smooth
 
 
-      case "GEXF" => Server ! ("export", "GEXF")
+      case "GEXF" =>
+        Server ! ("export", "GEXF")
 
       case any =>
     }
@@ -408,43 +409,54 @@ class Main extends TApplet with Client {
       case "none" =>
         return
       case err =>
-        //println("error")
+        //println("error")             || g.currentView.equalsIgnoreCase("macro")
         return
     }
     //println("recentering will be done!")
     //val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
     //val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
-    val (w,h) = (width.toDouble * 0.70, height.toDouble * 0.70)
+    val (w,h) = (width.toDouble * 0.70, height.toDouble * 0.70) // FEATURE 30% of margins
     val (cz,cp) = (getZoom,getPosition)
 
     //def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
     //def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
-     val centerOnSelection = mode.equalsIgnoreCase("selection") && g.currentView.equalsIgnoreCase("macro") && g.selectionNeighbourhood.size > 1
+
+     val centerOnSelection = (mode.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
       // spaghetti code
-    val ratio = (
-      if (centerOnSelection) {
-         (abs(g.xMinSelectionNeighbourhood - g.xMaxSelectionNeighbourhood) * getZoom,
-          abs(g.yMinSelectionNeighbourhood - g.yMaxSelectionNeighbourhood) * getZoom) // TODO we could use g.selection(0)
+    val ratio =  (((if (centerOnSelection) {
+         (g.xMinSelectionNeighbourhood - g.xMaxSelectionNeighbourhood,
+          g.yMinSelectionNeighbourhood - g.yMaxSelectionNeighbourhood) // TODO we could use g.selection(0)
       } else  {
-         (abs(g.xMin - g.xMax) * getZoom, abs(g.yMin - g.yMax) * getZoom)  // size to screen
-      }
-    ) match { case (gwidth,gheight) => max(gwidth / w, gheight / h) }
+         (g.xMin - g.xMax, g.yMin - g.yMax)  // size to screen
+     }) match {
+      case (gw, gh) => (abs(gw), abs(gh))
+    }) match {
+      case (gw, gh) => ((if (gw < 50.0) 50.0 else gw), (if (gh < 50.0) 50.0 else gh))
+    }) match {
+      case (gw,gh) =>
+        println("max(gw,gh): "+max(gw,gh))
+        //val mx = max(gw,gh)
+
+        //(gw,gh)
+        max(
+            gw * getZoom / w,
+            gh * getZoom / h
+            )
+    }
+
+
     val pos = if (centerOnSelection) g.selectionNeighbourhoodCenter else g.notSinglesCenter
 
     //if (abs(ratio) > 1.0001 || abs(ratio) < 0.9999) {
-
-
       var translate = new PVector(width.toFloat / 2.0f, height.toFloat / 2.0f, 0)
       translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
       translate.set(translate.x, translate.y, 0) // FIXME ugly hack, seems a bugs from the browser..
       updatePositionSilent(translate)
-      //println("selectionNeighbourhood.size: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio)
+      println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio)
       if (g.selectionNeighbourhood.size != 1) {
-      if (ratio != 0.0) updateZoomSilent(getZoom / (
-             // if (ratio < 1.0) (ratio * 2.0) else (ratio / 2.0)
-             ratio
-        ))
+         if (ratio != 0.0) updateZoomSilent(getZoom / ratio)
        } else {
+         println("updateZoomSilent(3.0)")
          updateZoomSilent(3.0) // hack: we update the zoom but we do not trigger an event (the "zoom changed" event is reserved for actions induced by users)
       }
     //}
