@@ -73,9 +73,14 @@ object PhysicLayout {
     val nbEdges = g.nbEdges.toDouble / 2.0
     //println("nbEdges: "+nbEdges)
     val maxD = 50.0 // 50 seems too big
-    val minD = 8.0 // min distance
+    val minD = 32.0 // min distance . 8 seems to be too short with default node size and zoom settings
     val maxEdges = 3000.0
-    val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
+
+    // between min (16) and max (20~50)
+    //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (32, maxD)), minD)
+    val distInterval = (50.0,45.0)
+    //println("distInterval: "+distInterval)
+
     //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
 
     //println("running forceVector on "+nbNodes+" nodes")
@@ -115,15 +120,22 @@ object PhysicLayout {
                     case "Document" => aMinMaxWeights
                     case "NGram" => bMinMaxWeights
                   }
-                  // Rest Length - the spring wants to be at this length and acts on the particles to push or pull them exactly this far apart at all times.
-                  val l = Maths.map(g.links(i1)(i2), minMaxInterval, distInterval).toFloat
 
+                  val strictDistance = (g.size(i1) + g.size(i2))
+                  val securityDistance = (strictDistance * 1.20) / g.cameraZoom // 20%
+
+                  // Rest Length - the spring wants to be at this length and acts on the particles to push or pull them exactly this far apart at all times.
+                  // we want dist interval to be [50,30]
+                  //val l = (Maths.map(g.links(i1)(i2), minMaxInterval, distInterval) match { case l => if (l < securityDistance) securityDistance else l })
+                   //println("("+g.label(i1)+" -> "+g.label(i2)+") securityDistance: "+securityDistance+"    l:"+l+ "distInterval: "+distInterval)
+                   val l = 250
                   // Strength - If they are strong they act like a stick. If they are weak they take a long time to return to their rest length.
-                  val s = 0.005f //Maths.map(g.links(i1)(i2), minMaxInterval, (0.1, 0.03)).toFloat // default 0.04
+                  val s = 0.005 //Maths.map(g.links(i1)(i2), minMaxInterval, (0.1, 0.03)).toFloat // default 0.04
 
                   // Damping - If springs have high damping they don't overshoot and they settle down quickly, with low damping springs oscillate.
-                  val d = Maths.map(g.links(i1)(i2), minMaxInterval, (0.01, 0.015)).toFloat
-                  ps.makeSpring(p1, p2, s, d, l) // 10.0f (float strength, float damping, float restLength)
+                  //val d = Maths.map(g.links(i1)(i2), minMaxInterval, (0.01, 0.015))
+                  val d = 0.015
+                  ps.makeSpring(p1, p2, s.toFloat, d.toFloat, l.toFloat) // 10.0f (float strength, float damping, float restLength)
                 }
                 else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f) // we repulse unrelated nodes
               }
