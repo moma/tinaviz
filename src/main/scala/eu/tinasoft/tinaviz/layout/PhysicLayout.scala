@@ -78,7 +78,7 @@ object PhysicLayout {
 
     // between min (16) and max (20~50)
     //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (32, maxD)), minD)
-    val distInterval = (50.0,45.0)
+    val distInterval = (200.0,80.0)
     //println("distInterval: "+distInterval)
 
     //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
@@ -122,15 +122,17 @@ object PhysicLayout {
                   }
 
                   val strictDistance = (g.size(i1) + g.size(i2))
-                  val securityDistance = (strictDistance * 1.20) / g.cameraZoom // 20%
+                  val securityDistance = (strictDistance * 1.20) * g.cameraZoom // 20%
 
                   // Rest Length - the spring wants to be at this length and acts on the particles to push or pull them exactly this far apart at all times.
                   // we want dist interval to be [50,30]
+                  val l = Maths.map(g.links(i1)(i2), minMaxInterval, distInterval)
+                  //val l = 80
                   //val l = (Maths.map(g.links(i1)(i2), minMaxInterval, distInterval) match { case l => if (l < securityDistance) securityDistance else l })
                    //println("("+g.label(i1)+" -> "+g.label(i2)+") securityDistance: "+securityDistance+"    l:"+l+ "distInterval: "+distInterval)
-                   val l = 250
+                   //val l = 150
                   // Strength - If they are strong they act like a stick. If they are weak they take a long time to return to their rest length.
-                  val s = 0.005 //Maths.map(g.links(i1)(i2), minMaxInterval, (0.1, 0.03)).toFloat // default 0.04
+                  val s = 0.05 // 0.005 //Maths.map(g.links(i1)(i2), minMaxInterval, (0.1, 0.03)).toFloat // default 0.04
 
                   // Damping - If springs have high damping they don't overshoot and they settle down quickly, with low damping springs oscillate.
                   //val d = Maths.map(g.links(i1)(i2), minMaxInterval, (0.01, 0.015))
