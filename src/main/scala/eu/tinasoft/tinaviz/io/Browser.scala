@@ -1,7 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/************************************************************************
+                                  Tinaviz
+*************************************************************************
+ This application is part of the Tinasoft project: http://tinasoft.eu
+ Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
+
+Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
+************************************************************************/
 
 package eu.tinasoft.tinaviz.io
 
@@ -34,26 +38,16 @@ object Browser extends Actor {
     //             (if (state) "true" else "false"))
   }
 
-
-
   def replace(str:String) = {
      str.replaceAll("\"","\\\"").replace("'","\\'")
   }
 
   def act() {
-
-    //var model = new Model()
-
     loop {
-
       react {
         case 'exit =>
           println("exiting browser")
           exit()
-
-
-        //   private def graphImportedCallback(msg:String) = {
-       // callAndForget("_graphImportedCallback", msg)
 
         // asynchronous call
         case func:String =>

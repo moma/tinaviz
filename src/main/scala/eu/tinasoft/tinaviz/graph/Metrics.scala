@@ -1,13 +1,16 @@
+/************************************************************************
+                                  Tinaviz
+*************************************************************************
+ This application is part of the Tinasoft project: http://tinasoft.eu
+ Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
+
+Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
+************************************************************************/
+
 package eu.tinasoft.tinaviz.graph
 
 import math._
 
-/**
- * Created by IntelliJ IDEA.
- * User: jbilcke
- * Date: 2/17/11
- * Time: 12:33 PM
- */
 object Metrics {
 
   /**

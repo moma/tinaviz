@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
+ */
+
 package eu.tinasoft.tinaviz
 
 import java.util.concurrent.atomic.AtomicReference

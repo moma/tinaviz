@@ -1,12 +1,8 @@
-package eu.tinasoft.tinaviz.layout
-
 /**
- * Created by IntelliJ IDEA.
- * User: jbilcke
- * Date: 3/29/11
- * Time: 11:28 AM
- * To change this template use File | Settings | File Templates.
+ * Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
  */
+
+package eu.tinasoft.tinaviz.layout
 
 import eu.tinasoft._
 import tinaviz.graph.Graph
