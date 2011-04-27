@@ -87,6 +87,7 @@ object Server extends Actor {
         case "recenter"                      => Workflow ! "recenter"
         case ("select", toBeSelected)        => Workflow ! "select"              -> toBeSelected
         case ("selectByPattern", pattern)    => Workflow ! "selectByPattern"     -> pattern
+        case ("selectByNeighbourPattern", pattern, category)    => Workflow ! ("selectByNeighbourPattern", pattern, category)
         case ("highlightByPattern", pattern) => Workflow ! "highlightByPattern"  -> pattern
 
         case ('getNodes,view,category) =>

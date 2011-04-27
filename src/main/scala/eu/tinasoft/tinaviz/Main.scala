@@ -452,7 +452,7 @@ class Main extends TApplet with Client {
       translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
       translate.set(translate.x, translate.y, 0) // FIXME ugly hack, seems a bugs from the browser..
       updatePositionSilent(translate)
-      println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio+" zoom: "+getZoom)
+      //println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio+" zoom: "+getZoom)
       if (g.selectionNeighbourhood.size != 1) {
          if (ratio != 0.0) updateZoomSilent(getZoom / ratio)
        } else {

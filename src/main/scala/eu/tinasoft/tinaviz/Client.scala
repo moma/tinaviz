@@ -204,6 +204,21 @@ trait Client {
     Server ! "selectByPattern" -> pattern
   }
 
+
+  def selectByNeighbourPattern(pattern:String, patternMode:String, category:String) : Unit = {
+
+    if (pattern == null || patternMode == null) {
+      System.out.println("selectByNeighbourPattern(" + pattern + ", " + patternMode + ", "+category+")");
+      return;
+    }
+    // shutdown the "center on visualization" mode
+
+    if (pattern.isEmpty()) {
+      return;
+    }
+    Server ! ("selectByNeighbourPattern",pattern,category)
+  }
+
   /**
    * Select a node from its ID
    *

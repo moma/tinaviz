@@ -174,6 +174,35 @@ object Workflow extends Actor {
           Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
           self ! "filter.view" -> Pipeline.input.currentView
 
+          /** Search and select a node depending on it's neighbour label match **/
+        case ("selectByNeighbourPattern", pattern: String, category:String) =>
+          val ref = Pipeline.input
+          val out = Pipeline.output
+          println("selectByNeighbourPattern("+pattern+", "+category+")")
+          Pipeline.setOutput(
+            if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
+              out + ("selected" -> out.selected.map(c => false))
+            } else {
+              out + ("selected" -> out.label.zipWithIndex.map {
+                case (label, i) =>
+                  val originalID = ref.id(out.uuid(i)) // out local graph out has a relative ID (int)..
+                                                       // we need to retrieve the reference ID (int) from the UUID (string)
+                  var matched = false
+                  ref.label.zipWithIndex foreach {
+                    case (potentialNeighbourLabel,potentialNeighbourID) =>
+                        if (
+                         ref.hasAnyLink(potentialNeighbourID,originalID) // if this is a neighbour..
+                         && ref.category(potentialNeighbourID).equalsIgnoreCase(category) // that match category..
+                         && (potentialNeighbourLabel.toLowerCase contains pattern.toLowerCase) // that match search..
+                        ) matched = true    // we select our node
+                  }
+                  if (matched) true else out.selected(i)
+              })
+            }
+          )
+          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
+          self ! "filter.view" -> Pipeline.input.currentView
+
         case ("highlightByPattern", pattern: String) =>
           val in = Pipeline.input
           val out = Pipeline.output

@@ -131,8 +131,13 @@ object PhysicLayout {
                   //val l = (Maths.map(g.links(i1)(i2), minMaxInterval, distInterval) match { case l => if (l < securityDistance) securityDistance else l })
                    //println("("+g.label(i1)+" -> "+g.label(i2)+") securityDistance: "+securityDistance+"    l:"+l+ "distInterval: "+distInterval)
                    //val l = 150
-                  // Strength - If they are strong they act like a stick. If they are weak they take a long time to return to their rest length.
-                  val s = 0.05 // 0.005 //Maths.map(g.links(i1)(i2), minMaxInterval, (0.1, 0.03)).toFloat // default 0.04
+
+
+                  // Strength
+                  // "If they are strong they act like a stick. If they are weak they take a long time to
+                  // return to their rest length."
+                  // 0.05 seems to be a good value - lower values okay, but greater looks very unstable!
+                  val s = 0.05
 
                   // Damping - If springs have high damping they don't overshoot and they settle down quickly, with low damping springs oscillate.
                   //val d = Maths.map(g.links(i1)(i2), minMaxInterval, (0.01, 0.015))
