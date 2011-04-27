@@ -78,7 +78,7 @@ object PhysicLayout {
 
     // between min (16) and max (20~50)
     //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (32, maxD)), minD)
-    val distInterval = (200.0,80.0)
+    val distInterval = (100.0,20.0) // 200, 80 seems good!
     //println("distInterval: "+distInterval)
 
     //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
@@ -99,7 +99,7 @@ object PhysicLayout {
       // }
 
       ps.clear // we clean everything, actually.. this could be optimized
-      val gravity = ps.makeParticle(20.0f, 0.0f, 0.0f, 0.0f)
+      val gravity = ps.makeParticle(200.0f, 0.0f, 0.0f, 0.0f)
       gravity.makeFixed
 
       val positionIndexNotSingleParticle = positionIndexSingle.filter {
@@ -121,8 +121,8 @@ object PhysicLayout {
                     case "NGram" => bMinMaxWeights
                   }
 
-                  val strictDistance = (g.size(i1) + g.size(i2))
-                  val securityDistance = (strictDistance * 1.20) * g.cameraZoom // 20%
+                  // val strictDistance = (g.size(i1) + g.size(i2))
+                  // val securityDistance = (strictDistance * 1.20) * g.cameraZoom // 20%
 
                   // Rest Length - the spring wants to be at this length and acts on the particles to push or pull them exactly this far apart at all times.
                   // we want dist interval to be [50,30]
@@ -141,13 +141,14 @@ object PhysicLayout {
 
                   // Damping - If springs have high damping they don't overshoot and they settle down quickly, with low damping springs oscillate.
                   //val d = Maths.map(g.links(i1)(i2), minMaxInterval, (0.01, 0.015))
-                  val d = 0.015
+                  val d = 0.05 // 0.015
+
                   ps.makeSpring(p1, p2, s.toFloat, d.toFloat, l.toFloat) // 10.0f (float strength, float damping, float restLength)
                 }
-                else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -800f, 10f) // we repulse unrelated nodes
+                else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -500f, 10f) // default -600   we repulse unrelated nodes
               }
           }
-          ps.makeAttraction(p1, gravity, 100f, 10f) // apply the gravity
+          ps.makeAttraction(p1, gravity, 900f, 200f) // apply the gravity
       }
     } // end hash changed
 

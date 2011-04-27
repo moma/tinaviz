@@ -415,7 +415,7 @@ class Main extends TApplet with Client {
     //println("recentering will be done!")
     //val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
     //val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
-    val (w,h) = (width.toDouble * 0.70, height.toDouble * 0.70) // FEATURE 30% of margins
+    val (w,h) = (width.toDouble * 0.85, height.toDouble * 0.85) // FEATURE 30% of margins
     val (cz,cp) = (getZoom,getPosition)
 
     //def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
@@ -450,7 +450,10 @@ class Main extends TApplet with Client {
     //if (abs(ratio) > 1.0001 || abs(ratio) < 0.9999) {
       var translate = new PVector(width.toFloat / 2.0f, height.toFloat / 2.0f, 0)
       translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
-      translate.set(translate.x, translate.y, 0) // FIXME ugly hack, seems a bugs from the browser..
+
+      // FIXME ugly hack, seems a bugs from the browser when inserting the applet.. it is positionned in absolute coord?!
+      translate.set(translate.x, translate.y + 30, 0)
+
       updatePositionSilent(translate)
       //println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio+" zoom: "+getZoom)
       if (g.selectionNeighbourhood.size != 1) {
