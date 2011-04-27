@@ -72,44 +72,6 @@ trait Client {
     }
   }
 
-  /*
-  def select(id:String) = {
-    println("JavaScript asked for select("+id+")")
-    Server ! "select" -> id
-    true
-  }
-   */
-
-  /*
-  def unselect() = {
-    Server ! 'select -> ""
-    true
-  }
-  */
-
-  // var Map[String]
-  /**
-   * Set a param
-   * TODO: boolean sync?
-   */
-  /*
-   def getLater(cb:String,key:String) = {
-   //val subscriber = sender
-   println("getLater(cb: "+cb+", key: "+key)
-   val sessionUser = actor {
-   //loop {
-   receive {
-   case any =>
-   Browser ! "callCb" -> Map( "cb" -> cb, "data" -> (Server !? key))
-   }
-   //}
-   }
-   sessionUser ! 'go
-
-   }
-   */
-  // { action: unselect }
-
   def openURI(url:String) = {
       Server ! 'open -> new java.net.URL(url)
     true
@@ -167,20 +129,6 @@ trait Client {
     //println("-> get("+key+")")
     (Server !? key).asInstanceOf[AnyRef]
   }
-  /*
-   def msgCb(action:String, args:String, cbId:Int) {
-   println("msgArgCb - action: "+action+" cbId:"+cbId+" args: "+args)
-
-   val cb = actor {
-   receive {
-   case msg => Browser ! "callCb" -> Map( "cb" -> cbId, "data" -> msg)
-   }
-   }
-   Server ! ('js, action, Json.parse(args), cb)
-   }*/
-
-  // warning: synchronous..
-
 
   /**
    * Update a Node in the current view, from it's UUID

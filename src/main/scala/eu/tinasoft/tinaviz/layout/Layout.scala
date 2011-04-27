@@ -1,6 +1,11 @@
-/**
- * Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
- */
+/************************************************************************
+                                  Tinaviz
+*************************************************************************
+ This application is part of the Tinasoft project: http://tinasoft.eu
+ Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
+
+Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
+************************************************************************/
 
 package eu.tinasoft.tinaviz.layout
 
@@ -22,29 +27,27 @@ object Layout extends Actor {
 
   def act() {
 
-      this ! 'run
+    this ! 'run
 
-      while (true) {
-        receive {
-          case 'run =>
-              Workflow ! ('setLayout,
-                PhysicLayout.layout(
-                   ((Workflow !? 'getLayout) match {
-                       case g:Graph =>
-                         //println("Layout: got graph ("+g.nbNodes+")")
-                         g
-                       case any =>
-                         //println("Layout: empty graph..")
-                         new Graph
-                   })
-                ).toGraph )
+    while (true) {
+      receive {
+        case 'run =>
+          Workflow ! ('setLayout,
+            PhysicLayout.layout(
+              ((Workflow !? 'getLayout) match {
+                case g: Graph =>
+                //println("Layout: got graph ("+g.nbNodes+")")
+                  g
+                case any =>
+                //println("Layout: empty graph..")
+                  new Graph
+              })
+            ).toGraph)
 
-              this ! 'run  // run layout as fast as possible
-          case 'exit =>
-              exit()
-        }
+          this ! 'run // run layout as fast as possible
+        case 'exit =>
+          exit()
+      }
     }
   }
-
-
 }

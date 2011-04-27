@@ -13,29 +13,6 @@ import math._
 
 object Metrics {
 
-  /**
-   * compute the amount of information added to thiq by g
-   */
-  def activity(g: Graph, f: Graph): Double = {
-    def max(x: Double, y: Double): Double = if (x < y) y else x
-    var addNodes = 0.0
-    var deletedNodes = 0.0
-    var addEdges = 0.0
-    var deletedEdges = 0.0
-    f.uuid.zipWithIndex foreach {
-      case (u, i) => if (!g.has(u)) addNodes += 1.0
-    }
-    g.uuid.zipWithIndex foreach {
-      case (u, i) => if (!f.has(u)) deletedNodes += 1.0
-    }
-    val activity1 = g.activity * g.entropy
-    val count = g.nbNodes + f.nbNodes
-    val activity2 = if (count > 0) ((addNodes + deletedNodes) / count) else 0
-    //val activity2 = if (count > 0) Maths.map(((addNodes + deletedNodes) / count),(0.0,1.0),(0.1,0.99)) else 0
-    val a = max(activity1, activity2)
-    //println("activity: " + a)
-    a
-  }
 
   /**
    * Compute the number of single nodes
@@ -120,21 +97,6 @@ object Metrics {
                 }
             }
         }
-
-        /*
-        g.links.zipWithIndex.map {
-          case (bLinks, b) =>
-            bLinks.foreach {
-              case (b, w) => if (a != b) {
-                if (g.hasAnyLink(a, b)) {
-                  val key : (Int,Int) = if (a < b) (a, b) else (b, a)
-                  val tpl : ((Int,Int),Boolean) = (key,true)
-                  lst += tpl
-                }
-              }
-            }
-        }
-        */
         neighbourMap.size
     }
     _degree.toArray
@@ -258,8 +220,6 @@ object Metrics {
     }
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
     }
-
-
 
   /**
    * Compute the extremums (X min, X max, Y min, Y max)

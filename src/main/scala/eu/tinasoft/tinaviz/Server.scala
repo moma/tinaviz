@@ -84,7 +84,6 @@ object Server extends Actor {
         case ("export","GEXF") =>  Workflow ! ("export","GEXF")
         case ('open, pathOrURL: Any) =>  (new GEXF) ! pathOrURL
 
-        case "recenter"                      => Workflow ! "recenter"
         case ("select", toBeSelected)        => Workflow ! "select"              -> toBeSelected
         case ("selectByPattern", pattern)    => Workflow ! "selectByPattern"     -> pattern
         case ("selectByNeighbourPattern", pattern, category)    => Workflow ! ("selectByNeighbourPattern", pattern, category)

@@ -13,9 +13,7 @@ import eu.tinasoft.tinaviz.util.Maths
 
 object Filters {
 
-
   def category(g:Graph) : Graph = {
-    //println("applyCategory: "+g.debugStats)
     if (g.nbNodes == 0) return g
     var removeMe = Set.empty[Int]
     val category = g.currentCategory
@@ -29,10 +27,8 @@ object Filters {
         }
 
       case "meso" =>
-        //println("\n\nfiltering the meso view: "+g.debugStats)
         g.selected.zipWithIndex foreach {
           case (f, i) => if (!f) {
-
               // remove the node which is not in our category
               if (!g.currentCategory.equalsIgnoreCase(g.category(i))) {
                 removeMe += i
@@ -74,7 +70,6 @@ object Filters {
           if (!g.selected(i)) removeMe += i 
     }  
     g.remove(removeMe)
-    // h + ("activity" -> Metrics.activity(h,g))
   }
     /**
    * Filter the Nodes weights
@@ -100,7 +95,6 @@ object Filters {
           if (!g.selected(i)) removeMe += i
     }
     removeMe
-    // h + ("activity" -> Metrics.activity(h,g))
   }
   /**
    * Filter the Edge weights
@@ -135,9 +129,7 @@ object Filters {
             }
         }
     }
-    val h = clean(g + ("links" -> newLinks))
-
-    h// + ("activity" -> Metrics.activity(h,g))
+    clean(g + ("links" -> newLinks))
   }
   
   def weightToSize(g: Graph) : Graph = {
@@ -155,7 +147,6 @@ object Filters {
       case (weight,i) => Maths.map(weight, g.category(i) match {
                                       case "Document" => aminmaxweight
                                       case "NGram" => bminmaxweight
-                                    //
                                    }, sliderRange) * (g.category(i) match {
                                       case "Document" => aratio
                                       case "NGram" => bratio
@@ -164,12 +155,11 @@ object Filters {
     g + ("size" -> newSize)
   }
 
-      /**
+  /**
    * Do some pre-processing, then send the final scene to the View
    * TODO: keep the Graph?
    */
   def clean(g:Graph) = {
-    // TODO: do that in another Actor, which will reply directly to our master
     g + ("links" -> g.links.zipWithIndex.map {
       case (links, i) =>
         links.filter {
@@ -183,7 +173,6 @@ object Filters {
               true
             }
         }
-
     }.toArray)
   }
 }

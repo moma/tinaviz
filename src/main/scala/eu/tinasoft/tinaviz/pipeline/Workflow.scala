@@ -216,11 +216,6 @@ object Workflow extends Actor {
           //Browser ! "_callbackSelectionChanged" -> "left"
           self ! "filter.view" -> in.currentView // will automatically update the highlight section
 
-        case "recenter" =>
-        //println("recentering now..")
-          Pipeline.setOutput(Functions.recenter(Pipeline.output))
-
-
         case ("camera.mouse", kind: Symbol, side: Symbol, count: Symbol, position: (Double, Double)) =>
           val out = Pipeline.output
           val (cz,cp, sr) = (out.cameraZoom, out.cameraPosition, out.selectionRadius)
