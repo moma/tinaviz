@@ -49,6 +49,8 @@ object PhysicLayout {
   def tinaforce(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
 
+    val h = Pipeline.categoryCache
+
     val GRAVITY = 200 // g.get[Double]("layout.gravity") // stronger means faster!
     val REPULSION = 800 // should be divided by the nb of edges? faster at the beggining, then slower?
     val DAMPING = 0.002 // please, no greater than 0.05
@@ -69,9 +71,13 @@ object PhysicLayout {
       ps.clear
       //println("hash changed, regenerating the particle system..")
 
-      val aMinMaxWeights = (g.minAEdgeWeight, g.maxAEdgeWeight)
-      val bMinMaxWeights = (g.minBEdgeWeight, g.maxBEdgeWeight)
+      val aMinMaxWeights = (h.minAEdgeWeight, h.maxAEdgeWeight)
+      val bMinMaxWeights = (h.minBEdgeWeight, h.maxBEdgeWeight)
+      val aMinMaxNodeWeights = (g.minANodeWeight, g.maxANodeWeight)
+      val bMinMaxNodeWeights = (g.minBNodeWeight, g.maxBNodeWeight)
 
+      //println("Detected min/max for Documents --> Nodes: "+aMinMaxNodeWeights+"  Links: "+aMinMaxWeights)
+      //println("Detected min/max for NGrams    --> Nodes: "+bMinMaxNodeWeights+"  Links: "+bMinMaxWeights)
       //val nbEdges = g.nbEdges.toDouble / 2.0
       //val springFactor = if (nbEdges > 20000) 0.005f else 0.01f
 
