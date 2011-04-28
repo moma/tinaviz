@@ -381,7 +381,7 @@ class Main extends TApplet with Client {
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
         //val weAreSelected = false // we don't care. else, use: g.selected(i)
-        val weAreSelected = g.selected(i)
+        val weAreSelected = b1 //g.selected(i)
         val weHaveACollision = sortedLabelIDs.exists {
           case (j) =>
             val p2 = g.position(j)
@@ -394,7 +394,7 @@ class Main extends TApplet with Client {
             val h2 = setFontSize((r2 * getZoom).toInt, b2)
             val w2 = textWidth(l2) /// getZoom //
             //val whichIsSelected = false // we don't care. else, use: scene.graph.selected(j)
-            val whichIsSelected = g.selected(j)
+            val whichIsSelected = b2 // g.selected(j)
             val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1))
               || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
               && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
