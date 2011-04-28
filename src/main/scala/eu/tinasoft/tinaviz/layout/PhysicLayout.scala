@@ -48,32 +48,17 @@ object PhysicLayout {
    */
   def tinaforce(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    val springFactor = if (g.nbEdges > 20000) 0.005f else 0.01f
+
+    val GRAVITY = 200 // g.get[Double]("layout.gravity") // stronger means faster!
+    val REPULSION = 800 // should be divided by the nb of edges? faster at the beggining, then slower?
+    val DAMPING = 0.002 // please, no greater than 0.05
+    val STRENGTH = 0.05 // 0.05 looks perfect
+    val maxLinkLength = 80 // max distance between linked nodes
+    val minLinkLength = 5 // min distance between linked nodes
+    val minDistance = 5 // min distance between unlinked nodes (and thus clusters)
 
     //since I can't normalize weight, it seems I have to adapt the drag myself
-    val drag = if (g.nbEdges > 20000) 0.2 else 0.4
-
-    //println("setting drag to " + drag)
-    //ps.setDrag(drag.toFloat)
-
-    val aMinMaxWeights = (g.minAEdgeWeight, g.maxAEdgeWeight)
-    val bMinMaxWeights = (g.minBEdgeWeight, g.maxBEdgeWeight)
-
-    val GRAVITY = 30 // g.get[Double]("layout.gravity") // stronger means faster!
-    val ATTRACTION = g.get[Double]("layout.attraction")
-    val REPULSION = g.get[Double]("layout.repulsion") // (if (nbNodes > 0) nbNodes else 1)// should be divided by the nb of edges
-
-    val nbEdges = g.nbEdges.toDouble / 2.0
-
-    val maxD = 50.0 // 50 seems too big
-    val minD = 32.0 // min distance . 8 seems to be too short with default node size and zoom settings
-    val maxEdges = 3000.0
-
-    // between min (16) and max (20~50)
-    //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (32, maxD)), minD)
-    val distInterval = (100.0, 20.0) // 200, 80 seems good!
-    //println("distInterval: "+distInterval)
-    //val distInterval = (if (nbEdges > maxEdges) maxD else Maths.map(nbEdges, (0.0, maxEdges), (12.0, maxD)), minD)
+    //ps.setDrag((if (g.nbEdges > 20000) 0.2 else 0.4).toFloat)
 
     val positionIndexSingle = g.position.zipWithIndex map {
       case (p, i) => (p, i, g.isSingle(i))
@@ -81,10 +66,18 @@ object PhysicLayout {
 
     if (g.hashed != lastHash) {
       lastHash = g.hashed
-      //println("hash changed, regenerating a particle system..")
+      ps.clear
+      //println("hash changed, regenerating the particle system..")
 
-      ps.clear // we clean everything, actually.. this could be optimized
-      val gravity = ps.makeParticle(200.0f, 0.0f, 0.0f, 0.0f)
+      val aMinMaxWeights = (g.minAEdgeWeight, g.maxAEdgeWeight)
+      val bMinMaxWeights = (g.minBEdgeWeight, g.maxBEdgeWeight)
+
+      //val nbEdges = g.nbEdges.toDouble / 2.0
+      //val springFactor = if (nbEdges > 20000) 0.005f else 0.01f
+
+      val distInterval = (minLinkLength.toDouble, maxLinkLength.toDouble)
+
+      val gravity = ps.makeParticle(GRAVITY.toFloat, 0.0f, 0.0f, 0.0f)
       gravity.makeFixed
 
       val positionIndexNotSingleParticle = positionIndexSingle.filter {
@@ -100,35 +93,28 @@ object PhysicLayout {
             case (pos2, i2, p2) =>
               if (i2 != i1) {
                 if (g.hasThisLink(i1, i2)) {
-                  // if we have a link, we create a spring
-                  val minMaxInterval = g.category(i1) match {
-                    case "Document" => aMinMaxWeights
-                    case "NGram" => bMinMaxWeights
-                  }
                   // val strictDistance = (g.size(i1) + g.size(i2))
                   // val securityDistance = (strictDistance * 1.20) * g.cameraZoom // 20%
-
-                  // Rest Length - the spring wants to be at this length and acts on the particles to push or pull them exactly this far apart at all times.
-                  // we want dist interval to be [50,30]
-                  val l = Maths.map(g.links(i1)(i2), minMaxInterval, distInterval)
-                  //val l = (Maths.map(g.links(i1)(i2), minMaxInterval, distInterval) match { case l => if (l < securityDistance) securityDistance else l })
-                  //println("("+g.label(i1)+" -> "+g.label(i2)+") securityDistance: "+securityDistance+"    l:"+l+ "distInterval: "+distInterval)
-
-                  // Strength
-                  // "If they are strong they act like a stick. If they are weak they take a long time to
-                  // return to their rest length.". 0.05 seems to be a good value - lower values okay, but greater are unstable
-                  val s = 0.05
-
-                  // Damping - If springs have high damping they don't overshoot and they settle down quickly, with low damping springs oscillate.
-                  //val d = Maths.map(g.links(i1)(i2), minMaxInterval, (0.01, 0.015))
-                  val d = 0.05 // 0.015
-
-                  ps.makeSpring(p1, p2, s.toFloat, d.toFloat, l.toFloat) // 10.0f (float strength, float damping, float restLength)
-                }
-                else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -500f, 10f) // default -600   we repulse unrelated nodes
+                  val w = g.links(i1)(i2)
+                  // if we have a link, we create a spring
+                  val minMaxInterval = (g.category(i1), g.category(i2)) match {
+                    case ("Document", "Document") => aMinMaxWeights
+                    case ("NGram", "NGram") => bMinMaxWeights
+                    case any => (w - 1.0, w + 1.0)
+                  }
+                  ps.makeSpring(
+                    p1,
+                    p2,
+                    STRENGTH.toFloat,
+                    DAMPING.toFloat,
+                    (Maths.map(w, minMaxInterval, (0.0, 1.0)) match {
+                        case l => ((1.0 - l) * (distInterval._2 - distInterval._1)) + distInterval._1
+                    }).toFloat)
+                } else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -REPULSION.toFloat, minDistance.toFloat) // default -600   we repulse unrelated nodes
               }
           }
-          ps.makeAttraction(p1, gravity, 900f, 200f) // apply the gravity
+
+          ps.makeAttraction(p1, gravity, 1500f, 200f) // apply the gravity
       }
     } // end hash changed
 
@@ -139,9 +125,9 @@ object PhysicLayout {
     ps.tick(1.0f)
 
     val gDiameter = Metrics.notSingleNodesDimension(g) match {
-      case dim => math.max(dim._1, dim._2) * 0.6
+      case dim => math.max(dim._1, dim._2) * 0.7
     }
-    var (ci, cj) = (0,0)
+    var (ci, cj) = (0, 0)
 
     if (g.pause) g
     else {

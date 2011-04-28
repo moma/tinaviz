@@ -54,7 +54,8 @@ object Maths {
        (tr._1 + ((tr._2 - tr._1) * r))
   }
 
-  
+
+
   def limit(v: Double, min: Double, max: Double): Double = {
     if (v < min) min else if (v > max) max else v
   }

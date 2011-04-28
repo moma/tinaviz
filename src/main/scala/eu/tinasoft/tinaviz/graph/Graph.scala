@@ -1,11 +1,7 @@
-/************************************************************************
-                                  Tinaviz
-*************************************************************************
- This application is part of the Tinasoft project: http://tinasoft.eu
- Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
-
-Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
-************************************************************************/
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
 package eu.tinasoft.tinaviz.graph
 
