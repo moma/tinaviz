@@ -347,21 +347,27 @@ class Main extends TApplet with Client {
 
 
     /**
-     * Make a string nicer
+     * Generic function to make a label nicer
      * Richard "Aphex Twin" James - University of Weird Music
      * will give:
      * Richard "Aphex Tw..
      */
-    def makeNice(text:String) = {
+    def labelCurator(text:String, len:Int, separator:String) = {
          (
-          if (text.contains(" - ")) text.split(" - ")(0)
+          if ((separator.size > 0) && text.contains(separator)) text.split(separator)(0)
           else text
            ) match {
            case text =>
-             if (text.size > 15) ("" + (text.grouped(15).toList)(0) + "..")
+             if (text.size > len) ("" + (text.grouped(len).toList)(0) + "..")
              else text
          }
     }
+
+    /**
+     * Tina-specific function to make labels nicer
+     */
+    def myLabelCurator(label:String, selected:Boolean=false) = if (selected) labelCurator(label, 55, " - ")  else labelCurator(label, 19, " - ")
+
     sortedLabelIDs.foreach {
       case (i) =>
         val p1 = g.position(i)
@@ -369,8 +375,8 @@ class Main extends TApplet with Client {
         val x1 = p1._1 + r1
         val y1 = p1._2
         val np1 = screenPosition(x1, y1)
-        val l1 = makeNice(g.label(i))
         val b1 =  (g.selected(i) || g.highlighted(i)) // F1 the text should be bold if node selected or highlighted
+        val l1 = myLabelCurator(g.label(i), b1)
         val h1 = setFontSize((r1 * getZoom).toInt, b1)
         val w1 = textWidth(l1) /// getZoom
         // println("L1: "+l1+" r1: "+r1+" h1: "+h1+" w1: "+w1+" x: "+np1._1+" y: "+np1._2)
@@ -383,8 +389,8 @@ class Main extends TApplet with Client {
             val x2 = p2._1 + r2
             val y2 = p2._2
             val np2 = screenPosition(x2, y2)
-            val l2 = makeNice(g.label(j))
             val b2 = (g.selected(j) || g.highlighted(j)) // SIDE EFFECT of F1
+            val l2 = myLabelCurator(g.label(j), b2)
             val h2 = setFontSize((r2 * getZoom).toInt, b2)
             val w2 = textWidth(l2) /// getZoom //
             //val whichIsSelected = false // we don't care. else, use: scene.graph.selected(j)
