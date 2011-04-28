@@ -345,6 +345,23 @@ class Main extends TApplet with Client {
       _._2
     }.toList.sort(compareBySize).toArray
 
+
+    /**
+     * Make a string nicer
+     * Richard "Aphex Twin" James - University of Weird Music
+     * will give:
+     * Richard "Aphex Tw..
+     */
+    def makeNice(text:String) = {
+         (
+          if (text.contains(" - ")) text.split(" - ")(0)
+          else text
+           ) match {
+           case text =>
+             if (text.size > 15) ("" + (text.grouped(15).toList)(0) + "..")
+             else text
+         }
+    }
     sortedLabelIDs.foreach {
       case (i) =>
         val p1 = g.position(i)
@@ -352,7 +369,7 @@ class Main extends TApplet with Client {
         val x1 = p1._1 + r1
         val y1 = p1._2
         val np1 = screenPosition(x1, y1)
-        val l1 = g.label(i)
+        val l1 = makeNice(g.label(i))
         val b1 =  (g.selected(i) || g.highlighted(i)) // F1 the text should be bold if node selected or highlighted
         val h1 = setFontSize((r1 * getZoom).toInt, b1)
         val w1 = textWidth(l1) /// getZoom
@@ -366,7 +383,7 @@ class Main extends TApplet with Client {
             val x2 = p2._1 + r2
             val y2 = p2._2
             val np2 = screenPosition(x2, y2)
-            val l2 = g.label(j)
+            val l2 = makeNice(g.label(j))
             val b2 = (g.selected(j) || g.highlighted(j)) // SIDE EFFECT of F1
             val h2 = setFontSize((r2 * getZoom).toInt, b2)
             val w2 = textWidth(l2) /// getZoom //
@@ -376,7 +393,7 @@ class Main extends TApplet with Client {
               || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
               && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
               || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
-            val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (g.label(j).compareTo(g.label(i)) > 0))
+            val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (l2.compareTo(l1) > 0))
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
             if (i == j) false else (weTouchSomething && (whichIsLarger || whichIsSelected))
         }
