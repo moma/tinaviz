@@ -85,7 +85,7 @@ trait Client {
    * Set a tuple of size two (both elements must be of the same type)
    */
     def sendTuple2(key:String, value1:java.lang.Object, value2:java.lang.Object, t:String) : Unit = {
-    //println("-> setAs(key:"+key+", value:"+value+", t:"+t+")")
+    //println("-> sendTuple2(key:"+key+", value1:"+value1+", value2: "+value2+", t:"+t+")")
     t match {
        case "Int" =>
        Server ! key -> (value1.toString.toInt, value2.toString.toInt)
@@ -94,7 +94,7 @@ trait Client {
        case "Double" =>
        Server ! key -> (value1.toString.toDouble, value2.toString.toDouble)
        case "Boolean" =>
-        println("converting "+key+" : ("+value1+","+value2+") to Boolean")
+        //println("converting "+key+" : ("+value1+","+value2+") to Boolean")
         Server ! key -> (value1.toString.toBoolean,value2.toString.toBoolean)
        case "String" => Server ! key -> (value1.toString, value2.toString)
        case "Json" =>
@@ -106,7 +106,8 @@ trait Client {
   }
 
   def send(key:String, value:java.lang.Object, t:String) : Unit = {
-    //println("-> setAs(key:"+key+", value:"+value+", t:"+t+")")
+    //println("-> send(key:"+key+", value:"+value+", t:"+t+")")
+    //"[\"NGram::41a14ef0a30a812946b69d522e1570db9e4c0d5579753ba429e7291a9bdbc96c\",\"NGram::bbbf7a6412d6d3e8244ac1fda5e35a20037acee661288cb95b7b18cf469980aa\",\"NGram::bc020a35b7f9cb1382e7b534c68e3c531d849b119bf14f75ddead6cc45c3ccc1\"]"
     t match {
        case "Int" => 
        Server ! key -> value.toString.toInt
@@ -115,7 +116,7 @@ trait Client {
        case "Double" => 
        Server ! key -> value.toString.toDouble
        case "Boolean" =>
-        println("converting "+key+" : "+value+" to Boolean")
+        //println("converting "+key+" : "+value+" to Boolean")
         Server ! key -> value.toString.toBoolean
        case "String" => Server ! key -> value.toString
        case "Json" =>

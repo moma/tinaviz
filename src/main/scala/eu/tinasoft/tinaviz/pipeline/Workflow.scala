@@ -121,7 +121,7 @@ object Workflow extends Actor {
           reply(result)
 
         case ("select", uuidList: List[String]) =>
-        //println("selecting nodes: '" + uuidList + "'")
+         // println("selecting nodes: '" + uuidList + "'")
           val in = Pipeline.input
           val out = Pipeline.output
           val out2 = if (uuidList.size == 0) {
@@ -155,12 +155,12 @@ object Workflow extends Actor {
               })
             }
           Pipeline.setOutput(out2)
-          println("calling Pipeline.output.updateSelectedWithCategory( g )")
+          //println("calling Pipeline.output.updateSelectedWithCategory( g )")
           /*Pipeline.output.updateSelectedWithCategory(
               out2
           ) */
-          println("out2.selection.size: " + out2.selection.size)
-          println("Pipeline.output.size: " + Pipeline.output.size)
+          //println("out2.selection.size: " + out2.selection.size)
+          // println("Pipeline.output.size: " + Pipeline.output.size)
           Browser ! "_callbackSelectionChanged" -> (out2.selectionAttributes, "left")
           //self ! "filter.view" -> Pipeline.input.currentView
 
@@ -238,7 +238,7 @@ object Workflow extends Actor {
               if (changed) Pipeline.setOutput(out2)
 
             case 'Click =>
-              println("Click!")
+              //println("Click!")
               var somethingIsSelected = false
               val doubleClicked = count match {
                       case 'Simple => false
@@ -265,7 +265,7 @@ object Workflow extends Actor {
                       if (nodeHasBeenTouched) !previousSelectionState else previousSelectionState
                   }
               }.toArray)
-              println("selection count, before: "+out.selection.size+" after: "+out2.selection.size)
+              //println("selection count, before: "+out.selection.size+" after: "+out2.selection.size)
               Pipeline.setOutput(out2)
               Browser ! "_callbackSelectionChanged" -> (out2.selectionAttributes, side match {
                 case 'Left => "left"

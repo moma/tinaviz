@@ -15,6 +15,7 @@ import traer.physics._
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import tinaviz.graph._
+import tinaviz.pipeline.Pipeline
 
 object PhysicLayout {
   val ps = new ParticleSystem(0f, 0.1f)
