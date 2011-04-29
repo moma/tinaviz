@@ -657,6 +657,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     nodeData
   }
 
+  def clearSelection = { this + ("selected" -> this.selected.map(c => false)) }
+
   /**
   var nodeData = Map(uuid.map {case uuid => (uuid,Map.empty[String,Any])}:_*)
   for (i <- ids) {

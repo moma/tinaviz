@@ -125,7 +125,8 @@ object Workflow extends Actor {
           val in = Pipeline.input
           val out = Pipeline.output
           val out2 = if (uuidList.size == 0) {
-              out + ("selected" -> out.selected.map(c => false))
+              Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              out.clearSelection
           } else {
               out + ("selected" -> out.uuid.zipWithIndex.map {
                 case (_uuid, i) =>
@@ -146,7 +147,8 @@ object Workflow extends Actor {
         case ("select", uuid: String) =>
           val out = Pipeline.output
           val out2 = if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
-              out + ("selected" -> out.selected.map(c => false))
+              Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              out.clearSelection
             } else {
               out + ("selected" -> out.uuid.zipWithIndex.map {
                 case (_uuid, i) =>
@@ -168,7 +170,8 @@ object Workflow extends Actor {
           val out = Pipeline.output
           Pipeline.setOutput(
             if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
-              out + ("selected" -> out.selected.map(c => false))
+              Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              out.clearSelection
             } else {
               out + ("selected" -> out.label.zipWithIndex.map {
                 case (label, i) => if (label.toLowerCase contains pattern.toLowerCase) true else out.selected(i)
@@ -185,7 +188,8 @@ object Workflow extends Actor {
           println("selectByNeighbourPattern("+pattern+", "+category+")")
           Pipeline.setOutput(
             if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
-              out + ("selected" -> out.selected.map(c => false))
+              Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              out.clearSelection
             } else {
               out + ("selected" -> out.label.zipWithIndex.map {
                 case (label, i) =>
@@ -309,6 +313,9 @@ object Workflow extends Actor {
         case (key: String, value: Any) =>
            Pipeline.applyKey(key, value)
 
+           // WARNING actually caching is not really used (didn't have the time to debug it) so a straightforward
+           // workflow is used instead. since it was that easy, I simply resetted the "categoryCache" when we unselect nodes
+           // if you happen to refactorate this, you will need to clear the selection in the other caches, too
           key match {
             case "filter.view" =>
               val out = Pipeline.output
