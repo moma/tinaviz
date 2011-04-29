@@ -347,6 +347,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   /**
    * Warm-up the lazy vals
+   * Should not be called to often, since this is a costly operation!
    */
   def toGraph = {
    position
@@ -358,6 +359,23 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    renderEdgeIndex
    renderEdgeWeight
    renderNodeShape
+   
+    
+        // a list of positions + ID
+        /*
+  selectionNeighbourhood 
+  selectionNeighbourhoodCenter
+  singlesCenter
+  notSinglesCenter 
+  outDegreeExtremums
+  inDegreeExtremums
+  extremums 
+  extremumsSelection
+  extremumsSelectionNeighbourhood 
+  nodeWeightExtremums
+  edgeWeightExtremums
+   */ 
+
    this
   }
 

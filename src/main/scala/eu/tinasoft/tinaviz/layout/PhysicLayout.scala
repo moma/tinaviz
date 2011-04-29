@@ -112,6 +112,7 @@ object PhysicLayout {
                   ps.makeSpring(
                     p1,
                     p2,
+                    //Maths.map(w, minMaxInterval, (0.002, 0.05)).toFloat,
                     STRENGTH.toFloat,
                     DAMPING.toFloat,
                     (Maths.map(w, minMaxInterval, (0.0, 1.0)) match {
