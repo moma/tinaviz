@@ -286,9 +286,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             //val alpha =  Maths.map(weight, getExtremum(catFrom), (0.50, 0.95))
             tmpColor ::= ((modeFrom, modeTo) match {
               case ('selected, any) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
-              case (any, 'selected) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
+              // case (any, 'selected) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
               case ('highlighted, any) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
-              case (any, 'highlighted) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
+              //case (any, 'highlighted) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
               case (any1, any2) =>
                if (selectionValid) {
                 // unselected

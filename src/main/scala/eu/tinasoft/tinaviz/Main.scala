@@ -132,6 +132,7 @@ class Main extends TApplet with Client {
     }
   }
 
+  var uninitializedZoom = false
   var doZoom: Symbol = 'none
   var export: String = "none"
 
@@ -224,6 +225,7 @@ class Main extends TApplet with Client {
         if (visible) {
           val powd = distance(psource, ptarget)
           (true,
+            g.renderEdgeIndex(i),
             i,
             source,
             target,
@@ -233,6 +235,7 @@ class Main extends TApplet with Client {
 
         } else {
           (false,
+            g.renderEdgeIndex(i),
             i,
             source,
             target,
@@ -245,16 +248,16 @@ class Main extends TApplet with Client {
     val edgeWeightIsPercentOfNodeSize = 0.35 // 1/3 of a node radius for good looking edges
 
     nbVisibleEdges = edgeTmp.filter {
-      case (visible, i, source, target, weight, color, lod) => visible
+      case (visible, ndx, i, source, target, weight, color, lod) => visible
     }.size
     edgeTmp foreach {
-      case (visible, i, source, target, weight, color, lod) =>
-        if (visible && !g.selected(g.renderEdgeIndex(i)._1)) {
+      case (visible, ndx, i, source, target, weight, color, lod) =>
+        if (visible && !(g.selected(ndx._1)||g.highlighted(ndx._1))) {
           setLod(lod)
           lineColor(color)
           if (nbVisibleNodes < 30000) {
             val th = if (nbVisibleEdges < 2000) {
-              val (a, b) = g.renderEdgeIndex(i)
+              val (a, b) = ndx
               val m = math.min(g.size(a),
                 g.size(b))
               val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
@@ -269,17 +272,14 @@ class Main extends TApplet with Client {
         }
     }
 
-    nbVisibleEdges = edgeTmp.filter {
-      case (visible, i, source, target, weight, color, lod) => visible
-    }.size
     edgeTmp foreach {
-      case (visible, i, source, target, weight, color, lod) =>
-        if (visible && g.selected(g.renderEdgeIndex(i)._1)) {
+      case (visible, ndx, i, source, target, weight, color, lod) =>
+        if (visible && (g.selected(ndx._1)||g.highlighted(ndx._1))) {
           setLod(lod)
           lineColor(color)
           if (nbVisibleNodes < 30000) {
             val th = if (nbVisibleEdges < 2000) {
-              val (a, b) = g.renderEdgeIndex(i)
+              val (a, b) = ndx
               val m = math.min(g.size(a),
                 g.size(b))
               val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
