@@ -460,15 +460,7 @@ class Main extends TApplet with Client {
     }) match {
       case (gw, gh) => ((if (gw < 40.0) 40.0 else gw), (if (gh < 40.0) 40.0 else gh))
     }) match {
-      case (gw,gh) =>
-        //println("max(gw,gh): "+max(gw,gh))
-        //val mx = max(gw,gh)
-
-        //(gw,gh)
-        max(
-            gw * getZoom / w,
-            gh * getZoom / h
-            )
+      case (gw,gh) => max(gw * getZoom / w, gh * getZoom / h)
     }
 
 

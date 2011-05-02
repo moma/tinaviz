@@ -193,16 +193,16 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     selected.zipWithIndex map {
       case (s, i) =>
         val mode = if (s) 'selected else if (highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
-        val color = category(i) match {
+        val color = (category(i) match {
           case "Document" => colorScheme.primary
           case "NGram" => colorScheme.tertiary
           case other => colorScheme.secondary
-        }
+        })
         mode match {
-          case 'selected => color.standard
-          case 'highlighted => color.standard
-          case 'unselected => color.lighter.saturation(0.25)
-          case 'default => color.lighter.saturation(0.25)
+          case 'selected => color.darker.saturateBy(1.00)
+          case 'highlighted => color.darker.saturateBy(0.85)
+          case 'unselected => color.standard.saturateBy(0.80)
+          case 'default => color.standard.saturateBy(0.90)
         }
     }
   }
@@ -211,19 +211,22 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    * Lazy computation of the node border
    */
   lazy val renderNodeBorderColor = {
+
+    val darkerColor = new Color(0.0, 1.0, 0.0).alpha(0.8)
+
     selected.zipWithIndex map {
       case (s, i) =>
         val mode = if (s) 'selected else if (highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
-        val color = category(i) match {
+        val color = (category(i) match {
           case "Document" => colorScheme.primary
           case "NGram" => colorScheme.tertiary
           case other => colorScheme.secondary
-        }
+        })
         mode match {
-          case 'selected => new Color(0.0, 0.0, 0.23)
-          case 'highlighted => new Color(0.0, 0.0, 0.23)
-          case 'unselected => color.darker.saturation(0.3)
-          case 'default => color.darker.saturation(0.3)
+          case 'selected => darkerColor
+          case 'highlighted => darkerColor.saturateBy(0.90)
+          case 'unselected => color.darker.saturation(0.90)
+          case 'default => color.darker.saturation(1.0)
         }
     }
   }
@@ -250,54 +253,53 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    * Lazy computation of the edge color to screen
    */
   lazy val renderEdgeColor = {
+    val darkerColor = new Color(0.0, 0.0, 0.23)
     var tmpColor = List.empty[Color]
     val aextremums = (minAEdgeWeight, maxAEdgeWeight)
     val bextremums = (minBEdgeWeight, maxBEdgeWeight)
+    def colorate(category:String) = (category match {
+                  case "Document" => colorScheme.primary.standard
+                  case "NGram" => colorScheme.tertiary.standard
+                  case other => colorScheme.secondary.standard
+                })
+    def getExtremum (category:String) = (category match {
+      case "Document" => aextremums
+      case "NGram" => bextremums
+      case any => aextremums
+    })
+
     val target = (0.4, 1.0)
     links.zipWithIndex map {
       case (mapIntDouble, from) =>
-        val mode = if (selected(from)) 'selected else if (highlighted(from)) 'highlighted else if (selectionValid) 'unselected else 'default
+       val modeFrom = if (selected(from)) 'selected else if (highlighted(from)) 'highlighted else if (selectionValid) 'unselected else 'default
         val catFrom = category(from)
-        val tmpMap = catFrom match {
-          case "Document" => aextremums
-          case "NGram" => bextremums
-        }
-        val a = renderNodeColor(from)
-        val ab = renderNodeBorderColor(from)
+        val extr = getExtremum(catFrom)
+        //val a = renderNodeColor(from)
+        //val ab = renderNodeBorderColor(from)
         mapIntDouble foreach {
           case (to, weight) =>
+            val catTo = category(to)
+            val modeTo = if (selected(to)) 'selected else if (highlighted(to)) 'highlighted else if (selectionValid) 'unselected else 'default
+            //val b = renderNodeColor(to)
+            //val bb = renderNodeBorderColor(to)
 
-            val b = renderNodeColor(to)
-            val bb = renderNodeBorderColor(to)
-
-            val alph = Maths.map(weight, tmpMap, (0.23, 0.85)) // minimum alpha <-->  maximum alpha
-
-            val d = if (catFrom.equals(category(to))) {
-              mode match {
-                case 'selected =>
-
-                  a.blend(b) //color.standard
-                case 'highlighted =>
-
-                  a.blend(b) //color.standard
-                case 'unselected =>
-
-                  ab.blend(bb).saturateBy(0.8).alpha(alph) //color.lighter.saturation(0.25)
-
-                case 'default =>
-                  ab.blend(bb).saturateBy(0.8).alpha(alph)
-              // ab.blend(bb).saturateBy(0.8).alpha(alph)
-              //a.blend(b)//.alpha(alph)//color.light
-
-              // old mode
-              //a.blend(b).alpha(alph)//color.light
+            //val alpha =  Maths.map(weight, getExtremum(catFrom), (0.50, 0.95))
+            tmpColor ::= ((modeFrom, modeTo) match {
+              case ('selected, any) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
+              case (any, 'selected) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
+              case ('highlighted, any) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
+              case (any, 'highlighted) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
+              case (any1, any2) =>
+               if (selectionValid) {
+                // unselected
+                val t = colorate(catFrom)
+               t.blend(colorate(catTo)).saturateBy(0.75).alpha(Maths.map(weight, extr, (0.77, 0.97)))
+              } else {
+                val t = colorate(catFrom)
+               t.blend(colorate(catTo)).alpha(Maths.map(weight, extr, (0.70, 0.97)))
               }
+            })
 
-            } else {
-              new Color(0.0, 0.0, 0.6).alpha(alph)
-            }
-
-            tmpColor ::= d
         }
     }
     tmpColor.toArray
@@ -384,7 +386,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   // hashcode will change if nodes/links are added/deleted
-  lazy val hashed = (uuid.toList.mkString("") + links.map {
+  lazy val hashed = (uuid.toList.mkString("") + size.toList.mkString("") + links.map {
     case mapID => mapID.hashCode
   }.toList.mkString("")).hashCode
 

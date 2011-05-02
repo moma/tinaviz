@@ -56,9 +56,9 @@ object PhysicLayout {
     val REPULSION = 900 // 800    should be divided by the nb of edges? faster at the beggining, then slower?
     val DAMPING = 0.01 // 0.002  please, no greater than 0.05
     val STRENGTH = 0.03 // 0.05   looks perfect on 90% of the graphs.. but 10% need 0.03 :/
-    val maxLinkLength = 80 // 80     max distance between linked nodes
-    val minLinkLength = 5 // 5      min distance between linked nodes
-    val minDistance = 5 // 5      min distance between unlinked nodes (and thus clusters)
+    val maxLinkLength = 60 // 80     max distance between linked nodes
+    val minLinkLength = 3 // 5      min distance between linked nodes
+    val minDistance = 3 // 5      min distance between unlinked nodes (and thus clusters)
 
     //since I can't normalize weight, it seems I have to adapt the drag myself
     //ps.setDrag((if (g.nbEdges > 20000) 0.2 else 0.4).toFloat)

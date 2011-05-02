@@ -145,7 +145,8 @@ object Filters {
     //println("applyWeightToSize: " + ratio)
     val newSize = g.weight.zipWithIndex map {
       case (weight,i) =>
-        if (cat equalsIgnoreCase "Document") {
+
+        if (g.category(i) equalsIgnoreCase "Document") {
 
           Maths.map(weight, aminmaxweight, sliderRange) * aratio
 
