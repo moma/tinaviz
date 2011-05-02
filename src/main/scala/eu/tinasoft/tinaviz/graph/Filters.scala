@@ -144,13 +144,16 @@ object Filters {
     val bminmaxweight =  (g.minBNodeWeight, g.maxBNodeWeight)  // NGram
     //println("applyWeightToSize: " + ratio)
     val newSize = g.weight.zipWithIndex map {
-      case (weight,i) => Maths.map(weight, g.category(i) match {
-                                      case "Document" => aminmaxweight
-                                      case "NGram" => bminmaxweight
-                                   }, sliderRange) * (g.category(i) match {
-                                      case "Document" => aratio
-                                      case "NGram" => bratio
-                                   })
+      case (weight,i) =>
+        if (cat equalsIgnoreCase "Document") {
+
+          Maths.map(weight, aminmaxweight, sliderRange) * aratio
+
+        } else {
+          Maths.map(weight,bminmaxweight, sliderRange) * bratio
+
+        }
+
     }
     g + ("size" -> newSize)
   }

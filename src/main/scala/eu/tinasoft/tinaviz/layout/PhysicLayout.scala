@@ -52,13 +52,13 @@ object PhysicLayout {
 
     val h = Pipeline.categoryCache
 
-    val GRAVITY = 200 // g.get[Double]("layout.gravity") // stronger means faster!
-    val REPULSION = 800 // should be divided by the nb of edges? faster at the beggining, then slower?
-    val DAMPING = 0.002 // please, no greater than 0.05
-    val STRENGTH = 0.05 // 0.05 looks perfect
-    val maxLinkLength = 80 // max distance between linked nodes
-    val minLinkLength = 5 // min distance between linked nodes
-    val minDistance = 5 // min distance between unlinked nodes (and thus clusters)
+    val GRAVITY = 200 // 200    g.get[Double]("layout.gravity") // stronger means faster!
+    val REPULSION = 900 // 800    should be divided by the nb of edges? faster at the beggining, then slower?
+    val DAMPING = 0.01 // 0.002  please, no greater than 0.05
+    val STRENGTH = 0.03 // 0.05   looks perfect on 90% of the graphs.. but 10% need 0.03 :/
+    val maxLinkLength = 80 // 80     max distance between linked nodes
+    val minLinkLength = 5 // 5      min distance between linked nodes
+    val minDistance = 5 // 5      min distance between unlinked nodes (and thus clusters)
 
     //since I can't normalize weight, it seems I have to adapt the drag myself
     //ps.setDrag((if (g.nbEdges > 20000) 0.2 else 0.4).toFloat)
@@ -82,7 +82,7 @@ object PhysicLayout {
       //val nbEdges = g.nbEdges.toDouble / 2.0
       //val springFactor = if (nbEdges > 20000) 0.005f else 0.01f
 
-      val distInterval = (minLinkLength.toDouble, maxLinkLength.toDouble)
+      //val distInterval = (minLinkLength.toDouble, maxLinkLength.toDouble)
 
       val gravity = ps.makeParticle(GRAVITY.toFloat, 0.0f, 0.0f, 0.0f)
       gravity.makeFixed
@@ -99,9 +99,12 @@ object PhysicLayout {
           positionIndexNotSingleParticle foreach {
             case (pos2, i2, p2) =>
               if (i2 != i1) {
+
+
                 if (g.hasThisLink(i1, i2)) {
-                  // val strictDistance = (g.size(i1) + g.size(i2))
-                  // val securityDistance = (strictDistance * 1.20) * g.cameraZoom // 20%
+                  val strictDistance = ((g.size(i1) / 2.0) + (g.size(i2) / 2.0))
+                  val securityDistance = (strictDistance * 1.20) // 20%
+                  val distInterval = (securityDistance.toDouble, maxLinkLength.toDouble)
                   val w = g.links(i1)(i2)
                   // if we have a link, we create a spring
                   val minMaxInterval = (g.category(i1), g.category(i2)) match {
@@ -112,11 +115,11 @@ object PhysicLayout {
                   ps.makeSpring(
                     p1,
                     p2,
-                    //Maths.map(w, minMaxInterval, (0.002, 0.05)).toFloat,
-                    STRENGTH.toFloat,
+                    Maths.map(w, minMaxInterval, (0.02, 0.05)).toFloat,
+                    //STRENGTH.toFloat,
                     DAMPING.toFloat,
                     (Maths.map(w, minMaxInterval, (0.0, 1.0)) match {
-                        case l => ((1.0 - l) * (distInterval._2 - distInterval._1)) + distInterval._1
+                      case l => ((1.0 - l) * (distInterval._2 - distInterval._1)) + distInterval._1
                     }).toFloat)
                 } else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -REPULSION.toFloat, minDistance.toFloat) // default -600   we repulse unrelated nodes
               }

@@ -117,9 +117,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val ids = 0 until nbNodes
 
   // metrics  & properties
-  lazy val nbNodes : Int = Metrics nbNodes this
-  lazy val nbEdges  : Int = Metrics nbEdges this
-  lazy val nbSingles  : Int = Metrics nbSingles this
+  lazy val nbNodes: Int = Metrics nbNodes this
+  lazy val nbEdges: Int = Metrics nbEdges this
+  lazy val nbSingles: Int = Metrics nbSingles this
 
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
@@ -136,15 +136,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val currentView = get[String]("filter.view")
   lazy val layout = get[String]("layout")
   lazy val pause = get[Boolean]("pause")
-  lazy val selectionRadius : Double = get[Double]("selectionRadius")
+  lazy val selectionRadius: Double = get[Double]("selectionRadius")
 
   lazy val baryCenter = Metrics baryCenter this
   lazy val selectionCenter = Metrics selectionCenter this
 
-    // a list of positions + ID
+  // a list of positions + ID
   lazy val selectionNeighbourhood = Metrics selectionNeighbourhood this
 
- lazy val selectionNeighbourhoodCenter = Metrics selectionNeighbourhoodCenter this
+  lazy val selectionNeighbourhoodCenter = Metrics selectionNeighbourhoodCenter this
 
   lazy val singlesCenter = Metrics singlesCenter this
   lazy val notSinglesCenter = Metrics notSinglesCenter this
@@ -253,45 +253,49 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     var tmpColor = List.empty[Color]
     val aextremums = (minAEdgeWeight, maxAEdgeWeight)
     val bextremums = (minBEdgeWeight, maxBEdgeWeight)
-    val target = (0.4,1.0)
+    val target = (0.4, 1.0)
     links.zipWithIndex map {
       case (mapIntDouble, from) =>
         val mode = if (selected(from)) 'selected else if (highlighted(from)) 'highlighted else if (selectionValid) 'unselected else 'default
+        val catFrom = category(from)
+        val tmpMap = catFrom match {
+          case "Document" => aextremums
+          case "NGram" => bextremums
+        }
+        val a = renderNodeColor(from)
+        val ab = renderNodeBorderColor(from)
         mapIntDouble foreach {
           case (to, weight) =>
-            val a = renderNodeColor(from)
-            val b = renderNodeColor(to)
-            val ab = renderNodeBorderColor(from)
-            val bb = renderNodeBorderColor(to)
-            val alph = Maths.map(weight, category(from) match {
-              case "Document" => aextremums
-              case "NGram" => bextremums
-            }, (0.23,0.85)) // minimum alpha <-->  maximum alpha
 
-           val d = if (category(from).equals(category(to))) {
-               mode match {
+            val b = renderNodeColor(to)
+            val bb = renderNodeBorderColor(to)
+
+            val alph = Maths.map(weight, tmpMap, (0.23, 0.85)) // minimum alpha <-->  maximum alpha
+
+            val d = if (catFrom.equals(category(to))) {
+              mode match {
                 case 'selected =>
 
-                  a.blend(b)//color.standard
+                  a.blend(b) //color.standard
                 case 'highlighted =>
 
-                  a.blend(b)//color.standard
+                  a.blend(b) //color.standard
                 case 'unselected =>
 
-                  ab.blend(bb).saturateBy(0.8).alpha(alph)//color.lighter.saturation(0.25)
+                  ab.blend(bb).saturateBy(0.8).alpha(alph) //color.lighter.saturation(0.25)
 
                 case 'default =>
-                   ab.blend(bb).saturateBy(0.8).alpha(alph)
-                   // ab.blend(bb).saturateBy(0.8).alpha(alph)
-                   //a.blend(b)//.alpha(alph)//color.light
+                  ab.blend(bb).saturateBy(0.8).alpha(alph)
+              // ab.blend(bb).saturateBy(0.8).alpha(alph)
+              //a.blend(b)//.alpha(alph)//color.light
 
-                   // old mode
-                  //a.blend(b).alpha(alph)//color.light
-               }
+              // old mode
+              //a.blend(b).alpha(alph)//color.light
+              }
 
             } else {
-             new Color(0.0, 0.0, 0.6).alpha(alph)
-           }
+              new Color(0.0, 0.0, 0.6).alpha(alph)
+            }
 
             tmpColor ::= d
         }
@@ -310,22 +314,22 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case ((j, weight), _j) => t ::= (position(i), position(j))
         }
     }
-   t.toArray
+    t.toArray
   }
-      /**
+  /**
    * Lazy computation of the edge position to screen
    */
   lazy val renderEdgeIndex = {
-    var t = List.empty[(Int,Int)]
+    var t = List.empty[(Int, Int)]
     links.zipWithIndex foreach {
       case (links, i) =>
         links.zipWithIndex foreach {
-          case ((j, weight), _j) => t ::= (i,j)
+          case ((j, weight), _j) => t ::= (i, j)
         }
     }
     t.toArray
   }
-    /**
+  /**
    * Lazy computation of the edge weights
    */
   lazy val renderEdgeWeight = {
@@ -340,9 +344,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   lazy val renderNodeShape = category.map {
-      case "Document" => 'Square
-      case "NGram" => 'Disk
-      case any => 'Square
+    case "Document" => 'Square
+    case "NGram" => 'Disk
+    case any => 'Square
   }
 
   /**
@@ -350,33 +354,33 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    * Should not be called to often, since this is a costly operation!
    */
   def toGraph = {
-   position
-   renderNodeColor
-   renderNodeBorderColor
-   renderEdgeSize
-   renderEdgeColor
-   renderEdgePosition
-   renderEdgeIndex
-   renderEdgeWeight
-   renderNodeShape
-   
-    
-        // a list of positions + ID
-        /*
-  selectionNeighbourhood 
-  selectionNeighbourhoodCenter
-  singlesCenter
-  notSinglesCenter 
-  outDegreeExtremums
-  inDegreeExtremums
-  extremums 
-  extremumsSelection
-  extremumsSelectionNeighbourhood 
-  nodeWeightExtremums
-  edgeWeightExtremums
-   */ 
+    position
+    renderNodeColor
+    renderNodeBorderColor
+    renderEdgeSize
+    renderEdgeColor
+    renderEdgePosition
+    renderEdgeIndex
+    renderEdgeWeight
+    renderNodeShape
 
-   this
+
+    // a list of positions + ID
+
+
+    selectionNeighbourhood
+    selectionNeighbourhoodCenter
+    singlesCenter
+    notSinglesCenter
+    outDegreeExtremums
+    inDegreeExtremums
+    extremums
+    extremumsSelection
+    extremumsSelectionNeighbourhood
+    nodeWeightExtremums
+    edgeWeightExtremums
+
+    this
   }
 
   // hashcode will change if nodes/links are added/deleted
@@ -675,7 +679,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     nodeData
   }
 
-  def clearSelection = { this + ("selected" -> this.selected.map(c => false)) }
+  def clearSelection = {
+    this + ("selected" -> this.selected.map(c => false))
+  }
 
   /**
   var nodeData = Map(uuid.map {case uuid => (uuid,Map.empty[String,Any])}:_*)
@@ -815,13 +821,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     )
   }
 
-  def normalizePositions : Graph = this + ("visible" -> position.map { case (x, y) => (x - baryCenter._1, y - baryCenter._2) } )
+  def normalizePositions: Graph = this + ("visible" -> position.map {
+    case (x, y) => (x - baryCenter._1, y - baryCenter._2)
+  })
 
 
   /**
    * TODO refactor to use a generic field update function
    */
-  def updatePositionWithCategory(g: Graph) : Graph = {
+  def updatePositionWithCategory(g: Graph): Graph = {
 
     val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
       case (elem, i) =>
@@ -840,10 +848,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     )
   }
 
-    /**
+  /**
    * TODO refactor to use a generic field update function
    */
-  def updateSizeWithCategory(g: Graph) : Graph = {
+  def updateSizeWithCategory(g: Graph): Graph = {
 
     val tmp1: Array[Double] = size.zipWithIndex.map {
       case (elem, i) =>
@@ -861,12 +869,13 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "size" -> tmp1) // need to recompute things
     )
   }
-      /**
+
+  /**
    * TODO refactor to use a generic field update function
    */
-  def updateLinksWithCategory(g: Graph) : Graph = {
+  def updateLinksWithCategory(g: Graph): Graph = {
 
-    val tmp1: Array[Map[Int,Double]] = links.zipWithIndex.map {
+    val tmp1: Array[Map[Int, Double]] = links.zipWithIndex.map {
       case (elem, i) =>
         val id = g.id(uuid(i))
         if (id == -1) {
@@ -883,10 +892,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     )
   }
 
-    /**
+  /**
    * TODO refactor to use a generic field update function
    */
-  def updateSelectedWithCategory(g: Graph) : Graph = {
+  def updateSelectedWithCategory(g: Graph): Graph = {
 
     val tmp2: Array[Boolean] = selected.zipWithIndex.map {
       case (s, i) =>
