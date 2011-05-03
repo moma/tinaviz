@@ -111,6 +111,14 @@ class TApplet extends PApplet with MouseWheelListener {
   protected def drawDisk(position: (Double, Double), radius: Double) = {
     ellipse(position._1.toFloat, position._2.toFloat, radius.toFloat, radius.toFloat)
   }
+  /**
+   * Draw a lane-like shape from two Double Tuples, which represent the source
+   * and target positions.
+   *
+   */
+  protected def drawLine(n1: (Double, Double), n2: (Double, Double)) = {
+    line(n1._1.toFloat, n1._2.toFloat, n2._1.toFloat, n2._2.toFloat)
+  }
 
   /**
    * Draw a curve-like shape from two Double Tuples, which represent the source

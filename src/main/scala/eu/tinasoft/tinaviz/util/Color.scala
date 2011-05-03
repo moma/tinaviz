@@ -76,7 +76,7 @@ object LePort extends Scheme (
 object Rio extends Scheme (
   // green
   new Palette(
-    new Color (0.247, 0.69, 0.95), // standard
+    new Color (0.247, 0.69, 0.92), // standard
     new Color (0.247, 0.69, 0.73), // dark
     new Color (0.247, 0.95, 0.67), // darker
     new Color (0.247, 0.67, 0.90), // light

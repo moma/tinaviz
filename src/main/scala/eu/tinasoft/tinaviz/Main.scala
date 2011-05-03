@@ -109,6 +109,7 @@ class Main extends TApplet with Client {
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+          //"file:///home/jbilcke/Desktop/FET67bipartite_graph_logjaccard_.gexf"
 
         )
     }
@@ -224,7 +225,7 @@ class Main extends TApplet with Client {
     }
 
     val edgeWeightIsPercentOfNodeSize = 0.35 // 1/3 of a node radius for good looking edges
-
+    val curved = g.edgeType match { case "curve" => true case any => false }
     nbVisibleEdges = edgeTmp.filter {
       case (visible, ndx, i, source, target, weight, color, lod) => visible
     }.size
@@ -243,7 +244,8 @@ class Main extends TApplet with Client {
             }
 
             lineThickness(th)
-            drawCurve(source, target)
+
+            if (curved) drawCurve(source, target) else drawLine(source, target)
           }
         }
     }
@@ -263,7 +265,8 @@ class Main extends TApplet with Client {
             }
 
             lineThickness(th)
-            drawCurve(source, target)
+
+            if (curved) drawCurve(source, target) else drawLine(source, target)
           }
         }
     }

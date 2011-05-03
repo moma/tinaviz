@@ -57,8 +57,8 @@ object PhysicLayout {
     val DAMPING = 0.002 // 0.002  please, no greater than 0.05
     val STRENGTH = 0.03 // 0.05   looks perfect on 90% of the graphs.. but 10% need 0.03 :/
     val maxLinkLength = 70 // 80     max distance between linked nodes
-    val minLinkLength = 5 // 5      min distance between linked nodes
-    val minDistance = 5 // 5      min distance between unlinked nodes (and thus clusters)
+    val minLinkLength = 16 // 5      min distance between linked nodes
+    val minDistance = 16 // 5      min distance between unlinked nodes (and thus clusters)
 
     //since I can't normalize weight, it seems I have to adapt the drag myself
     //ps.setDrag((if (g.nbEdges > 20000) 0.2 else 0.4).toFloat)
@@ -122,11 +122,11 @@ object PhysicLayout {
                     (Maths.map(w, minMaxInterval, (0.0, 1.0)) match {
                       case l => ((1.0 - l) * (distInterval._2 - distInterval._1)) + distInterval._1
                     }).toFloat)
-                } else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -REPULSION.toFloat, minDistance.toFloat) // default -600   we repulse unrelated nodes
+                } else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -REPULSION.toFloat, (g.size(i1) / 2.0).toFloat) // default -600   we repulse unrelated nodes
               }
           }
 
-          ps.makeAttraction(p1, gravity, 1500f, 200f) // apply the gravity
+          ps.makeAttraction(p1, gravity, 2000f, 400f) // apply the gravity
       }
     } // end hash changed
 

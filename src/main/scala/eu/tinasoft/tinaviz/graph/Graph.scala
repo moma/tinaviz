@@ -62,6 +62,7 @@ object Graph {
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
     "filter.map.node.shape" -> "category",
+    "edge.type" -> "curve",
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
@@ -136,7 +137,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val currentView = get[String]("filter.view")
   lazy val layout = get[String]("layout")
   lazy val pause = get[Boolean]("pause")
-  lazy val selectionRadius: Double = get[Double]("selectionRadius")
+  lazy val selectionRadius = get[Double]("selectionRadius")
+
+  lazy val edgeType = get[String]("edge.type")
 
   lazy val baryCenter = Metrics baryCenter this
   lazy val selectionCenter = Metrics selectionCenter this
@@ -291,7 +294,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
                   t.blend(colorate(catTo)).saturateBy(0.78).alpha(Maths.map(weight, extr, (0.75, 0.94)))
                 } else {
                   val t = colorate(catFrom)
-                  t.blend(colorate(catTo)).alpha(Maths.map(weight, extr, (0.68, 0.90)))
+                  t.blend(colorate(catTo)).alpha(Maths.map(weight, extr, (0.60, 0.90)))
                 }
             })
 
