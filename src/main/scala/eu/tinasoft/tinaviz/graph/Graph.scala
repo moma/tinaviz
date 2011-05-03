@@ -66,7 +66,7 @@ object Graph {
     "filter.map.node.size" -> "weight",
     "filter.map.node.shape" -> "category",
     //"edge.type" -> "line",
-    "layout" -> "phyloforce", // phyloforce
+    "layout" -> "phyloforce",  // phyloforce
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,

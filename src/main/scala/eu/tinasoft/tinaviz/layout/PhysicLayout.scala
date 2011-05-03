@@ -201,9 +201,9 @@ object PhysicLayout {
 
     val GRAVITY = 200 // 200    g.get[Double]("layout.gravity") // stronger means faster!
     val REPULSION = 1800 // 800    should be divided by the nb of edges? faster at the beggining, then slower?
-    val DAMPING = 0.002 // 0.002  please, no greater than 0.05
-    val STRENGTH = 0.03 // 0.05   looks perfect on 90% of the graphs.. but 10% need 0.03 :/
-    val maxLinkLength = 70 // 80     max distance between linked nodes
+    val DAMPING = 0.05 // 0.002  please, no greater than 0.05
+    val STRENGTH = 0.05 // 0.05   looks perfect on 90% of the graphs.. but 10% need 0.03 :/
+    val maxLinkLength = 30 // 80     max distance between linked nodes
     val minLinkLength = 16 // 5      min distance between linked nodes
     val minDistance = 16 // 5      min distance between unlinked nodes (and thus clusters)
 
@@ -261,8 +261,8 @@ object PhysicLayout {
                   ps.makeSpring(
                     p1,
                     p2,
-                    Maths.map(w, minMaxInterval, (0.02, 0.10)).toFloat,
-                    //STRENGTH.toFloat,
+                    //Maths.map(w, minMaxInterval, (0.02, 0.10)).toFloat,
+                    STRENGTH.toFloat,
                     DAMPING.toFloat,
                     (Maths.map(w, minMaxInterval, (0.0, 1.0)) match {
                       case l => ((1.0 - l) * (distInterval._2 - distInterval._1)) + distInterval._1
@@ -270,7 +270,7 @@ object PhysicLayout {
                 }
                 // no repulsion if they are not on the same date interval
                 else if (!g.hasAnyLink(i1, i2)) {
-                  if (pos1._1 != pos2._1) ps.makeAttraction(p1, p2, -REPULSION.toFloat, (g.size(i1) / 2.0).toFloat)
+                 ps.makeAttraction(p1, p2,-(if (pos1._1 != pos2._1) 2000 else 100).toFloat, (g.size(i1) / 2.0).toFloat)
                 } // default -600   we repulse unrelated nodes
               }
           }
@@ -298,12 +298,12 @@ object PhysicLayout {
 
             cj += 1 // okay to not start with zero here, because slot 0 is already used by gravity
             val p = ps.getParticle(cj).position()
-            p.setY(Maths.limit(p.y().toDouble, -6000, 6000).toFloat)
+            p.setY(Maths.limit(p.y().toDouble, -8000, 8000).toFloat)
             p.setX(nodePosition._1.toFloat)
 
             val (x, y) = (p.x().toDouble, p.y().toDouble)
             val v = ps.getParticle(cj).velocity()
-            v.setY(Maths.limit(v.y().toDouble, -50, 50).toFloat)
+            v.setY(Maths.limit(v.y().toDouble, -100, 100).toFloat)
             v.setX(0.toFloat)
 
             (x, y)
