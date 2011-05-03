@@ -66,7 +66,7 @@ object Graph {
     "filter.map.node.size" -> "weight",
     "filter.map.node.shape" -> "category",
     //"edge.type" -> "line",
-    "layout" -> "phyloforce",  // phyloforce
+    "layout" -> "tinaforce",  // phyloforce
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
@@ -593,18 +593,36 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     )
   }
 
-
   /**
-   * Return neighbours of a node ID
+   * Return neighbours of a node ID - todo refactor to make it more efficient: lazy val for array of IDs, and another function for the minimal attributes
    *
    */
-  def neighbours(i: Int): Map[String, Map[String, Any]] = {
+  /*
+   lazy val neighboursIDs(i: Int): List[Int] = {
+      ids.map {
+        case id =>
+        // println("  - mapping neighbours of node "+i+"..")
+        uuid.zipWithIndex.filter{
+            case (uj, ij) => hasAnyLink(ij,i) && (ij != i)
+          } map { case (uuid,id) => id }
+      }
+   }
+  }*/
+
+  /**
+   * Return neighbours of a node ID - todo refactor to make it more efficient: lazy val for array of IDs, and another function for the minimal attributes
+   *
+   */
+   def neighbours(i: Int): Map[String, Map[String, Any]] = {
     (if (links.size > i) {
       // println("  - mapping neighbours of node "+i+"..")
-      links(i).map {
-        case (i, w) =>
-          (getUuid(i), minimalAttributes(i))
-      }
+      Map.empty[String,Map[String,Any]] ++ Map((uuid.zipWithIndex.filter{
+          case (uj, ij) => hasAnyLink(ij,i) && (ij != i)
+        } collect {
+
+        case (uj,ij) =>
+         (uj,minimalAttributes(ij))
+      }): _*)
     }
     else
       Map.empty[String, Map[String, Any]])
@@ -640,6 +658,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "label" -> (if (label.size > i) label(i) else ""), // Base64.encode(label(i)),
       "rate" -> (if (rate.size > i) rate(i) else 0),
       "id" -> (if (uuid.size > i) uuid(i) else 0),
+      //"partition" -> (if (partition.size > i) partition(i) else 0),
       "degree" -> ((if (inDegree.size > i) inDegree(i) else 0) + (if (outDegree.size > i) outDegree(i) else 0))
       //"density" -> density(i)
     )
@@ -667,6 +686,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "label" -> (if (label.size > i) label(i) else ""), // Base64.encode(label(i)),
       //"rate" -> (if (rate.size > i) rate(i) else 0),
       "id" -> (if (uuid.size > i) uuid(i) else 0),
+      //"partition" -> (if (partition.size > i) partition(i) else 0),
       "degree" -> ((if (inDegree.size > i) inDegree(i) else 0) + (if (outDegree.size > i) outDegree(i) else 0))
 
       //"density" -> density(i)
