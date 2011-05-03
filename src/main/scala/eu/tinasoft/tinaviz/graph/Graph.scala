@@ -32,7 +32,15 @@ object Graph {
    * Default settings
    */
   val defaults: Map[String, Any] = Map(
-    "pause" -> true,
+    "layout" -> "tinaforce",  // phyloforce
+    "activity" -> 100.0,
+    "entropy" -> 0.95,
+    "maxDrawedNodes" -> 10,
+    "debug" -> false,
+    "filter.node.category" -> "Document",
+    "filter.view" -> "macro",
+    "selectionRadius" -> 10.0,
+    "pause" -> false,
     "uuid" -> Array.empty[String],
     "label" -> Array.empty[String],
     "color" -> Array.empty[Color],
@@ -51,9 +59,7 @@ object Graph {
     "camera.zoom" -> 1.0,
     "camera.position" -> (0.0, 0.0),
     "camera.target" -> "all", //'all, 'none, or 'selection
-    "filter.node.category" -> "Document",
-    "filter.view" -> "macro",
-    "selectionRadius" -> 10.0,
+    //"edge.type" -> "line",
     "filter.a.node.size" -> 0.2,
     "filter.a.node.weight" -> (0.0, 1.0),
     "filter.a.edge.weight" -> (0.0, 1.0),
@@ -64,13 +70,7 @@ object Graph {
     "filter.map.node.color.saturation" -> "weight",
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
-    "filter.map.node.shape" -> "category",
-    //"edge.type" -> "line",
-    "layout" -> "tinaforce",  // phyloforce
-    "activity" -> 100.0,
-    "entropy" -> 0.95,
-    "maxDrawedNodes" -> 10,
-    "debug" -> false
+    "filter.map.node.shape" -> "category"
   )
 }
 
