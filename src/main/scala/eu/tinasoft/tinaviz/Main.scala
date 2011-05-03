@@ -132,7 +132,7 @@ class Main extends TApplet with Client {
     }
   }
 
-  var uninitializedZoom = false
+  var uninitializedZoom = true
   var doZoom: Symbol = 'none
   var export: String = "none"
 
@@ -176,8 +176,16 @@ class Main extends TApplet with Client {
         doZoom = 'none
       case any =>
     }
-
-    _recenter(g, g.get[String]("camera.target"))
+    //println("g.nbNodes: "+g.nbNodes+" uninitializedZoom: "+uninitializedZoom)
+    if ((g.nbNodes > 0) && uninitializedZoom) {
+      println("HACK")
+      //setCameraPosition(width / 2, height / 2)
+      //zoom(true)
+      //mouseDragged
+      uninitializedZoom = false
+      //Server ! "camera.target" -> "all"
+    }
+    _recenter(g)
 
     export match {
       case "PDF" =>
@@ -429,8 +437,8 @@ class Main extends TApplet with Client {
   /**
    * Recenter
    */
-  private def _recenter(g: Graph, mode: String) {
-    mode match {
+  private def _recenter(g: Graph) {
+    g.cameraTarget match {
       case "all" =>
       case "selection" =>
       case "none" =>
@@ -448,7 +456,7 @@ class Main extends TApplet with Client {
     //def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
     //def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
 
-     val centerOnSelection = (mode.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
+     val centerOnSelection = (g.cameraTarget.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
       // spaghetti code
     val ratio =  (((if (centerOnSelection) {
          (g.xMinSelectionNeighbourhood - g.xMaxSelectionNeighbourhood,
@@ -473,13 +481,18 @@ class Main extends TApplet with Client {
       // FIXME ugly hack, seems a bugs from the browser when inserting the applet.. it is positionned in absolute coord?!
       translate.set(translate.x, translate.y + 30, 0)
 
-      updatePositionSilent(translate)
+      if (Maths.random < 0.1) updatePosition(translate) else updatePositionSilent(translate)
       //println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio+" zoom: "+getZoom)
       if (g.selectionNeighbourhood.size != 1) {
-         if (ratio != 0.0) updateZoomSilent(getZoom / ratio)
+         if (ratio != 0.0) if (Maths.random < 0.1) updateZoom(getZoom / ratio) else updateZoomSilent(getZoom / ratio)
        } else {
          //println("updateZoomSilent(3.0)")
-         updateZoomSilent(3.0) // hack: we update the zoom but we do not trigger an event (the "zoom changed" event is reserved for actions induced by users)
+         if (Maths.random < 0.1) {
+           updateZoom(3.0)
+         } else {
+            updateZoomSilent(3.0) // hack: we update the zoom but we do not trigger an event (the "zoom changed" event is reserved for actions induced by users)
+         }
+
       }
     //}
   }
@@ -495,7 +508,7 @@ class Main extends TApplet with Client {
     // TODO use the nap
     //Server ! "camera.target" -> "none"
 
-
+    println("zoomUpdated("+value+")")
     Server ! "camera.zoom" -> value
   }
 
@@ -508,7 +521,7 @@ class Main extends TApplet with Client {
 
     // TODO use the nap
     //Server ! "camera.target" -> "none"
-
+    println("positionUpdated("+value+")")
     Server ! "camera.position" -> value
   }
 
@@ -516,7 +529,7 @@ class Main extends TApplet with Client {
                             side: Symbol,
                             count: Symbol,
                             position: (Double, Double)) {
-    //println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
+    println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
     Server ! ("camera.mouse", kind, side, count, position)
   }
 

@@ -129,7 +129,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   // camera settings
   lazy val cameraZoom = get[Double]("camera.zoom")
   lazy val cameraPosition = get[(Double, Double)]("camera.position")
-  lazy val cameraSymbol = get[Symbol]("camera.target")
+  lazy val cameraTarget = get[String]("camera.target")
 
   // filters and view settings
   lazy val currentCategory = get[String]("filter.node.category")
@@ -293,10 +293,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
                if (selectionValid) {
                 // unselected
                 val t = colorate(catFrom)
-               t.blend(colorate(catTo)).saturateBy(0.75).alpha(Maths.map(weight, extr, (0.77, 0.97)))
+               t.blend(colorate(catTo)).saturateBy(0.78).alpha(Maths.map(weight, extr, (0.75, 0.94)))
               } else {
                 val t = colorate(catFrom)
-               t.blend(colorate(catTo)).alpha(Maths.map(weight, extr, (0.70, 0.97)))
+               t.blend(colorate(catTo)).alpha(Maths.map(weight, extr, (0.68, 0.94)))
               }
             })
 

@@ -56,7 +56,7 @@ object PhysicLayout {
     val REPULSION = 900 // 800    should be divided by the nb of edges? faster at the beggining, then slower?
     val DAMPING = 0.01 // 0.002  please, no greater than 0.05
     val STRENGTH = 0.03 // 0.05   looks perfect on 90% of the graphs.. but 10% need 0.03 :/
-    val maxLinkLength = 60 // 80     max distance between linked nodes
+    val maxLinkLength = 100 // 80     max distance between linked nodes
     val minLinkLength = 3 // 5      min distance between linked nodes
     val minDistance = 3 // 5      min distance between unlinked nodes (and thus clusters)
 
@@ -168,8 +168,8 @@ object PhysicLayout {
 
             val (x, y) = (p.x().toDouble, p.y().toDouble)
             val v = ps.getParticle(cj).velocity()
-            v.setX(Maths.limit(v.x().toDouble, -50, 50).toFloat)
-            v.setY(Maths.limit(v.y().toDouble, -50, 50).toFloat)
+            v.setX(Maths.limit(v.x().toDouble, -500, 500).toFloat)
+            v.setY(Maths.limit(v.y().toDouble, -500, 500).toFloat)
 
             (x, y)
           } else {

@@ -386,7 +386,9 @@ class TApplet extends PApplet with MouseWheelListener {
   def stopAutoCentering {
 
   }
-
+  def setCameraPosition(x:Int,y:Int) {
+    _camera.position = (x,y)
+  }
   override def mouseDragged {
     stopAutoCentering
     val p: PVector = _camera.position
