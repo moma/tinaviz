@@ -28,8 +28,11 @@ object Graph {
    */
   def make(elements: Map[String, Any]) = new Graph(elements)
 
+  /**
+   * Default settings
+   */
   val defaults: Map[String, Any] = Map(
-    "pause" -> false,
+    "pause" -> true,
     "uuid" -> Array.empty[String],
     "label" -> Array.empty[String],
     "color" -> Array.empty[Color],
@@ -62,11 +65,11 @@ object Graph {
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
     "filter.map.node.shape" -> "category",
-    "edge.type" -> "curve",
+    //"edge.type" -> "line",
+    "layout" -> "phyloforce", // phyloforce
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
-    "layout" -> "tinaforce", // phyloforce
     "debug" -> false
   )
 }

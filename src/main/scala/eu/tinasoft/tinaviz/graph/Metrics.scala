@@ -333,6 +333,15 @@ object Metrics {
   }
 
   /**
+   * Compute a graph's center. Very simple - you probably don't want to use that
+   */
+  def basicCenter(g: Graph): (Double, Double) = {
+    val (xmin, xmax, ymin, ymax) = g.extremums
+    ((xmax - xmin),(ymax - ymax))
+  }
+
+
+  /**
    * Compute a graph's barycenter
    */
   def baryCenter(g: Graph): (Double, Double) = {

@@ -183,17 +183,21 @@ class GEXF extends Actor {
       } catch {
         case x => "Node " + uuid
       }
-      val position = try {
-        (((n \\ "viz:position") \ "@x" text).toDouble,
-         ((n \\ "viz:position") \ "@y" text).toDouble)
-      } catch {
-        case x => (Maths.random(0, 200), Maths.random(0, 200))
-      }
+
+
+         val p = (n \\ "position")
+         //println("x: " +(p \ "@x" text)+" y:"+(p \ "@y" text))
+
+         val position = ((try { (p \ "@x" text) match { case "" => println("bad X for "+label+"") ; 0.0 case any => any.toDouble } } catch { case e => Maths.random(0, 200) }) * 100.0,
+                         try { (p \ "@y" text) match { case "" => println("bad Y for "+label+"") ; 0.0 case any => any.toDouble } } catch { case e => Maths.random(0, 200) })
+
+
+
       /*
        val color : Color = try {
-       (((n \\ "viz:color") \ "@r" text).toInt,
-       ((n \\ "viz:color") \ "@g" text).toInt,
-       ((n \\ "viz:color") \ "@b" text).toInt)
+       (((n \\ "color") \ "@r" text).toInt,
+       ((n \\ "color") \ "@g" text).toInt,
+       ((n \\ "color") \ "@b" text).toInt)
        } catch {
        case x => (0,0,0)
        }*/
@@ -264,7 +268,10 @@ class GEXF extends Actor {
       }
     }
 
-    Graph.make(g.elements)//.normalizePositions
+    val h = Graph.make(g.elements)//.normalizePositions
+    val (centerX, centerY) = Metrics.basicCenter(h)
+    println("center is: "+(centerX,centerY))
+    h + ("position" -> (h.position map { case (x,y) => (x - centerX, y - centerY) }))
   }
 
 
