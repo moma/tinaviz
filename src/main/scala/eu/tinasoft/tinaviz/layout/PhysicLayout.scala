@@ -54,11 +54,11 @@ object PhysicLayout {
 
     val GRAVITY = 200 // 200    g.get[Double]("layout.gravity") // stronger means faster!
     val REPULSION = 900 // 800    should be divided by the nb of edges? faster at the beggining, then slower?
-    val DAMPING = 0.01 // 0.002  please, no greater than 0.05
+    val DAMPING = 0.002 // 0.002  please, no greater than 0.05
     val STRENGTH = 0.03 // 0.05   looks perfect on 90% of the graphs.. but 10% need 0.03 :/
-    val maxLinkLength = 100 // 80     max distance between linked nodes
-    val minLinkLength = 3 // 5      min distance between linked nodes
-    val minDistance = 3 // 5      min distance between unlinked nodes (and thus clusters)
+    val maxLinkLength = 70 // 80     max distance between linked nodes
+    val minLinkLength = 5 // 5      min distance between linked nodes
+    val minDistance = 5 // 5      min distance between unlinked nodes (and thus clusters)
 
     //since I can't normalize weight, it seems I have to adapt the drag myself
     //ps.setDrag((if (g.nbEdges > 20000) 0.2 else 0.4).toFloat)
@@ -100,11 +100,12 @@ object PhysicLayout {
             case (pos2, i2, p2) =>
               if (i2 != i1) {
 
+                val strictDistance = ((g.size(i1) / 2.0) + (g.size(i2) / 2.0))
+                val securityDistance = (strictDistance * 1.20) // 20%
+                val distInterval = (minLinkLength.toDouble, maxLinkLength.toDouble)
 
                 if (g.hasThisLink(i1, i2)) {
-                  val strictDistance = ((g.size(i1) / 2.0) + (g.size(i2) / 2.0))
-                  val securityDistance = (strictDistance * 1.20) // 20%
-                  val distInterval = (securityDistance.toDouble, maxLinkLength.toDouble)
+
                   val w = g.links(i1)(i2)
                   // if we have a link, we create a spring
                   val minMaxInterval = (g.category(i1), g.category(i2)) match {
@@ -168,8 +169,8 @@ object PhysicLayout {
 
             val (x, y) = (p.x().toDouble, p.y().toDouble)
             val v = ps.getParticle(cj).velocity()
-            v.setX(Maths.limit(v.x().toDouble, -500, 500).toFloat)
-            v.setY(Maths.limit(v.y().toDouble, -500, 500).toFloat)
+            v.setX(Maths.limit(v.x().toDouble, -50, 50).toFloat)
+            v.setY(Maths.limit(v.y().toDouble, -50, 50).toFloat)
 
             (x, y)
           } else {

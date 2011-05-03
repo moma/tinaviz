@@ -108,31 +108,12 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/badgraph/gexf/PseudoInclusion_logJaccard_FET-graph.gexf"
           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
-          //"file:///Users/jbilcke/Checkouts/git/tina/grapheWhoswho/bipartite_graph.gexf"
 
-         // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/package_test/gexf/Cooccurrences_sharedNGrams_FET-graph.gexf"
-        // "file:///home/jbilcke/Dropbox/Shared/Tina/test.gexf"
-          //"file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
-          //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/bipartite_graph.gexf"
-
-          // standard one
-          //"file:///home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/phylo.gexf"
-
-          // seems buggy
-          // "file:///home/jbilcke/Desktop/from_Batch_10_to_FET-graph.gexf"
-
-          // "file:///home/jbilcke/Desktop/largescalegraph.gexf"
-          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/sessions/fetXX/gexf/FET-graph.gexf"
-
-          //"file:///home/jbilcke/Documents/1_test_graph-graph.gexf"
-          //"file:///home/jbilcke/test-graph.gexf"
         )
     }
   }
 
-  var uninitializedZoom = true
   var doZoom: Symbol = 'none
   var export: String = "none"
 
@@ -176,15 +157,7 @@ class Main extends TApplet with Client {
         doZoom = 'none
       case any =>
     }
-    //println("g.nbNodes: "+g.nbNodes+" uninitializedZoom: "+uninitializedZoom)
-    if ((g.nbNodes > 0) && uninitializedZoom) {
-      println("HACK")
-      //setCameraPosition(width / 2, height / 2)
-      //zoom(true)
-      //mouseDragged
-      uninitializedZoom = false
-      //Server ! "camera.target" -> "all"
-    }
+
     _recenter(g)
 
     export match {
@@ -206,9 +179,7 @@ class Main extends TApplet with Client {
       setFontSize(9, false)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
       text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec) zoom: "+getZoom, 10f, 13f)
-
     }
-    //updateCameraEngine
     setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
     setLod(32)
     lineThickness(1)
@@ -224,7 +195,6 @@ class Main extends TApplet with Client {
     //val visibleNodes = visibleNodesTmp.map { _._2 }.toList.sort(compareBySelection).toArray
 
     // TODO filter by weight, and show only the N biggers
-    //  (Boolean, Int, (Double,Double),(Double,Double),Double, Color, Int)
     val edgeTmp = g.renderEdgePosition.zipWithIndex map {
       case ((source, target), i) =>
         val psource = screenPosition(source)
@@ -265,9 +235,7 @@ class Main extends TApplet with Client {
           lineColor(color)
           if (nbVisibleNodes < 30000) {
             val th = if (nbVisibleEdges < 2000) {
-              val (a, b) = ndx
-              val m = math.min(g.size(a),
-                g.size(b))
+              val m = math.min(g.size(ndx._1),  g.size(ndx._2))
               val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
               if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
             } else {
@@ -286,10 +254,8 @@ class Main extends TApplet with Client {
           setLod(lod)
           lineColor(color)
           if (nbVisibleNodes < 30000) {
-            val th = if (nbVisibleEdges < 2000) {
-              val (a, b) = ndx
-              val m = math.min(g.size(a),
-                g.size(b))
+            val th = if (nbVisibleEdges < 1600) {
+              val m = math.min(g.size(ndx._1), g.size(ndx._2))
               val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
               if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
             } else {
@@ -447,14 +413,8 @@ class Main extends TApplet with Client {
         //println("error")             || g.currentView.equalsIgnoreCase("macro")
         return
     }
-    //println("recentering will be done!")
-    //val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
-    //val (w,h) = (width.toDouble - 60.0, height.toDouble - 60.0)
-    val (w,h) = (width.toDouble * 0.85, height.toDouble * 0.85) // FEATURE 30% of margins
-    val (cz,cp) = (getZoom,getPosition)
-
-    //def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
-    //def screen2model(p: (Double,Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
+    if (Maths.random < 0.5) {
+    val (w,h) = (width.toDouble * 0.85, height.toDouble * 0.85) // 15% of margins
 
      val centerOnSelection = (g.cameraTarget.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
       // spaghetti code
@@ -471,10 +431,8 @@ class Main extends TApplet with Client {
       case (gw,gh) => max(gw * getZoom / w, gh * getZoom / h)
     }
 
-
     val pos = if (centerOnSelection) g.selectionNeighbourhoodCenter else g.notSinglesCenter
 
-    //if (abs(ratio) > 1.0001 || abs(ratio) < 0.9999) {
       var translate = new PVector(width.toFloat / 2.0f, height.toFloat / 2.0f, 0)
       translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
 
@@ -494,7 +452,7 @@ class Main extends TApplet with Client {
          }
 
       }
-    //}
+    }
   }
 
   /**
@@ -503,12 +461,7 @@ class Main extends TApplet with Client {
    * value contains here the new value of the camera zoom
    */
   override def zoomUpdated(value: Double) {
-
-
-    // TODO use the nap
-    //Server ! "camera.target" -> "none"
-
-    println("zoomUpdated("+value+")")
+    //println("zoomUpdated("+value+")")
     Server ! "camera.zoom" -> value
   }
 
@@ -517,11 +470,7 @@ class Main extends TApplet with Client {
    *
    */
   override def positionUpdated(value: (Double, Double)) {
-
-
-    // TODO use the nap
-    //Server ! "camera.target" -> "none"
-    println("positionUpdated("+value+")")
+    //println("positionUpdated("+value+")")
     Server ! "camera.position" -> value
   }
 
@@ -529,7 +478,7 @@ class Main extends TApplet with Client {
                             side: Symbol,
                             count: Symbol,
                             position: (Double, Double)) {
-    println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
+    //println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
     Server ! ("camera.mouse", kind, side, count, position)
   }
 
@@ -540,7 +489,6 @@ class Main extends TApplet with Client {
    */
   override def keyPressed() {
     key match {
-    //case 'p' => Server ! "pause" -> 'toggle
       case 'a' => Server ! "pause" -> 'toggle
 
       case 'n' => Server ! "drawing.nodes" -> 'toggle

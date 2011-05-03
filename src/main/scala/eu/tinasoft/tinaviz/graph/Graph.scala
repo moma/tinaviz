@@ -257,12 +257,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     var tmpColor = List.empty[Color]
     val aextremums = (minAEdgeWeight, maxAEdgeWeight)
     val bextremums = (minBEdgeWeight, maxBEdgeWeight)
-    def colorate(category:String) = (category match {
-                  case "Document" => colorScheme.primary.standard
-                  case "NGram" => colorScheme.tertiary.standard
-                  case other => colorScheme.secondary.standard
-                })
-    def getExtremum (category:String) = (category match {
+    def colorate(category: String) = (category match {
+      case "Document" => colorScheme.primary.standard
+      case "NGram" => colorScheme.tertiary.standard
+      case other => colorScheme.secondary.standard
+    })
+    def getExtremum(category: String) = (category match {
       case "Document" => aextremums
       case "NGram" => bextremums
       case any => aextremums
@@ -271,33 +271,28 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     val target = (0.4, 1.0)
     links.zipWithIndex map {
       case (mapIntDouble, from) =>
-       val modeFrom = if (selected(from)) 'selected else if (highlighted(from)) 'highlighted else if (selectionValid) 'unselected else 'default
+        val modeFrom = if (selected(from)) 'selected else if (highlighted(from)) 'highlighted else if (selectionValid) 'unselected else 'default
         val catFrom = category(from)
         val extr = getExtremum(catFrom)
-        //val a = renderNodeColor(from)
-        //val ab = renderNodeBorderColor(from)
         mapIntDouble foreach {
           case (to, weight) =>
             val catTo = category(to)
             val modeTo = if (selected(to)) 'selected else if (highlighted(to)) 'highlighted else if (selectionValid) 'unselected else 'default
-            //val b = renderNodeColor(to)
-            //val bb = renderNodeBorderColor(to)
 
-            //val alpha =  Maths.map(weight, getExtremum(catFrom), (0.50, 0.95))
             tmpColor ::= ((modeFrom, modeTo) match {
               case ('selected, any) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
               // case (any, 'selected) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
               case ('highlighted, any) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
               //case (any, 'highlighted) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
               case (any1, any2) =>
-               if (selectionValid) {
-                // unselected
-                val t = colorate(catFrom)
-               t.blend(colorate(catTo)).saturateBy(0.78).alpha(Maths.map(weight, extr, (0.75, 0.94)))
-              } else {
-                val t = colorate(catFrom)
-               t.blend(colorate(catTo)).alpha(Maths.map(weight, extr, (0.68, 0.94)))
-              }
+                if (selectionValid) {
+                  // unselected
+                  val t = colorate(catFrom)
+                  t.blend(colorate(catTo)).saturateBy(0.78).alpha(Maths.map(weight, extr, (0.75, 0.94)))
+                } else {
+                  val t = colorate(catFrom)
+                  t.blend(colorate(catTo)).alpha(Maths.map(weight, extr, (0.68, 0.90)))
+                }
             })
 
         }
