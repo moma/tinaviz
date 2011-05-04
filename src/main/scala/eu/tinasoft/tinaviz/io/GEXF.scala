@@ -188,8 +188,8 @@ class GEXF extends Actor {
          val p = (n \\ "position")
          //println("x: " +(p \ "@x" text)+" y:"+(p \ "@y" text))
 
-         val position = ((try { (p \ "@x" text) match { case "" => println("bad X for "+label+"") ; 0.0 case any => any.toDouble } } catch { case e => Maths.random(0, 200) }),
-                         try { (p \ "@y" text) match { case "" => println("bad Y for "+label+"") ; 0.0 case any => any.toDouble } } catch { case e => Maths.random(0, 200) })
+         val position = ((try { (p \ "@x" text) match { case "" => Maths.random(0, 200) case any => any.toDouble } } catch { case e => Maths.random(0, 200) }),
+                         try { (p \ "@y" text) match { case "" => Maths.random(0, 200) case any => any.toDouble } } catch { case e => Maths.random(0, 200) })
 
 
 
