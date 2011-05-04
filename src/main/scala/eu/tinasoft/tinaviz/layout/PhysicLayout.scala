@@ -270,7 +270,7 @@ object PhysicLayout {
                 }
                 // no repulsion if they are not on the same date interval
                 else if (!g.hasAnyLink(i1, i2)) {
-                 ps.makeAttraction(p1, p2,-(if (pos1._1 != pos2._1) 2000 else 100).toFloat, (g.size(i1) / 2.0).toFloat)
+                  ps.makeAttraction(p1, p2,-(if (g.connectedComponents(i1)!=g.connectedComponents(i1)) 3000 else if (pos1._1 != pos2._1) 0 else 50).toFloat, (g.size(i1) / 2.0).toFloat)
                 } // default -600   we repulse unrelated nodes
               }
           }
