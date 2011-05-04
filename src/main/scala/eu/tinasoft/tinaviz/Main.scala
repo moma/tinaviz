@@ -434,7 +434,7 @@ class Main extends TApplet with Client {
         //println("error")             || g.currentView.equalsIgnoreCase("macro")
         return
     }
-    if (Maths.random < 0.5) {
+    //if (Maths.random < 0.9) {
     val (w,h) = (width.toDouble * 0.85, height.toDouble * 0.85) // 15% of margins
 
      val centerOnSelection = (g.cameraTarget.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
@@ -473,7 +473,7 @@ class Main extends TApplet with Client {
          }
 
       }
-    }
+    //}
   }
 
   /**
