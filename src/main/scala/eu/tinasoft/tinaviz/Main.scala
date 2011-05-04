@@ -405,7 +405,7 @@ class Main extends TApplet with Client {
         }
         setColor(col)
         // we can show the label if we are selected, or if we do not collide with a bigger one
-        if ((!weHaveACollision) || weAreSelected) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
+        if ((!weHaveACollision) || g.highlighted(i)) text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
     }
 
 
