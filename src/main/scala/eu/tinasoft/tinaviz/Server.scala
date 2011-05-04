@@ -47,7 +47,7 @@ object Server extends Actor {
     "selectionRadius" -> 10.0,
 
     // TODO real-time camera settings
-    "camera.zoom" -> 0.0,
+    "camera.zoom" -> 0.5,
     "camera.position" -> (0.0, 0.0),
     "camera.target" -> "all",
 

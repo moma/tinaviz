@@ -26,6 +26,7 @@ object PhysicLayout {
   var lastHash = 0
 
   def layout(g: Graph): Graph = {
+    println("g.layout: "+g.layout)
     g.layout match {
       case "tinaforce" => tinaforce(g)
       case any =>

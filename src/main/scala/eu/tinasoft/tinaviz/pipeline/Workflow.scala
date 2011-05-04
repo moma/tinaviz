@@ -312,7 +312,10 @@ object Workflow extends Actor {
 
         case (key: String, value: Any) =>
            Pipeline.applyKey(key, value)
-
+           key match {
+            case "layout" => println("got layout type update query. value: "+value)
+            case x => // ignore
+           }
            // WARNING actually caching is not really used (didn't have the time to debug it) so a straightforward
            // workflow is used instead. since it was that easy, I simply resetted the "categoryCache" when we unselect nodes
            // if you happen to refactorate this, you will need to clear the selection in the other caches, too
