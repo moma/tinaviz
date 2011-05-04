@@ -32,7 +32,7 @@ object Graph {
    * Default settings
    */
   val defaults: Map[String, Any] = Map(
-    "layout" -> "tinaforce",  // phyloforce
+    "layout" -> "phyloforce", //"tinaforce",  // phyloforce
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
@@ -194,7 +194,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val maxBEdgeWeight = edgeWeightExtremums._4
 
   lazy val selectionValid = (selection.size > 0)
-
+  lazy val connectedComponents = Metrics connectedComponents this
+    
   lazy val renderNodeColor = {
     selected.zipWithIndex map {
       case (s, i) =>
