@@ -194,7 +194,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val maxBEdgeWeight = edgeWeightExtremums._4
 
   lazy val selectionValid = (selection.size > 0)
-
+  lazy val connectedComponents = Metrics connectedComponents this
+    
   lazy val renderNodeColor = {
     selected.zipWithIndex map {
       case (s, i) =>
