@@ -67,6 +67,56 @@ object Metrics {
     }
     _inDegree.toArray
   }
+  
+  
+  def connectedComponents(g:Graph) : List[Int] = {
+      
+    // Calcul des partitions
+    var nb_partition = 0
+
+    //var nodesId = Map(g.ids.zipWithIndex: _*).map {
+    //  case (id, id) => (id,id)
+    //}
+
+    var nodesIds : Set[Int] = g.ids.toSet
+
+    var partitions = Map.empty[Int,Int]
+
+    while (nodesIds.size > 0) {
+        val target = nodesIds.head
+        //nodesIds /: remove(0)
+        nodesIds = nodesIds - target
+        nb_partition += 1
+        var current_partition = Set( target )
+        partitions += target -> nb_partition
+
+        // neighbors IDs
+        val neighborsList = g.neighbours( target ).map{ case (a,_) => g.id(a) }.toList
+        
+        var neighbors =  ( neighborsList.toSet --  current_partition.toSet )
+
+        while (neighbors.size > 0) {
+            val target2 = neighbors.head
+
+            val neighbors2 = g.neighbours( target2 ).map{ case (a,b) => g.id(a) }.toSet
+
+            partitions += target2 -> nb_partition
+
+            neighbors = neighbors - target2 // only keep the last elements except the first
+            nodesIds = nodesIds - target2 // remove target2 from nodesIds
+
+            current_partition += target2 // append target2 to current_parititon
+
+            // do the union of neighbors 1 and 2, then compute the difference with current partition
+            neighbors = (neighbors | neighbors2) &~ current_partition
+        }
+    }
+   println("number of partitions"+nb_partition) 
+    // sort the Map of ( ID -> PARTITION ) then only keep the partition's number'
+    partitions.toList sortBy {_._1} map { _._2 } 
+  }
+  
+  
 
   /**
    * Compute the degree array
