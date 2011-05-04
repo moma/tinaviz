@@ -32,7 +32,7 @@ object Graph {
    * Default settings
    */
   val defaults: Map[String, Any] = Map(
-    "layout" -> "phyloforce", //"tinaforce",  // phyloforce
+    "layout" -> "tinaforce", //"tinaforce",  // phyloforce
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
