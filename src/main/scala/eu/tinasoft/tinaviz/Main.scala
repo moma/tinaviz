@@ -108,9 +108,18 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/phylo.gexf.gz"
+           //"file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/phylo.gexf.gz"
           //"file:///home/jbilcke/Desktop/FET67bipartite_graph_logjaccard_.gexf"
 
+        
+          // DAVID path
+                 //  "file:///home/david/fast/gitcode/tinaweb/FET67bipartite_graph_logjaccard_.gexf"
+          
+          "file:///home/david/fast/gitcode/tinaweb/phyloX.gexf"
+         // "file:///home/david/fast/gitcode/tinaweb/test.gexf"
+         //"file:///home/david/fast/gitcode/tinaweb/default.gexf.gz" 
+          // "file:///home/david/fast/recherche/Registry/TinaCSS/scholarsMarch11.gexf" 
+        
         )
     }
   }
