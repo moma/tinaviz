@@ -549,6 +549,7 @@ class Main extends TApplet with Client {
     }
   }
 
+  /*
   override def start() {
     super.start()
     //println("started..")
@@ -562,9 +563,10 @@ class Main extends TApplet with Client {
   }
 
   override def destroy() {
-    println("Main.scala: sending exit signal to Server")
-    Server ! 'exit
-    println("Main.scala: calling super.destroy()")
-    super.destroy()
+    //println("Main.scala: sending exit signal to Server")
+    //Server ! 'exit
+    //println("Main.scala: calling super.destroy()")
+    //super.destroy()
   }
+  */
 }

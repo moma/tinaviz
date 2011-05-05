@@ -82,7 +82,7 @@ class TApplet extends PApplet with MouseWheelListener {
   val psCamera = ps.makeParticle( 1.0f,    0.05f,   0.0f,   0.0f)
   val psSpring = ps.makeSpring(psRoof, psCamera, 0.01f,  0.01f,  0.05f )
 
-  val minZoom = 0.05
+  val minZoom = 0.015 // old value was 0.050
   val maxZoom = 500.0
 
   private val _fonts = new Fonts(this)
