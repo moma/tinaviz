@@ -82,7 +82,7 @@ object Server extends Actor {
           Browser ! "_graphImportedCallback" -> "success"
 
         case ("export","GEXF") =>  Workflow ! ("export","GEXF")
-        case ('open, pathOrURL: Any) =>  (new GEXF) ! pathOrURL
+        case ('open, pathOrURL: Any) =>  (new GEXF) ! (pathOrURL, properties)
 
         case ("select", toBeSelected)        => Workflow ! "select"              -> toBeSelected
         case ("selectByPattern", pattern)    => Workflow ! "selectByPattern"     -> pattern

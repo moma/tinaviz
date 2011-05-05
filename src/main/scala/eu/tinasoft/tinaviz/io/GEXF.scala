@@ -42,15 +42,14 @@ class GEXF extends Actor {
           println("GEXF: exiting..")
           exit()
 
-        case url: URL =>
+        case (url: URL, defaults:Map[String,Any]) =>
             println("Connecting to " + url)
             val BUFFER_SIZE = 2048
             val conn = url.openConnection
             val ins = conn.getInputStream
 
             reply(
-              load(
-              if (url.toString.endsWith(".gexf")||url.toString.endsWith(".xml")) {
+              load((if (url.toString.endsWith(".gexf")||url.toString.endsWith(".xml")) {
                  println("Reading raw graph stream, please wait..")
                  XML.load(ins)
               } else if (url.toString.endsWith(".zip")||url.toString.endsWith(".gz")||url.toString.endsWith(".tar.gz")) {
@@ -66,13 +65,13 @@ class GEXF extends Actor {
 
               } else {
                 XML.load(ins)
-              }
+              }),defaults
             )
           )
 
-        case str: String =>
+        case (str: String, defaults:Map[String,Any]) =>
             println("Reading graph string, please wait..")
-            reply(load(XML.load(str)))
+            reply(load(XML.load(str), defaults))
 
 
         case graph: Graph =>
@@ -121,7 +120,7 @@ class GEXF extends Actor {
   }
 
 
-  def load(root:Elem) = {
+  def load(root:Elem, defaultProperties:Map[String,Any] = Map.empty[String,Any]) = {
     var properties = Map(
       "url" -> ""
     )
@@ -172,7 +171,7 @@ class GEXF extends Actor {
         })
 
     }
-    var g = new Graph()
+    var g = new Graph( defaultProperties )
     var id = -1
     for (n <- (root \\ "node")) {
       id += 1

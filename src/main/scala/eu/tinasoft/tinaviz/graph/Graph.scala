@@ -287,7 +287,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             val modeTo = if (selected(to)) 'selected else if (highlighted(to)) 'highlighted else if (selectionValid) 'unselected else 'default
 
             tmpColor ::= ((modeFrom, modeTo) match {
-              case ('selected, any) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
+              case ('selected, any) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98))) // previously: (0.86, 0.98)
+
               // case (any, 'selected) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
               case ('highlighted, any) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
               //case (any, 'highlighted) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
@@ -295,10 +296,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
                 if (selectionValid) {
                   // unselected
                   val t = colorate(catFrom)
-                  t.blend(colorate(catTo)).saturateBy(0.78).alpha(Maths.map(weight, extr, (0.75, 0.94)))
+                  t.blend(colorate(catTo)).saturateBy(0.70).alpha(Maths.map(weight, extr, (0.75, 0.94)))
                 } else {
                   val t = colorate(catFrom)
-                  t.blend(colorate(catTo)).alpha(Maths.map(weight, extr, (0.60, 0.90)))
+                  t.blend(colorate(catTo)).saturateBy(0.78).alpha(Maths.map(weight, extr, (0.60, 0.90)))
                 }
             })
 
