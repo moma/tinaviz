@@ -108,7 +108,7 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/phyloTh10.gexf.gz"
 
         )
     }
@@ -418,62 +418,10 @@ class Main extends TApplet with Client {
 
     showSelectionCircle(selectionRadius)
 
+    showBranding
   }
 
-  /**
-   * Recenter
-   */
-  private def _recenter(g: Graph) {
-    g.cameraTarget match {
-      case "all" =>
-      case "selection" =>
-      case "none" =>
-        return
-      case err =>
-        //println("error")             || g.currentView.equalsIgnoreCase("macro")
-        return
-    }
-    //if (Maths.random < 0.9) {
-    val (w,h) = (width.toDouble * 0.85, height.toDouble * 0.85) // 15% of margins
 
-     val centerOnSelection = (g.cameraTarget.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
-      // spaghetti code
-    val ratio =  (((if (centerOnSelection) {
-         (g.xMinSelectionNeighbourhood - g.xMaxSelectionNeighbourhood,
-          g.yMinSelectionNeighbourhood - g.yMaxSelectionNeighbourhood) // TODO we could use g.selection(0)
-      } else  {
-         (g.xMin - g.xMax, g.yMin - g.yMax)  // size to screen
-     }) match {
-      case (gw, gh) => (abs(gw), abs(gh))
-    }) match {
-      case (gw, gh) => ((if (gw < 40.0) 40.0 else gw), (if (gh < 40.0) 40.0 else gh))
-    }) match {
-      case (gw,gh) => max(gw * getZoom / w, gh * getZoom / h)
-    }
-
-    val pos = if (centerOnSelection) g.selectionNeighbourhoodCenter else g.notSinglesCenter
-
-      var translate = new PVector(width.toFloat / 2.0f, height.toFloat / 2.0f, 0)
-      translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
-
-      // FIXME ugly hack, seems a bugs from the browser when inserting the applet.. it is positionned in absolute coord?!
-      translate.set(translate.x, translate.y + 30, 0)
-
-      if (Maths.random < 0.1) updatePosition(translate) else updatePositionSilent(translate)
-      //println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio+" zoom: "+getZoom)
-      if (g.selectionNeighbourhood.size != 1) {
-         if (ratio != 0.0) if (Maths.random < 0.1) updateZoom(getZoom / ratio) else updateZoomSilent(getZoom / ratio)
-       } else {
-         //println("updateZoomSilent(3.0)")
-         if (Maths.random < 0.1) {
-           updateZoom(3.0)
-         } else {
-            updateZoomSilent(3.0) // hack: we update the zoom but we do not trigger an event (the "zoom changed" event is reserved for actions induced by users)
-         }
-
-      }
-    //}
-  }
 
   /**
    * We override the zoomUpdated callback
@@ -569,4 +517,69 @@ class Main extends TApplet with Client {
     //super.destroy()
   }
   */
+
+
+
+  /**
+  * Recenter
+  */
+ def _recenter(g: Graph) {
+   g.cameraTarget match {
+     case "all" =>
+     case "selection" =>
+     case "none" =>
+       return
+     case err =>
+       //println("error")             || g.currentView.equalsIgnoreCase("macro")
+       return
+   }
+   //if (Maths.random < 0.9) {
+   val (w,h) = (width.toDouble * 0.85, height.toDouble * 0.85) // 15% of margins
+
+    val centerOnSelection = (g.cameraTarget.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
+     // spaghetti code
+   val ratio =  (((if (centerOnSelection) {
+        (g.xMinSelectionNeighbourhood - g.xMaxSelectionNeighbourhood,
+         g.yMinSelectionNeighbourhood - g.yMaxSelectionNeighbourhood) // TODO we could use g.selection(0)
+     } else  {
+        (g.xMin - g.xMax, g.yMin - g.yMax)  // size to screen
+    }) match {
+     case (gw, gh) => (abs(gw), abs(gh))
+   }) match {
+     case (gw, gh) => ((if (gw < 40.0) 40.0 else gw), (if (gh < 40.0) 40.0 else gh))
+   }) match {
+     case (gw,gh) => max(gw * getZoom / w, gh * getZoom / h)
+   }
+
+   val pos = if (centerOnSelection) g.selectionNeighbourhoodCenter else g.notSinglesCenter
+
+     var translate = new PVector(width.toFloat / 2.0f, height.toFloat / 2.0f, 0)
+     translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
+
+     // FIXME ugly hack, seems a bugs from the browser when inserting the applet.. it is positionned in absolute coord?!
+     translate.set(translate.x, translate.y + 30, 0)
+
+     if (Maths.random < 0.1) updatePosition(translate) else updatePositionSilent(translate)
+     //println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio+" zoom: "+getZoom)
+     if (g.selectionNeighbourhood.size != 1) {
+        if (ratio != 0.0) if (Maths.random < 0.1) updateZoom(getZoom / ratio) else updateZoomSilent(getZoom / ratio)
+      } else {
+        //println("updateZoomSilent(3.0)")
+        if (Maths.random < 0.1) {
+          updateZoom(3.0)
+        } else {
+           updateZoomSilent(3.0) // hack: we update the zoom but we do not trigger an event (the "zoom changed" event is reserved for actions induced by users)
+        }
+
+     }
+   //}
+ }
+
+ /**
+  * Put a branding icon in the viz.. :/
+  */
+ def showBranding {
+
+ }
+
 }

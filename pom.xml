@@ -182,10 +182,12 @@
     <name>${project.artifactId} ${project.version}</name>
     
     <pluginRepositories>
+        <!--
         <pluginRepository>
             <id>lafros.com</id>
             <url>http://lafros.com/m2arts</url>
         </pluginRepository>
+        -->
     </pluginRepositories>
 
     <repositories>
