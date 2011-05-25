@@ -139,6 +139,7 @@ object Workflow extends Actor {
           val out = Pipeline.output
           val out2 = if (uuidList.size == 0) {
               Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              in.clearSelection
               out.clearSelection
           } else {
               out + ("selected" -> out.uuid.zipWithIndex.map {
@@ -158,9 +159,11 @@ object Workflow extends Actor {
           self ! "filter.view" -> in.currentView
 
         case ("select", uuid: String) =>
+          val in = Pipeline.input
           val out = Pipeline.output
           val out2 = if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
               Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              in.clearSelection
               out.clearSelection
             } else {
               out + ("selected" -> out.uuid.zipWithIndex.map {
@@ -180,10 +183,12 @@ object Workflow extends Actor {
           //self ! "filter.view" -> Pipeline.input.currentView
 
         case ("selectByPattern", pattern: String) =>
+          val in = Pipeline.input
           val out = Pipeline.output
           Pipeline.setOutput(
             if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
               Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+             in.clearSelection
               out.clearSelection
             } else {
               out + ("selected" -> out.label.zipWithIndex.map {
@@ -202,6 +207,7 @@ object Workflow extends Actor {
           Pipeline.setOutput(
             if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
               Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              ref.clearSelection
               out.clearSelection
             } else {
               out + ("selected" -> out.label.zipWithIndex.map {

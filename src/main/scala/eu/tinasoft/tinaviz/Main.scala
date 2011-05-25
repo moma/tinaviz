@@ -413,7 +413,13 @@ class Main extends TApplet with Client {
               || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
             val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (l2.compareTo(l1) > 0))
             //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
-            if (i == j) false else (weTouchSomething && (whichIsLarger || whichIsSelected))
+            if (i == j) {
+              false 
+            } else if (weTouchSomething) {
+              if (whichIsSelected) true else whichIsLarger
+            } else {
+              false
+            }
         }
         setFontSize((r1 * getZoom).toInt, b1)
         val col = if (weAreSelected) {
