@@ -840,6 +840,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
 
+
   /**
    * TODO refactor to use a generic field update function
    */

@@ -446,7 +446,20 @@ class TApplet extends PApplet with MouseWheelListener {
         zoom(e.getWheelRotation < 0)
       }
     }
+    resetIdle
     Server ! "camera.target" -> "none"
+  }
+
+  // detection system for user idle
+  var _idle = 0
+  def idle = _idle
+  def resetIdle : Int = {
+    _idle = 0
+    0
+  }
+  def increaseIdle : Int = {
+    _idle = idle + 1
+    _idle
   }
 
   def moveUp(amount: Double = 10) = _camera.position = (_camera.position._1, _camera.position._2 + amount)

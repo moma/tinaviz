@@ -33,6 +33,8 @@ import java.util.concurrent.atomic.AtomicReference
  */
 object Pipeline {
 
+  //var _revision = 0L
+
   val _input = new AtomicReference(new Graph)
   def setInput(g:Graph) { _input.set(g) }
   def input : Graph = _input.get
@@ -50,7 +52,12 @@ object Pipeline {
   def edgeWeightCache : Graph = _edgeWeightCache.get
 
   val _output = new AtomicReference(new Graph)
-  def setOutput(g:Graph) { _output.set(g) }
+  def setOutput(g:Graph) {
+    _output.set(g)
+    //revision = _revision + 1
+  }
+  //def revision = _revision
+
   def output : Graph = _output.get
 
   def applyKey(key:String, value:Any)= {

@@ -16,6 +16,8 @@ import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import tinaviz.graph._
 import tinaviz.pipeline.Pipeline
+import actors.threadpool.AbstractCollection
+import scala.Math
 
 object PhysicLayout {
   val ps = new ParticleSystem(0f, 0.1f)
@@ -69,6 +71,9 @@ object PhysicLayout {
     val maxLinkLength = 70 // 80     max distance between linked nodes
     val minLinkLength = 16 // 5      min distance between linked nodes
     val minDistance = 16 // 5      min distance between unlinked nodes (and thus clusters)
+
+
+    var deltas = 0
 
     //since I can't normalize weight, it seems I have to adapt the drag myself
     //ps.setDrag((if (g.nbEdges > 20000) 0.2 else 0.4).toFloat)
@@ -151,7 +156,7 @@ object PhysicLayout {
     }
     var (ci, cj) = (0, 0)
 
-    if (g.pause) g
+    if (g.pause) { Thread.sleep(1000); g }
     else {
       g + ("position" -> (positionIndexSingle map {
         case (nodePosition, i, s) =>
@@ -181,7 +186,8 @@ object PhysicLayout {
             val v = ps.getParticle(cj).velocity()
             v.setX(Maths.limit(v.x().toDouble, -50, 50).toFloat)
             v.setY(Maths.limit(v.y().toDouble, -50, 50).toFloat)
-
+            val (oldX, oldY) = (nodePosition._1, nodePosition._2)
+            val deltaLocal = (math.abs(oldX - x), math.abs(oldY - y))
             (x, y)
           } else {
             // node is not single

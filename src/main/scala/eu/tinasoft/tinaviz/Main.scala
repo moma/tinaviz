@@ -126,7 +126,7 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/phyloTh10.gexf.gz"
+           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
 
         )
     }
@@ -149,6 +149,44 @@ class Main extends TApplet with Client {
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
     if (g.pause) smooth else if (nbVisibleEdges < 600) smooth else noSmooth
+
+
+    // if activity, then we reset
+
+
+    // if the graph has low layout activity, then reduce the FPS
+    /*val activity = g.activity match {
+      case a =>
+        // if paused, no need to refresh very often
+        if (g.pause) 0.0
+        // else if (mouseMoved) 1.0
+        else if (a < 0.10) 0.0
+        else 1.0
+    } */
+    val fps = {
+      if (g.pause) {
+        increaseIdle
+        if (idle <= 10) {
+          25
+        } else if (idle <= 30) {
+          20
+        } else if (idle <= 40) {
+          18
+        } else if (idle <= 50) {
+          15
+        } else if (idle <= 60) {
+          12
+        } else if (idle <= 70) {
+          10
+        } else {
+          5
+        }
+      } else {
+        resetIdle
+        25
+      }
+    }
+    frameRate(fps)
 
     export match {
       case "PDF" =>
@@ -196,7 +234,7 @@ class Main extends TApplet with Client {
       setColor(new Color(0.0, 0.0, 0.0))
       setFontSize(9, false)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (" + frameRate.toInt + " img/sec) zoom: "+getZoom, 10f, 13f)
+      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (fps: "+fps+" real:" + frameRate.toInt + ") zoom: "+getZoom, 10f, 13f)
     }
     setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
     setLod(32)
@@ -454,6 +492,7 @@ class Main extends TApplet with Client {
    */
   override def zoomUpdated(value: Double) {
     //println("zoomUpdated("+value+")")
+    resetIdle
     Server ! "camera.zoom" -> value
   }
 
@@ -463,6 +502,7 @@ class Main extends TApplet with Client {
    */
   override def positionUpdated(value: (Double, Double)) {
     //println("positionUpdated("+value+")")
+    resetIdle
     Server ! "camera.position" -> value
   }
 
@@ -471,6 +511,7 @@ class Main extends TApplet with Client {
                             count: Symbol,
                             position: (Double, Double)) {
     //println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
+    resetIdle
     Server ! ("camera.mouse", kind, side, count, position)
   }
 
@@ -480,6 +521,7 @@ class Main extends TApplet with Client {
    *
    */
   override def keyPressed() {
+    resetIdle
     key match {
       case 'a' => Server ! "pause" -> 'toggle
 

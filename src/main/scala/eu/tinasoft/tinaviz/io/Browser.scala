@@ -64,14 +64,14 @@ object Browser extends Actor {
 
         // asynchronous call
         case func:String =>
-          //println("ASYNC window.call: "+_subPrefix + _apiPrefix + func+"")
+          println("ASYNC window.call: "+_subPrefix + _apiPrefix + func+"")
           if (_window!=null) {
             _window.call("setTimeout", Array[Object] (_subPrefix + _apiPrefix + func+"()",new java.lang.Integer(0)))
           }
 
          case (func:String,(any1,any2)) =>
           if (_window!=null) {
-            //println("calling setTimeout(\""+_subPrefix + _apiPrefix + func+"('"+replace(Json.build(any1).toString)+"','"+replace(Json.build(any2).toString)+"')\")")
+            println("calling setTimeout(\""+_subPrefix + _apiPrefix + func+"('"+replace(Json.build(any1).toString)+"','"+replace(Json.build(any2).toString)+"')\")")
             _window.call("setTimeout", Array[Object] (_subPrefix + _apiPrefix +func+"('"+replace(Json.build(any1).toString)+"','"+replace(Json.build(any2).toString)+"')",new java.lang.Integer(0)))
           }
 
@@ -81,7 +81,7 @@ object Browser extends Actor {
            Json.build(any2).toString,
            Json.build(any3).toString,
            new java.lang.Integer(0))
-         //println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
+         println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
          if (_window!=null) {
            _window.call(_subPrefix + _apiPrefix + func, args)
          }
@@ -106,7 +106,7 @@ object Browser extends Actor {
           val args = Array[Object] (
             Json.build(any).toString,
             new java.lang.Integer(0))
-          //println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+Json.build(any).toString+")")
+          println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+Json.build(any).toString+")")
           if (_window!=null) {
            // _window.call(_subPrefix + _apiPrefix + func, args)
             _window.call("setTimeout", Array[Object] (_subPrefix + _apiPrefix +func+"('"+replace(Json.build(any).toString)+"')",new java.lang.Integer(0)))
