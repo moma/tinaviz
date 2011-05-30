@@ -154,7 +154,7 @@
                     <options>
 
                         <option>-dontobfuscate</option>
-                        <option>-dontoptimize</option>
+                        <<option>-dontoptimize</option>
                         <option>-dontpreverify</option>
                         <option>-dontnote</option>
                         <option>-dontwarn</option>
@@ -202,9 +202,11 @@
                         </option>
 
                         <option>-keep class processing.core.PGraphicsJava2D</option>
+
                         <option>-keep class java.awt.event.MouseWheelEvent</option>
                         <option>-keep class java.awt.event.MouseWheelListener</option>
                         <option>-keep class java.awt.event.MouseListener</option>
+
                         <option>-keep class org.processing.core.PApplet</option>
                         <option>-keep class processing.pdf.PGraphicsPDF</option>
                         <option>-keep class eu.tinasoft.tinaviz.scene.TApplet</option>

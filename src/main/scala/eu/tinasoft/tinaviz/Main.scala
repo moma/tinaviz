@@ -190,7 +190,7 @@ class Main extends TApplet with Client {
         } else if (idle <= 40) {
           8
         } else {
-          1
+          5
         }
       } else {
         resetIdle
