@@ -46,23 +46,31 @@ import math._
 
 
 
+
+
 /**
  * The Main object
  *
  * Only used when run from the command-line
  */
-object Main {
+object Main extends TApplet with Client {
+
+  private var applet:Main = _
 
   /**
    * main method
    */
   def main(args: Array[String]): Unit = {
+    applet = new Main
     var frame = new JFrame("TinaViz")
-    var applet = new Main
     frame.getContentPane.add(applet)
     applet.init
+
     frame.pack
     frame.setVisible(true)
+
+    frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+
     /*
     frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
     frame.addWindowListener(new WindowAdapter {
@@ -73,7 +81,6 @@ object Main {
       }
     })
     */
-
   }
 
 }
@@ -93,6 +100,10 @@ object Main {
  * @return
  * @throws
  */
+
+
+
+
 class Main extends TApplet with Client {
 
   override def setup(): Unit = {
@@ -166,20 +177,20 @@ class Main extends TApplet with Client {
     val fps = {
       if (g.pause) {
         increaseIdle
-        if (idle <= 10) {
-          25
-        } else if (idle <= 30) {
+        if (idle <= 5) {
+          24
+        } else if (idle <= 10) {
           20
-        } else if (idle <= 40) {
-          18
-        } else if (idle <= 50) {
-          15
-        } else if (idle <= 60) {
+        } else if (idle <= 15) {
+          16
+        } else if (idle <= 20) {
           12
-        } else if (idle <= 70) {
+        } else if (idle <= 30) {
           10
+        } else if (idle <= 40) {
+          8
         } else {
-          5
+          1
         }
       } else {
         resetIdle
@@ -563,26 +574,34 @@ class Main extends TApplet with Client {
     }
   }
 
-  /*
+
   override def start() {
     super.start()
-    //println("started..")
+    println("started..")
     //Server ! "pause" -> 'toggle
   }
 
+  /*
   override def stop() {
     super.stop()
-    //println("stopped..")
+    println("stopped..")
     //Server ! "pause" -> false
-  }
+  }*/
 
   override def destroy() {
-    //println("Main.scala: sending exit signal to Server")
-    //Server ! 'exit
-    //println("Main.scala: calling super.destroy()")
-    //super.destroy()
+    println("Main.scala: sending exit signal to Server")
+    Server !? 'exit
+
+    println("Main.scala: sending exit to Browser, Layout and Workflow")
+    Browser !? 'exit
+    Layout !? 'exit
+    Workflow !? 'exit
+
+    Thread.sleep(2000)
+    println("Main.scala: calling super.destroy()")
+    super.destroy()
   }
-  */
+
 
 
 

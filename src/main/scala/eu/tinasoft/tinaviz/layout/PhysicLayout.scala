@@ -17,6 +17,7 @@ import tinaviz.util.Maths
 import tinaviz.graph._
 import tinaviz.pipeline.Pipeline
 import actors.threadpool.AbstractCollection
+
 import scala.Math
 
 object PhysicLayout {

@@ -12,7 +12,7 @@
             <groupId>netscape</groupId>
             <artifactId>javascript</artifactId>
             <version>1.6.0_22</version>
-          <!--<scope>provided</scope>-->
+            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.processing</groupId>
@@ -58,7 +58,7 @@
         <keystore.store.password>storepass</keystore.store.password>
         <keystore.key.password>keypass</keystore.key.password>
     </properties>
-    
+
 
     <build>
         <plugins>
@@ -77,12 +77,12 @@
                         </goals>
                     </execution>
                 </executions>
-              <configuration>
-          <jvmArgs>
-            <jvmArg>-Xms256m</jvmArg>
-            <jvmArg>-Xmx1024m</jvmArg>
-          </jvmArgs>
-        </configuration>
+                <configuration>
+                    <jvmArgs>
+                        <jvmArg>-Xms256m</jvmArg>
+                        <jvmArg>-Xmx1024m</jvmArg>
+                    </jvmArgs>
+                </configuration>
             </plugin>
 
 
@@ -98,7 +98,7 @@
                         </goals>
                         <configuration>
                             <artifactSet>
-                        <!-- signed jars-->
+                                <!-- signed jars-->
                                 <excludes>
                                     <!-- liveconnect:plugin was included for Netbeans, but browsers already have it -->
                                     <exclude>liveconnect:plugin</exclude>
@@ -107,25 +107,25 @@
 
                             <transformers>
                                 <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                <!-- Main class -->
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <!-- Main class -->
                                     <mainClass>eu.tinasoft.tinaviz.Main</mainClass>
                                 </transformer>
-                            <!-- Use resource transformers to prevent file overwrites -->
+                                <!-- Use resource transformers to prevent file overwrites -->
                                 <transformer
-                           implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>properties.properties</resource>
                                 </transformer>
                                 <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                        implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>applicationContext.xml</resource>
                                 </transformer>
                                 <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/cxf/cxf.extension</resource>
                                 </transformer>
                                 <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                        implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>META-INF/cxf/bus-extensions.xml</resource>
                                 </transformer>
                             </transformers>
@@ -135,24 +135,90 @@
                 </executions>
             </plugin>
 
-            <!--
+
             <plugin>
-      	    <groupId>com.pyx4me</groupId>
-      	    <artifactId>proguard-maven-plugin</artifactId>
-      	    <executions>
-      	      <execution>
-      	        <phase>package</phase>
-      	        <goals><goal>proguard</goal></goals>
-      	      </execution>
-      	    </executions>
-          <configuration>
-      	      <includeDependency>false</includeDependency>
-      	      <injar>${project.build.finalName}.jar</injar>
-      	      <outjar>${project.build.finalName}-small.jar</outjar>
-      	      <proguardInclude>${basedir}/proguard.conf</proguardInclude>
-      	    </configuration>
-      	  </plugin>
-            -->
+                <groupId>com.pyx4me</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includeDependency>false</includeDependency>
+                    <injar>${project.build.finalName}.jar</injar>
+                    <outjar>${project.build.finalName}-small.jar</outjar>
+                    <options>
+
+                        <option>-dontobfuscate</option>
+                        <option>-dontoptimize</option>
+                        <option>-dontpreverify</option>
+                        <option>-dontnote</option>
+                        <option>-dontwarn</option>
+                        <option>-ignorewarnings</option>
+                        <option>-keepattributes</option>
+
+                        <option>-keepclasseswithmembers public class * {
+                            public static void main(java.lang.String[]);
+                            }
+                        </option>
+
+                        <option>-keep class * implements org.xml.sax.EntityResolver</option>
+
+                        <option>-keepclassmembers class * {
+                            ** MODULE$;
+                            }
+                        </option>
+
+                        <option>-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinPool {
+                            long eventCount;
+                            int workerCounts;
+                            int runControl;
+                            scala.concurrent.forkjoin.ForkJoinPool$WaitQueueNode syncStack;
+                            scala.concurrent.forkjoin.ForkJoinPool$WaitQueueNode spareStack;
+                            }
+                        </option>
+
+                        <option>-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinWorkerThread {
+                            int base;
+                            int sp;
+                            int runState;
+                            }
+                        </option>
+
+                        <option>-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinTask {
+                            int status;
+                            }
+                        </option>
+
+                        <option>-keepclassmembernames class scala.concurrent.forkjoin.LinkedTransferQueue {
+                            scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference head;
+                            scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference tail;
+                            scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference cleanMe;
+                            }
+                        </option>
+
+                        <option>-keep class processing.core.PGraphicsJava2D</option>
+                        <option>-keep class java.awt.event.MouseWheelEvent</option>
+                        <option>-keep class java.awt.event.MouseWheelListener</option>
+                        <option>-keep class java.awt.event.MouseListener</option>
+                        <option>-keep class org.processing.core.PApplet</option>
+                        <option>-keep class processing.pdf.PGraphicsPDF</option>
+                        <option>-keep class eu.tinasoft.tinaviz.scene.TApplet</option>
+
+                        <!-- taken from the example -->
+                        <option>-allowaccessmodification</option>
+                        <option>-keep public class * extends java.applet.Applet { *; }</option>
+                    </options>
+                    <libs>
+                        <lib>${java.home}/lib/rt.jar</lib>
+                    </libs>
+                </configuration>
+            </plugin>
+
 
             <plugin>
                 <artifactId>maven-jarsigner-plugin</artifactId>
@@ -165,9 +231,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!--
+
                     <archive>target/${project.build.finalName}-small.jar</archive>
-                    -->
+
                     <keystore>${keystore.path}</keystore>
                     <storetype>${keystore.type}</storetype>
                     <alias>${keystore.alias}</alias>
@@ -180,7 +246,7 @@
     </build>
 
     <name>${project.artifactId} ${project.version}</name>
-    
+
     <pluginRepositories>
         <!--
         <pluginRepository>

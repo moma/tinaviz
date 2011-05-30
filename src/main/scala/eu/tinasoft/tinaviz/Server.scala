@@ -84,10 +84,7 @@ object Server extends Actor {
     while (true) {
       receive {
         case 'exit =>
-          println("exiting server")
-          Browser ! 'exit
-          Layout ! 'exit
-          Workflow ! 'exit
+          println("Server: calling exit() on myself")
           exit()
 
         case g: Graph =>
