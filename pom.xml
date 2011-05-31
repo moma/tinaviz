@@ -147,24 +147,79 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
+               <dependencies>
+                            <dependency>
+                                <groupId>net.sf.proguard</groupId>
+                                <artifactId>proguard</artifactId>
+                                <version>4.5.1</version>
+                                <scope>runtime</scope>
+                            </dependency>
+                        </dependencies>
+                     <configuration>
+                    <proguardVersion>4.5.1</proguardVersion>
+                    <maxMemory>512m</maxMemory>
                     <includeDependency>false</includeDependency>
                     <injar>${project.build.finalName}.jar</injar>
                     <outjar>${project.build.finalName}-small.jar</outjar>
                     <options>
 
-                        <option>-dontobfuscate</option>
-                        <option>-dontoptimize</option>
+
                         <option>-dontpreverify</option>
                         <option>-dontnote</option>
                         <option>-dontwarn</option>
                         <option>-ignorewarnings</option>
-                        <option>-keepattributes</option>
+                        <!--<option>-keepattributes</option> -->
+                        <option>-optimizationpasses 3</option>
+
+                       <option>-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*</option>
+                        <option>-dontobfuscate</option>
+                        <option>-dontoptimize</option>
 
                         <option>-keepclasseswithmembers public class * {
                             public static void main(java.lang.String[]);
                             }
                         </option>
+
+                        <option>-keepclass class processing.core.PGraphicsJava2D</option>
+                        <!--<option>-keepclassmembers class processing.core.PGraphics2D</option>
+                        <option>-keepclassmembernames class processing.core.PGraphics2D</option> -->
+                        <option>-keepclasseswithmembers class processing.core.PGraphics2D</option>
+
+
+                        <!--
+                        <option>-dontskipnonpubliclibraryclasses</option>
+                         -->
+
+                        <!-- HACK FOR PROGUARD OPTIMIZER -->
+                        <!--
+                        <option>-keepclass class sun.plugin2.applet.Applet2ClassLoader</option>
+                        <option>-keepclassmembers class sun.plugin2.applet.Applet2ClassLoader</option>
+                        <option>-keepclassmembernames class sun.plugin2.applet.Applet2ClassLoader</option>
+                        <option>-keepclasseswithmembers class sun.plugin2.applet.Applet2ClassLoader</option>
+                        -->
+                        <!-- END OF HACK FOR PROGUARD OPTIMIZER -->
+
+                        <!--
+                          PDF EXPORT HACK
+                        -->
+
+
+                        <!--
+                         <option>-keepclass class java.lang.StringBuffer</option>
+                         <option>-keepclasseswithmembers class java.lang.StringBuffer</option>
+
+                         <option>-keepclass class com.lowagie.text.pdf.PdfWriter</option>
+                         <option>-keepclasseswithmembers class com.lowagie.text.pdf.PdfWriter</option>
+
+                         <option>-keepclass class com.lowagie.text.pdf.PdfIndirectReference</option>
+                         <option>-keepclasseswithmembers class com.lowagie.text.pdf.PdfIndirectReference</option>
+
+                        <option>-keepclass class com.lowagie.text.pdf.TrueTypeFontUnicode</option>
+                         <option>-keepclasseswithmembers class com.lowagie.text.pdf.TrueTypeFontUnicode</option>
+                         -->
+                          <!--
+                            END OF PDF EXPORT HACK
+                          -->
 
                         <option>-keep class * implements org.xml.sax.EntityResolver</option>
 
@@ -172,7 +227,6 @@
                             ** MODULE$;
                             }
                         </option>
-
                         <option>-keepclassmembernames class scala.concurrent.forkjoin.ForkJoinPool {
                             long eventCount;
                             int workerCounts;
@@ -200,8 +254,6 @@
                             scala.concurrent.forkjoin.LinkedTransferQueue$PaddedAtomicReference cleanMe;
                             }
                         </option>
-
-                        <option>-keep class processing.core.PGraphicsJava2D</option>
 
                         <option>-keep class java.awt.event.MouseWheelEvent</option>
                         <option>-keep class java.awt.event.MouseWheelListener</option>
@@ -288,6 +340,11 @@
             <id>developer.k-int.com</id>
             <name>k-int repository</name>
             <url>http://developer.k-int.com/maven2/</url>
+        </repository>
+        <repository>
+            <id>www.wellfleetsoftware.com</id>
+            <name>WellFleet Software</name>
+            <url>http://www.wellfleetsoftware.com/m2/repository/</url>
         </repository>
     </repositories>
 </project>
