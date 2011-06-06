@@ -126,21 +126,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val rate = getArray[Int]("rate")
   lazy val uuid = getArray[String]("uuid")
 
-  lazy val outDegree = Metrics outDegree this
-  lazy val inDegree = Metrics inDegree this
-  lazy val degree = Metrics degree this
 
-  lazy val totalDegree = inDegree zip outDegree map {
-    case (a, b) => a + b
-  }
-  lazy val density = getArray[Double]("density")
-
-  lazy val ids = 0 until nbNodes
-
-  // metrics  & properties
-  lazy val nbNodes: Int = Metrics nbNodes this
-  lazy val nbEdges: Int = Metrics nbEdges this
-  lazy val nbSingles: Int = Metrics nbSingles this
 
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
@@ -160,6 +146,24 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val selectionRadius = get[Double]("selectionRadius")
 
   lazy val edgeType = get[String]("edge.type")
+
+
+
+  lazy val totalDegree = inDegree zip outDegree map {
+    case (a, b) => a + b
+  }
+  lazy val density = getArray[Double]("density")
+
+  lazy val ids = 0 until nbNodes
+
+  lazy val outDegree = Metrics outDegree this
+  lazy val inDegree = Metrics inDegree this
+  lazy val degree = Metrics degree this
+
+  // metrics  & properties
+  lazy val nbNodes: Int = Metrics nbNodes this
+  lazy val nbEdges: Int = Metrics nbEdges this
+  lazy val nbSingles: Int = Metrics nbSingles this
 
   lazy val baryCenter = Metrics baryCenter this
   lazy val selectionCenter = Metrics selectionCenter this
@@ -212,6 +216,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   lazy val selectionValid = (selection.size > 0)
   lazy val connectedComponents = Metrics connectedComponents this
+
     
   lazy val renderNodeColor = {
     selected.zipWithIndex map {

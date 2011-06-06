@@ -98,7 +98,7 @@ trait Client {
    * Set a tuple of size two (both elements must be of the same type)
    */
     def sendTuple2(key:String, value1:java.lang.Object, value2:java.lang.Object, t:String) : Unit = {
-    //println("-> sendTuple2(key:"+key+", value1:"+value1+", value2: "+value2+", t:"+t+")")
+    println("-> sendTuple2(key:"+key+", value1:"+value1+", value2: "+value2+", t:"+t+")")
     t match {
        case "Int" =>
        Server ! key -> (value1.toString.toInt, value2.toString.toInt)
