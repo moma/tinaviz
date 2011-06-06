@@ -16,9 +16,9 @@ import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import tinaviz.graph._
 import tinaviz.pipeline.Pipeline
+import actors.threadpool.AbstractCollection
+
 import scala.Math
-import actors.threadpool.{LinkedBlockingQueue, AbstractCollection}
-import scala.Predef._
 
 object PhysicLayout {
   val ps = new ParticleSystem(0f, 0.1f)
@@ -109,47 +109,41 @@ object PhysicLayout {
         case ((x, y), i, s) => ((x, y), i, ps.makeParticle(1.0f, x.toFloat, y.toFloat, 0.0f))
       }
 
-      var compteur1 = 0
-      var compteur2 = 0
-
       // every node are repulsing each other (negative attraction)
       positionIndexNotSingleParticle foreach {
         case (pos1, i1, p1) =>
           positionIndexNotSingleParticle foreach {
             case (pos2, i2, p2) =>
               if (i2 != i1) {
-                compteur1 += 1
-                val hasOutLink = g.hasThisLink(i1,i2)
-                if (hasOutLink) {
-                  val hasInLink = g.hasThisLink(i2, i1)
-                  val outWeight = if (hasOutLink) g.links(i1)(i2) else 0.0
-                  val inWeight = if (hasInLink) g.links(i2)(i1) else 0.0
 
-                  // if we have a single link, or are greater than the mutual link, we compute
-                  if (hasOutLink || (hasInLink && ((outWeight > inWeight) || (i1 > i2)))) {
-                    compteur2 += 1
-                    val strictDistance = ((g.size(i1) / 2.0) + (g.size(i2) / 2.0))
-                    val securityDistance = (strictDistance * 1.20) // 20%
-                    val distInterval = (minLinkLength.toDouble, maxLinkLength.toDouble)
-                    val minMax = if (g.category(i1).equalsIgnoreCase("Document")) aMinMaxWeights else bMinMaxWeights
+                val strictDistance = ((g.size(i1) / 2.0) + (g.size(i2) / 2.0))
+                val securityDistance = (strictDistance * 1.20) // 20%
+                val distInterval = (minLinkLength.toDouble, maxLinkLength.toDouble)
 
-                    // source, target, strength, damping, length
-                    ps.makeSpring(
-                      p1,
-                      p2,
-                      Maths.map(outWeight, minMax, (0.02, 0.05)).toFloat, //STRENGTH.toFloat,
-                      DAMPING.toFloat,
-                      (Maths.map(outWeight, minMax, (0.0, 1.0)) match {
-                        case l => ((1.0 - l) * (distInterval._2 - distInterval._1)) + distInterval._1
-                    }).toFloat)
+                if (g.hasThisLink(i1, i2)) {
+
+                  val w = g.links(i1)(i2)
+                  // if we have a link, we create a spring
+                  val minMaxInterval = (g.category(i1), g.category(i2)) match {
+                    case ("Document", "Document") => aMinMaxWeights
+                    case ("NGram", "NGram") => bMinMaxWeights
+                    case any => (w - 1.0, w + 1.0)
                   }
-                }
-              } else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -REPULSION.toFloat, (g.size(i1) / 2.0).toFloat) // default -600   we repulse unrelated nodes
+                  ps.makeSpring(
+                    p1,
+                    p2,
+                    Maths.map(w, minMaxInterval, (0.02, 0.05)).toFloat,
+                    //STRENGTH.toFloat,
+                    DAMPING.toFloat,
+                    (Maths.map(w, minMaxInterval, (0.0, 1.0)) match {
+                      case l => ((1.0 - l) * (distInterval._2 - distInterval._1)) + distInterval._1
+                    }).toFloat)
+                } else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -REPULSION.toFloat, (g.size(i1) / 2.0).toFloat) // default -600   we repulse unrelated nodes
+              }
           }
 
           ps.makeAttraction(p1, gravity, 2000f, 400f) // apply the gravity
       }
-     println("nb potential links: "+compteur1+" / "+compteur2)
     } // end hash changed
 
     // fix the center
@@ -163,7 +157,7 @@ object PhysicLayout {
     }
     var (ci, cj) = (0, 0)
 
-    if (g.pause) { Thread.sleep(300); g }
+    if (g.pause) { Thread.sleep(1000); g }
     else {
       g + ("position" -> (positionIndexSingle map {
         case (nodePosition, i, s) =>
