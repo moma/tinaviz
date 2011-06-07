@@ -23,11 +23,14 @@
 package eu.tinasoft.tinaviz.graph
 
 import eu.tinasoft._
+import tinaviz.graph.Metrics._
 import tinaviz.util._
 import tinaviz.util.Color._
 import tinaviz.util.Vector
 import tinaviz.io.json.Base64
 import collection.mutable.LinkedList
+import reflect.BooleanBeanProperty
+import reflect.generic.Trees.ValDef
 
 
 object Graph {
@@ -155,7 +158,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val density = getArray[Double]("density")
 
   lazy val ids = 0 until nbNodes
-
   lazy val outDegree = Metrics outDegree this
   lazy val inDegree = Metrics inDegree this
   lazy val degree = Metrics degree this
@@ -217,7 +219,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val selectionValid = (selection.size > 0)
   lazy val connectedComponents = Metrics connectedComponents this
 
-    
   lazy val renderNodeColor = {
     selected.zipWithIndex map {
       case (s, i) =>
@@ -379,8 +380,88 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   /**
    * Warm-up the lazy vals
    * Should not be called to often, since this is a costly operation!
+   * I found an alternative solution, for cases like looping: use a "commit" attribute, that allow loops of multiple
+   * toGraph to stay fast, then commit at the end
    */
-  def toGraph = {
+  def toGraph(commit:Boolean=true) = {
+
+    // TODO check topology. compute some parts only if changed.
+    println("TODO check topology. compute some parts only if changed.")
+    var g = this
+    g = g + ("nbNodes" -> Metrics.nbNodes(g))
+    g = g + ("nbEdges" -> Metrics.nbEdges(g))
+    g = g + ("nbSingles" -> Metrics.nbSingles(g))
+
+    g = g + ("outDegree" -> Metrics.outDegree(g))
+    g = g + ("inDegree" -> Metrics.inDegree(g))
+    g = g + ("degree" -> Metrics.degree(g))
+
+    g = g + ("position" -> Metrics.computePosition(g))
+
+    g = g + ("baryCenter" -> Metrics.baryCenter(g))
+    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+
+    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+
+    g = g + ("nodeColor" -> g.renderNodeColor)
+    g = g + ("nodeBorderColor" -> g.renderNodeBorderColor)
+    g = g + ("edgeColor" -> g.renderEdgeColor)
+
+
+    g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
+    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
+    g = g + ("singlesCenter" ->  Metrics.singlesCenter(g))
+    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
+
+    val outDegreeExtremums = Metrics outDegreeExtremums g
+    g = g + ("minOutDegree" -> outDegreeExtremums._1)
+    g = g + ("maxOutDegree" -> outDegreeExtremums._2)
+
+    val inDegreeExtremums = Metrics inDegreeExtremums g
+    g = g + ("minInDegree" -> inDegreeExtremums._1)
+    g = g + ("maxInDegree" -> inDegreeExtremums._2)
+
+   val extremums = Metrics extremums g
+    g = g + ("xMax" -> extremums._1)
+    g = g + ("xMin" -> extremums._2)
+    g = g + ("yMax" -> extremums._3)
+    g = g + ("yMin" -> extremums._4)
+
+
+   val extremumsSelection = Metrics extremumsSelection g
+     g = g + ("xMaxSelection" -> extremumsSelection._1)
+     g = g + ("xMinSelection" -> extremumsSelection._2)
+     g = g + ("yMaxSelection" -> extremumsSelection._3)
+     g = g + ("yMinSelection" -> extremumsSelection._4)
+
+   val extremumsSelectionNeighbourhood = Metrics extremumsSelectionNeighbourhood g
+     g = g + ("xMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._1)
+     g = g + ("xMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._2)
+     g = g + ("yMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._3)
+     g = g + ("yMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._4)
+
+
+   val nodeWeightExtremums = Metrics nodeWeightExtremums g
+     g = g + ("minANodeWeight" -> nodeWeightExtremums._1)
+     g = g + ("maxANodeWeight" -> nodeWeightExtremums._2)
+     g = g + ("minBNodeWeight" -> nodeWeightExtremums._3)
+     g = g + ("maxBNodeWeight" -> nodeWeightExtremums._4)
+
+
+   val edgeWeightExtremums = Metrics edgeWeightExtremums g
+   g = g + ("minAEdgeWeight" -> edgeWeightExtremums._1)
+   g = g + ("maxAEdgeWeight" -> edgeWeightExtremums._2)
+   g = g + ("minBEdgeWeight" -> edgeWeightExtremums._3)
+   g = g + ("maxBEdgeWeight" -> edgeWeightExtremums._4)
+
+   g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
+
+   g
+  }
+
+  lazy val warmCache : Graph = {
+    // TODO I think we don't need to warm the cache anymore
+    /*
     position
     renderNodeColor
     renderNodeBorderColor
@@ -390,11 +471,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     renderEdgeIndex
     renderEdgeWeight
     renderNodeShape
-
-
-    // a list of positions + ID
-
-
     selectionNeighbourhood
     selectionNeighbourhoodCenter
     singlesCenter
@@ -406,7 +482,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     extremumsSelectionNeighbourhood
     nodeWeightExtremums
     edgeWeightExtremums
-
+    */
     this
   }
 
@@ -459,6 +535,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case v: Color => List[Color](v).toArray
           case v: Symbol => List[Symbol](v).toArray
           case v: (Double, Double) => List[(Double, Double)](v).toArray
+          case v: (Double, Double, Double, Double) => List[(Double, Double, Double, Double)](v).toArray
           case v: Array[String] => List[Array[String]](v).toArray
           case v: Array[Symbol] => List[Array[Symbol]](v).toArray
           case v: Array[Double] => List[Array[Double]](v).toArray
@@ -509,6 +586,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case v: (Double, Double) =>
             var m = getArray[(Double, Double)](k)
             if (id < m.size) m(id) = v else m = (m.toList ::: List[(Double, Double)](v)).toArray
+            m
+          case v: (Double, Double, Double, Double) =>
+            var m = getArray[(Double, Double, Double, Double)](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List[(Double, Double, Double, Double)](v)).toArray
             m
           case v: Map[Int, Double] =>
             var m = getArray[Map[Int, Double]](k)
@@ -830,6 +911,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case (e, i) => conv(i) >= 0
         }.map(_._1).toArray)
       case (key: String, entries: Array[(Double, Double)]) =>
+        (key, entries.zipWithIndex.filter {
+          case (e, i) => conv(i) >= 0
+        }.map(_._1).toArray)
+      case (key: String, entries: Array[(Double, Double, Double, Double)]) =>
         (key, entries.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0
         }.map(_._1).toArray)

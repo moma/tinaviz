@@ -335,10 +335,13 @@ object Workflow extends Actor {
            // WARNING actually caching is not really used (didn't have the time to debug it) so a straightforward
            // workflow is used instead. since it was that easy, I simply resetted the "categoryCache" when we unselect nodes
            // if you happen to refactorate this, you will need to clear the selection in the other caches, too
+
+           // IDEA maybe, a better solution would be to define, for each "modifier", which kind of data is modified,
+           // and operation is done
           key match {
             case "filter.view" =>
               val out = Pipeline.output
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
+              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out).warmCache)
               Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
