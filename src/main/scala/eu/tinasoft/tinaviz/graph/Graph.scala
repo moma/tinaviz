@@ -31,6 +31,7 @@ import tinaviz.io.json.Base64
 import collection.mutable.LinkedList
 import reflect.BooleanBeanProperty
 import reflect.generic.Trees.ValDef
+import math.Numeric.DoubleAsIfIntegral
 
 
 object Graph {
@@ -90,7 +91,36 @@ object Graph {
     "filter.map.node.color.saturation" -> "weight",
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
-    "filter.map.node.shape" -> "category"
+    "filter.map.node.shape" -> "category" ,
+
+    "outDegree" -> Array.empty[Int],
+  "inDegree" -> Array.empty[Int],
+   "degree" -> Array.empty[Int],
+
+  // metrics  & properties
+  "nbNodes" -> 0,
+  "nbEdges" -> 0,
+  "nbSingles" -> 0,
+
+  "baryCenter" -> (0.0, 0.0),
+  "selectionCenter" -> (0.0, 0.0),
+  "selectionNeighbourhood" -> Array.empty[((Double,Double), Int)],
+    "selectionNeighbourhoodCenter" -> (0.0, 0.0),
+
+  "outDegreeExtremums" -> (0, 1),
+  "inDegreeExtremums" -> (0, 1),
+
+ "nodeWeightExtremums" -> (0.0, 1.0, 0.0, 1.0), // minx, maxx, miny, maxy
+ "edgeWeightExtremums" -> (0.0, 1.0, 0.0, 1.0), // same
+
+ "extremums" -> (1.0, 0.0, 1.0, 0.0),     // maxx, minx, maxy, miny (yes I know, not the same pattern.. sorry)
+ "extremumsSelection" -> (1.0, 0.0, 1.0, 0.0),  // same
+ "extremumsSelectionNeighbourhood" -> (1.0, 0.0, 1.0, 0.0), // same
+
+  "selectionNeighbourhoodCenter" -> (0.0, 0.0),
+  "notSinglesCenter" -> (0.0, 0.0),
+
+  "connectedComponents" -> Array.empty[Int]
   )
 }
 
@@ -158,66 +188,61 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val density = getArray[Double]("density")
 
   lazy val ids = 0 until nbNodes
-  lazy val outDegree = Metrics outDegree this
-  lazy val inDegree = Metrics inDegree this
-  lazy val degree = Metrics degree this
+  lazy val outDegree = getArray[Double]("outDegree")
+  lazy val inDegree = getArray[Double]("inDegree")
+  lazy val degree = getArray[Double]("degree")
 
   // metrics  & properties
-  lazy val nbNodes: Int = Metrics nbNodes this
-  lazy val nbEdges: Int = Metrics nbEdges this
-  lazy val nbSingles: Int = Metrics nbSingles this
+  lazy val nbNodes = get[Int]("nbNodes")
+  lazy val nbEdges = get[Int]("nbEdges")
+  lazy val nbSingles = get[Int]("nbSingles")
 
-  lazy val baryCenter = Metrics baryCenter this
-  lazy val selectionCenter = Metrics selectionCenter this
+  lazy val baryCenter = get[(Double,Double)]("baryCenter")
+  lazy val selectionCenter = get[(Double,Double)]("selectionCenter")
 
   // a list of positions + ID
-  lazy val selectionNeighbourhood = Metrics selectionNeighbourhood this
+  lazy val selectionNeighbourhood = getArray[((Double,Double), Int)]("selectionNeighbourhood")
+  lazy val selectionNeighbourhoodCenter = get[(Double,Double)]("selectionNeighbourhoodCenter")
+  lazy val selectionValid = (selection.size > 0)
 
-  lazy val selectionNeighbourhoodCenter = Metrics selectionNeighbourhoodCenter this
 
-  lazy val singlesCenter = Metrics singlesCenter this
-  lazy val notSinglesCenter = Metrics notSinglesCenter this
+  lazy val outDegreeExtremums = get[(Double,Double)]("outDegreeExtremums")
+  lazy val inDegreeExtremums = get[(Double,Double)]("inDegreeExtremums")
 
-  lazy val outDegreeExtremums = Metrics outDegreeExtremums this
-  lazy val minOutDegree = outDegreeExtremums._1
-  lazy val maxOutDegree = outDegreeExtremums._2
-
-  lazy val inDegreeExtremums = Metrics inDegreeExtremums this
-  lazy val minInDegree = inDegreeExtremums._1
-  lazy val maxInDegree = inDegreeExtremums._2
-
-  lazy val extremums = Metrics extremums this
+  lazy val extremums = get[(Double,Double,Double,Double)]("extremums")
   lazy val xMax = extremums._1
   lazy val xMin = extremums._2
   lazy val yMax = extremums._3
   lazy val yMin = extremums._4
 
-  lazy val extremumsSelection = Metrics extremumsSelection this
-  lazy val xMaxSelection = extremumsSelection._1
-  lazy val xMinSelection = extremumsSelection._2
-  lazy val yMaxSelection = extremumsSelection._3
-  lazy val yMinSelection = extremumsSelection._4
-
-  lazy val extremumsSelectionNeighbourhood = Metrics extremumsSelectionNeighbourhood this
-  lazy val xMaxSelectionNeighbourhood = extremumsSelectionNeighbourhood._1
-  lazy val xMinSelectionNeighbourhood = extremumsSelectionNeighbourhood._2
-  lazy val yMaxSelectionNeighbourhood = extremumsSelectionNeighbourhood._3
-  lazy val yMinSelectionNeighbourhood = extremumsSelectionNeighbourhood._4
-
-  lazy val nodeWeightExtremums = Metrics nodeWeightExtremums this
+  lazy val nodeWeightExtremums = get[(Double,Double,Double,Double)]("nodeWeightExtremums")
   lazy val minANodeWeight = nodeWeightExtremums._1
   lazy val maxANodeWeight = nodeWeightExtremums._2
   lazy val minBNodeWeight = nodeWeightExtremums._3
   lazy val maxBNodeWeight = nodeWeightExtremums._4
 
-  lazy val edgeWeightExtremums = Metrics edgeWeightExtremums this
+  lazy val edgeWeightExtremums = get[(Double,Double,Double,Double)]("edgeWeightExtremums")
   lazy val minAEdgeWeight = edgeWeightExtremums._1
   lazy val maxAEdgeWeight = edgeWeightExtremums._2
   lazy val minBEdgeWeight = edgeWeightExtremums._3
   lazy val maxBEdgeWeight = edgeWeightExtremums._4
 
-  lazy val selectionValid = (selection.size > 0)
-  lazy val connectedComponents = Metrics connectedComponents this
+  lazy val extremumsSelection = get[(Double,Double,Double,Double)]("extremumsSelection")
+  lazy val xMaxSelection = extremumsSelection._1
+  lazy val xMinSelection = extremumsSelection._2
+  lazy val yMaxSelection = extremumsSelection._3
+  lazy val yMinSelection = extremumsSelection._4
+
+  lazy val extremumsSelectionNeighbourhood = get[(Double,Double,Double,Double)]("extremumsSelectionNeighbourhood")
+  lazy val xMaxSelectionNeighbourhood = extremumsSelectionNeighbourhood._1
+  lazy val xMinSelectionNeighbourhood = extremumsSelectionNeighbourhood._2
+  lazy val yMaxSelectionNeighbourhood = extremumsSelectionNeighbourhood._3
+  lazy val yMinSelectionNeighbourhood = extremumsSelectionNeighbourhood._4
+
+  lazy val singlesCenter = get[(Double,Double)]("selectionNeighbourhoodCenter")
+  lazy val notSinglesCenter = get[(Double,Double)]("notSinglesCenter")
+
+  lazy val connectedComponents = getArray[Int]("connectedComponents")
 
   lazy val renderNodeColor = {
     selected.zipWithIndex map {
@@ -396,7 +421,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("inDegree" -> Metrics.inDegree(g))
     g = g + ("degree" -> Metrics.degree(g))
 
-    g = g + ("position" -> Metrics.computePosition(g))
+    //g = g + ("position" -> Metrics.updatePosition(g))
 
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
@@ -406,7 +431,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("nodeColor" -> g.renderNodeColor)
     g = g + ("nodeBorderColor" -> g.renderNodeBorderColor)
     g = g + ("edgeColor" -> g.renderEdgeColor)
-
 
     g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
     g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))

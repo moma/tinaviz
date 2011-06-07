@@ -82,7 +82,7 @@ object Metrics {
   }
   
   
-  def connectedComponents(g:Graph) : List[Int] = {
+  def connectedComponents(g:Graph) : Array[Int] = {
       
     // Calcul des partitions
     var nb_partition = 0
@@ -126,7 +126,8 @@ object Metrics {
     }
    println("number of partitions"+nb_partition) 
     // sort the Map of ( ID -> PARTITION ) then only keep the partition's number'
-    partitions.toList sortBy {_._1} map { _._2 } 
+    val res = partitions.toList sortBy {_._1} map { _._2 }
+    res.toArray
   }
   
   
