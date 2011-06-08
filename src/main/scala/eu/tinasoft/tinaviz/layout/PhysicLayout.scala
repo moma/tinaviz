@@ -82,7 +82,7 @@ object PhysicLayout {
     val positionIndexSingle = g.position.zipWithIndex map {
       case (p, i) => (p, i, g.isSingle(i))
     }
-
+    //println("Layout: position.size: "+g.position.size)
     if (g.hashed != lastHash) {
       lastHash = g.hashed
       ps.clear

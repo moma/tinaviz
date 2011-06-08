@@ -253,6 +253,9 @@ class Main extends TApplet with Client {
     lineThickness(1)
     noFill
 
+    //println("Main: nbNodes: "+g.nbNodes+"   nbEdges: "+g.nbEdges)
+    //println("Main: position.size: "+g.position.size  +" weight.size: "+ g.weight.size+"  edgeColor.size: "+g.edgeColor.size)
+
     val visibleNodes = g.position.zipWithIndex.filter {
       case (position, i) => isVisible(screenPosition(position))
     }
@@ -266,6 +269,8 @@ class Main extends TApplet with Client {
     val edgeTmp = g.edgeIndex.zipWithIndex map {
       case (sourceTargetIndexes, i) =>
         val (sourceIndex, targetIndex) = sourceTargetIndexes
+        //println("source target: "+sourceTargetIndexes)
+        //println("position size: "+g.position.size)
         val sourceTargetPosition = (g.position(sourceIndex), g.position(targetIndex))
         val (sourcePosition, targetPosition) = sourceTargetPosition
         val sourceTargetPositionOnScreen = (screenPosition(sourcePosition), screenPosition(targetPosition))

@@ -68,13 +68,10 @@ object Workflow extends Actor {
 
         case 'graphImported =>
               println("Workflow: graphImported.. warming filters up")
-              println("Workflow: Pipeline.input.nbNodes: "+Pipeline.input.nbNodes)
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.input))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
-              println("Workflow: Pipeline.output.nbNodes: "+Pipeline.output.nbNodes)
-
+              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.input).callbackNodeCountChanged)
+              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache).callbackNodeCountChanged)
+              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache).callbackNodeCountChanged)
+              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
         case ('getNodeAttributes, uuid: String) =>
           println("Workflow: asked for 'getNodeAttributes (on INPUT GRAPH) of " + uuid)
           reply(Pipeline.input.lessAttributes(uuid))
@@ -155,8 +152,8 @@ object Workflow extends Actor {
                   res
               })
           }
-          Pipeline.setOutput(out2)
-          Browser ! "_callbackSelectionChanged" -> (out2.selectionAttributes, "left")
+          Pipeline.setOutput(out2.callbackSelectionChanged)
+          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
           self ! "filter.view" -> in.currentView
 
         case ("select", uuid: String) =>
@@ -173,21 +170,21 @@ object Workflow extends Actor {
                   res
               })
             }
-          Pipeline.setOutput(out2)
+          Pipeline.setOutput(out2.callbackSelectionChanged)
           //println("calling Pipeline.output.updateSelectedWithCategory( g )")
           /*Pipeline.output.updateSelectedWithCategory(
               out2
           ) */
           //println("out2.selection.size: " + out2.selection.size)
           // println("Pipeline.output.size: " + Pipeline.output.size)
-          Browser ! "_callbackSelectionChanged" -> (out2.selectionAttributes, "left")
+          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
           //self ! "filter.view" -> Pipeline.input.currentView
 
         case ("selectByPattern", pattern: String) =>
           val in = Pipeline.input
           val out = Pipeline.output
           Pipeline.setOutput(
-            if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
+            (if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
               Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
              in.clearSelection
               out.clearSelection
@@ -195,7 +192,7 @@ object Workflow extends Actor {
               out + ("selected" -> out.label.zipWithIndex.map {
                 case (label, i) => if (label.toLowerCase contains pattern.toLowerCase) true else out.selected(i)
               })
-            }
+            }).callbackSelectionChanged
           )
           Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
           self ! "filter.view" -> Pipeline.input.currentView
@@ -206,7 +203,7 @@ object Workflow extends Actor {
           val out = Pipeline.output
           println("selectByNeighbourPattern("+pattern+", "+category+")")
           Pipeline.setOutput(
-            if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
+            (if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
               Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
               ref.clearSelection
               out.clearSelection
@@ -226,7 +223,7 @@ object Workflow extends Actor {
                   }
                   if (matched) true else out.selected(i)
               })
-            }
+            }).callbackSelectionChanged
           )
           Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
           self ! "filter.view" -> Pipeline.input.currentView
@@ -259,7 +256,7 @@ object Workflow extends Actor {
                   if (ggg != before) changed = true
                   ggg
               }.toArray)
-              if (changed) Pipeline.setOutput(out2)
+              if (changed) Pipeline.setOutput(out2.callbackSelectionChanged)
 
             case 'Click =>
               //println("Click!")
@@ -290,8 +287,8 @@ object Workflow extends Actor {
                   }
               }.toArray)
               //println("selection count, before: "+out.selection.size+" after: "+out2.selection.size)
-              Pipeline.setOutput(out2)
-              Browser ! "_callbackSelectionChanged" -> (out2.selectionAttributes, side match {
+              Pipeline.setOutput(out2.callbackSelectionChanged)
+              Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, side match {
                 case 'Left => "left"
                 case 'Right => "right"
                 case any => "none"
@@ -345,36 +342,42 @@ object Workflow extends Actor {
            //var updateNeeded =
           key match {
             case "filter.view" =>
+              println("Workflow: received msg: \""+key+"\"")
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)).callbackNodeCountChanged)
+              Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input))callbackNodeCountChanged)
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.node.category" =>
+              println("Workflow: received msg: \""+key+"\"")
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeAttributesChanged)
             case "filter.a.node.weight" =>
+              println("Workflow: received msg: \""+key+"\"")
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.a.edge.weight" =>
+              println("Workflow: received msg: \""+key+"\"")
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackEdgeCountChanged)
             case "filter.b.node.weight" =>
+              println("Workflow: received msg: \""+key+"\"")
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.b.edge.weight" =>
+              println("Workflow: received msg: \""+key+"\"")
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
@@ -382,6 +385,7 @@ object Workflow extends Actor {
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackEdgeCountChanged)
 
             case "filter.a.node.size" =>
+              println("Workflow: received msg: \""+key+"\"")
               Pipeline.setOutput (
                 Pipeline.output.updateSizeWithCategory (
                   Filters.weightToSize (
@@ -391,6 +395,7 @@ object Workflow extends Actor {
               )
 
             case "filter.b.node.size" =>
+              println("Workflow: received msg: \""+key+"\"")
               Pipeline.setOutput (
                 Pipeline.output.updateSizeWithCategory (
                   Filters.weightToSize (

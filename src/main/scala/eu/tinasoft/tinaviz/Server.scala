@@ -89,7 +89,8 @@ object Server extends Actor {
 
         case g: Graph =>
           properties = defaultProperties
-          val in = new Graph(properties ++ g.elements).callbackNodeCountChanged // brand new graph!
+          val in = new Graph(properties ++ g.elements).callbackNodeCountChanged // brand new graph!  maybe the callback is too much
+
           properties += "input" -> in
           Pipeline.setInput(in)
           Workflow ! 'graphImported
@@ -104,7 +105,7 @@ object Server extends Actor {
         case ("highlightByPattern", pattern) => Workflow ! "highlightByPattern"  -> pattern
 
         case ('getNodes,view,category) =>
-          println("Server: asekd for 'getNodes "+view+" "+category)
+          println("Server: client called getNodes("+view+", "+category+") -> replying..")
           reply(Workflow !? ('getNodes,view,category))
 
         case ('getNeighbourhood,view,todoList) =>

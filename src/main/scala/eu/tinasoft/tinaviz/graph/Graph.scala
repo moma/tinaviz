@@ -192,9 +192,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val density = getArray[Double]("density")
 
   lazy val ids = 0 until nbNodes
-  lazy val outDegree = getArray[Double]("outDegree")
-  lazy val inDegree = getArray[Double]("inDegree")
-  lazy val degree = getArray[Double]("degree")
+  lazy val outDegree = getArray[Int]("outDegree")
+  lazy val inDegree = getArray[Int]("inDegree")
+  lazy val degree = getArray[Int]("degree")
 
   // metrics  & properties
   lazy val nbNodes = get[Int]("nbNodes")
@@ -280,6 +280,29 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g
   }
 
+  def callbackSelectionChanged = {
+    println("Executing callbackSelectionChanged")
+    var g = this
+    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+    g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
+    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
+
+    val extremumsSelectionNeighbourhood = Metrics extremumsSelectionNeighbourhood g
+    g = g + ("xMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._1)
+    g = g + ("xMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._2)
+    g = g + ("yMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._3)
+    g = g + ("yMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._4)
+
+    g = g + ("nodeColor" -> Drawing.nodeColor(g))
+    g = g + ("nodeBorderColor" -> Drawing.nodeBorderColor(g))
+    g = g + ("nodeShape" -> Drawing.nodeShape(g))
+
+    g = g + ("edgeIndex" -> Drawing.edgeIndex(g))
+    g = g + ("edgeWeight" -> Drawing.edgeWeight(g))
+    g = g + ("edgeSize" -> Drawing.edgeSize(g))
+    g = g + ("edgeColor" -> Drawing.edgeColor(g))
+    g
+  }
   def callbackNodeCountChanged = {
     println("Executing callbackNodeCountChanged")
     var g = this
@@ -311,6 +334,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     println("executing callbackEdgeCountChanged")
     var g = this
     g = g + ("nbEdges" -> Metrics.nbEdges(g))
+    g = g + ("outDegree" -> Metrics.outDegree(g))
+    g = g + ("inDegree" -> Metrics.inDegree(g))
+    g = g + ("degree" -> Metrics.degree(g))
+    g = g + ("nbSingles" -> Metrics.nbSingles(g))
     g = g + ("nbSingles" -> Metrics.nbSingles(g))
 
     val edgeWeightExtremums = Metrics edgeWeightExtremums g
@@ -770,9 +797,21 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   def remove(set: Set[Int]): Graph = {
+
     val conv = converter(set)
     val newElements = elements.map {
 
+      // HACH we de not remove edge attributes (TODO: use a more complex pattern matching to do that, eg. "edge*")
+      case ("edgeNode", entries) =>
+        ("edgeNode", entries)
+      case ("edgeIndex", entries) =>
+        ("edgeIndex", entries)
+      case ("edgeWeight", entries) =>
+        ("edgeWeight", entries)
+      case ("edgeSize", entries) =>
+        ("edgeSize", entries)
+      case ("edgeColor", entries) =>
+        ("edgeColor", entries)
       case ("links", entries: Array[Map[Int, Double]]) =>
         val filteredEntries = entries.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0
