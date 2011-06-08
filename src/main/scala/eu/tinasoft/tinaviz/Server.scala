@@ -89,7 +89,7 @@ object Server extends Actor {
 
         case g: Graph =>
           properties = defaultProperties
-          val in = new Graph(properties ++ g.elements).callbackNodeCountChanged // brand new graph!  maybe the callback is too much
+          val in = new Graph(properties ++ g.elements).callbackGraphChanged // brand new graph!  maybe the callback is too much
 
           properties += "input" -> in
           Pipeline.setInput(in)

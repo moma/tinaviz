@@ -68,9 +68,9 @@ object Workflow extends Actor {
 
         case 'graphImported =>
               println("Workflow: graphImported.. warming filters up")
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.input).callbackNodeCountChanged)
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache).callbackNodeCountChanged)
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache).callbackNodeCountChanged)
+              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.input))
+              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
+              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
         case ('getNodeAttributes, uuid: String) =>
           println("Workflow: asked for 'getNodeAttributes (on INPUT GRAPH) of " + uuid)

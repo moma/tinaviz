@@ -46,6 +46,7 @@ object Graph {
    */
   def make(elements: Map[String, Any]) = new Graph(elements)
 
+
   /**
    * Default settings
    */
@@ -185,7 +186,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   lazy val edgeType = get[String]("edge.type")
 
-
+  // TODO should be precomputed!! OPTIMIZATION
   lazy val totalDegree = inDegree zip outDegree map {
     case (a, b) => a + b
   }
@@ -280,6 +281,18 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g
   }
 
+  def callbackGraphChanged = {
+    println("executing callbackGraphChanged")
+    var g = this
+
+    val nodeWeightExtremums = Metrics nodeWeightExtremums g
+    g = g + ("minANodeWeight" -> nodeWeightExtremums._1)
+    g = g + ("maxANodeWeight" -> nodeWeightExtremums._2)
+    g = g + ("minBNodeWeight" -> nodeWeightExtremums._3)
+    g = g + ("maxBNodeWeight" -> nodeWeightExtremums._4)
+
+    g
+  }
   def callbackSelectionChanged = {
     println("Executing callbackSelectionChanged")
     var g = this
@@ -309,16 +322,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("nbNodes" -> Metrics.nbNodes(g))
 
     val extremums = Metrics extremums g
-    g = g + ("xMax" -> extremums._1)
-    g = g + ("xMin" -> extremums._2)
-    g = g + ("yMax" -> extremums._3)
-    g = g + ("yMin" -> extremums._4)
+    g = g ++ Map[String,Any]("xMax" -> extremums._1, "xMin" -> extremums._2,
+                             "yMax" -> extremums._3, "yMin" -> extremums._4)
 
     val extremumsSelection = Metrics extremumsSelection g
-    g = g + ("xMaxSelection" -> extremumsSelection._1)
-    g = g + ("xMinSelection" -> extremumsSelection._2)
-    g = g + ("yMaxSelection" -> extremumsSelection._3)
-    g = g + ("yMinSelection" -> extremumsSelection._4)
+    g = g ++ Map[String,Any]("xMaxSelection" -> extremumsSelection._1, "xMinSelection" -> extremumsSelection._2,
+                             "yMaxSelection" -> extremumsSelection._3, "yMinSelection" -> extremumsSelection._4)
 
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
@@ -337,7 +346,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("outDegree" -> Metrics.outDegree(g))
     g = g + ("inDegree" -> Metrics.inDegree(g))
     g = g + ("degree" -> Metrics.degree(g))
-    g = g + ("nbSingles" -> Metrics.nbSingles(g))
     g = g + ("nbSingles" -> Metrics.nbSingles(g))
 
     val edgeWeightExtremums = Metrics edgeWeightExtremums g
@@ -377,16 +385,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   lazy val warmCache: Graph = {
     // TODO I think we don't need to warm the cache anymore
-    /*
+
     position
-    renderNodeColor
-    renderNodeBorderColor
-    renderEdgeSize
-    renderEdgeColor
-    renderEdgePosition
-    renderEdgeIndex
-    renderEdgeWeight
-    renderNodeShape
+    nodeColor
+    nodeBorderColor
+    edgeSize
+    edgeColor
+    edgeIndex
+    edgeWeight
+    nodeShape
     selectionNeighbourhood
     selectionNeighbourhoodCenter
     singlesCenter
@@ -398,7 +405,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     extremumsSelectionNeighbourhood
     nodeWeightExtremums
     edgeWeightExtremums
-    */
+
     this
   }
 

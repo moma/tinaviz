@@ -55,7 +55,7 @@ object Layout extends Actor {
                 //println("Layout: empty graph..")
                   new Graph
               })
-            ))
+            ).warmCache) // warm the cache, so the visualization thread don't have to do it
 
           this ! 'run // run layout as fast as possible
         case 'exit =>

@@ -174,7 +174,7 @@ object Filters {
 
   /**
    * Do some pre-processing, then send the final scene to the View
-   * TODO: keep the Graph?
+   * TODO check if this function is still important
    */
   def clean(g:Graph) = {
     g + ("links" -> g.links.zipWithIndex.map {
