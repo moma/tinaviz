@@ -346,7 +346,7 @@ object Workflow extends Actor {
           key match {
             case "filter.view" =>
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
+              Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)).callbackNodeCountChanged)
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
               Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)

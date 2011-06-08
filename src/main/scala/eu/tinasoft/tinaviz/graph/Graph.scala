@@ -264,6 +264,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val edgeColor = getArray[Color]("edgeColor")
 
   def callbackNodeAttributesChanged = {
+    println("executing callbackNodeAttributesChanged")
     var g = this
 
     val nodeWeightExtremums = Metrics nodeWeightExtremums g
@@ -280,6 +281,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   def callbackNodeCountChanged = {
+    println("Executing callbackNodeCountChanged")
     var g = this
     g = g + ("nbNodes" -> Metrics.nbNodes(g))
 
@@ -306,6 +308,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   def callbackEdgeCountChanged = {
+    println("executing callbackEdgeCountChanged")
     var g = this
     g = g + ("nbEdges" -> Metrics.nbEdges(g))
     g = g + ("nbSingles" -> Metrics.nbSingles(g))

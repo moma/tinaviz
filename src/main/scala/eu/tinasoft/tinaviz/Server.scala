@@ -89,7 +89,7 @@ object Server extends Actor {
 
         case g: Graph =>
           properties = defaultProperties
-          val in = new Graph(properties ++ g.elements)
+          val in = new Graph(properties ++ g.elements).callbackNodeCountChanged // brand new graph!
           properties += "input" -> in
           Pipeline.setInput(in)
           Workflow ! 'graphImported
