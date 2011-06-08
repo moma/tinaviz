@@ -1,7 +1,7 @@
 /************************************************************************
                                   Tinaviz
-*************************************************************************
- This application is part of the Tinasoft project: http://tinasoft.eu
+ *************************************************************************
+This application is part of the Tinasoft project: http://tinasoft.eu
  Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
 
  Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
@@ -18,7 +18,7 @@
 
  You should have received a copy of the GNU General Public License along
  with this program. If not, see <http://www.gnu.org/licenses/>.
-************************************************************************/
+ ************************************************************************/
 
 package eu.tinasoft.tinaviz.graph
 
@@ -29,7 +29,6 @@ import tinaviz.util.Color._
 import tinaviz.util.Vector
 import tinaviz.io.json.Base64
 import collection.mutable.LinkedList
-
 
 
 object Graph {
@@ -89,36 +88,45 @@ object Graph {
     "filter.map.node.color.saturation" -> "weight",
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
-    "filter.map.node.shape" -> "category" ,
+    "filter.map.node.shape" -> "category",
 
     "outDegree" -> Array.empty[Int],
-  "inDegree" -> Array.empty[Int],
-   "degree" -> Array.empty[Int],
+    "inDegree" -> Array.empty[Int],
+    "degree" -> Array.empty[Int],
 
-  // metrics  & properties
-  "nbNodes" -> 0,
-  "nbEdges" -> 0,
-  "nbSingles" -> 0,
+    // metrics  & properties
+    "nbNodes" -> 0,
+    "nbEdges" -> 0,
+    "nbSingles" -> 0,
 
-  "baryCenter" -> (0.0, 0.0),
-  "selectionCenter" -> (0.0, 0.0),
-  "selectionNeighbourhood" -> Array.empty[((Double,Double), Int)],
+    "baryCenter" -> (0.0, 0.0),
+    "selectionCenter" -> (0.0, 0.0),
+    "selectionNeighbourhood" -> Array.empty[((Double, Double), Int)],
     "selectionNeighbourhoodCenter" -> (0.0, 0.0),
 
-  "outDegreeExtremums" -> (0, 1),
-  "inDegreeExtremums" -> (0, 1),
+    "outDegreeExtremums" -> (0, 1),
+    "inDegreeExtremums" -> (0, 1),
 
- "nodeWeightExtremums" -> (0.0, 1.0, 0.0, 1.0), // minx, maxx, miny, maxy
- "edgeWeightExtremums" -> (0.0, 1.0, 0.0, 1.0), // same
+    "nodeWeightExtremums" -> (0.0, 1.0, 0.0, 1.0), // minx, maxx, miny, maxy
+    "edgeWeightExtremums" -> (0.0, 1.0, 0.0, 1.0), // same
 
- "extremums" -> (1.0, 0.0, 1.0, 0.0),     // maxx, minx, maxy, miny (yes I know, not the same pattern.. sorry)
- "extremumsSelection" -> (1.0, 0.0, 1.0, 0.0),  // same
- "extremumsSelectionNeighbourhood" -> (1.0, 0.0, 1.0, 0.0), // same
+    "extremums" -> (1.0, 0.0, 1.0, 0.0), // maxx, minx, maxy, miny (yes I know, not the same pattern.. sorry)
+    "extremumsSelection" -> (1.0, 0.0, 1.0, 0.0), // same
+    "extremumsSelectionNeighbourhood" -> (1.0, 0.0, 1.0, 0.0), // same
 
-  "selectionNeighbourhoodCenter" -> (0.0, 0.0),
-  "notSinglesCenter" -> (0.0, 0.0),
+    "selectionNeighbourhoodCenter" -> (0.0, 0.0),
+    "notSinglesCenter" -> (0.0, 0.0),
 
-  "connectedComponents" -> Array.empty[Int]
+    "connectedComponents" -> Array.empty[Int],
+
+    "nodeShape" -> Array.empty[Symbol],
+    "nodeColor" -> Array.empty[Color],
+    "nodeBorderColor" -> Array.empty[Color],
+    "nodeSize" -> Array.empty[Double],
+    "edgeIndex" -> Array.empty[(Int, Int)],
+    "edgeWeight" -> Array.empty[Double],
+    "edgeSize" -> Array.empty[Double],
+    "edgeColor" -> Array.empty[Color]
   )
 }
 
@@ -158,7 +166,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val uuid = getArray[String]("uuid")
 
 
-
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
 
@@ -179,7 +186,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val edgeType = get[String]("edge.type")
 
 
-
   lazy val totalDegree = inDegree zip outDegree map {
     case (a, b) => a + b
   }
@@ -195,245 +201,120 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val nbEdges = get[Int]("nbEdges")
   lazy val nbSingles = get[Int]("nbSingles")
 
-  lazy val baryCenter = get[(Double,Double)]("baryCenter")
-  lazy val selectionCenter = get[(Double,Double)]("selectionCenter")
+  lazy val baryCenter = get[(Double, Double)]("baryCenter")
+  lazy val selectionCenter = get[(Double, Double)]("selectionCenter")
 
   // a list of positions + ID
-  lazy val selectionNeighbourhood = getArray[((Double,Double), Int)]("selectionNeighbourhood")
-  lazy val selectionNeighbourhoodCenter = get[(Double,Double)]("selectionNeighbourhoodCenter")
+  lazy val selectionNeighbourhood = getArray[((Double, Double), Int)]("selectionNeighbourhood")
+  lazy val selectionNeighbourhoodCenter = get[(Double, Double)]("selectionNeighbourhoodCenter")
   lazy val selectionValid = (selection.size > 0)
 
 
-  lazy val outDegreeExtremums = get[(Double,Double)]("outDegreeExtremums")
-  lazy val inDegreeExtremums = get[(Double,Double)]("inDegreeExtremums")
+  lazy val outDegreeExtremums = get[(Double, Double)]("outDegreeExtremums")
+  lazy val inDegreeExtremums = get[(Double, Double)]("inDegreeExtremums")
 
-  lazy val extremums = get[(Double,Double,Double,Double)]("extremums")
+  lazy val extremums = get[(Double, Double, Double, Double)]("extremums")
   lazy val xMax = extremums._1
   lazy val xMin = extremums._2
   lazy val yMax = extremums._3
   lazy val yMin = extremums._4
 
-  lazy val nodeWeightExtremums = get[(Double,Double,Double,Double)]("nodeWeightExtremums")
+  lazy val nodeWeightExtremums = get[(Double, Double, Double, Double)]("nodeWeightExtremums")
   lazy val minANodeWeight = nodeWeightExtremums._1
   lazy val maxANodeWeight = nodeWeightExtremums._2
   lazy val minBNodeWeight = nodeWeightExtremums._3
   lazy val maxBNodeWeight = nodeWeightExtremums._4
 
-  lazy val edgeWeightExtremums = get[(Double,Double,Double,Double)]("edgeWeightExtremums")
+  lazy val edgeWeightExtremums = get[(Double, Double, Double, Double)]("edgeWeightExtremums")
   lazy val minAEdgeWeight = edgeWeightExtremums._1
   lazy val maxAEdgeWeight = edgeWeightExtremums._2
   lazy val minBEdgeWeight = edgeWeightExtremums._3
   lazy val maxBEdgeWeight = edgeWeightExtremums._4
 
-  lazy val extremumsSelection = get[(Double,Double,Double,Double)]("extremumsSelection")
+  lazy val extremumsSelection = get[(Double, Double, Double, Double)]("extremumsSelection")
   lazy val xMaxSelection = extremumsSelection._1
   lazy val xMinSelection = extremumsSelection._2
   lazy val yMaxSelection = extremumsSelection._3
   lazy val yMinSelection = extremumsSelection._4
 
-  lazy val extremumsSelectionNeighbourhood = get[(Double,Double,Double,Double)]("extremumsSelectionNeighbourhood")
+  lazy val extremumsSelectionNeighbourhood = get[(Double, Double, Double, Double)]("extremumsSelectionNeighbourhood")
   lazy val xMaxSelectionNeighbourhood = extremumsSelectionNeighbourhood._1
   lazy val xMinSelectionNeighbourhood = extremumsSelectionNeighbourhood._2
   lazy val yMaxSelectionNeighbourhood = extremumsSelectionNeighbourhood._3
   lazy val yMinSelectionNeighbourhood = extremumsSelectionNeighbourhood._4
 
-  lazy val singlesCenter = get[(Double,Double)]("selectionNeighbourhoodCenter")
-  lazy val notSinglesCenter = get[(Double,Double)]("notSinglesCenter")
+  lazy val singlesCenter = get[(Double, Double)]("selectionNeighbourhoodCenter")
+  lazy val notSinglesCenter = get[(Double, Double)]("notSinglesCenter")
 
   lazy val connectedComponents = getArray[Int]("connectedComponents")
 
-  lazy val renderNodeColor = {
-    selected.zipWithIndex map {
-      case (s, i) =>
-        val mode = if (s) 'selected else if (highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
-        val color = (category(i) match {
-          case "Document" => colorScheme.primary
-          case "NGram" => colorScheme.tertiary
-          case other => colorScheme.secondary
-        })
-        mode match {
-          case 'selected => color.darker.saturateBy(1.00)
-          case 'highlighted => color.darker.saturateBy(0.85)
-          case 'unselected => color.standard.saturateBy(0.80)
-          case 'default => color.standard.saturateBy(0.90)
-        }
-    }
-  }
 
   /**
-   * Lazy computation of the node border
+   * compute the edge position to screen
    */
-  lazy val renderNodeBorderColor = {
 
-    val darkerColor = new Color(0.0, 1.0, 0.0).alpha(0.8)
+  lazy val nodeShape = getArray[Symbol]("nodeShape")
+  lazy val nodeColor = getArray[Color]("nodeColor")
+  lazy val nodeBorderColor = getArray[Color]("nodeBorderColor")
+  lazy val nodeSize = getArray[Double]("nodeSize")
 
-    selected.zipWithIndex map {
-      case (s, i) =>
-        val mode = if (s) 'selected else if (highlighted(i)) 'highlighted else if (selectionValid) 'unselected else 'default
-        val color = (category(i) match {
-          case "Document" => colorScheme.primary
-          case "NGram" => colorScheme.tertiary
-          case other => colorScheme.secondary
-        })
-        mode match {
-          case 'selected => darkerColor
-          case 'highlighted => darkerColor.saturateBy(0.90)
-          case 'unselected => color.darker.saturation(0.90)
-          case 'default => color.darker.saturation(1.0)
-        }
-    }
+  lazy val edgeIndex = getArray[(Int, Int)]("edgeIndex")
+  lazy val edgeWeight = getArray[Double]("edgeWeight")
+  lazy val edgeSize = getArray[Double]("edgeSize")
+  lazy val edgeColor = getArray[Color]("edgeColor")
+
+  def callbackNodeAttributesChanged = {
+    var g = this
+
+    val nodeWeightExtremums = Metrics nodeWeightExtremums g
+    g = g + ("minANodeWeight" -> nodeWeightExtremums._1)
+    g = g + ("maxANodeWeight" -> nodeWeightExtremums._2)
+    g = g + ("minBNodeWeight" -> nodeWeightExtremums._3)
+    g = g + ("maxBNodeWeight" -> nodeWeightExtremums._4)
+
+    g = g + ("nodeColor" -> Drawing.nodeColor(g))
+    g = g + ("nodeBorderColor" -> Drawing.nodeBorderColor(g))
+    g = g + ("nodeShape" -> Drawing.nodeShape(g))
+
+    g
   }
 
-
-  /**
-   * Lazy computation of the edge size to screen
-   */
-  lazy val renderEdgeSize = {
-    (for ((links, i) <- links.zipWithIndex; (j, weight) <- links) yield {
-      val sizes = (size(i), size(j))
-      val avgSize = (sizes._1 + sizes._2) / 2.0
-      val w = Maths.limit(avgSize, Maths.min(sizes), Maths.max(sizes))
-      // print("  w: "+w)
-      //val r = weight * :1.0
-      //val r = 1.0 * 1.0
-      //println("  r: "+r)
-      //val
-      w
-    }).toArray
-  }
-
-  /**
-   * Lazy computation of the edge color to screen
-   */
-  lazy val renderEdgeColor = {
-    val darkerColor = new Color(0.0, 0.0, 0.23)
-    var tmpColor = List.empty[Color]
-    val aextremums = (minAEdgeWeight, maxAEdgeWeight)
-    val bextremums = (minBEdgeWeight, maxBEdgeWeight)
-    def colorate(category: String) = (category match {
-      case "Document" => colorScheme.primary.standard
-      case "NGram" => colorScheme.tertiary.standard
-      case other => colorScheme.secondary.standard
-    })
-    def getExtremum(category: String) = (category match {
-      case "Document" => aextremums
-      case "NGram" => bextremums
-      case any => aextremums
-    })
-
-    val target = (0.4, 1.0)
-    links.zipWithIndex map {
-      case (mapIntDouble, from) =>
-        val modeFrom = if (selected(from)) 'selected else if (highlighted(from)) 'highlighted else if (selectionValid) 'unselected else 'default
-        val catFrom = category(from)
-        val extr = getExtremum(catFrom)
-        mapIntDouble foreach {
-          case (to, weight) =>
-            val catTo = category(to)
-            val modeTo = if (selected(to)) 'selected else if (highlighted(to)) 'highlighted else if (selectionValid) 'unselected else 'default
-
-            tmpColor ::= ((modeFrom, modeTo) match {
-              case ('selected, any) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98))) // previously: (0.86, 0.98)
-
-              // case (any, 'selected) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
-              case ('highlighted, any) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
-              //case (any, 'highlighted) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
-              case (any1, any2) =>
-                if (selectionValid) {
-                  // unselected
-                  val t = colorate(catFrom)
-                  t.blend(colorate(catTo)).saturateBy(0.70).alpha(Maths.map(weight, extr, (0.75, 0.94)))
-                } else {
-                  val t = colorate(catFrom)
-                  t.blend(colorate(catTo)).saturateBy(0.78).alpha(Maths.map(weight, extr, (0.60, 0.90)))
-                }
-            })
-
-        }
-    }
-    tmpColor.toArray
-  }
-
-  /**
-   * Lazy computation of the edge position to screen
-   */
-  lazy val renderEdgePosition = {
-    var t = List.empty[((Double, Double), (Double, Double))]
-    links.zipWithIndex foreach {
-      case (links, i) =>
-        links.zipWithIndex foreach {
-          case ((j, weight), _j) => t ::= (position(i), position(j))
-        }
-    }
-    t.toArray
-  }
-  /**
-   * Lazy computation of the edge position to screen
-   */
-  lazy val renderEdgeIndex = {
-    var t = List.empty[(Int, Int)]
-    links.zipWithIndex foreach {
-      case (links, i) =>
-        links.zipWithIndex foreach {
-          case ((j, weight), _j) => t ::= (i, j)
-        }
-    }
-    t.toArray
-  }
-  /**
-   * Lazy computation of the edge weights
-   */
-  lazy val renderEdgeWeight = {
-    var t = List.empty[Double]
-    links.zipWithIndex foreach {
-      case (links, i) =>
-        links.zipWithIndex foreach {
-          case ((j, weight), _j) => t ::= weight
-        }
-    }
-    t.toArray
-  }
-
-  lazy val renderNodeShape = category.map {
-    case "Document" => 'Square
-    case "NGram" => 'Disk
-    case any => 'Square
-  }
-
-  /**
-   * Warm-up the lazy vals
-   * Should not be called to often, since this is a costly operation!
-   * I found an alternative solution, for cases like looping: use a "commit" attribute, that allow loops of multiple
-   * toGraph to stay fast, then commit at the end
-   */
-  def toGraph(commit:Boolean=true) = {
-
-    // TODO check topology. compute some parts only if changed.
-    println("TODO check topology. compute some parts only if changed.")
+  def callbackNodeCountChanged = {
     var g = this
     g = g + ("nbNodes" -> Metrics.nbNodes(g))
-    g = g + ("nbEdges" -> Metrics.nbEdges(g))
-    g = g + ("nbSingles" -> Metrics.nbSingles(g))
 
-    g = g + ("outDegree" -> Metrics.outDegree(g))
-    g = g + ("inDegree" -> Metrics.inDegree(g))
-    g = g + ("degree" -> Metrics.degree(g))
+    val extremums = Metrics extremums g
+    g = g + ("xMax" -> extremums._1)
+    g = g + ("xMin" -> extremums._2)
+    g = g + ("yMax" -> extremums._3)
+    g = g + ("yMin" -> extremums._4)
 
-    //g = g + ("position" -> Metrics.updatePosition(g))
+    val extremumsSelection = Metrics extremumsSelection g
+    g = g + ("xMaxSelection" -> extremumsSelection._1)
+    g = g + ("xMinSelection" -> extremumsSelection._2)
+    g = g + ("yMaxSelection" -> extremumsSelection._3)
+    g = g + ("yMinSelection" -> extremumsSelection._4)
 
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
 
-    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+    g = g.callbackNodeAttributesChanged
 
-    g = g + ("nodeColor" -> g.renderNodeColor)
-    g = g + ("nodeBorderColor" -> g.renderNodeBorderColor)
-    g = g + ("edgeColor" -> g.renderEdgeColor)
+    g = g.callbackEdgeCountChanged
 
-    g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
-    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
-    g = g + ("singlesCenter" ->  Metrics.singlesCenter(g))
-    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
+    g
+  }
+
+  def callbackEdgeCountChanged = {
+    var g = this
+    g = g + ("nbEdges" -> Metrics.nbEdges(g))
+    g = g + ("nbSingles" -> Metrics.nbSingles(g))
+
+    val edgeWeightExtremums = Metrics edgeWeightExtremums g
+    g = g + ("minAEdgeWeight" -> edgeWeightExtremums._1)
+    g = g + ("maxAEdgeWeight" -> edgeWeightExtremums._2)
+    g = g + ("minBEdgeWeight" -> edgeWeightExtremums._3)
+    g = g + ("maxBEdgeWeight" -> edgeWeightExtremums._4)
 
     val outDegreeExtremums = Metrics outDegreeExtremums g
     g = g + ("minOutDegree" -> outDegreeExtremums._1)
@@ -443,45 +324,28 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("minInDegree" -> inDegreeExtremums._1)
     g = g + ("maxInDegree" -> inDegreeExtremums._2)
 
-   val extremums = Metrics extremums g
-    g = g + ("xMax" -> extremums._1)
-    g = g + ("xMin" -> extremums._2)
-    g = g + ("yMax" -> extremums._3)
-    g = g + ("yMin" -> extremums._4)
+    g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
+    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
+    g = g + ("singlesCenter" -> Metrics.singlesCenter(g))
+    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
 
+    val extremumsSelectionNeighbourhood = Metrics extremumsSelectionNeighbourhood g
+    g = g + ("xMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._1)
+    g = g + ("xMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._2)
+    g = g + ("yMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._3)
+    g = g + ("yMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._4)
 
-   val extremumsSelection = Metrics extremumsSelection g
-     g = g + ("xMaxSelection" -> extremumsSelection._1)
-     g = g + ("xMinSelection" -> extremumsSelection._2)
-     g = g + ("yMaxSelection" -> extremumsSelection._3)
-     g = g + ("yMinSelection" -> extremumsSelection._4)
+    g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
 
-   val extremumsSelectionNeighbourhood = Metrics extremumsSelectionNeighbourhood g
-     g = g + ("xMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._1)
-     g = g + ("xMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._2)
-     g = g + ("yMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._3)
-     g = g + ("yMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._4)
+    g = g + ("edgeIndex" -> Drawing.edgeIndex(g))
+    g = g + ("edgeWeight" -> Drawing.edgeWeight(g))
+    g = g + ("edgeSize" -> Drawing.edgeSize(g))
+    g = g + ("edgeColor" -> Drawing.edgeColor(g))
 
-
-   val nodeWeightExtremums = Metrics nodeWeightExtremums g
-     g = g + ("minANodeWeight" -> nodeWeightExtremums._1)
-     g = g + ("maxANodeWeight" -> nodeWeightExtremums._2)
-     g = g + ("minBNodeWeight" -> nodeWeightExtremums._3)
-     g = g + ("maxBNodeWeight" -> nodeWeightExtremums._4)
-
-
-   val edgeWeightExtremums = Metrics edgeWeightExtremums g
-   g = g + ("minAEdgeWeight" -> edgeWeightExtremums._1)
-   g = g + ("maxAEdgeWeight" -> edgeWeightExtremums._2)
-   g = g + ("minBEdgeWeight" -> edgeWeightExtremums._3)
-   g = g + ("maxBEdgeWeight" -> edgeWeightExtremums._4)
-
-   g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
-
-   g
+    g
   }
 
-  lazy val warmCache : Graph = {
+  lazy val warmCache: Graph = {
     // TODO I think we don't need to warm the cache anymore
     /*
     position
@@ -556,11 +420,14 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case v: String => List[String](v).toArray
           case v: Color => List[Color](v).toArray
           case v: Symbol => List[Symbol](v).toArray
+          case v: (Int, Int) => List[(Int, Int)](v).toArray
           case v: (Double, Double) => List[(Double, Double)](v).toArray
+          case v: ((Double, Double), Int) => List[((Double, Double), Int)](v).toArray
           case v: (Double, Double, Double, Double) => List[(Double, Double, Double, Double)](v).toArray
           case v: Array[String] => List[Array[String]](v).toArray
           case v: Array[Symbol] => List[Array[Symbol]](v).toArray
           case v: Array[Double] => List[Array[Double]](v).toArray
+          case v: Array[(Double,Double)] => List[Array[(Double,Double)]](v).toArray
           case v: Array[Int] => List[Array[Int]](v).toArray
           case v: List[Double] => List[List[Double]](v).toArray
           case v: List[String] => List[List[String]](v).toArray
@@ -569,7 +436,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
           case v: Map[Int, Double] => List[Map[Int, Double]](v).toArray
           case v =>
             throw new Exception("UNRECOGNIZED TYPE")
-        // List(v).toArray
+          // List(v).toArray
         }
       } else {
         //println("key "+k+" already match!")
@@ -605,9 +472,17 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             var m = getArray[Symbol](k)
             if (id < m.size) m(id) = v else m = (m.toList ::: List[Symbol](v)).toArray
             m
+          case v: (Int, Int) =>
+            var m = getArray[(Int, Int)](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List[(Int, Int)](v)).toArray
+            m
           case v: (Double, Double) =>
             var m = getArray[(Double, Double)](k)
             if (id < m.size) m(id) = v else m = (m.toList ::: List[(Double, Double)](v)).toArray
+            m
+          case v: ((Double, Double),Int) =>
+            var m = getArray[((Double, Double),Int)](k)
+            if (id < m.size) m(id) = v else m = (m.toList ::: List[((Double, Double),Int)](v)).toArray
             m
           case v: (Double, Double, Double, Double) =>
             var m = getArray[(Double, Double, Double, Double)](k)
@@ -647,7 +522,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
             m
 
           case v: Any =>
-          // Actually, this is the only case called
+            // Actually, this is the only case called
             throw new Exception("FATAL ERROR, GOT ANY FOR " + v)
         }
       }
@@ -740,15 +615,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    * Return neighbours of a node ID - todo refactor to make it more efficient: lazy val for array of IDs, and another function for the minimal attributes
    *
    */
-   def neighbours(i: Int): Map[String, Map[String, Any]] = {
+  def neighbours(i: Int): Map[String, Map[String, Any]] = {
     (if (links.size > i) {
       // println("  - mapping neighbours of node "+i+"..")
-      Map.empty[String,Map[String,Any]] ++ Map((uuid.zipWithIndex.filter{
-          case (uj, ij) => hasAnyLink(ij,i) && (ij != i)
-        } collect {
+      Map.empty[String, Map[String, Any]] ++ Map((uuid.zipWithIndex.filter {
+        case (uj, ij) => hasAnyLink(ij, i) && (ij != i)
+      } collect {
 
-        case (uj,ij) =>
-         (uj,minimalAttributes(ij))
+        case (uj, ij) =>
+          (uj, minimalAttributes(ij))
       }): _*)
     }
     else
@@ -932,7 +807,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
         (key, entries.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0
         }.map(_._1).toArray)
+      case (key: String, entries: Array[(Int, Int)]) =>
+        (key, entries.zipWithIndex.filter {
+          case (e, i) => conv(i) >= 0
+        }.map(_._1).toArray)
       case (key: String, entries: Array[(Double, Double)]) =>
+        (key, entries.zipWithIndex.filter {
+          case (e, i) => conv(i) >= 0
+        }.map(_._1).toArray)
+      case (key: String, entries: Array[((Double, Double),Int)]) =>
         (key, entries.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0
         }.map(_._1).toArray)
@@ -950,7 +833,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
     Graph.make(newElements)
   }
-
 
 
   /**

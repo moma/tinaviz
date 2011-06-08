@@ -55,7 +55,7 @@ object Layout extends Actor {
                 //println("Layout: empty graph..")
                   new Graph
               })
-            ).toGraph)
+            ))
 
           this ! 'run // run layout as fast as possible
         case 'exit =>

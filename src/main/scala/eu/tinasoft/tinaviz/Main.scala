@@ -34,6 +34,7 @@ import processing.pdf.PGraphicsPDF
 
 import eu.tinasoft._
 
+import scala.Predef._
 import tinaviz.io.Browser
 import tinaviz.scene._
 import tinaviz.pipeline._
@@ -262,28 +263,33 @@ class Main extends TApplet with Client {
     //val visibleNodes = visibleNodesTmp.map { _._2 }.toList.sort(compareBySelection).toArray
 
     // TODO filter by weight, and show only the N biggers
-    val edgeTmp = g.renderEdgePosition.zipWithIndex map {
-      case ((source, target), i) =>
-        val psource = screenPosition(source)
-        val ptarget = screenPosition(target)
-        val visible = (isVisible(psource) || isVisible(ptarget))
-        if (visible) {
-          val powd = distance(psource, ptarget)
+    val edgeTmp = g.edgeIndex.zipWithIndex map {
+      case (sourceTargetIndexes, i) =>
+        val (sourceIndex, targetIndex) = sourceTargetIndexes
+        val sourceTargetPosition = (g.position(sourceIndex), g.position(targetIndex))
+        val (sourcePosition, targetPosition) = sourceTargetPosition
+        val sourceTargetPositionOnScreen = (screenPosition(sourcePosition), screenPosition(targetPosition))
+        val (sourcePositionOnScreen, targetPositionOnScreen) = sourceTargetPositionOnScreen
+
+        if (isVisible(sourcePositionOnScreen) || isVisible(targetPositionOnScreen)) {
+          val powd = distance(sourcePositionOnScreen, targetPositionOnScreen)
           (true,
-            g.renderEdgeIndex(i),
             i,
-            source,
-            target,
-            g.renderEdgeWeight(i),
-            g.renderEdgeColor(i),
+            sourceIndex,
+            targetIndex,
+            sourcePosition,
+            targetPosition,
+            g.edgeWeight(i),
+            g.edgeColor(i),
             if (powd >= 10 && width >= 11) limit(PApplet.map(powd.toFloat, 10, width, 1, 120), 1, 120).toInt else 1)
 
         } else {
           (false,
-            g.renderEdgeIndex(i),
             i,
-            source,
-            target,
+            sourceIndex,
+            targetIndex,
+            sourcePosition,
+            targetPosition,
             0.0,
             new Color(0.0, 0.0, 0.0),
             0)
@@ -311,16 +317,16 @@ class Main extends TApplet with Client {
     }
 
     nbVisibleEdges = edgeTmp.filter {
-      case (visible, ndx, i, source, target, weight, color, lod) => visible
+      case (visible, i, sourceIndex, targetIndex, sourcePosition, targetPosition, weight, color, lod) => visible
     }.size
     edgeTmp foreach {
-      case (visible, ndx, i, source, target, weight, color, lod) =>
-        if (visible && !(g.selected(ndx._1)||g.highlighted(ndx._1))) {
+      case (visible, i, sourceIndex, targetIndex,  sourcePosition, targetPosition, weight, color, lod) =>
+        if (visible && !(g.selected(sourceIndex)||g.highlighted(sourceIndex))) {
           setLod(lod)
           lineColor(color)
           if (nbVisibleNodes < 30000) {
             val th = if (nbVisibleEdges < 2000) {
-              val m = math.min(g.size(ndx._1),  g.size(ndx._2))
+              val m = math.min(g.size(sourceIndex),  g.size(targetIndex))
               val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
               if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
             } else {
@@ -329,19 +335,19 @@ class Main extends TApplet with Client {
 
             lineThickness(th)
 
-            if (curved) drawCurve(source, target) else drawLine(source, target)
+            if (curved) drawCurve(sourcePosition, targetPosition) else drawLine(sourcePosition, targetPosition)
           }
         }
     }
 
     edgeTmp foreach {
-      case (visible, ndx, i, source, target, weight, color, lod) =>
-        if (visible && (g.selected(ndx._1)||g.highlighted(ndx._1))) {
+      case (visible, i, sourceIndex, targetIndex, sourcePosition, targetPosition, weight, color, lod) =>
+        if (visible && (g.selected(sourceIndex)||g.highlighted(sourceIndex))) {
           setLod(lod)
           lineColor(color)
           if (nbVisibleNodes < 30000) {
             val th = if (nbVisibleEdges < 1600) {
-              val m = math.min(g.size(ndx._1), g.size(ndx._2))
+              val m = math.min(g.size(sourceIndex), g.size(targetIndex))
               val wz = m * getZoom * edgeWeightIsPercentOfNodeSize
               if (wz < 1.0) 1.0 else (if (wz > 5.0) 5.0 else wz)
             } else {
@@ -350,7 +356,7 @@ class Main extends TApplet with Client {
 
             lineThickness(th)
 
-            if (curved) drawCurve(source, target) else drawLine(source, target)
+            if (curved) drawCurve(sourcePosition, targetPosition) else drawLine(sourcePosition, targetPosition)
           }
         }
     }
@@ -364,15 +370,15 @@ class Main extends TApplet with Client {
     noStroke
     visibleNodes.foreach {
       case (position, i) =>
-        setColor(g.renderNodeBorderColor(i))
-        g.renderNodeShape(i) match {
+        setColor(g.nodeBorderColor(i))
+        g.nodeShape(i) match {
           case 'Disk =>
             drawDisk(position, g.size(i))
-            setColor(g.renderNodeColor(i))
+            setColor(g.nodeColor(i))
             drawDisk(position, g.size(i) * 0.75)
           case x =>
             drawSquare(position, g.size(i))
-            setColor(g.renderNodeColor(i))
+            setColor(g.nodeColor(i))
             drawSquare(position, g.size(i) * 0.75)
         }
     }

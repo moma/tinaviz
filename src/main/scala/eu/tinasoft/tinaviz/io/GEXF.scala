@@ -88,7 +88,7 @@ class GEXF extends Actor {
 
 
         case graph: Graph =>
-          val newColors = graph.renderNodeColor map {
+          val newColors = graph.nodeColor.map {
             case (col) => col.toRGBTuple3
           }
           reply (

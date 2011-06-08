@@ -37,6 +37,7 @@ import actors.Actor
 import actors.Actor._
 
 import compat.Platform
+import com.lowagie.text.pdf.codec.Base64.OutputStream
 
 /**
  *
@@ -338,55 +339,53 @@ object Workflow extends Actor {
 
            // IDEA maybe, a better solution would be to define, for each "modifier", which kind of data is modified,
            // and operation is done
+           val out = Pipeline.output
+           val output : Graph = null
+           //var tmp = new Graph
+           //var updateNeeded =
           key match {
             case "filter.view" =>
-              val out = Pipeline.output
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out).warmCache)
+              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.node.category" =>
-              val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeAttributesChanged)
             case "filter.a.node.weight" =>
-              val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.a.edge.weight" =>
-              val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackEdgeCountChanged)
             case "filter.b.node.weight" =>
-              val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.b.edge.weight" =>
-              val out = Pipeline.output
               Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
               Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)))
+              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackEdgeCountChanged)
 
             case "filter.a.node.size" =>
               Pipeline.setOutput (
                 Pipeline.output.updateSizeWithCategory (
                   Filters.weightToSize (
-                    Pipeline.categoryCache
+                    Pipeline.categoryCache.callbackNodeAttributesChanged
                   )
                 )
               )
@@ -395,7 +394,7 @@ object Workflow extends Actor {
               Pipeline.setOutput (
                 Pipeline.output.updateSizeWithCategory (
                   Filters.weightToSize (
-                    Pipeline.categoryCache
+                    Pipeline.categoryCache.callbackNodeAttributesChanged
                   )
                 )
               )
@@ -403,6 +402,10 @@ object Workflow extends Actor {
             case any => // we don't need to update the scene for other attributes
           }
 
+         /*
+         if (pushToOutput) {
+              output//.warmCache
+         } */
         case s: String =>
         case msg => println("Workflow: unknow msg: " + msg)
       }
