@@ -29,9 +29,7 @@ import tinaviz.util.Color._
 import tinaviz.util.Vector
 import tinaviz.io.json.Base64
 import collection.mutable.LinkedList
-import reflect.BooleanBeanProperty
-import reflect.generic.Trees.ValDef
-import math.Numeric.DoubleAsIfIntegral
+
 
 
 object Graph {
