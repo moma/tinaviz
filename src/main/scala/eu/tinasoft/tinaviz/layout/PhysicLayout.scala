@@ -103,7 +103,7 @@ object PhysicLayout {
       val gravity = ps.makeParticle(GRAVITY.toFloat, 0.0f, 0.0f, 0.0f)
       gravity.makeFixed
 
-      val positionIndexNotSingleParticle = positionIndexSingle.par.filter {
+      val positionIndexNotSingleParticle = positionIndexSingle.filter {
         case (p, i, s) => !s // on garde si on est pas single
       }.map {
         case ((x, y), i, s) => ((x, y), i, ps.makeParticle(1.0f, x.toFloat, y.toFloat, 0.0f))
@@ -112,7 +112,7 @@ object PhysicLayout {
       // every node are repulsing each other (negative attraction)
       positionIndexNotSingleParticle.foreach {
         case (pos1, i1, p1) =>
-          positionIndexNotSingleParticle.par.foreach {
+          positionIndexNotSingleParticle.foreach {
             case (pos2, i2, p2) =>
               if (i2 != i1) {
 
@@ -159,7 +159,7 @@ object PhysicLayout {
 
     if (g.pause) { Thread.sleep(1000); g }
     else {
-      g + ("position" -> (positionIndexSingle.par.map {
+      g + ("position" -> (positionIndexSingle.map {
         case (nodePosition, i, s) =>
 
         // if we have at least one single

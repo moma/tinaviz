@@ -140,7 +140,7 @@ class Main extends TApplet with Client {
       case e: Exception =>
         println("Looking like we are not running in a web browser context..")
         Server ! 'open -> new java.net.URL(
-           "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+           "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
 
         )
     }
