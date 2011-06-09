@@ -30,11 +30,15 @@
             <version>1.5.1</version>
         </dependency>
         <dependency>
-            <groupId>traer</groupId>
-            <artifactId>physics</artifactId>
-            <version>3.0</version>
+            <groupId>codeanticode</groupId>
+            <artifactId>clphysics</artifactId>
+            <version>0.0.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.jocl</groupId>
+            <artifactId>jocl</artifactId>
+            <version>0.1.6</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
