@@ -119,7 +119,7 @@ trait Client {
   }
 
   def send(key:String, value:java.lang.Object, t:String) : Unit = {
-    //println("-> send(key:"+key+", value:"+value+", t:"+t+")")
+    println("-> send(key:"+key+", value:"+value+", t:"+t+")")
     //"[\"NGram::41a14ef0a30a812946b69d522e1570db9e4c0d5579753ba429e7291a9bdbc96c\",\"NGram::bbbf7a6412d6d3e8244ac1fda5e35a20037acee661288cb95b7b18cf469980aa\",\"NGram::bc020a35b7f9cb1382e7b534c68e3c531d849b119bf14f75ddead6cc45c3ccc1\"]"
     t match {
        case "Int" => 
@@ -140,7 +140,7 @@ trait Client {
     }
   }
   def get(key:String) : java.lang.Object = {
-    //println("-> get("+key+")")
+    println("-> get("+key+")")
     (Server !? key).asInstanceOf[AnyRef]
   }
 

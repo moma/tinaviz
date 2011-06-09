@@ -104,7 +104,7 @@
                                 <excludes>
                                     <!-- liveconnect:plugin was included for Netbeans, but browsers already have it -->                                                              
                                     <exclude>junit:junit</exclude>
-                                    <exclude>javascript:javascript</exclude>
+                                    <!--<exclude>javascript:javascript</exclude>-->
                                 </excludes>
                             </artifactSet>
 
