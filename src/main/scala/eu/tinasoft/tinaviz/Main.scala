@@ -110,7 +110,8 @@ object Main extends TApplet with Client {
 class Main extends TApplet with Client {
 
   override def setup(): Unit = {
-    size(1200, 800, PConstants.P2D)
+    val engine = PConstants.P2D
+    size(1200, 800, engine)
     frameRate(35)
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
