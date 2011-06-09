@@ -198,10 +198,11 @@
                         <option>-keepclassmembernames class processing.core.PGraphics2D</option> -->
                         <option>-keepclasseswithmembers class processing.core.PGraphics2D</option>
                         
-                        <option>-keepclass class processing.opengl.PGraphicsOpenGL</option>
-                        <!--<option>-keepclassmembers class processing.opengl.PGraphicsOpenGL</option>
-                        <option>-keepclassmembernames class processing.opengl.PGraphicsOpenGL</option> -->
-                        <option>-keepclasseswithmembers class processing.opengl.PGraphicsOpenGL</option>
+                        <option>-keepclass class processing.opengl2.PGraphicsOpenGL2</option>
+                        <!--<option>-keepclassmembers class processing.opengl2.PGraphicsOpenGL2</option>
+                        <option>-keepclassmembernames class processing.opengl2.PGraphicsOpenGL2</option> -->
+                        <option>-keepclasseswithmembers class processing.opengl2.PGraphicsOpenGL2</option>
+                        <!-- import processing.opengl2.PShape3D; -->
                         
 
                         <!--
