@@ -1,1 +1,1 @@
-/usr/lib/jvm/java-6-sun/bin/java -classpath /home/jbilcke/Checkouts/git/TINA/tinaviz2/target/tinaviz-2.0-SNAPSHOT-small.jar eu.tinasoft.tinaviz.Main
+/usr/lib/jvm/java-6-sun/bin/java -Djava.library.path=/usr/lib/jni -classpath /home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/jogl/jogl.jar:/home/jbilcke/Checkouts/git/TINA/tinaviz2/misc/gluegen-rt/gluegen-rt.jar:/usr/share/java/:/home/jbilcke/Checkouts/git/TINA/tinaviz2/target/tinaviz-2.0-SNAPSHOT-small.jar eu.tinasoft.tinaviz.Main

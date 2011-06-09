@@ -31,6 +31,8 @@ import netscape.javascript.JSException
 
 import processing.core._
 import processing.pdf.PGraphicsPDF
+import processing.opengl._
+import javax.media.opengl._
 
 import eu.tinasoft._
 
@@ -110,7 +112,8 @@ object Main extends TApplet with Client {
 class Main extends TApplet with Client {
 
   override def setup(): Unit = {
-    size(1200, 800, PConstants.P2D)
+    val engine = PConstants.OPENGL
+    size(1200, 800, engine)
     frameRate(35)
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
