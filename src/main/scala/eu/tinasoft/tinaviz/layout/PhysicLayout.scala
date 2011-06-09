@@ -21,7 +21,8 @@ import actors.threadpool.AbstractCollection
 import scala.Math
 
 object PhysicLayout {
-  val ps = new ParticleSystem(0f, 0.1f)
+  //new ParticleSystem(this, ParticleSystem.RUNGE_KUTTA, numBodies, POINTS);
+  val ps = new ParticleSystem()
   //ps.setIntegrator( ParticleSystem.MODIFIED_EULER )
   //ps.setGravity( 1.3f )
   //ps.setDrag(0.1f)
