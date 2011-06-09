@@ -59,7 +59,7 @@ object Metrics {
    * Compute the out degree array
    */
   def outDegree(g: Graph): Array[Int] = {
-    val _outDegree = g.links.map {
+    val _outDegree = g.links.par.map {
       case m => m.size
     }
     _outDegree.toArray
@@ -136,7 +136,7 @@ object Metrics {
    * Compute the degree array
    */
   def degree(g: Graph): Array[Int] = {
-    val _degree = g.links.zipWithIndex.map {
+    val _degree = g.links.par.zipWithIndex.map {
       case (aLinks, a) =>
       // var d = 0
         var neighbourMap = Map.empty[Int, Boolean]
@@ -237,7 +237,7 @@ object Metrics {
     if (g.position.size == 0) {
       (0.0, 0.0, 0.0, 0.0)
     } else {
-      val _selectedNodes = g.position.zipWithIndex filter {
+      val _selectedNodes = g.position.par.zipWithIndex filter {
         case (p, i) => g.selected(i)
       }
       if (_selectedNodes.size == 0) {
@@ -261,7 +261,7 @@ object Metrics {
 
   // a list of positions + ID
   def selectionNeighbourhood(g:Graph) = {
-     val tmp = g.position.zipWithIndex filter {
+     val tmp = g.position.par.zipWithIndex filter {
         case (p, i) => g.selected(i)
      }
      g.position.zipWithIndex filter {
@@ -422,7 +422,7 @@ object Metrics {
    */
   def selectionCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
-    val _selectedNodes = g.position.zipWithIndex filter {
+    val _selectedNodes = g.position.par.zipWithIndex filter {
       case (p, i) => g.selected(i)
     }
     val N = _selectedNodes.size.toDouble

@@ -571,7 +571,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   /**
    * List of selected nodes' IDs
    */
-  lazy val selection: List[Int] = selected.zipWithIndex.filter {
+  lazy val selection: List[Int] = selected.par.zipWithIndex.filter {
     case (selected, i) => selected
   }.map {
     case (s, i) => i
@@ -820,12 +820,11 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       case ("edgeColor", entries) =>
         ("edgeColor", entries)
       case ("links", entries: Array[Map[Int, Double]]) =>
-        val filteredEntries = entries.zipWithIndex.filter {
+        val newEntries = entries.par.zipWithIndex.filter {
           case (e, i) => conv(i) >= 0
-        }.map(_._1).toArray
-        val newEntries = filteredEntries.map {
-          links =>
-            links.filter {
+        }.map {
+          case tpl =>
+            tpl._1.filter {
               case (id, weight) => conv(id) >= 0
             }.map {
               case (id, weight) => (conv(id), weight)
@@ -889,13 +888,13 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def updatePosition(g: Graph): Graph = {
 
-    val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
+    val tmp1: Array[(Double, Double)] = position.par.zipWithIndex.map {
       case (elem, i) =>
         val id = g.id(uuid(i))
         if (id == -1) elem else g.position(id)
     }.toArray
 
-    val tmp2: Array[Boolean] = selected.zipWithIndex.map {
+    val tmp2: Array[Boolean] = selected.par.zipWithIndex.map {
       case (s, i) =>
         val id = g.id(uuid(i))
         if (id == -1) s else g.selected(id)
@@ -917,7 +916,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def updatePositionWithCategory(g: Graph): Graph = {
 
-    val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
+    val tmp1: Array[(Double, Double)] = position.par.zipWithIndex.map {
       case (elem, i) =>
         val id = g.id(uuid(i))
         if (id == -1) {
@@ -939,7 +938,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def updateSizeWithCategory(g: Graph): Graph = {
 
-    val tmp1: Array[Double] = size.zipWithIndex.map {
+    val tmp1: Array[Double] = size.par.zipWithIndex.map {
       case (elem, i) =>
         val id = g.id(uuid(i))
         if (id == -1) {
@@ -961,7 +960,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def updateLinksWithCategory(g: Graph): Graph = {
 
-    val tmp1: Array[Map[Int, Double]] = links.zipWithIndex.map {
+    val tmp1: Array[Map[Int, Double]] = links.par.zipWithIndex.map {
       case (elem, i) =>
         val id = g.id(uuid(i))
         if (id == -1) {
@@ -983,7 +982,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
    */
   def updateSelectedWithCategory(g: Graph): Graph = {
 
-    val tmp2: Array[Boolean] = selected.zipWithIndex.map {
+    val tmp2: Array[Boolean] = selected.par.zipWithIndex.map {
       case (s, i) =>
         val id = g.id(uuid(i))
         if (id == -1) {
