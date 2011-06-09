@@ -72,6 +72,8 @@ object Main extends TApplet with Client {
 
     frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
+    //collection.parallel.ForkJoinTasks.defaultForkJoinPool.setParallelism(parlevel=2)
+
     /*
     frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
     frame.addWindowListener(new WindowAdapter {
