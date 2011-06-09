@@ -6,5 +6,6 @@ mvn install:install-file -DgroupId=org.processing -DartifactId=pdf -Dversion=1.5
 mvn install:install-file -DgroupId=org.processing -DartifactId=opengl -Dversion=1.5.1 -Dpackaging=jar -Dfile=opengl.jar -DgeneratePom=true
 mvn install:install-file -DgroupId=org.processing -DartifactId=core -Dversion=1.5.1 -Dpackaging=jar -Dfile=core.jar -DgeneratePom=true
 mvn install:install-file -DgroupId=org.jocl -DartifactId=jocl -Dversion=0.1.6 -Dpackaging=jar -Dfile=jocl.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=codeanticode -DartifactId=clphysics -Dversion=0.0.1 -Dpackaging=jar -Dfile=CLPhysics.jar -DgeneratePom=true
 cd ..
 
