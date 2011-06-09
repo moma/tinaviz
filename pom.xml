@@ -45,10 +45,10 @@
             <artifactId>scala-library</artifactId>
             <version>${lib.org.scala-lang.scala.version}</version>
         </dependency>
-    </dependencies>
-
+  
+ </dependencies>
     <properties>
-        <lib.org.scala-lang.scala.version>2.8.1</lib.org.scala-lang.scala.version>
+        <lib.org.scala-lang.scala.version>2.9.0</lib.org.scala-lang.scala.version>
         <project.build.mainClass>eu.tinasoft.tinaviz.Main</project.build.mainClass>
         <maven.scala.version>${lib.org.scala-lang.scala.version}</maven.scala.version>
         <keystore.path>~/Private/dev.keystore</keystore.path>
@@ -139,6 +139,7 @@
             <plugin>
                 <groupId>com.pyx4me</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.0.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -147,6 +148,7 @@
                         </goals>
                     </execution>
                 </executions>
+                <!--
                <dependencies>
                             <dependency>
                                 <groupId>net.sf.proguard</groupId>
@@ -155,6 +157,7 @@
                                 <scope>runtime</scope>
                             </dependency>
                         </dependencies>
+                      -->
                      <configuration>
                     <proguardVersion>4.5.1</proguardVersion>
                     <maxMemory>512m</maxMemory>
@@ -171,7 +174,9 @@
                         <!--<option>-keepattributes</option> -->
                         <option>-optimizationpasses 3</option>
 
+                       <!-- 
                        <option>-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*</option>
+                       -->
                         <option>-dontobfuscate</option>
                         <option>-dontoptimize</option>
 
@@ -268,6 +273,11 @@
                         <option>-keep public class * extends java.applet.Applet { *; }</option>
                     </options>
                     <libs>
+                        <!--
+                             on mac:
+                          cd /System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/
+                          sudo ln -sf ../../Classes/classes.jar rt.jar
+                            -->
                         <lib>${java.home}/lib/rt.jar</lib>
                     </libs>
                 </configuration>
@@ -311,6 +321,7 @@
     </pluginRepositories>
 
     <repositories>
+        
         <repository>
             <id>maven.iscpif.fr</id>
             <name>ISCPIF repository</name>
@@ -341,10 +352,16 @@
             <name>k-int repository</name>
             <url>http://developer.k-int.com/maven2/</url>
         </repository>
+        
         <repository>
             <id>www.wellfleetsoftware.com</id>
             <name>WellFleet Software</name>
             <url>http://www.wellfleetsoftware.com/m2/repository/</url>
+        </repository>
+        <repository>
+            <id>pyx4me.com</id>
+            <name>http://pyx4me.com/</name>
+            <url>http://pyx4me.com/maven2-release</url>
         </repository>
     </repositories>
 </project>
