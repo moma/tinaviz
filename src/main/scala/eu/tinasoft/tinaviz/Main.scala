@@ -32,7 +32,7 @@ import netscape.javascript.JSException
 import processing.core._
 import processing.pdf.PGraphicsPDF
 
-import processing.opengl2._
+import processing.opengl._
 //import processing.opengl2.PShape3D
 //import processing.opengl._
 //import javax.media.opengl._
