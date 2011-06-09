@@ -10,8 +10,8 @@ Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
 package eu.tinasoft.tinaviz.layout
 
 import eu.tinasoft._
-import traer.physics._
-
+//import traer.physics._
+import codeanticode.clphysics._ // OpenCL version of traer.physics! :)
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import tinaviz.graph._
