@@ -48,4 +48,47 @@ object Functions  {
   }
 
 
+  /**
+   * Are the given coordinate invisible?
+   */
+  def isVisible(p: (Int, Int)) = {
+    val w = g.screenWidth / 48 // changed from 1/16 to 1/32
+    val h = g.screenHeight / 128 // in height, we don't care too much
+    ((p._1 > -w) && (p._1 < (g.screenWidth + w))
+      && (p._2 > -h) && (p._2 < (g.screenHeight + h)))
+  }
+
+  /**
+   * Are the given coordinate visible?
+   */
+  def isInvisible(p: (Int, Int)) = !isVisible(p)
+
+  /**
+   * TODO could be optimized, by using the reverse action (translate, zoom)
+   * Thus we could use this function anywhere, if we have access to camera value
+   */
+  def screenPosition(p: (Double, Double)): (Int, Int) = screenPosition(p._1, p._2)
+
+
+  /**
+   * TODO could be optimized, by using the reverse action (translate, zoom)
+   * Thus we could use this function anywhere, if we have access to camera value
+   */
+  def screenPosition(x: Double, y: Double): (Int, Int) = (screenX(x.toFloat, y.toFloat).toInt,
+                                                          screenY(x.toFloat, y.toFloat).toInt)
+
+
+  //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
+  //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
+  def modelPosition(p:(Double,Double)) : (Double,Double) = modelPosition(p._1,p._2)
+  def modelPosition(x:Double,y:Double) : (Double,Double) = (
+    (x.toDouble / _camera.zoom) - _camera.position._1,
+    (y.toDouble / _camera.zoom) - _camera.position._2)
+
+  /**
+   * Get the size to the screen
+   */
+  def screenSize(s: Double): Int = {
+    (s * _camera.zoom).toInt
+  }
 }

@@ -78,6 +78,8 @@ object Graph {
     "camera.zoom" -> 1.0,
     "camera.position" -> (0.0, 0.0),
     "camera.target" -> "all", //'all, 'none, or 'selection
+    "window.height" -> 600,
+    "window.width" -> 800,
     //"edge.type" -> "line",
     "filter.a.node.size" -> 0.2,
     "filter.a.node.weight" -> (0.0, 1.0),

@@ -124,7 +124,7 @@ object Filters {
       (g.minBEdgeWeight, g.maxBEdgeWeight))
 
     //println("applyEdgeWeight: " + range + " (" + g.get[(Double, Double)]("filter.edge.weight") + ")")
-    val newLinks = g.links.par.zipWithIndex map {
+    val newLinks = g.links.zipWithIndex map {
       case (links,i) => 
         links.filter { 
           case (j, weight) => 
@@ -156,7 +156,7 @@ object Filters {
     val aminmaxweight =  (g.minANodeWeight, g.maxANodeWeight)  // Document
     val bminmaxweight =  (g.minBNodeWeight, g.maxBNodeWeight)  // NGram
     //println("applyWeightToSize: " + ratio)
-    val newSize = g.weight.par.zipWithIndex map {
+    val newSize = g.weight.zipWithIndex map {
       case (weight,i) =>
 
         if (g.category(i) equalsIgnoreCase "Document") {
@@ -177,7 +177,7 @@ object Filters {
    * TODO check if this function is still important
    */
   def clean(g:Graph) = {
-    g + ("links" -> g.links.par.zipWithIndex.map {
+    g + ("links" -> g.links.zipWithIndex.map {
       case (links, i) =>
         links.filter {
           case (j, weight) =>

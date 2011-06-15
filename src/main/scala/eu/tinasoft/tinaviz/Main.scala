@@ -105,7 +105,10 @@ object Main extends TApplet with Client {
  */
 
 
-
+/*
+ * TODO instead of a boolean to tell if a node/edge is disappeared, we should use some kind of timer function
+ * to gently fade down elements
+ */
 
 class Main extends TApplet with Client {
 
@@ -166,6 +169,9 @@ class Main extends TApplet with Client {
     if (g.pause) smooth else if (nbVisibleEdges < 600) smooth else noSmooth
 
 
+    // if there are too many edges, we enable the stochastic edge drawing
+    val stochasticRendering = (g.nbEdges > 1500)
+    println("stoch: "+stochasticRendering)
     // if activity, then we reset
 
 
@@ -257,7 +263,7 @@ class Main extends TApplet with Client {
     noFill
 
     //println("Main: nbNodes: "+g.nbNodes+"   nbEdges: "+g.nbEdges)
-    //println("Main: position.size: "+g.position.size  +" weight.size: "+ g.weight.size+"  edgeColor.size: "+g.edgeColor.size)
+    //println("Main: position.size: "+g.position.size  +" weight.size: "+ g.weight.size+"  edgeColor.size: "+g.edgeColor.size
 
     val visibleNodes = g.position.zipWithIndex.filter {
       case (position, i) => isVisible(screenPosition(position))
@@ -269,6 +275,7 @@ class Main extends TApplet with Client {
     //val visibleNodes = visibleNodesTmp.map { _._2 }.toList.sort(compareBySelection).toArray
 
     // TODO filter by weight, and show only the N biggers
+
     val edgeTmp = g.edgeIndex.zipWithIndex map {
       case (sourceTargetIndexes, i) =>
         val (sourceIndex, targetIndex) = sourceTargetIndexes
@@ -278,8 +285,7 @@ class Main extends TApplet with Client {
         val (sourcePosition, targetPosition) = sourceTargetPosition
         val sourceTargetPositionOnScreen = (screenPosition(sourcePosition), screenPosition(targetPosition))
         val (sourcePositionOnScreen, targetPositionOnScreen) = sourceTargetPositionOnScreen
-
-        if (isVisible(sourcePositionOnScreen) || isVisible(targetPositionOnScreen)) {
+        if ((isVisible(sourcePositionOnScreen) || isVisible(targetPositionOnScreen))) {
           val powd = distance(sourcePositionOnScreen, targetPositionOnScreen)
           (true,
             i,
@@ -442,6 +448,7 @@ class Main extends TApplet with Client {
      * Tina-specific function to make labels nicer
      */
     def myLabelCurator(label:String, selected:Boolean=false) = if (selected) labelCurator(label, 55, " - ")  else labelCurator(label, 19, " - ")
+
 
     sortedLabelIDs.foreach {
       case (i) =>
