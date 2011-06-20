@@ -26,7 +26,6 @@ import javax.swing.JFrame
 
 import processing.core._
 import processing.core.PImage
-import processing.pdf.PGraphicsPDF
 
 import eu.tinasoft._
 
@@ -219,7 +218,6 @@ class Main extends TApplet with Client {
     export match {
       case "PDF" =>
         smooth
-        beginRecord(PConstants.PDF, "graph.pdf")
 
       case "PNG" =>
         smooth
@@ -512,7 +510,7 @@ class Main extends TApplet with Client {
 
 
     export match {
-      case "PDF" => endRecord()
+      case "PDF" => //endRecord()
       case "PNG" => save("graph.png")
       case any =>
     }

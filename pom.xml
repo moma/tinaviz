@@ -18,17 +18,7 @@
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
             <version>1.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.processing</groupId>
-            <artifactId>itext</artifactId>
-            <version>1.5.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.processing</groupId>
-            <artifactId>pdf</artifactId>
-            <version>1.5.1</version>
-        </dependency>
+        </dependency>>
         <dependency>
             <groupId>traer</groupId>
             <artifactId>physics</artifactId>
