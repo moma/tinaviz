@@ -47,48 +47,79 @@ object Functions  {
     }
   }
 
+  /**
+   * Generic function to make a label nicer
+   * Richard "Aphex Twin" James - University of Weird Music
+   * will give:
+   * Richard "Aphex Tw..
+   */
+  def labelCurator(text: String, len: Int, separator: String) = {
+    (
+      if ((separator.size > 0) && text.contains(separator)) text.split(separator)(0)
+      else text
+      ) match {
+      case text =>
+        if (text.size > len) ("" + (text.grouped(len).toList)(0) + "..")
+        else text
+    }
+  }
+
+  /**
+   * Tina-specific function to make labels nicer
+   */
+  def myLabelCurator(label: String, selected: Boolean = false) = if (selected) labelCurator(label, 55, " - ") else labelCurator(label, 19, " - ")
+
 
   /**
    * Are the given coordinate invisible?
    */
-  def isVisible(p: (Int, Int)) = {
-    val w = g.screenWidth / 48 // changed from 1/16 to 1/32
-    val h = g.screenHeight / 128 // in height, we don't care too much
-    ((p._1 > -w) && (p._1 < (g.screenWidth + w))
-      && (p._2 > -h) && (p._2 < (g.screenHeight + h)))
+
+  def isVisible(g:Graph,p: (Int, Int)) = {
+    val w = g.window._1 / 48 // changed from 1/16 to 1/32
+    val h = g.window._2 / 128 // in height, we don't care too much
+    ((p._1 > -w) && (p._1 < (g.window._1 + w))
+      && (p._2 > -h) && (p._2 < (g.window._2 + h)))
   }
+
 
   /**
    * Are the given coordinate visible?
    */
-  def isInvisible(p: (Int, Int)) = !isVisible(p)
+  /
+  def isInvisible(g:Graph,p: (Int, Int)) = !isVisible(g,p)
 
   /**
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
-  def screenPosition(p: (Double, Double)): (Int, Int) = screenPosition(p._1, p._2)
+
+  def screenPosition(g:Graph,p: (Double, Double)): (Int, Int) = screenPosition(g,p._1, p._2)
 
 
   /**
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
-  def screenPosition(x: Double, y: Double): (Int, Int) = (screenX(x.toFloat, y.toFloat).toInt,
+
+  def screenPosition(g:Graph,x: Double, y: Double): (Int, Int) = (screenX(x.toFloat, y.toFloat).toInt,
                                                           screenY(x.toFloat, y.toFloat).toInt)
 
 
-  //def modelPosition(p:(Int,Int)) : (Double,Double) = modelPosition(p._1,p._2)
-  //def modelPosition(x:Int,y:Int) : (Double,Double) = modelPosition(x,y)
-  def modelPosition(p:(Double,Double)) : (Double,Double) = modelPosition(p._1,p._2)
-  def modelPosition(x:Double,y:Double) : (Double,Double) = (
-    (x.toDouble / _camera.zoom) - _camera.position._1,
-    (y.toDouble / _camera.zoom) - _camera.position._2)
+   // position in the model
+  def modelPosition(g:Graph,p:(Int,Int)) : (Double,Double) = modelPosition(g,p._1,p._2)
+  def modelPosition(g:Graph,x:Int,y:Int) : (Double,Double) = modelPosition(g = x,y)
+
+  def modelPosition(g:Graph, p:(Double,Double)) : (Double,Double) = modelPosition(g,p._1,p._2)
+  def modelPosition(g:Graph, :Double,y:Double) : (Double,Double) = (
+    (x.toDouble / g.cameraZoom) - g.cameraPosition._1,
+    (y.toDouble / g.cameraZoom) - g.cameraPosition._2)
 
   /**
    * Get the size to the screen
    */
+  /
   def screenSize(s: Double): Int = {
-    (s * _camera.zoom).toInt
+    (s * g.cameraZoom).toInt
   }
+
 }

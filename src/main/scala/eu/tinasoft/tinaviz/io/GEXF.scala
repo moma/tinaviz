@@ -24,12 +24,11 @@ package eu.tinasoft.tinaviz.io
 
 import eu.tinasoft._
 
+import tinaviz.graph._
 import tinaviz.util.Color
 import tinaviz.util.Color._
 import tinaviz.util.Rio
 import tinaviz.util.Maths
-
-import tinaviz.graph._
 
 import actors._
 import Actor._
@@ -197,6 +196,7 @@ class GEXF extends Actor {
       }
 
 
+
          val p = (n \\ "position")
          //println("x: " +(p \ "@x" text)+" y:"+(p \ "@y" text))
 
@@ -218,6 +218,7 @@ class GEXF extends Actor {
                             Maths.random(0.8, 1.0))
       g += (id, "uuid", uuid)
       g += (id, "label", title(label))
+      g += (id, "shortLabel", Functions.myLabelCurator(label, true))
       g += (id, "color", color)
       g += (id, "selected", false)
       g += (id, "highlighted", false)

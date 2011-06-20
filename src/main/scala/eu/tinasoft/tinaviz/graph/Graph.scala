@@ -60,8 +60,11 @@ object Graph {
     "filter.view" -> "macro",
     "selectionRadius" -> 10.0,
     "pause" -> false,
+    "logo" -> new PImage(),
     "uuid" -> Array.empty[String],
     "label" -> Array.empty[String],
+    "shortLabel" -> Array.empty[String],
+    "renderedLabel" -> Array.empty[String],
     "color" -> Array.empty[Color],
     "selected" -> Array.empty[Boolean],
     "highlighted" -> Array.empty[Boolean],
@@ -78,8 +81,7 @@ object Graph {
     "camera.zoom" -> 1.0,
     "camera.position" -> (0.0, 0.0),
     "camera.target" -> "all", //'all, 'none, or 'selection
-    "window.height" -> 600,
-    "window.width" -> 800,
+    "window" -> (800,600),
     //"edge.type" -> "line",
     "filter.a.node.size" -> 0.2,
     "filter.a.node.weight" -> (0.0, 1.0),
@@ -129,7 +131,8 @@ object Graph {
     "edgeIndex" -> Array.empty[(Int, Int)],
     "edgeWeight" -> Array.empty[Double],
     "edgeSize" -> Array.empty[Double],
-    "edgeColor" -> Array.empty[Color]
+    "edgeColor" -> Array.empty[Color],
+    "showLabel" -> Array.empty[Boolean]
   )
 }
 
@@ -165,9 +168,11 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val saveStatus = getArray[Symbol]("saveStatus")
   // saving, saved
   lazy val label = getArray[String]("label")
+  lazy val shortLabel = getArray[String]("shortLabel")
+  lazy val renderedLabel = getArray[String]("renderedLabel")
   lazy val rate = getArray[Int]("rate")
   lazy val uuid = getArray[String]("uuid")
-
+  lazy val logo = get[PImage]("logo")
 
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
@@ -186,6 +191,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val pause = get[Boolean]("pause")
   lazy val selectionRadius = get[Double]("selectionRadius")
 
+  lazy val showLabel = get[String]("showLabel")
   lazy val edgeType = get[String]("edge.type")
 
   // TODO should be precomputed!! OPTIMIZATION
@@ -266,6 +272,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val edgeSize = getArray[Double]("edgeSize")
   lazy val edgeColor = getArray[Color]("edgeColor")
 
+  lazy val window = get[(Int, Int)]("window")
+
   def callbackNodeAttributesChanged = {
     println("executing callbackNodeAttributesChanged")
     var g = this
@@ -316,6 +324,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("edgeWeight" -> Drawing.edgeWeight(g))
     g = g + ("edgeSize" -> Drawing.edgeSize(g))
     g = g + ("edgeColor" -> Drawing.edgeColor(g))
+
+    g = g + ("renderedLabel" -> Drawing.renderedLabel(g))
     g
   }
   def callbackNodeCountChanged = {

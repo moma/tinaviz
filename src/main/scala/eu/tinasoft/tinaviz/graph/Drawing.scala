@@ -175,4 +175,8 @@ object Drawing {
     case "NGram" => 'Disk
     case any => 'Square
   }
+
+  def renderedLabel (g:Graph) = g.ids.map {
+    case i => if (g.selected(i) || g.highlighted(i)) g.shortLabel(i) else g.label(i)
+  }
 }
