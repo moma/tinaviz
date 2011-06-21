@@ -45,6 +45,8 @@ class Workflow (val session:Session) extends Actor {
 
   def act() {
 
+    val pipeline = session.pipeline
+
     while (true) {
       receive {
 
@@ -89,7 +91,7 @@ class Workflow (val session:Session) extends Actor {
 
 
           //System.out.println("calling callback with this data: " + (nodeList, neighbourList))
-          browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
+          session.webpage ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
 
         case ('getNeighbourhood, view: String, "selection") =>
           val in = pipeline.input
@@ -110,7 +112,7 @@ class Workflow (val session:Session) extends Actor {
             case (uuid, i) => (uuid, container.neighbours(container.id(uuid)))
           }
           //System.out.println("calling callback with this data: " + (nodeList, neighbourList))
-          Browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
+          session.webpage ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
 
 
         case ('getNodes, view: String, category: String) =>
@@ -152,7 +154,7 @@ class Workflow (val session:Session) extends Actor {
               })
           }
           pipeline.setOutput(out2.callbackSelectionChanged)
-          Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
+          session.webpage ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
           self ! "filter.view" -> in.currentView
 
         case ("select", uuid: String) =>
@@ -176,7 +178,7 @@ class Workflow (val session:Session) extends Actor {
           ) */
           //println("out2.selection.size: " + out2.selection.size)
           // println("pipeline.output.size: " + pipeline.output.size)
-          Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
+          session.webpage ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
           //self ! "filter.view" -> pipeline.input.currentView
 
         case ("selectByPattern", pattern: String) =>
@@ -193,7 +195,7 @@ class Workflow (val session:Session) extends Actor {
               })
             }).callbackSelectionChanged
           )
-          Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
+          session.webpage ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
           self ! "filter.view" -> pipeline.input.currentView
 
           /** Search and select a node depending on it's neighbour label match **/
@@ -224,7 +226,7 @@ class Workflow (val session:Session) extends Actor {
               })
             }).callbackSelectionChanged
           )
-          Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
+          session.webpage ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
           self ! "filter.view" -> pipeline.input.currentView
 
         case ("highlightByPattern", pattern: String) =>
@@ -287,7 +289,7 @@ class Workflow (val session:Session) extends Actor {
               }.toArray)
               //println("selection count, before: "+out.selection.size+" after: "+out2.selection.size)
               pipeline.setOutput(out2.callbackSelectionChanged)
-              Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, side match {
+              session.webpage ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, side match {
                 case 'Left => "left"
                 case 'Right => "right"
                 case any => "none"
@@ -296,7 +298,7 @@ class Workflow (val session:Session) extends Actor {
               // check if we need to recompute the meso field
               if (doubleClicked) {
                 if (somethingIsSelected) {
-                    Server ! "filter.view" -> "meso"
+                    session.webpage ! "filter.view" -> "meso"
 
                   } else {
                     // zoom?
@@ -323,7 +325,7 @@ class Workflow (val session:Session) extends Actor {
 
         case ("export","GEXF") => (new GEXF) ! pipeline.output
         case x:scala.xml.Elem =>
-          Browser ! 'forceDownload -> x.toString
+          session.webpage ! 'forceDownload -> x.toString
          //  new ExportGraphDialog(x.toString)
 
         case (key: String, value: Any) =>

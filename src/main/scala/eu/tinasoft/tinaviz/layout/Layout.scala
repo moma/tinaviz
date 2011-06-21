@@ -37,12 +37,14 @@ import tinaviz.{Session, Main, Server}
 class Layout (val session:Session)  extends Actor {
 
   def act() {
+
     this ! 'run
+     val layout = new PhysicLayout(session)
     while (true) {
       receive {
         case 'run =>
           session.workflow ! ('setLayout,
-            PhysicLayout.layout(
+            layout.layout(
               ((session.workflow !? 'getLayout) match {
                 case g: Graph =>
                 //println("Layout: got graph ("+g.nbNodes+")")

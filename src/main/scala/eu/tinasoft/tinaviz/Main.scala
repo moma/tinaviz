@@ -107,7 +107,10 @@ object Main extends TApplet with Client {
 
 class Main extends TApplet with Client {
 
-  val session = new Session (this)
+   val session = new Session (this)
+   //setTAppletSession(session)  // hack for TApplet. TODO: put it in the TApplet's constructor
+  // setClientSession(session) // hack for client. TODO: put it in the Client's constructor
+
 
   override def setup(): Unit = {
     val engine = PConstants.P2D
@@ -136,17 +139,15 @@ class Main extends TApplet with Client {
      // new PImage (ImageIO.read(new URL("http://hostname.com/image.gif")))
      //}
 
-    addMouseWheelListener(this)
+        addMouseWheelListener(this)
 
     /* In the JDK's appletviewer, selecting the Restart menu item calls stop() and then start().
      * Selecting the Reload menu item calls stop(), destroy(), and init(), in that order.
      *  (Normally the byte codes will also be reloaded and the HTML file reread though Netscape has a problem with this.)
      */
 
-    session.webpage.connect (this)
-
     println("session start")
-    session start
+    session.start
 
     if (!(session.webpage.connected)) session.server ! 'open -> new java.net.URL(
           //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"

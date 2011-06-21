@@ -91,7 +91,7 @@ class Webpage(val session: Session) extends Actor {
             new java.lang.Integer(0))
           //println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
           if (window != null) {
-            _window.call(jsContext + prefix + func, args)
+            window.call(jsContext + prefix + func, args)
           }
 
         case ('forceDownload, str: String) =>

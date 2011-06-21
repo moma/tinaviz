@@ -32,6 +32,8 @@ trait Client {
   
   private var cached : Map[String,(Any,Future[Any])] = Map.empty
 
+  private var session : Session = null
+  def setClientSession(s:Session) = { session = s }
   /**
    * Regularly get a param using future
    *
@@ -48,7 +50,7 @@ trait Client {
     tp._2 match {
       case null =>
         //if (key.equals("scene")) println("asking for future!")
-        (Server !! key) match {
+        (session.server !! key) match {
           case f:Future[T] =>
             //if (key.equals("scene")) println("got future! storing it..")
             future = f
@@ -79,18 +81,18 @@ trait Client {
 // Called by Javascript
 
   def togglePause = {
-    (Server !? "pause" -> 'toggle) match {
+    (session.server !? "pause" -> 'toggle) match {
       case b:Boolean => b
       case x => false
     }
   }
 
   def openURI(url:String) = {
-      Server ! 'open -> new java.net.URL(url)
+      session.server ! 'open -> new java.net.URL(url)
     true
   }
   def openString(str:String) = {
-      Server ! 'open -> str
+      session.server ! 'open -> str
     true
   }
 
@@ -101,20 +103,20 @@ trait Client {
     println("-> sendTuple2(key:"+key+", value1:"+value1+", value2: "+value2+", t:"+t+")")
     t match {
        case "Int" =>
-       Server ! key -> (value1.toString.toInt, value2.toString.toInt)
+       session.server ! key -> (value1.toString.toInt, value2.toString.toInt)
        case "Float" =>
-       Server ! key -> (value1.toString.toFloat, value2.toString.toFloat)
+       session.server ! key -> (value1.toString.toFloat, value2.toString.toFloat)
        case "Double" =>
-       Server ! key -> (value1.toString.toDouble, value2.toString.toDouble)
+       session.server ! key -> (value1.toString.toDouble, value2.toString.toDouble)
        case "Boolean" =>
         //println("converting "+key+" : ("+value1+","+value2+") to Boolean")
-        Server ! key -> (value1.toString.toBoolean,value2.toString.toBoolean)
-       case "String" => Server ! key -> (value1.toString, value2.toString)
+        session.server ! key -> (value1.toString.toBoolean,value2.toString.toBoolean)
+       case "String" => session.server ! key -> (value1.toString, value2.toString)
        case "Json" =>
          val data = (Json.parse(value1.toString),Json.parse(value2.toString))
          //println("parsed Json to "+data)
-         Server ! key -> data
-       case x => Server ! key -> (value1, value2)
+         session.server ! key -> data
+       case x => session.server ! key -> (value1, value2)
     }
   }
 
@@ -123,25 +125,25 @@ trait Client {
     //"[\"NGram::41a14ef0a30a812946b69d522e1570db9e4c0d5579753ba429e7291a9bdbc96c\",\"NGram::bbbf7a6412d6d3e8244ac1fda5e35a20037acee661288cb95b7b18cf469980aa\",\"NGram::bc020a35b7f9cb1382e7b534c68e3c531d849b119bf14f75ddead6cc45c3ccc1\"]"
     t match {
        case "Int" => 
-       Server ! key -> value.toString.toInt
+       session.server ! key -> value.toString.toInt
        case "Float" => 
-       Server ! key -> value.toString.toFloat
+       session.server ! key -> value.toString.toFloat
        case "Double" => 
-       Server ! key -> value.toString.toDouble
+       session.server ! key -> value.toString.toDouble
        case "Boolean" =>
         //println("converting "+key+" : "+value+" to Boolean")
-        Server ! key -> value.toString.toBoolean
-       case "String" => Server ! key -> value.toString
+        session.server ! key -> value.toString.toBoolean
+       case "String" => session.server ! key -> value.toString
        case "Json" =>
          val data = Json.parse(value.toString)
          //println("parsed Json to "+data)
-         Server ! key -> data
-       case x => Server ! key -> value
+         session.server ! key -> data
+       case x => session.server ! key -> value
     }
   }
   def get(key:String) : java.lang.Object = {
     println("-> get("+key+")")
-    (Server !? key).asInstanceOf[AnyRef]
+    (session.server !? key).asInstanceOf[AnyRef]
   }
 
   /**
@@ -159,7 +161,7 @@ trait Client {
   def selectByPattern(pattern:String, patternMode:String) : Unit = {
     
     if (pattern == null || patternMode == null) {
-      System.out.println("selectByPattern(" + pattern + ", " + patternMode + ")");
+      println("selectByPattern(" + pattern + ", " + patternMode + ")");
       return;
     }
     // shutdown the "center on visualization" mode
@@ -167,14 +169,14 @@ trait Client {
     if (pattern.isEmpty()) {
       return;
     }
-    Server ! "selectByPattern" -> pattern
+    session.server ! "selectByPattern" -> pattern
   }
 
 
   def selectByNeighbourPattern(pattern:String, patternMode:String, category:String) : Unit = {
 
     if (pattern == null || patternMode == null) {
-      System.out.println("selectByNeighbourPattern(" + pattern + ", " + patternMode + ", "+category+")");
+      println("selectByNeighbourPattern(" + pattern + ", " + patternMode + ", "+category+")");
       return;
     }
     // shutdown the "center on visualization" mode
@@ -182,7 +184,7 @@ trait Client {
     if (pattern.isEmpty()) {
       return;
     }
-    Server ! ("selectByNeighbourPattern",pattern,category)
+    session.server ! ("selectByNeighbourPattern",pattern,category)
   }
 
   /**
@@ -196,7 +198,7 @@ trait Client {
   def highlightByPattern(pattern:String, patternMode:String) : Unit = {
     
     if (pattern == null | patternMode == null) {
-      System.out.println("highlightByPattern(" + pattern + ", " + patternMode + ")");
+      println("highlightByPattern(" + pattern + ", " + patternMode + ")");
       return;
     }
     // shutdown the "center on visualization" mode
@@ -204,7 +206,7 @@ trait Client {
     if (pattern.isEmpty()) {
       return;
     }
-    Server ! "highlightByPattern" -> pattern
+    session.server ! "highlightByPattern" -> pattern
   }
   
   /**
@@ -212,7 +214,7 @@ trait Client {
    */
   def getNodeAttributes(view:String, uuid:String) : String = {
     //System.out.println("getting node by UUID: " + uuid)
-    val attributes : String = (Server !? 'getNodeAttributes -> uuid) match {
+    val attributes : String = (session.server !? 'getNodeAttributes -> uuid) match {
       case m:Map[Any,Any] =>
          Json.build(m).toString
 
@@ -229,14 +231,14 @@ trait Client {
   def getNeighbourhood(view:String, rawJSONList:String) = {
     val todoList = "selection" //Json.parse(rawJSONList)
     println("TODO get the neighbourListof "+todoList+" ("+rawJSONList+")")
-    Server ! ('getNeighbourhood,view,todoList)
+    session.server ! ('getNeighbourhood,view,todoList)
     true
   }
   
   // TODO should be asynchronous
   def getNodes(view:String, category:String) : String = {
     //System.out.println("getting node by UUID: " + uuid)
-    val nodes : String = (Server !? ('getNodes,view,category)) match {
+    val nodes : String = (session.server !? ('getNodes,view,category)) match {
       case m:Map[String,Map[String,Any]] =>
         println("Server replied with some node map: "+m)
         //Json.build(m).toString

@@ -24,15 +24,13 @@ package eu.tinasoft.tinaviz.scene
 
 import processing.core._
 
-import java.awt.event.MouseWheelEvent
-import java.awt.event.MouseWheelListener
-import java.awt.event.MouseListener
-
 import eu.tinasoft._
-import tinaviz.Server
 import tinaviz.util._
 import tinaviz.util.Vector._
+import java.awt.event.MouseWheelListener
+import java.awt.event.MouseWheelEvent
 
+import tinaviz.{Session, Server}
 import traer.physics._
 
 class Fonts(val p: PApplet,
@@ -86,6 +84,10 @@ class PDFFonts(val p: PApplet,
  * @throws
  */
 class TApplet extends PApplet with MouseWheelListener {
+
+
+  private var session : Session = null
+  def setTAppletSession(s:Session) = { session = s }
 
   // particle system for the Camera (smooth moves)
   //
@@ -422,7 +424,7 @@ class TApplet extends PApplet with MouseWheelListener {
     _camera.dragged = true
     updatePosition(t)
     updateMouse('Drag)
-    Server ! "camera.target" -> "none"
+    session.server ! "camera.target" -> "none"
   }
 
   override def mouseClicked = updateMouse('Click)
@@ -447,7 +449,7 @@ class TApplet extends PApplet with MouseWheelListener {
       }
     }
     resetIdle
-    Server ! "camera.target" -> "none"
+    session.server ! "camera.target" -> "none"
   }
 
   // detection system for user idle
