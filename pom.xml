@@ -41,14 +41,14 @@
             <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
-       
+
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${lib.org.scala-lang.scala.version}</version>
         </dependency>
-  
- </dependencies>
+
+    </dependencies>
     <properties>
         <lib.org.scala-lang.scala.version>2.8.1</lib.org.scala-lang.scala.version>
         <project.build.mainClass>eu.tinasoft.tinaviz.Main</project.build.mainClass>
@@ -102,7 +102,7 @@
                             <artifactSet>
                                 <!-- signed jars-->
                                 <excludes>
-                                    <!-- liveconnect:plugin was included for Netbeans, but browsers already have it -->                                                              
+                                    <!-- liveconnect:plugin was included for Netbeans, but browsers already have it -->
                                     <exclude>junit:junit</exclude>
                                     <!--<exclude>javascript:javascript</exclude>-->
                                 </excludes>
@@ -161,7 +161,7 @@
                             </dependency>
                         </dependencies>
                       -->
-                     <configuration>
+                <configuration>
                     <proguardVersion>4.5.1</proguardVersion>
                     <maxMemory>512m</maxMemory>
                     <includeDependency>false</includeDependency>
@@ -177,9 +177,9 @@
                         <!--<option>-keepattributes</option> -->
                         <option>-optimizationpasses 3</option>
 
-                       <!-- 
-                       <option>-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*</option>
-                       -->
+                        <!--
+                        <option>-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*</option>
+                        -->
                         <option>-dontobfuscate</option>
                         <option>-dontoptimize</option>
 
@@ -225,9 +225,9 @@
                         <option>-keepclass class com.lowagie.text.pdf.TrueTypeFontUnicode</option>
                          <option>-keepclasseswithmembers class com.lowagie.text.pdf.TrueTypeFontUnicode</option>
                          -->
-                          <!--
-                            END OF PDF EXPORT HACK
-                          -->
+                        <!--
+                          END OF PDF EXPORT HACK
+                        -->
 
                         <option>-keep class * implements org.xml.sax.EntityResolver</option>
 
@@ -309,6 +309,31 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>eu.tinasoft.tinaviz.Main</mainClass>
+                            <arguments>
+                                <!--
+                                <argument>arg0</argument>
+                                -->
+                                <!--
+                                <argument>arg1</argument>
+                                -->
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -324,7 +349,7 @@
     </pluginRepositories>
 
     <repositories>
-        
+
         <repository>
             <id>maven.iscpif.fr</id>
             <name>ISCPIF repository</name>
@@ -355,7 +380,7 @@
             <name>k-int repository</name>
             <url>http://developer.k-int.com/maven2/</url>
         </repository>
-        
+
         <repository>
             <id>www.wellfleetsoftware.com</id>
             <name>WellFleet Software</name>

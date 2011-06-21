@@ -38,7 +38,7 @@ case class Step(val step: Symbol)
 /**
  * This class need a big refactoring..
  */
-object Server extends Actor {
+class Server (val session:Session) extends Actor {
 
   val defaultProperties: Map[String, Any] = Map(
     // global real FPS
@@ -83,6 +83,7 @@ object Server extends Actor {
 
     while (true) {
       receive {
+
         case 'exit =>
           println("Server: calling exit() on myself")
           exit()
@@ -92,40 +93,40 @@ object Server extends Actor {
           val in = new Graph(properties ++ g.elements).callbackGraphChanged // brand new graph!  maybe the callback is too much
 
           properties += "input" -> in
-          Pipeline.setInput(in)
-          Workflow ! 'graphImported
-          Browser ! "_graphImportedCallback" -> "success"
+          session.pipeline.setInput(in)
+          session.workflow ! 'graphImported
+          session.webpage ! "_graphImportedCallback" -> "success"
 
-        case ("export","GEXF") =>  Workflow ! ("export","GEXF")
+        case ("export","GEXF") =>  session.workflow ! ("export","GEXF")
         case ('open, pathOrURL: Any) =>  (new GEXF) ! (pathOrURL, properties)
 
-        case ("select", toBeSelected)        => Workflow ! "select"              -> toBeSelected
-        case ("selectByPattern", pattern)    => Workflow ! "selectByPattern"     -> pattern
-        case ("selectByNeighbourPattern", pattern, category)    => Workflow ! ("selectByNeighbourPattern", pattern, category)
-        case ("highlightByPattern", pattern) => Workflow ! "highlightByPattern"  -> pattern
+        case ("select", toBeSelected)        => session.workflow ! "select"              -> toBeSelected
+        case ("selectByPattern", pattern)    => session.workflow ! "selectByPattern"     -> pattern
+        case ("selectByNeighbourPattern", pattern, category)    => session.workflow ! ("selectByNeighbourPattern", pattern, category)
+        case ("highlightByPattern", pattern) => session.workflow ! "highlightByPattern"  -> pattern
 
         case ('getNodes,view,category) =>
           println("Server: client called getNodes("+view+", "+category+") -> replying..")
-          reply(Workflow !? ('getNodes,view,category))
+          reply(session.workflow !? ('getNodes,view,category))
 
         case ('getNeighbourhood,view,todoList) =>
-          Workflow ! ('getNeighbourhood,view,todoList)
+          session.workflow ! ('getNeighbourhood,view,todoList)
 
         case ('getNodeAttributes,uuid) =>
-          reply (Workflow !? 'getNodesAttributes -> uuid)
+          reply (session.workflow !? 'getNodesAttributes -> uuid)
 
         case ("camera.mouse", kind, side, count, position) =>
-          Workflow ! ("camera.mouse", kind, side, count, position)
+          session.workflow ! ("camera.mouse", kind, side, count, position)
 
         case ('updated, key: String, value: Any, previous: Any) =>
           key match {
             case "filter.view" =>
-              Browser ! "_callbackViewChanged" -> value
-              Workflow ! key -> value
+              session.webpage ! "_callbackViewChanged" -> value
+              session.workflow ! key -> value
             //case "camera.zoom" =>
             //case "camera.position" =>
             case "frameRate" =>
-            case any => Workflow ! key -> value
+            case any => session.workflow ! key -> value
           }
         case key: String =>  reply(properties(key))
 

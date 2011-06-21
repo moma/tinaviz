@@ -27,27 +27,23 @@ import tinaviz.graph.Graph
 import tinaviz.pipeline.Pipeline
 import tinaviz.pipeline.Workflow
 
-import tinaviz.Main
-import tinaviz.Server
-
 import actors.Actor
 import actors.Actor._
+import tinaviz.{Session, Main, Server}
 
 /**
  * Layout Actor
  */
-object Layout extends Actor {
+class Layout (val session:Session)  extends Actor {
 
   def act() {
-
     this ! 'run
-
     while (true) {
       receive {
         case 'run =>
-          Workflow ! ('setLayout,
+          session.workflow ! ('setLayout,
             PhysicLayout.layout(
-              ((Workflow !? 'getLayout) match {
+              ((session.workflow !? 'getLayout) match {
                 case g: Graph =>
                 //println("Layout: got graph ("+g.nbNodes+")")
                   g

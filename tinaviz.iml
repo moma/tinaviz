@@ -20,9 +20,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: netscape:javascript:1.6.0_22" level="project" />
-    <orderEntry type="library" name="Maven: org.processing:core:1.2.1" level="project" />
-    <orderEntry type="library" name="Maven: org.processing:itext:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.processing:pdf:1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.processing:core:1.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.processing:itext:1.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.processing:pdf:1.5.1" level="project" />
     <orderEntry type="library" name="Maven: traer:physics:3.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.8.1" level="project" />

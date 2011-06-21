@@ -30,7 +30,7 @@ import processing.pdf.PGraphicsPDF
 
 import eu.tinasoft._
 
-import tinaviz.io.Browser
+import tinaviz.io.Webpage
 import tinaviz.scene._
 import tinaviz.pipeline._
 import tinaviz.util._
@@ -52,13 +52,12 @@ import java.net.URL
  */
 object Main extends TApplet with Client {
 
-  private var applet: Main = _
 
   /**
    * main method
    */
   def main(args: Array[String]): Unit = {
-    applet = new Main
+    val applet = new Main
     var frame = new JFrame("TinaViz")
     frame.getContentPane.add(applet)
     applet.init
@@ -75,7 +74,7 @@ object Main extends TApplet with Client {
     frame.addWindowListener(new WindowAdapter {
       public void windowClosing(e:WindowEvent) {
         Server -> 'quit
-        Browser -> 'quit
+        Webpage -> 'quit
         System.exit(0)
       }
     })
@@ -107,6 +106,8 @@ object Main extends TApplet with Client {
  */
 
 class Main extends TApplet with Client {
+
+  val session = new Session (this)
 
   override def setup(): Unit = {
     val engine = PConstants.P2D
@@ -141,23 +142,16 @@ class Main extends TApplet with Client {
      * Selecting the Reload menu item calls stop(), destroy(), and init(), in that order.
      *  (Normally the byte codes will also be reloaded and the HTML file reread though Netscape has a problem with this.)
      */
-    Browser.start
-    Workflow.start
-    Server.start
-    Layout.start
 
+    session.webpage.connect (this)
 
-    try {
-      Browser.init(this, getParameter("js_context"))
-      println("Connecting to web browser..")
-    } catch {
-      case e: Exception =>
-        println("Looking like we are not running in a web browser context..")
-        Server ! 'open -> new java.net.URL(
-          "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+    println("session start")
+    session start
 
-        )
-    }
+    if (!(session.webpage.connected)) session.server ! 'open -> new java.net.URL(
+          //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+    )
   }
 
   var doZoom: Symbol = 'none
@@ -171,11 +165,11 @@ class Main extends TApplet with Client {
   override def draw(): Unit = {
 
     // send some values
-    Server ! "frameRate" -> frameRate.toInt
-    Server ! "camera.zoom" -> getZoom
+    session.server ! "frameRate" -> frameRate.toInt
+    session.server ! "camera.zoom" -> getZoom
 
-    val g = Pipeline.output
-    //println("Main: Pipeline.output.nbNodes: "+Pipeline.output.nbNodes)
+    val g = session.pipeline.output
+    //println("Main: pipeline.output.nbNodes: "+pipeline.output.nbNodes)
     val debug = getIfPossible[Boolean]("debug")
     val selectionRadius = getIfPossible[Double]("selectionRadius")
     if (g.pause) smooth else if (nbVisibleEdges < 600) smooth else noSmooth
@@ -231,7 +225,7 @@ class Main extends TApplet with Client {
 
 
       case "GEXF" =>
-        Server ! ("export", "GEXF")
+        session.server ! ("export", "GEXF")
 
       case any =>
     }
@@ -492,7 +486,7 @@ class Main extends TApplet with Client {
           // we can show the label if we are selected, or if we do not collide with a bigger one
           if ((!weHaveACollision) || g.highlighted(i)) {
             text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
-            Pipeline.setOutput(g.set(i, "showLabel", true))
+            session.pipeline.setOutput(g.set(i, "showLabel", true))
           }
       }
     } else {
@@ -537,8 +531,8 @@ class Main extends TApplet with Client {
   override def zoomUpdated(value: Double) {
     //println("zoomUpdated("+value+")")
     resetIdle
-    Server ! "camera.zoom" -> value
-    Server ! "window" -> (width, height)
+    session.server ! "camera.zoom" -> value
+    session.server ! "window" -> (width, height)
   }
 
   /**
@@ -548,8 +542,8 @@ class Main extends TApplet with Client {
   override def positionUpdated(value: (Double, Double)) {
     //println("positionUpdated("+value+")")
     resetIdle
-    Server ! "camera.position" -> value
-    Server ! "window" -> (width, height)
+    session.server ! "camera.position" -> value
+    session.server ! "window" -> (width, height)
   }
 
   override def mouseUpdated(kind: Symbol,
@@ -558,8 +552,8 @@ class Main extends TApplet with Client {
                             position: (Double, Double)) {
     //println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
     resetIdle
-    Server ! ("camera.mouse", kind, side, count, position)
-    Server ! "window" -> (width, height)
+    session.server ! ("camera.mouse", kind, side, count, position)
+    session.server ! "window" -> (width, height)
   }
 
   /**
@@ -569,28 +563,28 @@ class Main extends TApplet with Client {
    */
   override def keyPressed() {
     resetIdle
-    Server ! "window" -> (width, height)
+    session.server ! "window" -> (width, height)
     key match {
-      case 'a' => Server ! "pause" -> 'toggle
+      case 'a' => session.server ! "pause" -> 'toggle
 
-      case 'n' => Server ! "drawing.nodes" -> 'toggle
-      case 'l' => Server ! "drawing.edges" -> 'toggle
+      case 'n' => session.server ! "drawing.nodes" -> 'toggle
+      case 'l' => session.server ! "drawing.edges" -> 'toggle
 
       case 'x' => export = "GEXF"
       case 'f' => export = "PDF"
       case 'g' => export = "PNG"
 
-      case 'c' => Server ! "filter.node.category" -> 'toggle
-      case 'v' => Server ! "filter.view" -> 'toggle
+      case 'c' => session.server ! "filter.node.category" -> 'toggle
+      case 'v' => session.server ! "filter.view" -> 'toggle
 
-      case 'r' => Server ! "camera.target" -> "all"
-      case 's' => Server ! "camera.target" -> "selection"
-      case 'h' => Server ! "camera.target" -> "none"
-      case 'u' => Server ! "select" -> ""
+      case 'r' => session.server ! "camera.target" -> "all"
+      case 's' => session.server ! "camera.target" -> "selection"
+      case 'h' => session.server ! "camera.target" -> "none"
+      case 'u' => session.server ! "select" -> ""
       case 'q' => quick = !quick
 
       case 'd' =>
-        Server ! "debug" -> 'toggle
+        session.server ! "debug" -> 'toggle
 
       case 'p' =>
         doZoom = 'in
@@ -620,26 +614,26 @@ class Main extends TApplet with Client {
   def jsKeyPressed(key: String) {
     resetIdle
     key match {
-      case "a" => Server ! "pause" -> 'toggle
+      case "a" => session.server ! "pause" -> 'toggle
 
-      case "n" => Server ! "drawing.nodes" -> 'toggle
-      case "l" => Server ! "drawing.edges" -> 'toggle
+      case "n" => session.server ! "drawing.nodes" -> 'toggle
+      case "l" => session.server ! "drawing.edges" -> 'toggle
 
       case "x" => export = "GEXF"
       case "f" => export = "PDF"
       case "g" => export = "PNG"
 
-      case "c" => Server ! "filter.node.category" -> 'toggle
-      case "v" => Server ! "filter.view" -> 'toggle
+      case "c" => session.server ! "filter.node.category" -> 'toggle
+      case "v" => session.server ! "filter.view" -> 'toggle
 
-      case "r" => Server ! "camera.target" -> "all"
-      case "s" => Server ! "camera.target" -> "selection"
-      case "h" => Server ! "camera.target" -> "none"
-      case "u" => Server ! "select" -> ""
+      case "r" => session.server ! "camera.target" -> "all"
+      case "s" => session.server ! "camera.target" -> "selection"
+      case "h" => session.server ! "camera.target" -> "none"
+      case "u" => session.server ! "select" -> ""
       case "q" => quick = !quick
 
       case "d" =>
-        Server ! "debug" -> 'toggle
+        session.server ! "debug" -> 'toggle
 
       case "p" =>
         doZoom = 'in
@@ -678,14 +672,8 @@ class Main extends TApplet with Client {
 
   override def destroy() {
     println("Main.scala: sending exit signal to Server")
-    Server !? 'exit
+    session.close
 
-    println("Main.scala: sending exit to Browser, Layout and Workflow")
-    Browser !? 'exit
-    Layout !? 'exit
-    Workflow !? 'exit
-
-    Thread.sleep(2000)
     println("Main.scala: calling super.destroy()")
     super.destroy()
   }

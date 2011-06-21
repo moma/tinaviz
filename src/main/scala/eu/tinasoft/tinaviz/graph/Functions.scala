@@ -109,14 +109,15 @@ object Functions  {
   */
 
    // position in the model
-  def modelPosition(g:Graph,p:(Int,Int)) : (Double,Double) = modelPosition(g,p._1,p._2)
+  /*def modelPosition(g:Graph,p:(Int,Int)) : (Double,Double) = modelPosition(g,p._1,p._2)
   def modelPosition(g:Graph,x:Int,y:Int) : (Double,Double) = modelPosition(g,x,y)
-
+  */
+  /*
   def modelPosition(g:Graph, p:(Double,Double)) : (Double,Double) = modelPosition(g,p._1,p._2)
   def modelPosition(g:Graph, x:Double,y:Double) : (Double,Double) = (
     (x.toDouble / g.cameraZoom) - g.cameraPosition._1,
     (y.toDouble / g.cameraZoom) - g.cameraPosition._2)
-
+    */
   /**
    * Get the size to the screen
    */

@@ -17,11 +17,11 @@ import tinaviz.util.Maths
 import tinaviz.graph._
 import tinaviz.pipeline.Pipeline
 import actors.threadpool.AbstractCollection
+import eu.tinasoft.tinaviz.Session
 
 import scala.Math
 
-object
-PhysicLayout {
+class PhysicLayout (val session:Session) {
   val ps = new ParticleSystem(0f, 0.1f)
   //ps.setIntegrator( ParticleSystem.MODIFIED_EULER )
   //ps.setGravity( 1.3f )
@@ -64,7 +64,7 @@ PhysicLayout {
   def tinaforce(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
 
-    val h = Pipeline.categoryCache
+    val h = session.pipeline.categoryCache
 
     val GRAVITY = 200 // 200    g.get[Double]("layout.gravity") // stronger means faster!
     val REPULSION = 900 // 800    should be divided by the nb of edges? faster at the beggining, then slower?
@@ -212,7 +212,7 @@ PhysicLayout {
   def phyloforce(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
 
-    val h = Pipeline.categoryCache
+    val h = session.pipeline.categoryCache
 
     val GRAVITY = 200 // 200    g.get[Double]("layout.gravity") // stronger means faster!
     val REPULSION = 1800 // 800    should be divided by the nb of edges? faster at the beggining, then slower?

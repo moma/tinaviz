@@ -24,10 +24,8 @@ package eu.tinasoft.tinaviz.pipeline
 
 import eu.tinasoft._
 import tinaviz.graph._
-import tinaviz.Main
-import tinaviz.Server
 import tinaviz.io.json.Json
-import tinaviz.io.Browser
+import tinaviz.io.Webpage
 import tinaviz.io.GEXF
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
@@ -38,11 +36,12 @@ import actors.Actor._
 
 import compat.Platform
 import com.lowagie.text.pdf.codec.Base64.OutputStream
+import tinaviz.{Session, Main, Server}
 
 /**
  *
  */
-object Workflow extends Actor {
+class Workflow (val session:Session) extends Actor {
 
   def act() {
 
@@ -57,28 +56,28 @@ object Workflow extends Actor {
         case ('setLayout,g:Graph) =>
           //println("Workflow: setLayout("+g.nbNodes+")")
           // do some kin of "morphing" by merging latest computed coordinates inside the current Input graph
-          Pipeline.setOutput(
-            Pipeline.output.updatePositionWithCategory(
+          pipeline.setOutput(
+            pipeline.output.updatePositionWithCategory(
               g
             )
           )
         case 'getLayout =>
-          //println("Workflow: getLayout ("+Pipeline.output.nbNodes+")")
-          reply(Pipeline.output)
+          //println("Workflow: getLayout ("+pipeline.output.nbNodes+")")
+          reply(pipeline.output)
 
         case 'graphImported =>
               println("Workflow: graphImported.. warming filters up")
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.input))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
+              pipeline.setCategoryCache(Filters.weightToSize(pipeline.input))
+              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
+              pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
+              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged)
         case ('getNodeAttributes, uuid: String) =>
           println("Workflow: asked for 'getNodeAttributes (on INPUT GRAPH) of " + uuid)
-          reply(Pipeline.input.lessAttributes(uuid))
+          reply(pipeline.input.lessAttributes(uuid))
 
         case ('getNeighbourhood, view: String, todoList: List[String]) =>
-          val in = Pipeline.input
-          val out = Pipeline.output
+          val in = pipeline.input
+          val out = pipeline.output
           val container = (view match {
             case "meso" => out
             case any => in
@@ -90,11 +89,11 @@ object Workflow extends Actor {
 
 
           //System.out.println("calling callback with this data: " + (nodeList, neighbourList))
-          Browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
+          browser ! "_callbackGetNeighbourhood" -> (nodeList, neighbourList)
 
         case ('getNeighbourhood, view: String, "selection") =>
-          val in = Pipeline.input
-          val out = Pipeline.output
+          val in = pipeline.input
+          val out = pipeline.output
           val container = (view match {
             case "meso" => {
               //println("taking the current (bad) neighbourhood graph")
@@ -116,8 +115,8 @@ object Workflow extends Actor {
 
         case ('getNodes, view: String, category: String) =>
         //println("Server: asked for 'getNodes " + view + " " + category)
-          val in = Pipeline.input
-          val out = Pipeline.output
+          val in = pipeline.input
+          val out = pipeline.output
           val all = (view match {
             case "meso" => out
             case any => in
@@ -133,10 +132,10 @@ object Workflow extends Actor {
 
         case ("select", uuidList: List[String]) =>
          // println("selecting nodes: '" + uuidList + "'")
-          val in = Pipeline.input
-          val out = Pipeline.output
+          val in = pipeline.input
+          val out = pipeline.output
           val out2 = if (uuidList.size == 0) {
-              Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
               in.clearSelection
               out.clearSelection
           } else {
@@ -152,15 +151,15 @@ object Workflow extends Actor {
                   res
               })
           }
-          Pipeline.setOutput(out2.callbackSelectionChanged)
-          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
+          pipeline.setOutput(out2.callbackSelectionChanged)
+          Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
           self ! "filter.view" -> in.currentView
 
         case ("select", uuid: String) =>
-          val in = Pipeline.input
-          val out = Pipeline.output
+          val in = pipeline.input
+          val out = pipeline.output
           val out2 = if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
-              Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
               in.clearSelection
               out.clearSelection
             } else {
@@ -170,22 +169,22 @@ object Workflow extends Actor {
                   res
               })
             }
-          Pipeline.setOutput(out2.callbackSelectionChanged)
-          //println("calling Pipeline.output.updateSelectedWithCategory( g )")
-          /*Pipeline.output.updateSelectedWithCategory(
+          pipeline.setOutput(out2.callbackSelectionChanged)
+          //println("calling pipeline.output.updateSelectedWithCategory( g )")
+          /*pipeline.output.updateSelectedWithCategory(
               out2
           ) */
           //println("out2.selection.size: " + out2.selection.size)
-          // println("Pipeline.output.size: " + Pipeline.output.size)
-          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
-          //self ! "filter.view" -> Pipeline.input.currentView
+          // println("pipeline.output.size: " + pipeline.output.size)
+          Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
+          //self ! "filter.view" -> pipeline.input.currentView
 
         case ("selectByPattern", pattern: String) =>
-          val in = Pipeline.input
-          val out = Pipeline.output
-          Pipeline.setOutput(
+          val in = pipeline.input
+          val out = pipeline.output
+          pipeline.setOutput(
             (if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
-              Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
              in.clearSelection
               out.clearSelection
             } else {
@@ -194,17 +193,17 @@ object Workflow extends Actor {
               })
             }).callbackSelectionChanged
           )
-          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
-          self ! "filter.view" -> Pipeline.input.currentView
+          Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
+          self ! "filter.view" -> pipeline.input.currentView
 
           /** Search and select a node depending on it's neighbour label match **/
         case ("selectByNeighbourPattern", pattern: String, category:String) =>
-          val ref = Pipeline.input
-          val out = Pipeline.output
+          val ref = pipeline.input
+          val out = pipeline.output
           println("selectByNeighbourPattern("+pattern+", "+category+")")
-          Pipeline.setOutput(
+          pipeline.setOutput(
             (if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
-              Pipeline.setCategoryCache(Pipeline.categoryCache.clearSelection)
+              pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
               ref.clearSelection
               out.clearSelection
             } else {
@@ -225,20 +224,20 @@ object Workflow extends Actor {
               })
             }).callbackSelectionChanged
           )
-          Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, "left")
-          self ! "filter.view" -> Pipeline.input.currentView
+          Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, "left")
+          self ! "filter.view" -> pipeline.input.currentView
 
         case ("highlightByPattern", pattern: String) =>
-          val in = Pipeline.input
-          val out = Pipeline.output
-          Pipeline.setOutput(out + ("highlighted" -> out.label.map {
+          val in = pipeline.input
+          val out = pipeline.output
+          pipeline.setOutput(out + ("highlighted" -> out.label.map {
             case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
           }))
-          //Browser ! "_callbackSelectionChanged" -> "left"
+          //Webpage ! "_callbackSelectionChanged" -> "left"
           self ! "filter.view" -> in.currentView // will automatically update the highlight section
 
         case ("camera.mouse", kind: Symbol, side: Symbol, count: Symbol, position: (Double, Double)) =>
-          val out = Pipeline.output
+          val out = pipeline.output
           val (cz,cp, sr) = (out.cameraZoom, out.cameraPosition, out.selectionRadius)
           def model2screen(p: (Double, Double)): (Int, Int) = (((p._1 + cp._1) * cz).toInt, ((p._2 + cp._2) * cz).toInt)
           def screen2model(p: (Double, Double)): (Double, Double) = ((p._1 - cp._1) / cz, (p._2 - cp._2) / cz)
@@ -256,7 +255,7 @@ object Workflow extends Actor {
                   if (ggg != before) changed = true
                   ggg
               }.toArray)
-              if (changed) Pipeline.setOutput(out2.callbackSelectionChanged)
+              if (changed) pipeline.setOutput(out2.callbackSelectionChanged)
 
             case 'Click =>
               //println("Click!")
@@ -287,8 +286,8 @@ object Workflow extends Actor {
                   }
               }.toArray)
               //println("selection count, before: "+out.selection.size+" after: "+out2.selection.size)
-              Pipeline.setOutput(out2.callbackSelectionChanged)
-              Browser ! "_callbackSelectionChanged" -> (Pipeline.output.selectionAttributes, side match {
+              pipeline.setOutput(out2.callbackSelectionChanged)
+              Browser ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, side match {
                 case 'Left => "left"
                 case 'Right => "right"
                 case any => "none"
@@ -310,7 +309,7 @@ object Workflow extends Actor {
 
             case 'Drag =>
             val pause = try {
-              Pipeline.input.pause
+              pipeline.input.pause
             } catch {
               case x => true
             }
@@ -322,13 +321,13 @@ object Workflow extends Actor {
           }
 
 
-        case ("export","GEXF") => (new GEXF) ! Pipeline.output
+        case ("export","GEXF") => (new GEXF) ! pipeline.output
         case x:scala.xml.Elem =>
           Browser ! 'forceDownload -> x.toString
          //  new ExportGraphDialog(x.toString)
 
         case (key: String, value: Any) =>
-           Pipeline.applyKey(key, value)
+           pipeline.applyKey(key, value)
    
            // WARNING actually caching is not really used (didn't have the time to debug it) so a straightforward
            // workflow is used instead. since it was that easy, I simply resetted the "categoryCache" when we unselect nodes
@@ -336,70 +335,70 @@ object Workflow extends Actor {
 
            // IDEA maybe, a better solution would be to define, for each "modifier", which kind of data is modified,
            // and operation is done
-           val out = Pipeline.output
+           val out = pipeline.output
            val output : Graph = null
            //var tmp = new Graph
            //var updateNeeded =
           key match {
             case "filter.view" =>
               println("Workflow: received msg: \""+key+"\"")
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input))callbackNodeCountChanged)
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
+              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
+              pipeline.setCategoryCache(Filters.weightToSize(Filters.category(pipeline.input))callbackNodeCountChanged)
+              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
+              pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
+              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.node.category" =>
               println("Workflow: received msg: \""+key+"\"")
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Filters.category(Pipeline.input)))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeAttributesChanged)
+              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
+              pipeline.setCategoryCache(Filters.weightToSize(Filters.category(pipeline.input)))
+              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
+              pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
+              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeAttributesChanged)
             case "filter.a.node.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
+              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
+              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
+              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
+              pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
+              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.a.edge.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackEdgeCountChanged)
+              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
+              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
+              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
+              pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
+              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackEdgeCountChanged)
             case "filter.b.node.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackNodeCountChanged)
+              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
+              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
+              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
+              pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
+              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.b.edge.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              Pipeline.setInput(Pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              Pipeline.setCategoryCache(Filters.weightToSize(Pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
-              Pipeline.setNodeWeightCache(Filters.nodeWeight2(Pipeline.categoryCache))
-              Pipeline.setEdgeWeightCache(Filters.edgeWeight(Pipeline.nodeWeightCache))
-              Pipeline.setOutput(Filters.clean(Filters.category(Pipeline.edgeWeightCache)).callbackEdgeCountChanged)
+              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
+              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
+              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
+              pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
+              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackEdgeCountChanged)
 
             case "filter.a.node.size" =>
               println("Workflow: received msg: \""+key+"\"")
-              Pipeline.setOutput (
-                Pipeline.output.updateSizeWithCategory (
+              pipeline.setOutput (
+                pipeline.output.updateSizeWithCategory (
                   Filters.weightToSize (
-                    Pipeline.categoryCache.callbackNodeAttributesChanged
+                    pipeline.categoryCache.callbackNodeAttributesChanged
                   )
                 )
               )
 
             case "filter.b.node.size" =>
               println("Workflow: received msg: \""+key+"\"")
-              Pipeline.setOutput (
-                Pipeline.output.updateSizeWithCategory (
+              pipeline.setOutput (
+                pipeline.output.updateSizeWithCategory (
                   Filters.weightToSize (
-                    Pipeline.categoryCache.callbackNodeAttributesChanged
+                    pipeline.categoryCache.callbackNodeAttributesChanged
                   )
                 )
               )

@@ -26,7 +26,7 @@ import actors._
 import Actor._
 import eu.tinasoft._
 import tinaviz.io.json.Json
-import tinaviz.io.Browser
+import tinaviz.io.Webpage
 
 trait Client {
   
@@ -245,7 +245,7 @@ trait Client {
         throw new Exception("couldn't find nodes from view: "+view+" and category: "+category)
     }
     println("TODO send the nodes "+nodes+" to the client")
-    //Browser ! "_callbackGetNodes" -> nodes
+    //Webpage ! "_callbackGetNodes" -> nodes
     nodes
   }
 }

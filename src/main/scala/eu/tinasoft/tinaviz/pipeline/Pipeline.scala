@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference
  * Grameda - Graph Memory Database
  * At first was a standard Scala Actor, but _fast_ wasn't __FAST__ enough
  */
-object Pipeline {
+class Pipeline {
 
   //var _revision = 0L
 
