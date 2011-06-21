@@ -85,7 +85,7 @@ object Functions  {
   /**
    * Are the given coordinate visible?
    */
-  /
+
   def isInvisible(g:Graph,p: (Int, Int)) = !isVisible(g,p)
 
   /**
@@ -93,32 +93,35 @@ object Functions  {
    * Thus we could use this function anywhere, if we have access to camera value
    */
 
+  /*
   def screenPosition(g:Graph,p: (Double, Double)): (Int, Int) = screenPosition(g,p._1, p._2)
 
+   */
 
   /**
    * TODO could be optimized, by using the reverse action (translate, zoom)
    * Thus we could use this function anywhere, if we have access to camera value
    */
 
+   /*
   def screenPosition(g:Graph,x: Double, y: Double): (Int, Int) = (screenX(x.toFloat, y.toFloat).toInt,
                                                           screenY(x.toFloat, y.toFloat).toInt)
-
+  */
 
    // position in the model
   def modelPosition(g:Graph,p:(Int,Int)) : (Double,Double) = modelPosition(g,p._1,p._2)
-  def modelPosition(g:Graph,x:Int,y:Int) : (Double,Double) = modelPosition(g = x,y)
+  def modelPosition(g:Graph,x:Int,y:Int) : (Double,Double) = modelPosition(g,x,y)
 
   def modelPosition(g:Graph, p:(Double,Double)) : (Double,Double) = modelPosition(g,p._1,p._2)
-  def modelPosition(g:Graph, :Double,y:Double) : (Double,Double) = (
+  def modelPosition(g:Graph, x:Double,y:Double) : (Double,Double) = (
     (x.toDouble / g.cameraZoom) - g.cameraPosition._1,
     (y.toDouble / g.cameraZoom) - g.cameraPosition._2)
 
   /**
    * Get the size to the screen
    */
-  /
-  def screenSize(s: Double): Int = {
+
+  def screenSize(g: Graph, s: Double): Int = {
     (s * g.cameraZoom).toInt
   }
 

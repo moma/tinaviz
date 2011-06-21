@@ -20,7 +20,8 @@ import actors.threadpool.AbstractCollection
 
 import scala.Math
 
-object PhysicLayout {
+object
+PhysicLayout {
   val ps = new ParticleSystem(0f, 0.1f)
   //ps.setIntegrator( ParticleSystem.MODIFIED_EULER )
   //ps.setGravity( 1.3f )
@@ -135,9 +136,15 @@ object PhysicLayout {
                     Maths.map(w, minMaxInterval, (0.02, 0.05)).toFloat,
                     //STRENGTH.toFloat,
                     DAMPING.toFloat,
+
+
+                    // map the link weight to the desired distance
                     (Maths.map(w, minMaxInterval, (0.0, 1.0)) match {
-                      case l => ((1.0 - l) * (distInterval._2 - distInterval._1)) + distInterval._1
-                    }).toFloat)
+                      case w => ((1.0 - w) * (distInterval._2 - distInterval._1)) + distInterval._1
+                    }).toFloat
+
+                  )
+
                 } else if (!g.hasAnyLink(i1, i2)) ps.makeAttraction(p1, p2, -REPULSION.toFloat, (g.size(i1) / 2.0).toFloat) // default -600   we repulse unrelated nodes
               }
           }

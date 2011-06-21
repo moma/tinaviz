@@ -39,10 +39,11 @@ import tinaviz.graph._
 import tinaviz.layout.Layout
 import math._
 
+/*
 import java.awt.Image
 import javax.imageio.ImageIO
 import java.net.URL
-import sun.jvm.hotspot.utilities.ProcImageClassLoader
+   */
 
 /**
  * The Main object
@@ -120,11 +121,15 @@ class Main extends TApplet with Client {
     setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
 
-       try {
-        logo = getParameter("logo") match {
-          case logo => loadImage( logo )
-        }
-       }
+    /*
+      logo = try {
+          getParameter("logo") match {
+            case logo => loadImage( logo )
+          }
+       } catch {
+            case e => new PImage()
+       } */
+
 
      //{
      // new PImage (ImageIO.read(new URL("http://hostname.com/image.gif")))
@@ -520,7 +525,7 @@ class Main extends TApplet with Client {
 
     showSelectionCircle(selectionRadius)
 
-    image(imag, 0, 0)
+    //image(imag, 0, 0)
   }
 
 
@@ -612,7 +617,7 @@ class Main extends TApplet with Client {
    * We use here the processing-provided "key" variable, which give us the key code
    *
    */
-  override def jsKeyPressed(key: String) {
+  def jsKeyPressed(key: String) {
     resetIdle
     key match {
       case "a" => Server ! "pause" -> 'toggle

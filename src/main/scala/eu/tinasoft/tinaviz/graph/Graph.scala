@@ -60,7 +60,7 @@ object Graph {
     "filter.view" -> "macro",
     "selectionRadius" -> 10.0,
     "pause" -> false,
-    "logo" -> new PImage(),
+    //"logo" -> new PImage(),
     "uuid" -> Array.empty[String],
     "label" -> Array.empty[String],
     "shortLabel" -> Array.empty[String],
@@ -170,9 +170,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val label = getArray[String]("label")
   lazy val shortLabel = getArray[String]("shortLabel")
   lazy val renderedLabel = getArray[String]("renderedLabel")
+  lazy val showLabel = getArray[Boolean]("showLabel")
   lazy val rate = getArray[Int]("rate")
   lazy val uuid = getArray[String]("uuid")
-  lazy val logo = get[PImage]("logo")
+  //lazy val logo = get[PImage]("logo")
 
   lazy val entropy = get[Double]("entropy")
   lazy val activity = get[Double]("activity")
@@ -191,7 +192,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val pause = get[Boolean]("pause")
   lazy val selectionRadius = get[Double]("selectionRadius")
 
-  lazy val showLabel = get[String]("showLabel")
   lazy val edgeType = get[String]("edge.type")
 
   // TODO should be precomputed!! OPTIMIZATION
