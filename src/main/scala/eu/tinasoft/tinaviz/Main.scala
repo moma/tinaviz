@@ -108,8 +108,8 @@ object Main extends TApplet with Client {
 class Main extends TApplet with Client {
 
    val session = new Session (this)
-   //setTAppletSession(session)  // hack for TApplet. TODO: put it in the TApplet's constructor
-  // setClientSession(session) // hack for client. TODO: put it in the Client's constructor
+   setTAppletSession(session)  // hack for TApplet. TODO: put it in the TApplet's constructor
+   setClientSession(session) // hack for client. TODO: put it in the Client's constructor
 
 
   override def setup(): Unit = {
@@ -435,7 +435,7 @@ class Main extends TApplet with Client {
 
 
 
-    if (false) {
+    if (math.random < 0.01) {
       sortedLabelIDs.foreach {
         case (i) =>
           val p1 = g.position(i)
