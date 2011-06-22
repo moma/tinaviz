@@ -37,6 +37,7 @@ import actors.Actor._
 import compat.Platform
 import com.lowagie.text.pdf.codec.Base64.OutputStream
 import tinaviz.{Session, Main, Server}
+import reflect.ValDef
 
 /**
  *
@@ -71,7 +72,8 @@ class Workflow (val session:Session) extends Actor {
              // println("Workflow: graphStream, after the callback: "+g.nbNodes+" nodes and "+g.nbEdges+" edges")
 
               pipeline.setInput(g.callbackNodeCountChangedNoViz) // need to compute stats (warning, will also compute some drawing..)
-             // println("Workflow: input, after the callback: "+pipeline.input.nbNodes+" nodes and "+pipeline.input.nbEdges+" edges")
+              val inputAfterCallbackNodeCountChangedNoViz = pipeline.input
+              println("Workflow: inputAfterCallbackNodeCountChangedNoViz: "+inputAfterCallbackNodeCountChangedNoViz.nbNodes+" nodes and "+inputAfterCallbackNodeCountChangedNoViz.nbEdges+" edges")
               pipeline.setCategoryCache(Filters.weightToSize(pipeline.input))
               //println("Workflow: categoryCache of "+pipeline.categoryCache.nbNodes+" nodes and "+pipeline.categoryCache.nbEdges+" edges")
               pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
@@ -81,8 +83,10 @@ class Workflow (val session:Session) extends Actor {
              // println("Workflow: Filters.category(pipeline.edgeWeightCache)) of "+(Filters.category(pipeline.edgeWeightCache)).nbNodes+" nodes and "+(Filters.category(pipeline.edgeWeightCache)).nbEdges+" edges\n")
              // pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged.updatePositionWithCategory(out))
              // println("Workflow: final output: "+pipeline.output.nbNodes+" nodes and "+pipeline.output.nbEdges+" edges\n")
+              val newOutput = Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged
+              println("Workflow: newOutput: "+newOutput.nbNodes+" nodes and "+newOutput.nbEdges+" edges")
           pipeline.setOutput(
-            Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged
+            newOutput
               .updatePositionWithCategory(pipeline.output)
           )
 
