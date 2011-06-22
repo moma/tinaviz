@@ -253,12 +253,12 @@ class GEXF (val session:Session) extends Actor {
 
       // send to the viz
       if (id==0) {
-        session.server ! (g, 'streamStart)
+        session.server ! g
       }
       ei = ei +1
-      if (ei >= 10) {
+      if (ei >= 100) {
         ei = 0
-        session.server ! (g, 'streamChunk)
+        session.server ! g
       }
     }
 
@@ -293,16 +293,17 @@ class GEXF (val session:Session) extends Actor {
            g += (node2id, "links", lnks(node2id) + (node1id -> weight))
       }
       ei = ei +1
-      if (ei >= 100) {
+      if (ei >= 500) {
         ei = 0
-        session.server ! (g, 'streamChunk)
+        session.server ! g
       }
     }
 
     val h = Graph.make(g.elements)//.normalizePositions
     val (centerX, centerY) = Metrics.basicCenter(h)
     println("center is: "+(centerX,centerY))
-    (h + ("position" -> (h.position map { case (x,y) => (x - centerX, y - centerY) })), 'streamEnd)
+    session.server ! (h + ("position" -> (h.position map { case (x,y) => (x - centerX, y - centerY) })))
+    'graphImported
   }
 
 

@@ -277,7 +277,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val window = get[(Int, Int)]("window")
 
   def callbackNodeAttributesChanged = {
-    println("executing callbackNodeAttributesChanged")
+    println("  callbackNodeAttributesChanged")
     var g = this
 
     val nodeWeightExtremums = Metrics nodeWeightExtremums g
@@ -296,9 +296,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("labelColor" -> Drawing.labelColor(g))
     g
   }
-
-  def callbackGraphChanged = {
-    println("executing callback GRAPH changed")
+  def callbackNodeAttributesChangedNoViz = {
+    println("  callbackNodeAttributesChangedNoViz")
     var g = this
 
     val nodeWeightExtremums = Metrics nodeWeightExtremums g
@@ -307,11 +306,78 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("minBNodeWeight" -> nodeWeightExtremums._3)
     g = g + ("maxBNodeWeight" -> nodeWeightExtremums._4)
 
-    g = g.callbackNodeCountChanged
+    g
+  }
+
+  def callbackNodeCountChangedNoViz = {
+    println("  callbackNodeCountChangedNoViz")
+    var g = this
+    g = g + ("nbNodes" -> (Metrics nbNodes g))
+
+    val nodeWeightExtremums = Metrics nodeWeightExtremums g
+    g = g + ("minANodeWeight" -> nodeWeightExtremums._1)
+    g = g + ("maxANodeWeight" -> nodeWeightExtremums._2)
+    g = g + ("minBNodeWeight" -> nodeWeightExtremums._3)
+    g = g + ("maxBNodeWeight" -> nodeWeightExtremums._4)
+
+    val extremums = Metrics extremums g
+    g = g ++ Map[String,Any]("xMax" -> extremums._1, "xMin" -> extremums._2,
+                             "yMax" -> extremums._3, "yMin" -> extremums._4)
+
+    val extremumsSelection = Metrics extremumsSelection g
+    g = g ++ Map[String,Any]("xMaxSelection" -> extremumsSelection._1, "xMinSelection" -> extremumsSelection._2,
+                             "yMaxSelection" -> extremumsSelection._3, "yMinSelection" -> extremumsSelection._4)
+
+    g = g + ("baryCenter" -> Metrics.baryCenter(g))
+    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+
+    g = g.callbackNodeAttributesChangedNoViz
+    g = g.callbackEdgeCountChangedNoViz
+    g
+  }
+    def callbackEdgeCountChangedNoViz = {
+    println("  callbackEdgeCountChangedNoViz")
+    var g = this
+    g = g + ("nbEdges" -> Metrics.nbEdges(g))
+    g = g + ("outDegree" -> Metrics.outDegree(g))
+    g = g + ("inDegree" -> Metrics.inDegree(g))
+    g = g + ("degree" -> Metrics.degree(g))
+    g = g + ("nbSingles" -> Metrics.nbSingles(g))
+
+    val edgeWeightExtremums = Metrics edgeWeightExtremums g
+    g = g + ("minAEdgeWeight" -> edgeWeightExtremums._1)
+    g = g + ("maxAEdgeWeight" -> edgeWeightExtremums._2)
+    g = g + ("minBEdgeWeight" -> edgeWeightExtremums._3)
+    g = g + ("maxBEdgeWeight" -> edgeWeightExtremums._4)
+
+    val outDegreeExtremums = Metrics outDegreeExtremums g
+    g = g + ("minOutDegree" -> outDegreeExtremums._1)
+    g = g + ("maxOutDegree" -> outDegreeExtremums._2)
+
+    val inDegreeExtremums = Metrics inDegreeExtremums g
+    g = g + ("minInDegree" -> inDegreeExtremums._1)
+    g = g + ("maxInDegree" -> inDegreeExtremums._2)
+
+    g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
+    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
+    g = g + ("singlesCenter" -> Metrics.singlesCenter(g))
+    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
+
+    val extremumsSelectionNeighbourhood = Metrics extremumsSelectionNeighbourhood g
+    g = g + ("xMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._1)
+    g = g + ("xMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._2)
+    g = g + ("yMaxSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._3)
+    g = g + ("yMinSelectionNeighbourhood" -> extremumsSelectionNeighbourhood._4)
+
+    g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
+
+    g = g + ("edgeIndex" -> Drawing.edgeIndex(g))
+    g = g + ("edgeWeight" -> Drawing.edgeWeight(g))
+
     g
   }
   def callbackSelectionChanged = {
-    println("Executing callback SELECTION changed")
+    println("  callbackSelectionChanged")
     var g = this
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
     g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
@@ -339,9 +405,17 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g
   }
   def callbackNodeCountChanged = {
-    println("Executing callback NODE COUNT changed")
+    println("  callbackNodeCountChanged")
     var g = this
-    g = g + ("nbNodes" -> Metrics.nbNodes(g))
+    println("    A BEFORE NBNODES===> "+g.nbNodes)
+    g = g + ("nbNodes" -> (Metrics nbNodes g))
+    println("    A AFTER NBNODES===> "+g.nbNodes)
+
+    val nodeWeightExtremums = Metrics nodeWeightExtremums g
+    g = g + ("minANodeWeight" -> nodeWeightExtremums._1)
+    g = g + ("maxANodeWeight" -> nodeWeightExtremums._2)
+    g = g + ("minBNodeWeight" -> nodeWeightExtremums._3)
+    g = g + ("maxBNodeWeight" -> nodeWeightExtremums._4)
 
     val extremums = Metrics extremums g
     g = g ++ Map[String,Any]("xMax" -> extremums._1, "xMin" -> extremums._2,
@@ -355,9 +429,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
 
     g = g.callbackNodeAttributesChanged
-
+    println("    B NBNODES===> "+g.nbNodes)
     g = g.callbackEdgeCountChanged
-
+    println("    C NBNODES===> "+g.nbNodes)
     g
   }
 
