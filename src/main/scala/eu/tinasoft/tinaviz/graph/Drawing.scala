@@ -176,7 +176,13 @@ object Drawing {
     case any => 'Square
   }
 
-  def renderedLabel (g:Graph) = g.ids.map {
-    case i => if (g.selected(i) || g.highlighted(i)) g.shortLabel(i) else g.label(i)
-  }
+  def labelColor (g:Graph) : Array[Color] = (g.selected.zipWithIndex.map {
+    case (selected,i) =>
+       new Color(0.0, 1.0, 0.0).alpha( if (selected ||g.highlighted(i)) 1.0 else 0.8)
+  }).toArray
+
+  def renderedLabel (g:Graph) : Array[String] = ((g.selected).zip(g.highlighted).zip(g.label).zip(g.shortLabel).map {
+    case d =>
+     // if (g.selected(i) || g.highlighted(i)) g.shortLabel(i) else label
+  }).toArray
 }

@@ -65,6 +65,7 @@ object Graph {
     "label" -> Array.empty[String],
     "shortLabel" -> Array.empty[String],
     "renderedLabel" -> Array.empty[String],
+    "showLabel" -> Array.empty[Boolean],
     "color" -> Array.empty[Color],
     "selected" -> Array.empty[Boolean],
     "highlighted" -> Array.empty[Boolean],
@@ -131,8 +132,7 @@ object Graph {
     "edgeIndex" -> Array.empty[(Int, Int)],
     "edgeWeight" -> Array.empty[Double],
     "edgeSize" -> Array.empty[Double],
-    "edgeColor" -> Array.empty[Color],
-    "showLabel" -> Array.empty[Boolean]
+    "edgeColor" -> Array.empty[Color]
   )
 }
 

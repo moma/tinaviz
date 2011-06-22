@@ -693,7 +693,7 @@ class Main extends TApplet with Client {
         //println("error")             || g.currentView.equalsIgnoreCase("macro")
         return
     }
-    println("g.cameraTarget: " + g.cameraTarget)
+    //println("g.cameraTarget: " + g.cameraTarget)
     //if (Maths.random < 0.9) {
     val (w, h) = (width.toDouble * 0.85, height.toDouble * 0.85) // 15% of margins
 
