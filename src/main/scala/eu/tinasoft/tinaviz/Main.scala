@@ -435,7 +435,7 @@ class Main extends TApplet with Client {
 
 
 
-    if (math.random < 0.01) {
+    if (math.random < 0.1) {
       sortedLabelIDs.foreach {
         case (i) =>
           val p1 = g.position(i)
@@ -478,12 +478,7 @@ class Main extends TApplet with Client {
               }
           }
           setFontSize((r1 * getZoom).toInt, b1)
-          val col = if (weAreSelected) {
-            new Color(0.0, 1.0, 0.0).alpha(1.0)
-          } else {
-            new Color(0.0, 1.0, 0.0).alpha(0.8)
-          }
-          setColor(col)
+          setColor(g.labelColor(i))
           // we can show the label if we are selected, or if we do not collide with a bigger one
           if ((!weHaveACollision) || g.highlighted(i)) {
             text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
@@ -504,6 +499,7 @@ class Main extends TApplet with Client {
             val b1 = (g.selected(i) || g.highlighted(i)) // F1 the text should be bold if node selected or highlighted
             val l1 = g.renderedLabel(i)
             val h1 = setFontSize((r1 * getZoom).toInt, b1)
+            setColor(g.labelColor(i))
             text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
 
           }

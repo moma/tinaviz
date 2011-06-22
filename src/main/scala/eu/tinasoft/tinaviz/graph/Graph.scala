@@ -66,6 +66,7 @@ object Graph {
     "shortLabel" -> Array.empty[String],
     "renderedLabel" -> Array.empty[String],
     "showLabel" -> Array.empty[Boolean],
+    "labelColor" -> Array.empty[Color],
     "color" -> Array.empty[Color],
     "selected" -> Array.empty[Boolean],
     "highlighted" -> Array.empty[Boolean],
@@ -168,6 +169,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val saveStatus = getArray[Symbol]("saveStatus")
   // saving, saved
   lazy val label = getArray[String]("label")
+  lazy val labelColor = getArray[Color]("labelColor")
   lazy val shortLabel = getArray[String]("shortLabel")
   lazy val renderedLabel = getArray[String]("renderedLabel")
   lazy val showLabel = getArray[Boolean]("showLabel")
@@ -288,11 +290,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("nodeBorderColor" -> Drawing.nodeBorderColor(g))
     g = g + ("nodeShape" -> Drawing.nodeShape(g))
 
+     // depend on the selection
+    println("Updating rendered label and label color")
+    g = g + ("renderedLabel" -> Drawing.renderedLabel(g))
+    g = g + ("labelColor" -> Drawing.labelColor(g))
     g
   }
 
   def callbackGraphChanged = {
-    println("executing callbackGraphChanged")
+    println("executing callback GRAPH changed")
     var g = this
 
     val nodeWeightExtremums = Metrics nodeWeightExtremums g
@@ -304,7 +310,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g
   }
   def callbackSelectionChanged = {
-    println("Executing callbackSelectionChanged")
+    println("Executing callback SELECTION changed")
     var g = this
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
     g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
@@ -325,11 +331,14 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("edgeSize" -> Drawing.edgeSize(g))
     g = g + ("edgeColor" -> Drawing.edgeColor(g))
 
+    // depend on the selection
+    println("Updating rendered label and label color")
     g = g + ("renderedLabel" -> Drawing.renderedLabel(g))
+    g = g + ("labelColor" -> Drawing.labelColor(g))
     g
   }
   def callbackNodeCountChanged = {
-    println("Executing callbackNodeCountChanged")
+    println("Executing callback NODE COUNT changed")
     var g = this
     g = g + ("nbNodes" -> Metrics.nbNodes(g))
 
@@ -352,7 +361,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   def callbackEdgeCountChanged = {
-    println("executing callbackEdgeCountChanged")
+    println("executing callback EDGE COUNT changed")
     var g = this
     g = g + ("nbEdges" -> Metrics.nbEdges(g))
     g = g + ("outDegree" -> Metrics.outDegree(g))
