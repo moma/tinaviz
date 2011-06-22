@@ -349,13 +349,13 @@ class Workflow (val session:Session) extends Actor {
               pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
               pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
               pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged)
-            case "filter.node.category" =>
+            case "filter.node.category" => // might impact the filters!
               println("Workflow: received msg: \""+key+"\"")
               pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
               pipeline.setCategoryCache(Filters.weightToSize(Filters.category(pipeline.input)))
               pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
               pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
-              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeAttributesChanged)
+              pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged)
             case "filter.a.node.weight" =>
               println("Workflow: received msg: \""+key+"\"")
               pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
