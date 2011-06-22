@@ -307,6 +307,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("minBNodeWeight" -> nodeWeightExtremums._3)
     g = g + ("maxBNodeWeight" -> nodeWeightExtremums._4)
 
+    g = g.callbackNodeCountChanged
     g
   }
   def callbackSelectionChanged = {

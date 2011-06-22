@@ -23,7 +23,7 @@
 package eu.tinasoft.tinaviz.io
 
 import eu.tinasoft._
-
+import tinaviz.Session
 import tinaviz.graph._
 import tinaviz.util.Color
 import tinaviz.util.Color._
@@ -42,7 +42,7 @@ import java.net.{URLConnection, URL, Authenticator, PasswordAuthentication}
 import java.util.zip.GZIPInputStream
 import java.io.BufferedInputStream
 
-class GEXF extends Actor {
+class GEXF (val session:Session) extends Actor {
 
    start
 
@@ -183,6 +183,7 @@ class GEXF extends Actor {
         })
 
     }
+    var ei = 0
     var g = new Graph( defaultProperties )
     var id = -1
     for (n <- (root \\ "node")) {
@@ -249,10 +250,20 @@ class GEXF extends Actor {
       g += (id, "content", g.content(id).replaceAll("\"","&quot;").replaceAll("'", "&#39;"))
       //println("added size "+g.getArray[Double]("weight")(id))
       g += (id, "keywords", keywords.toList.toArray)
+
+      // send to the viz
+      if (id==0) {
+        session.server ! (g, 'streamStart)
+      }
+      ei = ei +1
+      if (ei >= 10) {
+        ei = 0
+        session.server ! (g, 'streamChunk)
+      }
     }
 
 
-
+    ei = 0
     for (e <- (root \\ "edge")) {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
@@ -281,12 +292,17 @@ class GEXF extends Actor {
         if (undirected)
            g += (node2id, "links", lnks(node2id) + (node1id -> weight))
       }
+      ei = ei +1
+      if (ei >= 100) {
+        ei = 0
+        session.server ! (g, 'streamChunk)
+      }
     }
 
     val h = Graph.make(g.elements)//.normalizePositions
     val (centerX, centerY) = Metrics.basicCenter(h)
     println("center is: "+(centerX,centerY))
-    h + ("position" -> (h.position map { case (x,y) => (x - centerX, y - centerY) }))
+    (h + ("position" -> (h.position map { case (x,y) => (x - centerX, y - centerY) })), 'streamEnd)
   }
 
 

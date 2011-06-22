@@ -67,12 +67,16 @@ class Workflow (val session:Session) extends Actor {
           //println("Workflow: getLayout ("+pipeline.output.nbNodes+")")
           reply(pipeline.output)
 
-        case 'graphImported =>
-              println("Workflow: graphImported.. warming filters up")
-              pipeline.setCategoryCache(Filters.weightToSize(pipeline.input))
+        case ('graphStream,g:Graph) =>
+              println("Workflow: graphStream.. warming filters up")
+              val out = pipeline.output
+              pipeline.setInput(g.updatePositionWithCategory(out).updateSelectedWithCategory(out))
+              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
               pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
               pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
               pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged)
+
+
         case ('getNodeAttributes, uuid: String) =>
           println("Workflow: asked for 'getNodeAttributes (on INPUT GRAPH) of " + uuid)
           reply(pipeline.input.lessAttributes(uuid))
@@ -323,7 +327,7 @@ class Workflow (val session:Session) extends Actor {
           }
 
 
-        case ("export","GEXF") => (new GEXF) ! pipeline.output
+        case ("export","GEXF") => (new GEXF(session)) ! pipeline.output
         case x:scala.xml.Elem =>
           session.webpage ! 'forceDownload -> x.toString
          //  new ExportGraphDialog(x.toString)

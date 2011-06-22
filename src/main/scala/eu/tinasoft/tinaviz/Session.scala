@@ -19,8 +19,8 @@ class Session (val applet:Applet) {
 
   def start = services.foreach( _.start )
   def close = {
-    services.foreach( _ ! 'exit )
-    Thread.sleep(2000)
+    services.foreach( _ !? 'exit )
+    // Thread.sleep(2000)
   }
 
 }

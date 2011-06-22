@@ -32,6 +32,7 @@ import tinaviz.layout._
 
 import actors._
 import Actor._
+import xml.dtd.ValidationException
 
 case class Step(val step: Symbol)
 
@@ -87,18 +88,21 @@ class Server (val session:Session) extends Actor {
         case 'exit =>
           println("Server: calling exit() on myself")
           exit()
-
-        case g: Graph =>
+        case (g: Graph, 'streamStart) =>
           properties = defaultProperties
           val in = new Graph(properties ++ g.elements).callbackGraphChanged // brand new graph!  maybe the callback is too much
-
           properties += "input" -> in
           session.pipeline.setInput(in)
-          session.workflow ! 'graphImported
-          session.webpage ! "_graphImportedCallback" -> "success"
+
+        case (g: Graph, any:String) =>
+          val in = g.callbackGraphChanged // compute stats
+          properties += "input" -> in
+          session.workflow ! ('graphStream, in)
+          if (any=='streamEnd)
+            session.webpage ! "_graphImportedCallback" -> "success"
 
         case ("export","GEXF") =>  session.workflow ! ("export","GEXF")
-        case ('open, pathOrURL: Any) =>  (new GEXF) ! (pathOrURL, properties)
+        case ('open, pathOrURL: Any) =>  (new GEXF(session)) ! (pathOrURL, properties)
 
         case ("select", toBeSelected)        => session.workflow ! "select"              -> toBeSelected
         case ("selectByPattern", pattern)    => session.workflow ! "selectByPattern"     -> pattern
