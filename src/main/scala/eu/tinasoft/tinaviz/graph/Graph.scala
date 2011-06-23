@@ -56,8 +56,6 @@ object Graph {
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
     "debug" -> false,
-    "filter.node.category" -> "Document",
-    "filter.view" -> "macro",
     "selectionRadius" -> 10.0,
     "pause" -> false,
     //"logo" -> new PImage(),
@@ -85,6 +83,8 @@ object Graph {
     "camera.target" -> "all", //'all, 'none, or 'selection
     "window" -> (800,600),
     //"edge.type" -> "line",
+      "filter.node.category" -> "Document",
+    "filter.view" -> "macro",
     "filter.a.node.size" -> 0.2,
     "filter.a.node.weight" -> (0.0, 1.0),
     "filter.a.edge.weight" -> (0.0, 1.0),
@@ -407,9 +407,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   def callbackNodeCountChanged = {
     println("  callbackNodeCountChanged")
     var g = this
-    println("    A BEFORE NBNODES===> "+g.nbNodes)
+    println("    A BEFORE NBNODES g.uuid.size ===> "+g.uuid.size)
     g = g + ("nbNodes" -> (Metrics nbNodes g))
-    println("    A AFTER NBNODES===> "+g.nbNodes)
+    println("    A AFTER NBNODES g.uuid.size ===> "+g.uuid.size)
 
     val nodeWeightExtremums = Metrics nodeWeightExtremums g
     g = g + ("minANodeWeight" -> nodeWeightExtremums._1)

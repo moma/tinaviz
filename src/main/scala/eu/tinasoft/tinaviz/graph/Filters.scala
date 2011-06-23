@@ -34,7 +34,8 @@ object Filters {
       case "macro" =>
         g.category.zipWithIndex map {
           case (cat, i) =>
-            if (!g.currentCategory.equalsIgnoreCase(cat)) {
+            if (!category.equalsIgnoreCase(cat)) {
+              //println("removing "+g.label(i)+" because: "+category+".equalsIgnoreCase("+cat+") is FALSE!")
               removeMe += i
             }
         }
@@ -44,6 +45,7 @@ object Filters {
           case (f, i) => if (!f) {
               // remove the node which is not in our category
               if (!g.currentCategory.equalsIgnoreCase(g.category(i))) {
+                //println("removing "+g.label(i)+" because: !"+g.currentCategory+".equalsIgnoreCase("+g.category(i)+")=="+(!g.currentCategory.equalsIgnoreCase(g.category(i))))
                 removeMe += i
               } else {
                 var keepThat = false
@@ -51,11 +53,18 @@ object Filters {
                 g.selection.foreach {
                   case j => if (g.hasAnyLink(i, j)) keepThat = true
                 }
-                if (!keepThat) removeMe += i
+                if (!keepThat) {
+                  removeMe += i
+                }
               }
             }
         }
     }
+    //print("current category is "+g.currentCategory+". removing "+removeMe.size+" nodes: ")
+    removeMe.foreach{
+      case i => print(""+g.label(i)+" ("+g.category(i)+"), ")
+    }
+
     g.remove(removeMe)
 
   }
@@ -113,7 +122,7 @@ object Filters {
    * Filter the Edge weights
    */
   def edgeWeight(g: Graph): Graph = {
-    if (g.nbNodes == 0) return g
+    if ((g.nbNodes * g.nbEdges) == 0) return g
     val arange = Maths.map(
       g.get[(Double, Double)]("filter.a.edge.weight"),
       (0.0, 1.0),
@@ -176,7 +185,7 @@ object Filters {
    * Do some pre-processing, then send the final scene to the View
    * TODO check if this function is still important
    */
-  def clean(g:Graph) = {
+  def clean(g:Graph) : Graph = {
     g + ("links" -> g.links.zipWithIndex.map {
       case (links, i) =>
         links.filter {

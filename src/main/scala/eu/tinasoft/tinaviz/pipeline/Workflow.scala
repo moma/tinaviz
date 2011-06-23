@@ -70,25 +70,31 @@ class Workflow (val session:Session) extends Actor {
 
         case ('graphStream,g:Graph) =>
              // println("Workflow: graphStream, after the callback: "+g.nbNodes+" nodes and "+g.nbEdges+" edges")
+              println("WORKFLOW: g: "+g.uuid.size)
+              var h = g.callbackNodeCountChangedNoViz
+              pipeline.setInput(h) // need to compute stats (warning, will also compute some drawing..)
+              println("WORKFLOW: h: "+h.uuid.size)
 
-              pipeline.setInput(g.callbackNodeCountChangedNoViz) // need to compute stats (warning, will also compute some drawing..)
-              val inputAfterCallbackNodeCountChangedNoViz = pipeline.input
-              println("Workflow: inputAfterCallbackNodeCountChangedNoViz: "+inputAfterCallbackNodeCountChangedNoViz.nbNodes+" nodes and "+inputAfterCallbackNodeCountChangedNoViz.nbEdges+" edges")
-              pipeline.setCategoryCache(Filters.weightToSize(pipeline.input))
+              //pipeline.setCategoryCache(Filters.weightToSize(h)) // category is a problem
               //println("Workflow: categoryCache of "+pipeline.categoryCache.nbNodes+" nodes and "+pipeline.categoryCache.nbEdges+" edges")
-              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
+              //pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
               //println("Workflow: nodeweight of "+pipeline.nodeWeightCache.nbNodes+" nodes and "+pipeline.nodeWeightCache.nbEdges+" edges")
-              pipeline.setEdgeWeightCache(Filters.edgeWeight(pipeline.nodeWeightCache))
+              //h = Filters.edgeWeight(pipeline.nodeWeightCache)
+              pipeline.setEdgeWeightCache(h)
+              pipeline.setNodeWeightCache(h)
+              pipeline.setCategoryCache(h)
              //  println("Workflow: edgeweight of "+pipeline.edgeWeightCache.nbNodes+" nodes and "+pipeline.edgeWeightCache.nbEdges+" edges")
              // println("Workflow: Filters.category(pipeline.edgeWeightCache)) of "+(Filters.category(pipeline.edgeWeightCache)).nbNodes+" nodes and "+(Filters.category(pipeline.edgeWeightCache)).nbEdges+" edges\n")
              // pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged.updatePositionWithCategory(out))
              // println("Workflow: final output: "+pipeline.output.nbNodes+" nodes and "+pipeline.output.nbEdges+" edges\n")
-              val newOutput = Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged
-              println("Workflow: newOutput: "+newOutput.nbNodes+" nodes and "+newOutput.nbEdges+" edges")
-          pipeline.setOutput(
-            newOutput
-              .updatePositionWithCategory(pipeline.output)
-          )
+               //println("WORKFLOW:  Filters.edgeWeight(pipeline.nodeWeightCache) => "+h.uuid.size)
+              h =  Filters.category(h)
+               println("WORKFLOW:  Filters.category(h) => "+h.uuid.size)
+              h = Filters.clean(h)
+              println("WORKFLOW: Filters.clean(h) => "+h.uuid.size)
+              h = h.callbackNodeCountChanged
+              println("WORKFLOW: h callbackNodeCountChanged: "+h.uuid.size)
+              pipeline.setOutput(h.updatePositionWithCategory(pipeline.output))
 
         case ('getNodeAttributes, uuid: String) =>
           println("Workflow: asked for 'getNodeAttributes (on INPUT GRAPH) of " + uuid)
