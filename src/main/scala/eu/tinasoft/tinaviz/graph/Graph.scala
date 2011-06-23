@@ -1015,7 +1015,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     val tmp1: Array[(Double, Double)] = position.zipWithIndex.map {
       case (elem, i) =>
         val id = g.id(uuid(i))
-        if (id == -1) {
+        if (id == -1) {  // the invader do not belong to us
           elem
         } else if (g.category(id).equalsIgnoreCase(category(i))) {
           g.position(id)

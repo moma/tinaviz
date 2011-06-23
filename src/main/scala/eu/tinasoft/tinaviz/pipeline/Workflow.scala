@@ -64,6 +64,11 @@ class Workflow (val session:Session) extends Actor {
               g
             )
           )
+          pipeline.setInput(
+            pipeline.input.updatePositionWithCategory(
+              g
+            )
+          )
         case 'getLayout =>
           //println("Workflow: getLayout ("+pipeline.output.nbNodes+")")
           reply(pipeline.output)
@@ -71,42 +76,9 @@ class Workflow (val session:Session) extends Actor {
         case ('graphStream,g:Graph) =>
              // println("Workflow: graphStream, after the callback: "+g.nbNodes+" nodes and "+g.nbEdges+" edges")
               //println("WORKFLOW: g: "+g.uuid.size)
-
-
-              pipeline.setInput(g) // store the graph together with its metrics
-              //println("WORKFLOW: h: "+h.uuid.size)
-
-              // first we filter by category
-
-              var h =  Filters.category(g)
-
-              //pipeline.setCategoryCache(Filters.weightToSize(h)) // category is a problem
-              //println("Workflow: categoryCache of "+pipeline.categoryCache.nbNodes+" nodes and "+pipeline.categoryCache.nbEdges+" edges")
-              //pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
-              //println("Workflow: nodeweight of "+pipeline.nodeWeightCache.nbNodes+" nodes and "+pipeline.nodeWeightCache.nbEdges+" edges")
-              //h = Filters.edgeWeight(pipeline.nodeWeightCache)
-              pipeline.setCategoryCache(h)
-              pipeline.setNodeWeightCache(h)
-              // pipeline.setEdgeWeightCache(h)
-
-
-             //  println("Workflow: edgeweight of "+pipeline.edgeWeightCache.nbNodes+" nodes and "+pipeline.edgeWeightCache.nbEdges+" edges")
-             // println("Workflow: Filters.category(pipeline.edgeWeightCache)) of "+(Filters.category(pipeline.edgeWeightCache)).nbNodes+" nodes and "+(Filters.category(pipeline.edgeWeightCache)).nbEdges+" edges\n")
-             // pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged.updatePositionWithCategory(out))
-             // println("Workflow: final output: "+pipeline.output.nbNodes+" nodes and "+pipeline.output.nbEdges+" edges\n")
-               //println("WORKFLOW:  Filters.edgeWeight(pipeline.nodeWeightCache) => "+h.uuid.size)
-
-             // println("WORKFLOW:  Filters.category(h) => "+h.uuid.size)
-
-
-              // trick to inject existing graph's coordinate into new one for smooth layout transition
-              h.updatePositionWithCategory(pipeline.input)
-
-              // recompute some metrics and graphical attributes
-              h = h.callbackNodeCountChanged
-
-              // send the result to viz
-              pipeline.setOutput(h)
+              println("GraphStream: "+g.uuid.size)
+              pipeline.setInput(g)
+              this ! "filter.node.category" -> g.currentCategory
 
 
         case ('getNodeAttributes, uuid: String) =>
@@ -380,66 +352,63 @@ class Workflow (val session:Session) extends Actor {
           key match {
             case "filter.view" =>
               println("Workflow: received msg: \""+key+"\"")
-              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              pipeline.setCategoryCache(Filters.weightToSize(Filters.category(pipeline.input))callbackNodeCountChanged)
-              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
-              val k = Filters.edgeWeight(pipeline.nodeWeightCache)
-              pipeline.setOutput(Filters.clean(Filters.category(k)).callbackNodeCountChanged)
+              val f = pipeline.input
+              val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
+              val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
+              pipeline.setOutput(h)
             case "filter.node.category" => // might impact the filters!
               println("Workflow: received msg: \""+key+"\"")
-              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              pipeline.setCategoryCache(Filters.weightToSize(Filters.category(pipeline.input)))
-              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
-              val k = Filters.edgeWeight(pipeline.nodeWeightCache)
-              pipeline.setOutput(Filters.clean(Filters.category(k)).callbackNodeCountChanged)
+              val f = pipeline.input
+              println("f: "+f.uuid.size)
+              var ff = Filters.nodeWeight2(f,f)
+              println("ff: "+ff.uuid.size)
+              ff = Filters.edgeWeight(ff,f)
+              println("fff: "+ff.uuid.size)
+              val g = Filters.weightToSize(ff)
+              println("g: "+g.uuid.size)
+              //println("g':"+Filters.clean(Filters.category(g)).uuid.size)
+              val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
+               //println("h: "+h.uuid.size)
+              pipeline.setOutput(h)
+
             case "filter.a.node.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
-              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
-              val k = Filters.edgeWeight(pipeline.nodeWeightCache)
-              pipeline.setOutput(Filters.clean(Filters.category(k)).callbackNodeCountChanged)
+              val f = pipeline.input
+              val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
+              val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
+              pipeline.setOutput(h)
             case "filter.a.edge.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
-              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
-              val k = Filters.edgeWeight(pipeline.nodeWeightCache)
-              pipeline.setOutput(Filters.clean(Filters.category(k)).callbackNodeCountChanged)
+              val f = pipeline.input
+              val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
+              val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
+              pipeline.setOutput(h)
             case "filter.b.node.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
-              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
-              val k = Filters.edgeWeight(pipeline.nodeWeightCache)
-              pipeline.setOutput(Filters.clean(Filters.category(k)).callbackNodeCountChanged)
+              val f = pipeline.input
+              val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
+              val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
+              pipeline.setOutput(h)
             case "filter.b.edge.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              pipeline.setInput(pipeline.input.updatePositionWithCategory(out).updateSelectedWithCategory(out))
-              pipeline.setCategoryCache(Filters.weightToSize(pipeline.categoryCache.updatePositionWithCategory(out).updateSelectedWithCategory(out)))
-              pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
-              val k = Filters.edgeWeight(pipeline.nodeWeightCache)
-              pipeline.setOutput(Filters.clean(Filters.category(k)).callbackNodeCountChanged)
+              val f = pipeline.input
+              val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
+              val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
+              pipeline.setOutput(h)
 
             case "filter.a.node.size" =>
               println("Workflow: received msg: \""+key+"\"")
-              pipeline.setOutput (
-                pipeline.output.updateSizeWithCategory (
-                  Filters.weightToSize (
-                    pipeline.categoryCache.callbackNodeAttributesChanged
-                  )
-                )
-              )
+              val f = pipeline.input
+              val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
+              val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
+              pipeline.setOutput(h)
 
             case "filter.b.node.size" =>
               println("Workflow: received msg: \""+key+"\"")
-              pipeline.setOutput (
-                pipeline.output.updateSizeWithCategory (
-                  Filters.weightToSize (
-                    pipeline.categoryCache.callbackNodeAttributesChanged
-                  )
-                )
-              )
+              val f = pipeline.input
+              val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
+              val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
+              pipeline.setOutput(h)
 
             case any => // we don't need to update the scene for other attributes
           }

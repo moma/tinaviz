@@ -305,7 +305,7 @@ class GEXF (val session:Session) extends Actor {
     val (centerX, centerY) = Metrics.basicCenter(g)
     val h = (g + ("position" -> (g.position map { case (x,y) => (x - centerX, y - centerY) })))
     // compute some stats if the topology of network (level 1: nodes) has changed, and send it to the server
-    session.server !  h.callbackNodeCountChangedNoViz
+    session.server !  h.callbackNodeCountChanged
   }
   /*
    implicit def urlToString(url: java.net.URL): String = {

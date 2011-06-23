@@ -162,6 +162,7 @@ class Main extends TApplet with Client {
   var nbVisibleNodes = 0
   var nbVisibleEdges = 0
   var logo = new PImage ()
+  var counter = 0
 
   override def draw(): Unit = {
 
@@ -435,7 +436,8 @@ class Main extends TApplet with Client {
 
 
 
-    if (false && (math.random < 0.1)) {
+    if (counter >= 100) {
+      counter = 0
       sortedLabelIDs.foreach {
         case (i) =>
           val p1 = g.position(i)
@@ -486,7 +488,7 @@ class Main extends TApplet with Client {
           }
       }
     } else {
-
+      counter += 1
       sortedLabelIDs.foreach {
         case (i) =>
           if (g.showLabel(i)) {
