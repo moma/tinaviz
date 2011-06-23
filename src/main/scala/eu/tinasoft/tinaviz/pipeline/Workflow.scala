@@ -363,9 +363,9 @@ class Workflow (val session:Session) extends Actor {
               var ff = Filters.nodeWeight2(f,f)
               println("ff: "+ff.uuid.size)
               ff = Filters.edgeWeight(ff,f)
-              println("fff: "+ff.uuid.size)
-              val g = Filters.weightToSize(ff)
-              println("g: "+g.uuid.size)
+              //println("fff: "+ff.uuid.size)
+              val g = Filters.weightToSize(ff, f)
+              //println("g: "+g.uuid.size)
               //println("g':"+Filters.clean(Filters.category(g)).uuid.size)
               val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
                //println("h: "+h.uuid.size)

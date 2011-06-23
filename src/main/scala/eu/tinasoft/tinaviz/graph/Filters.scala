@@ -66,7 +66,7 @@ object Filters {
         }
     }
 
-    println("current graph has "+g.uuid.size+" nodes. curr category is "+g.currentCategory+". removed "+removeMe.size+" nodes ")
+   // println("current graph has "+g.uuid.size+" nodes. curr category is "+g.currentCategory+". removed "+removeMe.size+" nodes ")
     //removeMe.foreach{
     //  case i => print(""+g.label(i)+" ("+g.category(i)+"), ")
     //}
@@ -86,6 +86,8 @@ object Filters {
       g.get[(Double, Double)]("filter.b.node.weight"),
       (0.0, 1.0),
       (ref.minBNodeWeight, ref.maxBNodeWeight))
+    print("range a: "+(ref.minANodeWeight, ref.maxANodeWeight))
+    print("range b: "+(ref.minBNodeWeight, ref.maxBNodeWeight))
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map { 
       case (weight, i) =>
@@ -93,8 +95,10 @@ object Filters {
           case "Document" => rangeA
           case "NGram" => rangeB
         }
+        print("  - "+g.label(i)+" ~ "+weight+"? "+((!(r._1 <= weight && weight <= r._2))))
         if (!(r._1 <= weight && weight <= r._2))
-          if (!g.selected(i)) removeMe += i 
+          if (!g.selected(i))
+            removeMe += i
     }  
     g.remove(removeMe)
   }

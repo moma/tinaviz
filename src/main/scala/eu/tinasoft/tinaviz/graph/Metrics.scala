@@ -350,14 +350,15 @@ object Metrics {
       var amin = Double.MaxValue
       var bmax = Double.MinValue
       var bmin = Double.MaxValue
-      g.weight.zip(g.category) foreach {
-            case (x,"NGram") =>
-              if (x < bmin) bmin = x
-              if (x > bmax) bmax = x
-            case (x,"Document") =>
-              if (x < amin) amin = x
-              if (x > amax) amax = x
-            case (x,any) =>
+      g.weight.zipWithIndex foreach {
+            case (w,i) =>
+              if (g.category(i).equalsIgnoreCase("Document")) {
+                if (w < amin) amin = w
+                if (w > amax) amax = w
+              } else {
+                if (w < bmin) bmin = w
+                if (w > bmax) bmax = w
+              }
       }
       (amin, amax, bmin, bmax)
     }
