@@ -23,6 +23,7 @@
 package eu.tinasoft.tinaviz.graph
 
 import eu.tinasoft.tinaviz.util.Maths
+import reflect.ValDef
 
 object Filters {
 
@@ -65,8 +66,7 @@ object Filters {
     //  case i => print(""+g.label(i)+" ("+g.category(i)+"), ")
     //}
 
-    g.remove(removeMe)
-
+    clean(g.remove(removeMe))
   }
   /**
    * Filter the Nodes weights

@@ -39,9 +39,11 @@ class Pipeline {
   def setInput(g:Graph) { _input.set(g) }
   def input : Graph = _input.get
 
+  /*
   val _categoryCache = new AtomicReference(new Graph)
   def setCategoryCache(g:Graph) { _categoryCache.set(g) }
   def categoryCache : Graph = _categoryCache.get
+   */
 
   val _nodeWeightCache = new AtomicReference(new Graph)
   def setNodeWeightCache(g:Graph) { _nodeWeightCache.set(g) }

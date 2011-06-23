@@ -70,31 +70,40 @@ class Workflow (val session:Session) extends Actor {
 
         case ('graphStream,g:Graph) =>
              // println("Workflow: graphStream, after the callback: "+g.nbNodes+" nodes and "+g.nbEdges+" edges")
-              println("WORKFLOW: g: "+g.uuid.size)
-              var h = g.callbackNodeCountChangedNoViz // we need stats before filtering :)
-              pipeline.setInput(h) // need to compute stats (warning, will also compute some drawing..)
-              println("WORKFLOW: h: "+h.uuid.size)
+              //println("WORKFLOW: g: "+g.uuid.size)
+
+
+              pipeline.setInput(g) // store the graph together with its metrics
+              //println("WORKFLOW: h: "+h.uuid.size)
+
+              // first we filter by category
+              var h =  Filters.category(g)
 
               //pipeline.setCategoryCache(Filters.weightToSize(h)) // category is a problem
               //println("Workflow: categoryCache of "+pipeline.categoryCache.nbNodes+" nodes and "+pipeline.categoryCache.nbEdges+" edges")
               //pipeline.setNodeWeightCache(Filters.nodeWeight2(pipeline.categoryCache))
               //println("Workflow: nodeweight of "+pipeline.nodeWeightCache.nbNodes+" nodes and "+pipeline.nodeWeightCache.nbEdges+" edges")
               //h = Filters.edgeWeight(pipeline.nodeWeightCache)
-              pipeline.setEdgeWeightCache(h)
               pipeline.setNodeWeightCache(h)
-              pipeline.setCategoryCache(h)
+              pipeline.setEdgeWeightCache(h)
+
+
              //  println("Workflow: edgeweight of "+pipeline.edgeWeightCache.nbNodes+" nodes and "+pipeline.edgeWeightCache.nbEdges+" edges")
              // println("Workflow: Filters.category(pipeline.edgeWeightCache)) of "+(Filters.category(pipeline.edgeWeightCache)).nbNodes+" nodes and "+(Filters.category(pipeline.edgeWeightCache)).nbEdges+" edges\n")
              // pipeline.setOutput(Filters.clean(Filters.category(pipeline.edgeWeightCache)).callbackNodeCountChanged.updatePositionWithCategory(out))
              // println("Workflow: final output: "+pipeline.output.nbNodes+" nodes and "+pipeline.output.nbEdges+" edges\n")
                //println("WORKFLOW:  Filters.edgeWeight(pipeline.nodeWeightCache) => "+h.uuid.size)
-              h =  Filters.category(h)
-               println("WORKFLOW:  Filters.category(h) => "+h.uuid.size)
-              h = Filters.clean(h)
-              println("WORKFLOW: Filters.clean(h) => "+h.uuid.size)
+
+             // println("WORKFLOW:  Filters.category(h) => "+h.uuid.size)
+
+
+              // trick to inject existing graph's coordinate into new one for smooth layout transition
+              h.updatePositionWithCategory(pipeline.input)
+
+              // recompute some metrics and graphical attributes
               h = h.callbackNodeCountChanged
-              h = h.updatePositionWithCategory(pipeline.output)
-              println("WORKFLOW: h callbackNodeCountChanged: "+h.uuid.size)
+
+              // send the result to viz
               pipeline.setOutput(h)
 
         case ('getNodeAttributes, uuid: String) =>

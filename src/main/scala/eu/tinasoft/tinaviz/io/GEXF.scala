@@ -37,6 +37,8 @@ import io.Source
 
 import xml._
 import java.net.{URLConnection, URL, Authenticator, PasswordAuthentication}
+import reflect.ValDef
+
 //import java.io.{FileInputStream,FileOutputStream,IOException}
 //import java.util.zip.InflaterInputStream
 import java.util.zip.GZIPInputStream
@@ -190,11 +192,11 @@ class GEXF (val session:Session) extends Actor {
       id += 1
 
       val uuid = n \ "@id" text
-      val label = try {
+      val label =title( try {
         n \ "@label" text
       } catch {
         case x => "Node " + uuid
-      }
+      })
 
 
 
@@ -218,8 +220,8 @@ class GEXF (val session:Session) extends Actor {
                             Maths.random(0.8, 1.0),
                             Maths.random(0.8, 1.0))
       g += (id, "uuid", uuid)
-      g += (id, "label", title(label))
-      g += (id, "renderedLabel", title(label))
+      g += (id, "label", label)
+      g += (id, "renderedLabel", label)
       g += (id, "shortLabel", Functions.myLabelCurator(label, true))
       g += (id, "showLabel", true)
       g += (id, "color", color)
@@ -252,13 +254,10 @@ class GEXF (val session:Session) extends Actor {
       g += (id, "keywords", keywords.toList.toArray)
 
       // send to the viz
-      if (id==0) {
-        session.server ! g
-      }
       ei = ei +1
-      if (ei >= 100) {
+      if (ei >= 10) {
         ei = 0
-        session.server ! g
+        stream(g)
       }
     }
 
@@ -293,20 +292,27 @@ class GEXF (val session:Session) extends Actor {
            g += (node2id, "links", lnks(node2id) + (node1id -> weight))
       }
       ei = ei +1
-      if (ei >= 500) {
+      if (ei >= 100) {
         ei = 0
-        session.server ! g
+        stream(g)
       }
     }
-
-    val h = Graph.make(g.elements)//.normalizePositions
-    val (centerX, centerY) = Metrics.basicCenter(h)
-    println("center is: "+(centerX,centerY))
-    session.server ! (h + ("position" -> (h.position map { case (x,y) => (x - centerX, y - centerY) })))
+     stream(g)
     'graphImported
   }
 
+  def stream(f) {
+    // we normalize the graph
+    val g = Graph.make(f.elements)//.normalizePositions
+    val (centerX, centerY) = Metrics.basicCenter(g)
+    //println("center is: "+(centerX,centerY))
+    val h = (g + ("position" -> (g.position map { case (x,y) => (x - centerX, y - centerY) })))
+    // then we update the server
 
+    // we compute some stats if the topology of network (level 1: nodes) has changed
+    // and we sent it to the server
+    session.server !  h.callbackNodeCountChangedNoViz
+  }
   /*
    implicit def urlToString(url: java.net.URL): String = {
    val b = new StringBuilder
