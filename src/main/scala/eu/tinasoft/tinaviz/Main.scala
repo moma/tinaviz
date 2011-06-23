@@ -150,8 +150,8 @@ class Main extends TApplet with Client {
     session.start
 
     if (!(session.webpage.connected)) session.server ! 'open -> new java.net.URL(
-          "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
-          // "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+          //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
     )
   }
 
