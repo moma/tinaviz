@@ -480,7 +480,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   }
 
   lazy val warmCache: Graph = {
-    // TODO I think we don't need to warm the cache anymore
+    // TODO I think we don't need to warm the cache anymorewith the layout, since topology and stats don't change often
 
     position
     nodeColor

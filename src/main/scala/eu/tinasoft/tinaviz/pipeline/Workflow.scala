@@ -71,7 +71,7 @@ class Workflow (val session:Session) extends Actor {
         case ('graphStream,g:Graph) =>
              // println("Workflow: graphStream, after the callback: "+g.nbNodes+" nodes and "+g.nbEdges+" edges")
               println("WORKFLOW: g: "+g.uuid.size)
-              var h = g.callbackNodeCountChangedNoViz
+              var h = g.callbackNodeCountChangedNoViz // we need stats before filtering :)
               pipeline.setInput(h) // need to compute stats (warning, will also compute some drawing..)
               println("WORKFLOW: h: "+h.uuid.size)
 
@@ -93,8 +93,9 @@ class Workflow (val session:Session) extends Actor {
               h = Filters.clean(h)
               println("WORKFLOW: Filters.clean(h) => "+h.uuid.size)
               h = h.callbackNodeCountChanged
+              h = h.updatePositionWithCategory(pipeline.output)
               println("WORKFLOW: h callbackNodeCountChanged: "+h.uuid.size)
-              pipeline.setOutput(h.updatePositionWithCategory(pipeline.output))
+              pipeline.setOutput(h)
 
         case ('getNodeAttributes, uuid: String) =>
           println("Workflow: asked for 'getNodeAttributes (on INPUT GRAPH) of " + uuid)

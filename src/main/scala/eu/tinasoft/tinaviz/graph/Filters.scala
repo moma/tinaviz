@@ -61,9 +61,9 @@ object Filters {
         }
     }
     //print("current category is "+g.currentCategory+". removing "+removeMe.size+" nodes: ")
-    removeMe.foreach{
-      case i => print(""+g.label(i)+" ("+g.category(i)+"), ")
-    }
+    //removeMe.foreach{
+    //  case i => print(""+g.label(i)+" ("+g.category(i)+"), ")
+    //}
 
     g.remove(removeMe)
 
