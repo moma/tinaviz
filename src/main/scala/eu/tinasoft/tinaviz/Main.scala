@@ -435,7 +435,7 @@ class Main extends TApplet with Client {
 
 
 
-    if (math.random < 0.1) {
+    if (false && (math.random < 0.1)) {
       sortedLabelIDs.foreach {
         case (i) =>
           val p1 = g.position(i)

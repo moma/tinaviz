@@ -124,7 +124,7 @@ object Metrics {
             neighbors = (neighbors | neighbors2) &~ current_partition
         }
     }
-   println("number of partitions: "+nb_partition)
+    //println("number of partitions: "+nb_partition)
     // sort the Map of ( ID -> PARTITION ) then only keep the partition's number'
     val res = partitions.toList sortBy {_._1} map { _._2 }
     res.toArray

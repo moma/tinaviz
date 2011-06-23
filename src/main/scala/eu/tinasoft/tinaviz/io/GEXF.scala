@@ -255,12 +255,11 @@ class GEXF (val session:Session) extends Actor {
 
       // send to the viz
       ei = ei +1
-      if (ei >= 10) {
+      if (ei >= 300) {
         ei = 0
-        stream(g)
+        //stream(g)
       }
     }
-
 
     ei = 0
     for (e <- (root \\ "edge")) {
@@ -282,35 +281,30 @@ class GEXF (val session:Session) extends Actor {
          case e => false
       }
 
+
       val lnks = g.getArray[Map[Int, Double]]("links")
 
       if (!node1uuid.equals(node2uuid)) {
         val node1id = g.id(node1uuid)
         val node2id = g.id(node2uuid)
         g += (node1id, "links", lnks(node1id) + (node2id -> weight))
-        if (undirected)
-           g += (node2id, "links", lnks(node2id) + (node1id -> weight))
+        if (undirected) g += (node2id, "links", lnks(node2id) + (node1id -> weight))
       }
       ei = ei +1
-      if (ei >= 100) {
+      if (ei >= 500) {
         ei = 0
-        stream(g)
+        //stream(g)
       }
     }
      stream(g)
     'graphImported
   }
 
-  def stream(f) {
+  def stream(g:Graph) {
     // we normalize the graph
-    val g = Graph.make(f.elements)//.normalizePositions
     val (centerX, centerY) = Metrics.basicCenter(g)
-    //println("center is: "+(centerX,centerY))
     val h = (g + ("position" -> (g.position map { case (x,y) => (x - centerX, y - centerY) })))
-    // then we update the server
-
-    // we compute some stats if the topology of network (level 1: nodes) has changed
-    // and we sent it to the server
+    // compute some stats if the topology of network (level 1: nodes) has changed, and send it to the server
     session.server !  h.callbackNodeCountChangedNoViz
   }
   /*
