@@ -436,7 +436,7 @@ class Main extends TApplet with Client {
 
 
 
-    if (counter >= 100) {
+    if (g.pause /* counter >= 100 */ ) {
       counter = 0
       sortedLabelIDs.foreach {
         case (i) =>
@@ -488,7 +488,7 @@ class Main extends TApplet with Client {
           }
       }
     } else {
-      counter += 1
+      // counter += 1
       sortedLabelIDs.foreach {
         case (i) =>
           if (g.showLabel(i)) {
