@@ -280,7 +280,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     //println("  callbackNodeAttributesChanged")
     var g = this
 
-    g = g + ("nodeWeightExtremums" -> Metrics nodeWeightExtremums g)
+    g = g + ("nodeWeightExtremums" -> (Metrics nodeWeightExtremums g))
 
     g = g + ("nodeColor" -> Drawing.nodeColor(g))
     g = g + ("nodeBorderColor" -> Drawing.nodeBorderColor(g))
@@ -296,7 +296,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     //println("  callbackNodeAttributesChangedNoViz")
     var g = this
 
-    g = g + ("nodeWeightExtremums" -> Metrics nodeWeightExtremums g)
+    g = g + ("nodeWeightExtremums" -> (Metrics nodeWeightExtremums g))
 
     g
   }
@@ -306,7 +306,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     var g = this
     g = g + ("nbNodes" -> (Metrics nbNodes g))
 
-    g = g + ("nodeWeightExtremums" -> Metrics nodeWeightExtremums g)
+    g = g + ("nodeWeightExtremums" -> (Metrics nodeWeightExtremums g))
 
     g = g + ("extremums" -> (Metrics extremums g))
     g = g + ("extremumsSelection" -> (Metrics extremumsSelection g))
@@ -365,7 +365,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("edgeColor" -> Drawing.edgeColor(g))
 
     // depend on the selection
-    println("Updating rendered label and label color")
+    //println("Updating rendered label and label color")
     g = g + ("renderedLabel" -> Drawing.renderedLabel(g))
     g = g + ("labelColor" -> Drawing.labelColor(g))
     g
@@ -377,10 +377,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("nbNodes" -> (Metrics nbNodes g))
     //println("    A AFTER NBNODES g.uuid.size ===> "+g.uuid.size)
 
-    g.weight.zip(g.label) foreach {
-      case (w,l) => println(l+" ~ "+w)
-    }
-    g = g + ("nodeWeightExtremums" -> Metrics nodeWeightExtremums g)
+    //g.weight.zip(g.label) foreach {
+    //  case (w,l) => println(l+" ~ "+w)
+    //}
+    g = g + ("nodeWeightExtremums" -> (Metrics nodeWeightExtremums g))
     g = g + ("extremums" -> (Metrics extremums g))
     g = g + ("extremumsSelection" -> (Metrics extremumsSelection g))
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
