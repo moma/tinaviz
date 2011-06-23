@@ -221,7 +221,7 @@ trait Client {
       case any =>
         throw new Exception("couldn't find node attributes "+uuid)
     }
-    println("TODO send the node attributes "+attributes+" to the client")
+    // TODO send the node attributes "+attributes+" to the client using a callback
     attributes
   }
 
@@ -230,7 +230,7 @@ trait Client {
    */
   def getNeighbourhood(view:String, rawJSONList:String) = {
     val todoList = "selection" //Json.parse(rawJSONList)
-    println("TODO get the neighbourListof "+todoList+" ("+rawJSONList+")")
+    //println("TODO get the neighbourListof "+todoList+" ("+rawJSONList+")")
     session.server ! ('getNeighbourhood,view,todoList)
     true
   }
@@ -246,7 +246,7 @@ trait Client {
       case any =>
         throw new Exception("couldn't find nodes from view: "+view+" and category: "+category)
     }
-    println("TODO send the nodes "+nodes+" to the client")
+    // TODO send the nodes "+nodes+" to the client using a callback
     //Webpage ! "_callbackGetNodes" -> nodes
     nodes
   }

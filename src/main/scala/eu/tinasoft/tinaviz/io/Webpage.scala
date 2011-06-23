@@ -60,14 +60,14 @@ class Webpage(val session: Session) extends Actor {
 
         // asynchronous call
         case func: String =>
-          println("ASYNC window.call: " + jsContext + prefix + func + "")
+          //println("ASYNC window.call: " + jsContext + prefix + func + "")
           if (window != null) {
             window.call("setTimeout", Array[Object](jsContext + prefix + func + "()", new java.lang.Integer(0)))
           }
 
         case (func: String, (any1, any2)) =>
           if (window != null) {
-            println("calling setTimeout(\"" + jsContext + prefix + func + "('" + replace(Json.build(any1).toString) + "','" + replace(Json.build(any2).toString) + "')\")")
+            //println("calling setTimeout(\"" + jsContext + prefix + func + "('" + replace(Json.build(any1).toString) + "','" + replace(Json.build(any2).toString) + "')\")")
             window.call("setTimeout", Array[Object](jsContext + prefix + func + "('" + replace(Json.build(any1).toString) + "','" + replace(Json.build(any2).toString) + "')", new java.lang.Integer(0)))
           }
 
@@ -77,7 +77,7 @@ class Webpage(val session: Session) extends Actor {
             Json.build(any2).toString,
             Json.build(any3).toString,
             new java.lang.Integer(0))
-          println("SYNC window.call: " + jsContext + prefix + func + "(" + args + ")")
+          //println("SYNC window.call: " + jsContext + prefix + func + "(" + args + ")")
           if (window != null) {
             window.call(jsContext + prefix + func, args)
           }
@@ -102,7 +102,7 @@ class Webpage(val session: Session) extends Actor {
           val args = Array[Object](
             Json.build(any).toString,
             new java.lang.Integer(0))
-          println("SYNC window.call: " + jsContext + prefix + func + "(" + Json.build(any).toString + ")")
+          // println("SYNC window.call: " + jsContext + prefix + func + "(" + Json.build(any).toString + ")")
           if (window != null) {
             // _window.call(_subPrefix + _apiPrefix + func, args)
             window.call("setTimeout", Array[Object](jsContext + prefix + func + "('" + replace(Json.build(any).toString) + "')", new java.lang.Integer(0)))
