@@ -35,6 +35,7 @@ class PhysicLayout (val session:Session) {
       case "tinaforce" => tinaforce(g)
       case any =>
         phyloforce(g)
+        //g // DISABLED
         /*
         g.currentView match {
           case "macro" =>
