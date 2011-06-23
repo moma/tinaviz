@@ -192,6 +192,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val currentView = get[String]("filter.view")
   lazy val layout = get[String]("layout")
   lazy val pause = get[Boolean]("pause")
+  lazy val debug = get[Boolean]("debug")
   lazy val selectionRadius = get[Double]("selectionRadius")
 
   lazy val edgeType = get[String]("edge.type")

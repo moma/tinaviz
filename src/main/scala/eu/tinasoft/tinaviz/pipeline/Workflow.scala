@@ -345,6 +345,7 @@ class Workflow (val session:Session) extends Actor {
 
            // IDEA maybe, a better solution would be to define, for each "modifier", which kind of data is modified,
            // and operation is done
+           val f = pipeline.input
            val out = pipeline.output
            val output : Graph = null
            //var tmp = new Graph
@@ -352,16 +353,12 @@ class Workflow (val session:Session) extends Actor {
           key match {
             case "filter.view" =>
               println("Workflow: received msg: \""+key+"\"")
-              val f = pipeline.input
               val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
               val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
               pipeline.setOutput(h)
             case "filter.node.category" => // might impact the filters!
               println("Workflow: received msg: \""+key+"\"")
-              val f = pipeline.input
-              println("f: "+f.uuid.size)
               var ff = Filters.nodeWeight2(f,f)
-              println("ff: "+ff.uuid.size)
               ff = Filters.edgeWeight(ff,f)
               //println("fff: "+ff.uuid.size)
               val g = Filters.weightToSize(ff, f)
@@ -373,45 +370,40 @@ class Workflow (val session:Session) extends Actor {
 
             case "filter.a.node.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              val f = pipeline.input
               val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
               val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
               pipeline.setOutput(h)
             case "filter.a.edge.weight" =>
-              println("Workflow: received msg: \""+key+"\"")
-              val f = pipeline.input
               val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
               val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
               pipeline.setOutput(h)
             case "filter.b.node.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              val f = pipeline.input
               val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
               val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
               pipeline.setOutput(h)
             case "filter.b.edge.weight" =>
               println("Workflow: received msg: \""+key+"\"")
-              val f = pipeline.input
               val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
               val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
               pipeline.setOutput(h)
 
             case "filter.a.node.size" =>
               println("Workflow: received msg: \""+key+"\"")
-              val f = pipeline.input
               val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
               val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
               pipeline.setOutput(h)
 
             case "filter.b.node.size" =>
               println("Workflow: received msg: \""+key+"\"")
-              val f = pipeline.input
               val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f,f),f),f)
               val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
               pipeline.setOutput(h)
 
             case any => // we don't need to update the scene for other attributes
           }
+
+           pipeline.applyKey(key, value)
 
          /*
          if (pushToOutput) {

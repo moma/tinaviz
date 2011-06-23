@@ -385,7 +385,7 @@ class TApplet extends PApplet with MouseWheelListener {
 
 
   def showSelectionCircle(radius: Double) {
-
+    //println("showSelectionCircle: "+radius)
     if (radius < 1) return
 
     scale((1.0 / _camera.zoom).toFloat)

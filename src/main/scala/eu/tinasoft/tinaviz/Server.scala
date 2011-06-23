@@ -55,9 +55,6 @@ class Server (val session:Session) extends Actor {
     "filter.b.node.weight" -> (0.0, 1.0),
     "filter.b.edge.weight" -> (0.0, 1.0),
     "filter.b.node.size" -> .2,
-    "layout.gravity" -> 1.3, // stronger means faster!
-    "layout.attraction" -> 1.01,
-    "layout.repulsion" -> 1.5,
     "pause" -> false,
     "debug" -> false,
 
@@ -69,8 +66,6 @@ class Server (val session:Session) extends Actor {
     "camera.position" -> (0.0, 0.0),
     "camera.target" -> "all",
 
-    "views.macro.pause" -> false,
-    "views.macro.debug" -> false,
 
     "screen.width" -> 100,
     "screen.height" -> 100,
@@ -116,6 +111,7 @@ class Server (val session:Session) extends Actor {
         case ("camera.mouse", kind, side, count, position) =>
           session.workflow ! ("camera.mouse", kind, side, count, position)
 
+
         case ('updated, key: String, value: Any, previous: Any) =>
           key match {
             case "filter.view" =>
@@ -124,6 +120,10 @@ class Server (val session:Session) extends Actor {
             //case "camera.zoom" =>
             //case "camera.position" =>
             case "frameRate" =>
+            //case "selectionRadius" =>
+              //println("Session: catched selectionRadius: "+value)
+              //session.pipeline.applyKey("selectionRadius",value)
+
             case any => session.workflow ! key -> value
           }
         case key: String =>  reply(properties(key))

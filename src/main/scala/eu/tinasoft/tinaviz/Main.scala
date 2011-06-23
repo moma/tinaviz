@@ -150,8 +150,8 @@ class Main extends TApplet with Client {
     session.start
 
     if (!(session.webpage.connected)) session.server ! 'open -> new java.net.URL(
-          //"file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
-          "file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+          "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+          //"file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
     )
   }
 
@@ -172,8 +172,8 @@ class Main extends TApplet with Client {
 
     val g = session.pipeline.output
     //println("Main: pipeline.output.nbNodes: "+pipeline.output.nbNodes)
-    val debug = getIfPossible[Boolean]("debug")
-    val selectionRadius = getIfPossible[Double]("selectionRadius")
+    val debug = g.debug// getIfPossible[Boolean]("debug")
+
     if (g.pause) smooth else if (nbVisibleEdges < 600) smooth else noSmooth
 
 
@@ -516,7 +516,7 @@ class Main extends TApplet with Client {
     }
     export = "none"
 
-    showSelectionCircle(selectionRadius)
+    showSelectionCircle(g.selectionRadius)
 
     //image(imag, 0, 0)
   }
