@@ -62,7 +62,7 @@ class Workflow (val session:Session) extends Actor {
           pipeline.setOutput(
             pipeline.output.updatePositionWithCategory(
               g
-            )
+            ).callbackPositionsChanged.warmCache
           )
           pipeline.setInput(
             pipeline.input.updatePositionWithCategory(

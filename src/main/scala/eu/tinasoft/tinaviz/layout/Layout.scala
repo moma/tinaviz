@@ -53,7 +53,7 @@ class Layout (val session:Session)  extends Actor {
                 //println("Layout: empty graph..")
                   new Graph
               })
-            ).callbackPositionsChanged.warmCache) // warm the cache, so the visualization thread don't have to do it
+            )) // warm the cache, so the visualization thread don't have to do it
 
           this ! 'run // run layout as fast as possible
         case 'exit =>
