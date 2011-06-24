@@ -436,7 +436,7 @@ class Main extends TApplet with Client {
 
 
 
-    if (g.pause /* counter >= 100 */ ) {
+    if (g.pause || counter >= 25) {
       counter = 0
       sortedLabelIDs.foreach {
         case (i) =>
@@ -484,11 +484,19 @@ class Main extends TApplet with Client {
           // we can show the label if we are selected, or if we do not collide with a bigger one
           if ((!weHaveACollision) || g.highlighted(i)) {
             text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
-            session.pipeline.setOutput(g.set(i, "showLabel", true))
+            session.pipeline.setOutput(
+                session.pipeline.output.set(i, "showLabel", true)
+            )
+          } else {
+
+            session.pipeline.setOutput(
+            //println("disabling label..")
+              session.pipeline.output.set(i, "showLabel", false)
+            )
           }
       }
     } else {
-      // counter += 1
+      counter += 1
       sortedLabelIDs.foreach {
         case (i) =>
           if (g.showLabel(i)) {

@@ -347,7 +347,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g
   }
   def callbackSelectionChanged = {
-    println("  callbackSelectionChanged")
+    //println("  callbackSelectionChanged")
     var g = this
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
     g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
@@ -372,7 +372,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g
   }
   def callbackNodeCountChanged = {
-    println("  callbackNodeCountChanged")
+    //println("  callbackNodeCountChanged")
     var g = this
     //println("    A BEFORE NBNODES g.uuid.size ===> "+g.uuid.size)
     g = g + ("nbNodes" -> (Metrics nbNodes g))
@@ -1039,5 +1039,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
       "selected" -> tmp2) // need to recompute things
     )
   }
+
 
 }
