@@ -277,12 +277,27 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   lazy val window = get[(Int, Int)]("window")
 
+   def callbackNodeCountChanged = {
+    var g = this
+    g = g + ("nbNodes" -> (Metrics nbNodes g))
+    g = g.callbackNodeAttributesChanged
+    g = g.callbackPositionsChanged
+    g = g.callbackEdgeCountChanged
+    g
+  }
+ def callbackPositionsChanged = {
+    var g = this
+    g = g + ("extremums" -> (Metrics extremums g))
+    g = g + ("extremumsSelection" -> (Metrics extremumsSelection g))
+    g = g + ("baryCenter" -> Metrics.baryCenter(g))
+    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+    g
+  }
+
   def callbackNodeAttributesChanged = {
     //println("  callbackNodeAttributesChanged")
     var g = this
-
     g = g + ("nodeWeightExtremums" -> (Metrics nodeWeightExtremums g))
-
     g = g + ("nodeColor" -> Drawing.nodeColor(g))
     g = g + ("nodeBorderColor" -> Drawing.nodeBorderColor(g))
     g = g + ("nodeShape" -> Drawing.nodeShape(g))
@@ -293,106 +308,6 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("labelColor" -> Drawing.labelColor(g))
     g
   }
-  def callbackNodeAttributesChangedNoViz = {
-    //println("  callbackNodeAttributesChangedNoViz")
-    var g = this
-
-    g = g + ("nodeWeightExtremums" -> (Metrics nodeWeightExtremums g))
-
-    g
-  }
-
-  def callbackNodeCountChangedNoViz = {
-    //println("  callbackNodeCountChangedNoViz")
-    var g = this
-    g = g + ("nbNodes" -> (Metrics nbNodes g))
-
-    g = g + ("nodeWeightExtremums" -> (Metrics nodeWeightExtremums g))
-
-    g = g + ("extremums" -> (Metrics extremums g))
-    g = g + ("extremumsSelection" -> (Metrics extremumsSelection g))
-
-    g = g + ("baryCenter" -> Metrics.baryCenter(g))
-    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
-
-    g = g.callbackNodeAttributesChangedNoViz
-    g = g.callbackEdgeCountChangedNoViz
-    g
-  }
-    def callbackEdgeCountChangedNoViz = {
-    println("  callbackEdgeCountChangedNoViz")
-    var g = this
-    g = g + ("nbEdges" -> Metrics.nbEdges(g))
-    g = g + ("outDegree" -> Metrics.outDegree(g))
-    g = g + ("inDegree" -> Metrics.inDegree(g))
-    g = g + ("degree" -> Metrics.degree(g))
-    g = g + ("nbSingles" -> Metrics.nbSingles(g))
-
-    g = g + ("edgeWeightExtremums" -> (Metrics edgeWeightExtremums g))
-    g = g + ("outDegreeExtremums" -> (Metrics outDegreeExtremums g))
-    g = g + ("inDegreeExtremums" -> (Metrics inDegreeExtremums g))
-
-    g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
-    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
-    g = g + ("singlesCenter" -> Metrics.singlesCenter(g))
-    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
-
-    g = g + ("extremumsSelectionNeighbourhood" -> (Metrics extremumsSelectionNeighbourhood g))
-
-    //g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
-
-    g = g + ("edgeIndex" -> Drawing.edgeIndex(g))
-    g = g + ("edgeWeight" -> Drawing.edgeWeight(g))
-
-    g
-  }
-  def callbackSelectionChanged = {
-    //println("  callbackSelectionChanged")
-    var g = this
-    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
-    g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
-    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
-
-    g = g + ("extremumsSelectionNeighbourhood" -> (Metrics extremumsSelectionNeighbourhood g))
-
-
-    g = g + ("nodeColor" -> Drawing.nodeColor(g))
-    g = g + ("nodeBorderColor" -> Drawing.nodeBorderColor(g))
-    g = g + ("nodeShape" -> Drawing.nodeShape(g))
-
-    g = g + ("edgeIndex" -> Drawing.edgeIndex(g))
-    g = g + ("edgeWeight" -> Drawing.edgeWeight(g))
-    g = g + ("edgeSize" -> Drawing.edgeSize(g))
-    g = g + ("edgeColor" -> Drawing.edgeColor(g))
-
-    // depend on the selection
-    //println("Updating rendered label and label color")
-    g = g + ("renderedLabel" -> Drawing.renderedLabel(g))
-    g = g + ("labelColor" -> Drawing.labelColor(g))
-    g
-  }
-  def callbackNodeCountChanged = {
-    //println("  callbackNodeCountChanged")
-    var g = this
-    //println("    A BEFORE NBNODES g.uuid.size ===> "+g.uuid.size)
-    g = g + ("nbNodes" -> (Metrics nbNodes g))
-    //println("    A AFTER NBNODES g.uuid.size ===> "+g.uuid.size)
-
-    //g.weight.zip(g.label) foreach {
-    //  case (w,l) => println(l+" ~ "+w)
-    //}
-    g = g + ("nodeWeightExtremums" -> (Metrics nodeWeightExtremums g))
-    g = g + ("extremums" -> (Metrics extremums g))
-    g = g + ("extremumsSelection" -> (Metrics extremumsSelection g))
-    g = g + ("baryCenter" -> Metrics.baryCenter(g))
-    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
-
-    g = g.callbackNodeAttributesChanged
-    //println("    B NBNODES===> "+g.nbNodes)
-    g = g.callbackEdgeCountChanged
-    //println("    C NBNODES===> "+g.nbNodes)
-    g
-  }
 
   def callbackEdgeCountChanged = {
     println("executing callback EDGE COUNT changed")
@@ -400,19 +315,20 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("nbEdges" -> Metrics.nbEdges(g))
     g = g + ("outDegree" -> Metrics.outDegree(g))
     g = g + ("inDegree" -> Metrics.inDegree(g))
-    g = g + ("degree" -> Metrics.degree(g))
+    g = g + ("degree" -> Metrics.degree(g)) // do not count twice a link
     g = g + ("nbSingles" -> Metrics.nbSingles(g))
-
-    g = g + ("edgeWeightExtremums" -> (Metrics edgeWeightExtremums g))
 
     g = g + ("outDegreeExtremums" -> (Metrics outDegreeExtremums g))
     g = g + ("inDegreeExtremums" -> (Metrics inDegreeExtremums g))
 
+    g = g + ("edgeWeightExtremums" -> (Metrics edgeWeightExtremums g))
+
+    // thse settings vary with edge count
     g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
-    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
-    g = g + ("singlesCenter" -> Metrics.singlesCenter(g))
-    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
     g = g + ("extremumsSelectionNeighbourhood" -> (Metrics extremumsSelectionNeighbourhood g))
+    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g)) // need selectionNeighbourhood
+    g = g + ("singlesCenter" -> Metrics.singlesCenter(g)) // need isSingle
+    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
 
     //g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
 
@@ -423,6 +339,27 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
     g
   }
+
+  def callbackSelectionChanged = {
+    //println("  callbackSelectionChanged")
+    var g = this
+
+    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+    g = g + ("selectionNeighbourhood" -> Metrics.selectionNeighbourhood(g))
+    g = g + ("extremumsSelectionNeighbourhood" -> (Metrics extremumsSelectionNeighbourhood g))
+    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g))
+
+    g = g + ("nodeColor" -> Drawing.nodeColor(g))
+    g = g + ("nodeBorderColor" -> Drawing.nodeBorderColor(g))
+
+    g = g + ("edgeColor" -> Drawing.edgeColor(g))
+
+    // depend on the selection
+    //println("Updating rendered label and label color")
+    g = g + ("labelColor" -> Drawing.labelColor(g))
+    g
+  }
+
 
   lazy val warmCache: Graph = {
     // TODO I think we don't need to warm the cache anymorewith the layout, since topology and stats don't change often

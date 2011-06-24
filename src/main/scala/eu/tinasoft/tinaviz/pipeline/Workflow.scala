@@ -145,7 +145,7 @@ class Workflow (val session:Session) extends Actor {
           val in = pipeline.input
           val out = pipeline.output
           val out2 = if (uuidList.size == 0) {
-              pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
+              // pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
               in.clearSelection
               out.clearSelection
           } else {
@@ -169,7 +169,7 @@ class Workflow (val session:Session) extends Actor {
           val in = pipeline.input
           val out = pipeline.output
           val out2 = if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
-              pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
+              //pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
               in.clearSelection
               out.clearSelection
             } else {
@@ -194,7 +194,7 @@ class Workflow (val session:Session) extends Actor {
           val out = pipeline.output
           pipeline.setOutput(
             (if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
-              pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
+             // pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
              in.clearSelection
               out.clearSelection
             } else {
@@ -213,7 +213,7 @@ class Workflow (val session:Session) extends Actor {
           println("selectByNeighbourPattern("+pattern+", "+category+")")
           pipeline.setOutput(
             (if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
-              pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
+              //pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
               ref.clearSelection
               out.clearSelection
             } else {
