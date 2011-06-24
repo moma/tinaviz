@@ -680,7 +680,7 @@ class Main extends TApplet with Client {
   override def destroy() {
     println("Main.scala: sending exit signal to Server")
     session.close
-
+    Thread.sleep(2)
     println("Main.scala: calling super.destroy()")
     super.destroy()
   }
@@ -703,6 +703,7 @@ class Main extends TApplet with Client {
     //if (Maths.random < 0.9) {
     val (w, h) = (width.toDouble * 0.85, height.toDouble * 0.85) // 15% of margins
     //println("xy min max: "+(g.xMin, g.xMax, g.yMin, g.yMax))
+    //println("target: "+g.cameraTarget)
     val centerOnSelection = (g.cameraTarget.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
     // spaghetti code
     val ratio = (((if (centerOnSelection) {

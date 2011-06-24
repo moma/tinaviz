@@ -223,7 +223,7 @@ class GEXF (val session:Session) extends Actor {
       g += (id, "label", label)
       g += (id, "renderedLabel", label)
       g += (id, "shortLabel", Functions.myLabelCurator(label, true))
-      g += (id, "showLabel", true)
+      g += (id, "showLabel", false) // disabled by default
       g += (id, "color", color)
       g += (id, "selected", false)
       g += (id, "highlighted", false)

@@ -281,7 +281,13 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     var g = this
     g = g + ("nbNodes" -> (Metrics nbNodes g))
     g = g.callbackNodeAttributesChanged
-    g = g.callbackPositionsChanged
+
+    // we can't call callback position, because not everything is computed already
+    g = g + ("extremums" -> (Metrics extremums g))
+    g = g + ("extremumsSelection" -> (Metrics extremumsSelection g))
+    g = g + ("baryCenter" -> Metrics.baryCenter(g))
+    g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+
     g = g.callbackEdgeCountChanged
     g
   }
@@ -291,6 +297,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("extremumsSelection" -> (Metrics extremumsSelection g))
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
+
+    // in some case, this is overwritten by a following call to "update edges"
+    g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g)) // need selectionNeighbourhood
+    g = g + ("singlesCenter" -> Metrics.singlesCenter(g)) // need isSingle
+    g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
+
     g
   }
 
@@ -316,6 +328,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("outDegree" -> Metrics.outDegree(g))
     g = g + ("inDegree" -> Metrics.inDegree(g))
     g = g + ("degree" -> Metrics.degree(g)) // do not count twice a link
+
     g = g + ("nbSingles" -> Metrics.nbSingles(g))
 
     g = g + ("outDegreeExtremums" -> (Metrics outDegreeExtremums g))
