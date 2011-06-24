@@ -345,8 +345,9 @@ class Workflow (val session:Session) extends Actor {
 
            // IDEA maybe, a better solution would be to define, for each "modifier", which kind of data is modified,
            // and operation is done
-           val f = pipeline.input
+
            val out = pipeline.output
+           val f = pipeline.input.updateSelectedWithCategory(out)
            val output : Graph = null
            //var tmp = new Graph
            //var updateNeeded =
@@ -403,7 +404,7 @@ class Workflow (val session:Session) extends Actor {
             case any => // we don't need to update the scene for other attributes
           }
 
-           pipeline.applyKey(key, value)
+           //pipeline.applyKey(key, value)
 
          /*
          if (pushToOutput) {
