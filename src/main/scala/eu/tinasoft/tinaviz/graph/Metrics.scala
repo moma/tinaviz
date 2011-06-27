@@ -23,6 +23,9 @@
 package eu.tinasoft.tinaviz.graph
 
 import math._
+import math.Numeric.DoubleAsIfIntegral
+import util.parsing.input.OffsetPosition
+import reflect.ValDef
 
 object Metrics {
 
@@ -79,6 +82,26 @@ object Metrics {
         d
     }
     _inDegree.toArray
+  }
+
+  def indexedNodeWeight(g:Graph, nbGroups:Int=100) : Array[Int] = {
+
+    val sortedByWeight = g.weight.zipWithIndex.toList.sort{
+      case (t1:(Double,Int), t2:(Double,Int)) => if (t1._1 > t1._2) true else false
+    }.toArray
+
+
+    var nodeWeights = Array.empty[(Int, Double)]
+    var remainingNodes = g.nbNodes
+    (0 until nbGroups).foreach {
+      case groupId => {
+         val index = (g.nbNodes - remainingNodes) + (remainingNodes / (nbGroups - groupId))
+        sortedByWeight(index)
+      }
+
+    }
+
+     Array.empty[Int]
   }
   
   
