@@ -84,8 +84,8 @@ object Metrics {
     _inDegree.toArray
   }
 
-  def indexedNodeWeight(g:Graph, nbGroups:Int=100) : Array[Int] = {
-
+  def indexedNodeWeight(g:Graph, nbTicks:Int=10) : Array[Double] = {
+    println("computing indexedNodeWeight")
     val sortedByWeight = g.weight.zipWithIndex.toList.sort{
       case (t1:(Double,Int), t2:(Double,Int)) => if (t1._1 > t1._2) true else false
     }.toArray
@@ -93,15 +93,23 @@ object Metrics {
 
     var nodeWeights = Array.empty[(Int, Double)]
     var remainingNodes = g.nbNodes
-    (0 until nbGroups).foreach {
-      case groupId => {
-         val index = (g.nbNodes - remainingNodes) + (remainingNodes / (nbGroups - groupId))
-        sortedByWeight(index)
+    println(" remainingNodes: "+)
+    (0 until nbTicks - 1).foreach {
+      case tickId => {
+        println("  "+tickId+":")
+        val tickIndex = (g.nbNodes - remainingNodes) + (remainingNodes / (nbTicks - tickId))
+        println("    - tickIndex: "+tickIndex)
+        val tickValue = sortedByWeight(tickIndex)
+        println("    - tickValue: "+tickValue)
+        // calculer les noeuds
+        //N - nb de noeuds inférieurs au tick
+
       }
+      println("last tickValue: "+sortedByWeight(g.nbNodes - 1))
 
     }
 
-     Array.empty[Int]
+     Array.empty[Double]
   }
   
   

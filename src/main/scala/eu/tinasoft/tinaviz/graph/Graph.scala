@@ -288,6 +288,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
 
+    g = g + ("indexedNodeWeight" -> Metrics.indexedNodeWeight(g))
+
     g = g.callbackEdgeCountChanged
     g
   }
@@ -342,6 +344,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("selectionNeighbourhoodCenter" -> Metrics.selectionNeighbourhoodCenter(g)) // need selectionNeighbourhood
     g = g + ("singlesCenter" -> Metrics.singlesCenter(g)) // need isSingle
     g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
+
 
     //g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
 
