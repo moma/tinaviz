@@ -107,9 +107,11 @@ object Main extends TApplet with Client {
 
 class Main extends TApplet with Client {
 
-   val session = new Session (this)
-   setTAppletSession(session)  // hack for TApplet. TODO: put it in the TApplet's constructor
-   setClientSession(session) // hack for client. TODO: put it in the Client's constructor
+  val session = new Session(this)
+  setTAppletSession(session) // hack for TApplet. TODO: put it in the TApplet's constructor
+  setClientSession(session)
+
+  // hack for client. TODO: put it in the Client's constructor
 
 
   override def setup(): Unit = {
@@ -135,11 +137,11 @@ class Main extends TApplet with Client {
        } */
 
 
-     //{
-     // new PImage (ImageIO.read(new URL("http://hostname.com/image.gif")))
-     //}
+    //{
+    // new PImage (ImageIO.read(new URL("http://hostname.com/image.gif")))
+    //}
 
-        addMouseWheelListener(this)
+    addMouseWheelListener(this)
 
     /* In the JDK's appletviewer, selecting the Restart menu item calls stop() and then start().
      * Selecting the Reload menu item calls stop(), destroy(), and init(), in that order.
@@ -150,8 +152,8 @@ class Main extends TApplet with Client {
     session.start
 
     if (!(session.webpage.connected)) session.server ! 'open -> new java.net.URL(
-          "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
-          //"file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+      "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
+      //"file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
     )
   }
 
@@ -161,7 +163,7 @@ class Main extends TApplet with Client {
 
   var nbVisibleNodes = 0
   var nbVisibleEdges = 0
-  var logo = new PImage ()
+  var logo = new PImage()
   var counter = 0
 
   override def draw(): Unit = {
@@ -172,7 +174,7 @@ class Main extends TApplet with Client {
 
     val g = session.pipeline.output
     //println("Main: pipeline.output.nbNodes: "+pipeline.output.nbNodes)
-    val debug = g.debug// getIfPossible[Boolean]("debug")
+    val debug = g.debug // getIfPossible[Boolean]("debug")
 
     if (g.pause) smooth else if (nbVisibleEdges < 600) smooth else noSmooth
 
@@ -424,11 +426,24 @@ class Main extends TApplet with Client {
     }
 
     def compareBySize(i: Int, j: Int): Boolean = {
+      val h1 = g.highlighted(i)
+      val h2 = g.highlighted(j)
+      val s1 = g.selected(i)
+      val s2 = g.selected(j)
       val r1 = g.size(i)
       val l1 = g.label(i)
       val r2 = g.size(j)
       val l2 = g.label(j)
-      if (r1 > r2) true else (if (r1 < r2) false else (l1.compareTo(l2) < 0))
+      val normalComparison = if (r1 > r2) true else (if (r1 < r2) false else (l1.compareTo(l2) < 0))
+
+      // if the node is highlighted or selected, and its neighbour is neither selected or highlighted: then greater!
+      if ((h1 && !h2 && !s2) || (!s1 && !h2 && !s2)) {
+        true
+      } else if ((h2 && !h1 && !s1) || (!s2 && !h1 && !s1)) {
+        false
+      } else {
+        normalComparison
+      }
     }
     val sortedLabelIDs = visibleNodes.map {
       _._2
@@ -469,7 +484,13 @@ class Main extends TApplet with Client {
                 || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
                 && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
                 || ((np1._2 >= np2._2) && (np1._2 <= np2._2 + h2))))
-              val whichIsLarger = if (r2 > r1) true else (if (r2 < r1) false else (l2.compareTo(l1) > 0))
+              val whichIsLarger = if (b2 && !b1) {
+                true
+              //} else if (b1 && !b2) {
+              //  false
+              } else {
+               if (r2 > r1) true else (if (r2 < r1) false else (l2.compareTo(l1) > 0))
+              }
               //println("   weTouchSomething:"+weTouchSomething+" whichIsLarger: "+whichIsLarger+" L2: "+l2+" R2: "+r2+" h2: "+h2+" w2: "+w2+" x: "+np2._1+" y: "+np2._2)
               if (i == j) {
                 false
@@ -485,12 +506,12 @@ class Main extends TApplet with Client {
           if ((!weHaveACollision) || g.highlighted(i)) {
             text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
             session.pipeline.setOutput(
-                session.pipeline.output.set(i, "showLabel", true)
+              session.pipeline.output.set(i, "showLabel", true)
             )
           } else {
 
             session.pipeline.setOutput(
-            //println("disabling label..")
+              //println("disabling label..")
               session.pipeline.output.set(i, "showLabel", false)
             )
           }

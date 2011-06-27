@@ -271,7 +271,9 @@ class GEXF (val session:Session) extends Actor {
           case any => "0"
       }).toDouble
 
+
       val undirected = try {
+
              (e \ "@type" text) match {
                   case "undirected" => true
                   case "directed" => false
@@ -287,8 +289,12 @@ class GEXF (val session:Session) extends Actor {
       if (!node1uuid.equals(node2uuid)) {
         val node1id = g.id(node1uuid)
         val node2id = g.id(node2uuid)
+
+        // add a link. will overwrite previous mutal links if applicable.
         g += (node1id, "links", lnks(node1id) + (node2id -> weight))
-        if (undirected) g += (node2id, "links", lnks(node2id) + (node1id -> weight))
+
+        // add a mutual link. if a mutual link already exists, ignore.
+        if (!lnks.contains(node2id)) g += (node2id, "links", lnks(node2id) + (node1id -> weight))
       }
       ei = ei +1
       if (ei >= 500) {
