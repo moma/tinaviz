@@ -96,6 +96,8 @@ object Graph {
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
     "filter.map.node.shape" -> "category",
+    "nodeWeightRange" -> List.empty[Double],
+    "edgeWeightRange" -> List.empty[Double],
 
     "outDegree" -> Array.empty[Int],
     "inDegree" -> Array.empty[Int],
@@ -261,6 +263,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val connectedComponents = getArray[Int]("connectedComponents")
 
 
+  lazy val nodeWeightRange = get[List[Double]]("nodeWeightRange")
+  lazy val edgeWeightRange = get[List[Double]]("edgeWeightRange")
   /**
    * compute the edge position to screen
    */
@@ -288,8 +292,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
 
-    g = g + ("indexedNodeWeight" -> Metrics.indexedNodeWeight(g))
-
+    g = g + ("nodeWeightRange" -> Metrics.nodeWeightRange(g))
+    println("Result of nodeWeightRange: "+g.nodeWeightRange)
     g = g.callbackEdgeCountChanged
     g
   }
@@ -345,6 +349,8 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("singlesCenter" -> Metrics.singlesCenter(g)) // need isSingle
     g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
 
+
+    g = g + ("edgeWeightRange" -> Metrics.edgeWeightRange(g))
 
     //g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
 

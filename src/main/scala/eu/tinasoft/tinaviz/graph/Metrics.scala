@@ -1,7 +1,7 @@
 /************************************************************************
                                   Tinaviz
-*************************************************************************
- This application is part of the Tinasoft project: http://tinasoft.eu
+ *************************************************************************
+This application is part of the Tinasoft project: http://tinasoft.eu
  Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
 
  Copyright (C) 2009-2011 CREA Lab, CNRS/Ecole Polytechnique UMR 7656 (Fr)
@@ -18,7 +18,7 @@
 
  You should have received a copy of the GNU General Public License along
  with this program. If not, see <http://www.gnu.org/licenses/>.
-************************************************************************/
+ ************************************************************************/
 
 package eu.tinasoft.tinaviz.graph
 
@@ -26,6 +26,7 @@ import math._
 import math.Numeric.DoubleAsIfIntegral
 import util.parsing.input.OffsetPosition
 import reflect.ValDef
+import scala.Math
 
 object Metrics {
 
@@ -84,37 +85,53 @@ object Metrics {
     _inDegree.toArray
   }
 
-  def indexedNodeWeight(g:Graph, nbTicks:Int=10) : Array[Double] = {
-    println("computing indexedNodeWeight")
-    val sortedByWeight = g.weight.zipWithIndex.toList.sort{
-      case (t1:(Double,Int), t2:(Double,Int)) => if (t1._1 > t1._2) true else false
+  def nodeWeightRange(g: Graph, nbTicks: Int = 10): List[Double] = {
+    println("computing nodeWeightRange")
+    val sortedByWeight = g.weight.zipWithIndex.toList.sort {
+      case (t1: (Double, Int), t2: (Double, Int)) => if (t1._1 < t1._2) true else false
     }.toArray
 
+    if (g.nbNodes == 0) return List.empty[Double]
 
-    var nodeWeights = Array.empty[(Int, Double)]
     var remainingNodes = g.nbNodes
-    println(" remainingNodes: "+)
-    (0 until nbTicks - 1).foreach {
-      case tickId => {
-        println("  "+tickId+":")
-        val tickIndex = (g.nbNodes - remainingNodes) + (remainingNodes / (nbTicks - tickId))
-        println("    - tickIndex: "+tickIndex)
-        val tickValue = sortedByWeight(tickIndex)
-        println("    - tickValue: "+tickValue)
-        // calculer les noeuds
-        //N - nb de noeuds inférieurs au tick
+    println(" remainingNodes: " + remainingNodes)
+    ((0 until nbTicks).map {
+      case tickId =>
+        if (tickId == nbTicks) {
+          sortedByWeight.last._1
+        } else {
+          println("  " + tickId + ":")
+          val tickIndex = ((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
+          println("    - tickIndex: " + tickIndex)
 
-      }
-      println("last tickValue: "+sortedByWeight(g.nbNodes - 1))
+          val t = sortedByWeight(tickIndex)
+          val nodeWeightValue = t._1
+          val nodeId = t._2
 
-    }
+          println("    - nodeWeightValue: " + nodeWeightValue + " (node id " + nodeId + ")")
 
-     Array.empty[Double]
+          // trouver l'index maximum qui donne t1
+          var max = 0
+          sortedByWeight.zipWithIndex.foreach {
+            case ((realWeight, nodeId), sortedIndex) =>
+              if (realWeight <= nodeWeightValue) {
+                max = nodeId
+              }
+          }
+          println("max: " + max)
+          println(" remainingNodes before: " + remainingNodes)
+          remainingNodes = g.nbNodes - max
+          println(" remainingNodes after: " + remainingNodes)
+          nodeWeightValue
+        }
+    }).toList
   }
-  
-  
-  def connectedComponents(g:Graph) : Array[Int] = {
-      
+   def edgeWeightRange(g: Graph, nbTicks: Int = 10): List[Double] = {
+         println("computing edgeWeightRange")
+         List.empty[Double]
+   }
+  def connectedComponents(g: Graph): Array[Int] = {
+
     // Calcul des partitions
     var nb_partition = 0
 
@@ -122,46 +139,53 @@ object Metrics {
     //  case (id, id) => (id,id)
     //}
 
-    var nodesIds : Set[Int] = g.ids.toSet
+    var nodesIds: Set[Int] = g.ids.toSet
 
-    var partitions = Map.empty[Int,Int]
+    var partitions = Map.empty[Int, Int]
 
     while (nodesIds.size > 0) {
-        val target = nodesIds.head
-        //nodesIds /: remove(0)
-        nodesIds = nodesIds - target
-        nb_partition += 1
-        var current_partition = Set( target )
-        partitions += target -> nb_partition
+      val target = nodesIds.head
+      //nodesIds /: remove(0)
+      nodesIds = nodesIds - target
+      nb_partition += 1
+      var current_partition = Set(target)
+      partitions += target -> nb_partition
 
-        // neighbors IDs
-        val neighborsList = g.neighbours( target ).map{ case (a,_) => g.id(a) }.toList
-        
-        var neighbors =  ( neighborsList.toSet --  current_partition.toSet )
+      // neighbors IDs
+      val neighborsList = g.neighbours(target).map {
+        case (a, _) => g.id(a)
+      }.toList
 
-        while (neighbors.size > 0) {
-            val target2 = neighbors.head
+      var neighbors = (neighborsList.toSet -- current_partition.toSet)
 
-            val neighbors2 = g.neighbours( target2 ).map{ case (a,b) => g.id(a) }.toSet
+      while (neighbors.size > 0) {
+        val target2 = neighbors.head
 
-            partitions += target2 -> nb_partition
+        val neighbors2 = g.neighbours(target2).map {
+          case (a, b) => g.id(a)
+        }.toSet
 
-            neighbors = neighbors - target2 // only keep the last elements except the first
-            nodesIds = nodesIds - target2 // remove target2 from nodesIds
+        partitions += target2 -> nb_partition
 
-            current_partition += target2 // append target2 to current_parititon
+        neighbors = neighbors - target2 // only keep the last elements except the first
+        nodesIds = nodesIds - target2 // remove target2 from nodesIds
 
-            // do the union of neighbors 1 and 2, then compute the difference with current partition
-            neighbors = (neighbors | neighbors2) &~ current_partition
-        }
+        current_partition += target2 // append target2 to current_parititon
+
+        // do the union of neighbors 1 and 2, then compute the difference with current partition
+        neighbors = (neighbors | neighbors2) &~ current_partition
+      }
     }
     //println("number of partitions: "+nb_partition)
     // sort the Map of ( ID -> PARTITION ) then only keep the partition's number'
-    val res = partitions.toList sortBy {_._1} map { _._2 }
+    val res = partitions.toList sortBy {
+      _._1
+    } map {
+      _._2
+    }
     res.toArray
   }
-  
-  
+
 
   /**
    * Compute the degree array
@@ -169,7 +193,7 @@ object Metrics {
   def degree(g: Graph): Array[Int] = {
     val _degree = g.links.zipWithIndex.map {
       case (aLinks, a) =>
-      // var d = 0
+        // var d = 0
         var neighbourMap = Map.empty[Int, Boolean]
         aLinks.foreach {
           case (b, w) =>
@@ -291,30 +315,30 @@ object Metrics {
   }
 
   // a list of positions + ID
-  def selectionNeighbourhood(g:Graph) = {
-     val tmp = g.position.zipWithIndex filter {
-        case (p, i) => g.selected(i)
-     }
-     g.position.zipWithIndex filter {
-        case (p, i1) =>
-             tmp.find {
-               case (p2, i2) =>
-                 (g.hasAnyLink(i1,i2) || i1 == i2)
-             } match {
-                 case None => false
-                 case any => true
-             }
-      }
+  def selectionNeighbourhood(g: Graph) = {
+    val tmp = g.position.zipWithIndex filter {
+      case (p, i) => g.selected(i)
+    }
+    g.position.zipWithIndex filter {
+      case (p, i1) =>
+        tmp.find {
+          case (p2, i2) =>
+            (g.hasAnyLink(i1, i2) || i1 == i2)
+        } match {
+          case None => false
+          case any => true
+        }
+    }
   }
 
-    def selectionNeighbourhoodCenter(g:Graph) : (Double, Double) = {
+  def selectionNeighbourhoodCenter(g: Graph): (Double, Double) = {
     var p = (0.0, 0.0)
     val N = g.selectionNeighbourhood.size.toDouble
     g.selectionNeighbourhood foreach {
       case ((x, y), i) => p = (p._1 + x, p._2 + y)
     }
     if (N != 0) (p._1 / N, p._2 / N) else (0.0, 0.0)
-    }
+  }
 
   /**
    * Compute the extremums (X min, X max, Y min, Y max)
@@ -382,14 +406,14 @@ object Metrics {
       var bmax = Double.MinValue
       var bmin = Double.MaxValue
       g.weight.zipWithIndex foreach {
-            case (w,i) =>
-              if (g.category(i).equalsIgnoreCase("Document")) {
-                if (w < amin) amin = w
-                if (w > amax) amax = w
-              } else {
-                if (w < bmin) bmin = w
-                if (w > bmax) bmax = w
-              }
+        case (w, i) =>
+          if (g.category(i).equalsIgnoreCase("Document")) {
+            if (w < amin) amin = w
+            if (w > amax) amax = w
+          } else {
+            if (w < bmin) bmin = w
+            if (w > bmax) bmax = w
+          }
       }
       (amin, amax, bmin, bmax)
     }
@@ -430,7 +454,7 @@ object Metrics {
    */
   def basicCenter(g: Graph): (Double, Double) = {
     val (xmin, xmax, ymin, ymax) = g.extremums
-    ((xmax - xmin),(ymax - ymax))
+    ((xmax - xmin), (ymax - ymax))
   }
 
 
