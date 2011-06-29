@@ -87,7 +87,7 @@ object Metrics {
 
   def nodeWeightRange(g: Graph, nbTicks: Int = 100): List[Double] = {
     //println("computing nodeWeightRange")
-    val sortedByWeight = g.weight.zipWithIndex.toList.sort {
+    val sortedByWeight = g.weight.zipWithIndex.filter{ case t: (Double, Int) => cat.equalsIgnoreCase(g.category(t._2))  }.toList.sort {
       case (t1: (Double, Int), t2: (Double, Int)) => (t1._1 < t2._1)
     }
     //println("weights:")
@@ -104,7 +104,7 @@ object Metrics {
         if (tickId == nbTicks-1) {
           sortedByWeight.last._1
         } else {
-          println("  " + tickId + ":")
+          //println("  " + tickId + ":")
           val tickIndex = ((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
           //println("    - tickIndex: " + tickIndex)
 
@@ -130,9 +130,15 @@ object Metrics {
     }).toList
   }
 
-  def edgeWeightRange(g: Graph, nbTicks: Int = 100): List[Double] = {
+  def edgeWeightRange(g: Graph, cat:String, nbTicks: Int = 100): List[Double] = {
     //println("computing edgeWeightRange")
-    val sortedByWeight = g.edgeWeight.zipWithIndex.toList.sort {
+    val sortedByWeight = g.edgeWeight.zipWithIndex.filter{
+      case t: (Double, Int) =>
+        val (sourceId, targetId) = g.edgeIndex(t._2)
+        val (sourceCat, targetCat) = (g.category(sourceId), g.category(targetId))
+        TODO CHECK AND FILTER THE WEIGHT
+        cat.equalsIgnoreCase(g.category(  t._2))
+    }.toList.sort {
       case (t1: (Double, Int), t2: (Double, Int)) =>
         (t1._1 < t2._1)
     }
@@ -150,7 +156,7 @@ object Metrics {
         if (tickId == nbTicks-1) {
           sortedByWeight.last._1
         } else {
-          println("  " + tickId + ":")
+          //println("  " + tickId + ":")
           val tickIndex = ((g.nbEdges - remainingEdges) + Math.floor(remainingEdges / (nbTicks - tickId))).toInt
           //println("    - tickIndex: " + tickIndex)
 

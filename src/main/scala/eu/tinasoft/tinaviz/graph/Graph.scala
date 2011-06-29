@@ -96,8 +96,10 @@ object Graph {
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
     "filter.map.node.shape" -> "category",
-    "nodeWeightRange" -> List.empty[Double],
-    "edgeWeightRange" -> List.empty[Double],
+    "nodeAWeightRange" -> List.empty[Double],
+    "edgeAWeightRange" -> List.empty[Double],
+    "nodeBWeightRange" -> List.empty[Double],
+    "edgeBWeightRange" -> List.empty[Double],
 
     "outDegree" -> Array.empty[Int],
     "inDegree" -> Array.empty[Int],
@@ -263,8 +265,10 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val connectedComponents = getArray[Int]("connectedComponents")
 
 
-  lazy val nodeWeightRange = get[List[Double]]("nodeWeightRange")
-  lazy val edgeWeightRange = get[List[Double]]("edgeWeightRange")
+  lazy val nodeAWeightRange = get[List[Double]]("nodeAWeightRange")
+  lazy val edgeAWeightRange = get[List[Double]]("edgeAWeightRange")
+    lazy val nodeBWeightRange = get[List[Double]]("nodeBWeightRange")
+  lazy val edgeBWeightRange = get[List[Double]]("edgeBWeightRange")
   /**
    * compute the edge position to screen
    */
@@ -292,8 +296,9 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
 
-    g = g + ("nodeWeightRange" -> Metrics.nodeWeightRange(g))
-    println("Result of nodeWeightRange: "+g.nodeWeightRange)
+    g = g + ("nodeAWeightRange" -> Metrics.nodeWeightRange(g, "Document"))
+    g = g + ("nodeBWeightRange" -> Metrics.nodeWeightRange(g, "NGram"))
+    //println("Result of nodeWeightRange: "+g.nodeWeightRange)
     g = g.callbackEdgeCountChanged
     g
   }
@@ -349,12 +354,15 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("singlesCenter" -> Metrics.singlesCenter(g)) // need isSingle
     g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
 
+    g = g + ("edgeIndex" -> Drawing.edgeIndex(g))
     g = g + ("edgeWeight" -> Functions.edgeWeight(g))
-    g = g + ("edgeWeightRange" -> Metrics.edgeWeightRange(g))
 
+    g = g + ("edgeAWeightRange" -> Metrics.edgeWeightRange(g, "Document"))
+    g = g + ("edgeBWeightRange" -> Metrics.edgeWeightRange(g, "NGram"))
+    //println("Result of edgeWeightRange: "+g.edgeWeightRange)
     //g = g + ("connectedComponents" -> Metrics.connectedComponents(g))
 
-    g = g + ("edgeIndex" -> Drawing.edgeIndex(g))
+
     g = g + ("edgeSize" -> Drawing.edgeSize(g))
     g = g + ("edgeColor" -> Drawing.edgeColor(g))
 

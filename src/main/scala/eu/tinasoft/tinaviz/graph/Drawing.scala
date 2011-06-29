@@ -125,19 +125,6 @@ object Drawing {
     t.toArray
   }*/
 
-  /**
-   * compute the edge position to screen
-   */
-  def edgeIndex (g:Graph) = {
-    var t = List.empty[(Int, Int)]
-    g.links.zipWithIndex foreach {
-      case (links, i) =>
-        links.zipWithIndex foreach {
-          case ((j, weight), _j) => t ::= (i, j)
-        }
-    }
-    t.toArray
-  }
 
 
   /**
