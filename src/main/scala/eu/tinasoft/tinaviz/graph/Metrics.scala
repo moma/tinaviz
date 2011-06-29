@@ -85,51 +85,97 @@ object Metrics {
     _inDegree.toArray
   }
 
-  def nodeWeightRange(g: Graph, nbTicks: Int = 10): List[Double] = {
-    println("computing nodeWeightRange")
+  def nodeWeightRange(g: Graph, nbTicks: Int = 100): List[Double] = {
+    //println("computing nodeWeightRange")
     val sortedByWeight = g.weight.zipWithIndex.toList.sort {
-      case (t1: (Double, Int), t2: (Double, Int)) => if (t1._1 < t1._2) true else false
-    }.toArray
-
+      case (t1: (Double, Int), t2: (Double, Int)) => (t1._1 < t2._1)
+    }
+    //println("weights:")
+    //sortedByWeight.foreach {
+    //  case (weight, id) => println(" - "+weight)
+    //}
     if (g.nbNodes == 0) return List.empty[Double]
-
+    var maxIndex = 0
+    var maxValue = 0.0
     var remainingNodes = g.nbNodes
-    println(" remainingNodes: " + remainingNodes)
+    //println(" remainingNodes: " + remainingNodes)
     ((0 until nbTicks).map {
       case tickId =>
-        if (tickId == nbTicks) {
+        if (tickId == nbTicks-1) {
           sortedByWeight.last._1
         } else {
           println("  " + tickId + ":")
           val tickIndex = ((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
-          println("    - tickIndex: " + tickIndex)
+          //println("    - tickIndex: " + tickIndex)
 
           val t = sortedByWeight(tickIndex)
-          val nodeWeightValue = t._1
-          val nodeId = t._2
+          maxValue = t._1
 
-          println("    - nodeWeightValue: " + nodeWeightValue + " (node id " + nodeId + ")")
+          //println("    - maxValue: " + maxValue)
 
           // trouver l'index maximum qui donne t1
-          var max = 0
+
           sortedByWeight.zipWithIndex.foreach {
             case ((realWeight, nodeId), sortedIndex) =>
-              if (realWeight <= nodeWeightValue) {
-                max = nodeId
+              if (realWeight <= maxValue) {
+                maxIndex = sortedIndex
               }
           }
-          println("max: " + max)
-          println(" remainingNodes before: " + remainingNodes)
-          remainingNodes = g.nbNodes - max
-          println(" remainingNodes after: " + remainingNodes)
-          nodeWeightValue
+          //println("maxIndex: " + maxIndex)
+          //println(" remainingNodes before: " + remainingNodes)
+          remainingNodes = g.nbNodes - maxIndex
+          //println(" remainingNodes after: " + remainingNodes)
+          maxValue
         }
     }).toList
   }
-   def edgeWeightRange(g: Graph, nbTicks: Int = 10): List[Double] = {
-         println("computing edgeWeightRange")
-         List.empty[Double]
-   }
+
+  def edgeWeightRange(g: Graph, nbTicks: Int = 100): List[Double] = {
+    //println("computing edgeWeightRange")
+    val sortedByWeight = g.edgeWeight.zipWithIndex.toList.sort {
+      case (t1: (Double, Int), t2: (Double, Int)) =>
+        (t1._1 < t2._1)
+    }
+    //println("weights:")
+    //sortedByWeight.foreach {
+    //  case (weight, id) => println(" - "+weight)
+    //}
+    if (g.nbEdges == 0) return List.empty[Double]
+    var maxIndex = 0
+    var maxValue = 0.0
+    var remainingEdges = g.nbEdges
+    //println(" remainingNodes: " + remainingNodes)
+    ((0 until nbTicks).map {
+      case tickId =>
+        if (tickId == nbTicks-1) {
+          sortedByWeight.last._1
+        } else {
+          println("  " + tickId + ":")
+          val tickIndex = ((g.nbEdges - remainingEdges) + Math.floor(remainingEdges / (nbTicks - tickId))).toInt
+          //println("    - tickIndex: " + tickIndex)
+
+          val t = sortedByWeight(tickIndex)
+          maxValue = t._1
+
+          //println("    - maxValue: " + maxValue)
+
+          // trouver l'index maximum qui donne t1
+
+          sortedByWeight.zipWithIndex.foreach {
+            case ((realWeight, nodeId), sortedIndex) =>
+              if (realWeight <= maxValue) {
+                maxIndex = sortedIndex
+              }
+          }
+          //println("maxIndex: " + maxIndex)
+          //println(" remainingNodes before: " + remainingNodes)
+          remainingEdges = g.nbEdges - maxIndex
+          //println(" remainingNodes after: " + remainingNodes)
+          maxValue
+        }
+    }).toList
+  }
+
   def connectedComponents(g: Graph): Array[Int] = {
 
     // Calcul des partitions

@@ -48,6 +48,20 @@ object Functions  {
   }
 
   /**
+   * compute the edge weights
+   */
+  def edgeWeight (g:Graph) = {
+    var t = List.empty[Double]
+    g.links.zipWithIndex foreach {
+      case (links, i) =>
+        links.zipWithIndex foreach {
+          case ((j, weight), _j) => t ::= weight
+        }
+    }
+    t.toArray
+  }
+
+  /**
    * Generic function to make a label nicer
    * Richard "Aphex Twin" James - University of Weird Music
    * will give:
