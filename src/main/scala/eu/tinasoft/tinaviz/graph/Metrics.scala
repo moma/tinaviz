@@ -85,7 +85,7 @@ object Metrics {
     _inDegree.toArray
   }
 
-  def nodeWeightRange(g: Graph, nbTicks: Int = 100): List[Double] = {
+  def nodeWeightRange(g: Graph, cat:String, nbTicks: Int = 100): List[Double] = {
     //println("computing nodeWeightRange")
     val sortedByWeight = g.weight.zipWithIndex.filter{ case t: (Double, Int) => cat.equalsIgnoreCase(g.category(t._2))  }.toList.sort {
       case (t1: (Double, Int), t2: (Double, Int)) => (t1._1 < t2._1)
