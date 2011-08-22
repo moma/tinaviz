@@ -120,6 +120,7 @@ object Filters {
   /**
    * Filter the Nodes weights
    */
+  /*
   def nodeWeight(g: Graph, ref: Graph): Set[Int] = {
     if (g.nbNodes == 0) return Set.empty[Int]
     val rangeA = Maths.map(
@@ -142,6 +143,7 @@ object Filters {
     }
     removeMe
   }
+  */
 
   /**
    * Filter the Nodes weights
@@ -152,8 +154,10 @@ object Filters {
     val rangeB = g.get[(Double, Double)]("filter.b.edge.weight")
 
 
-    //println("g.edgeWeightRange:"+g.edgeWeightRange)
-    //println("ref.edgeWeightRange:"+ref.edgeWeightRange)
+    println("g.edgeAWeightRange:"+g.edgeAWeightRange)
+
+    println("ref.edgeAWeightRange:"+ref.edgeAWeightRange)
+
 
     val newLinks = g.links.zipWithIndex map {
       case (links, i) =>
