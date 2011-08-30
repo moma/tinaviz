@@ -48,7 +48,7 @@ Eg. for a production setting:
         <keystore.path>~/prod.keystore</keystore.path>
         <keystore.alias>tinasoft</keystore.alias>
         <keystore.type>JKS</keystore.type>
-        <keystore.store.password>*SOMETHING_DIFFERENT*</keystore.store.password>
+        <keystore.store.password>${keystore.password}</keystore.store.password>
         <keystore.key.password>${keystore.password}</keystore.key.password>
         <keystore.password>*SOMETHING*</keystore.password>
       </properties>
