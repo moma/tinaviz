@@ -354,7 +354,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("singlesCenter" -> Metrics.singlesCenter(g)) // need isSingle
     g = g + ("notSinglesCenter" -> Metrics.notSinglesCenter(g))
 
-    g = g + ("edgeIndex" -> Drawing.edgeIndex(g))
+    g = g + ("edgeIndex" -> Functions.edgeIndex(g))
     g = g + ("edgeWeight" -> Functions.edgeWeight(g))
 
     g = g + ("edgeAWeightRange" -> Metrics.edgeWeightRange(g, "Document"))

@@ -131,12 +131,12 @@ object Metrics {
   }
 
   def edgeWeightRange(g: Graph, cat:String, nbTicks: Int = 100): List[Double] = {
-    //println("computing edgeWeightRange")
+    println("ERROR ERROR ERROR computing edgeWeightRange with wrong values")
     val sortedByWeight = g.edgeWeight.zipWithIndex.filter{
       case t: (Double, Int) =>
         val (sourceId, targetId) = g.edgeIndex(t._2)
         val (sourceCat, targetCat) = (g.category(sourceId), g.category(targetId))
-        TODO CHECK AND FILTER THE WEIGHT
+        // TODO CHECK AND FILTER THE WEIGHT
         cat.equalsIgnoreCase(g.category(  t._2))
     }.toList.sort {
       case (t1: (Double, Int), t2: (Double, Int)) =>
