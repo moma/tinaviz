@@ -16,26 +16,24 @@ How to setup your development environement:
 5. Run "./PLEASE_RUN_ME_THE_FIRST_TIME.sh" 
 6. Configure your system for JAR signature :
 
-http://www.coding-stories.com/2010/09/02/signer-les-jars-avec-maven/#more-266
+Explanations in french: http://www.coding-stories.com/2010/09/02/signer-les-jars-avec-maven/#more-266
 
 First, you will need a keystore:
 
-For Development:
+For Development, you can by example put it in ~/dev.keystore
 
-~/Private/dev.keystore
-keytool -genkeypair -dname "cn=David Chavalarias, ou=Tina, o=CNRS, c=FR" -alias devalias -keypass keypass -keystore ~/dev.keystore -storepass storepass -validity 180
+for this, simply type: 
 
-(done sur mon mac)
+           keytool -genkeypair -dname "cn=David Chavalarias, ou=Tina, o=CNRS, c=FR" -alias devalias -keypass keypass -keystore ~/dev.keystore -storepass storepass -validity 180
 
 For Production:
-store path: ~/Private/prod.keystore
+store path: ~/prod.keystore
 store pass: *SOMETHING*
 
 alias: tinasoft
 keypass: *SOMETHING_DIFFERENT*
 
 keytool -genkeypair -dname "cn=David Chavalarias, ou=Tinasoft, o=CNRS, c=FR" -alias tinasoft -keypass *SOMETHING_DIFFERENT* -keystore ~/prod.keystore -storepass *SOMETHING* -validity 350
-
 
 
 Also, you will need a ${HOME}/.m2/settings.xml file, with a signing profile.
