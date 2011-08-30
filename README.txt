@@ -57,7 +57,12 @@ Eg. for a production setting:
 </settings>
 
 7. edit the POM accordingly to your config
-8. run "mvn install"
+8. You are done. Please go to "How to compile"
+
+
+How to compile :
+1. run "mvn install"
+
 
 Then, all depend on what you want to do.
 Maybe you will want to copy the JAR to another directory (eg. tinaweb/js/tinaviz)
