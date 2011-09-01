@@ -87,6 +87,7 @@ object Metrics {
 
   def nodeWeightRange(g: Graph, cat:String, nbTicks: Int = 100): List[Double] = {
     //println("computing nodeWeightRange")
+
     val sortedByWeight = g.weight.zipWithIndex.filter{ case t: (Double, Int) => cat.equalsIgnoreCase(g.category(t._2))  }.toList.sort {
       case (t1: (Double, Int), t2: (Double, Int)) => (t1._1 < t2._1)
     }
@@ -94,10 +95,10 @@ object Metrics {
     //sortedByWeight.foreach {
     //  case (weight, id) => println(" - "+weight)
     //}
-    if (g.nbNodes == 0) return List.empty[Double]
+    if (sortedByWeight.length == 0) return List.empty[Double]
     var maxIndex = 0
     var maxValue = 0.0
-    var remainingNodes = g.nbNodes
+    var remainingNodes = sortedByWeight.length
     //println(" remainingNodes: " + remainingNodes)
     ((0 until nbTicks).map {
       case tickId =>
@@ -105,8 +106,25 @@ object Metrics {
           sortedByWeight.last._1
         } else {
           //println("  " + tickId + ":")
-          val tickIndex = ((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
-          //println("    - tickIndex: " + tickIndex)
+          /*
+((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
+((588 - 588) + Math.floor(588 / (100 - 0))).toInt
+(0 + Math.floor(remainingNodes / 100)).toInt
+(0+5.0).toInt
+    - tickIndex: 5 sorted weight size: 67
+
+((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
+((588 - 522) + Math.floor(522 / (100 - 1))).toInt
+(66 + Math.floor(remainingNodes / 99)).toInt
+(66+5.0).toInt
+    - tickIndex: 71 sorted weight size: 67
+           */
+          //println("((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt")
+          //println("(("+sortedByWeight.length+" - "+remainingNodes+") + Math.floor("+remainingNodes+" / ("+nbTicks+" - "+tickId+"))).toInt")
+          //println("("+(sortedByWeight.length - remainingNodes)+" + Math.floor("+remainingNodes+" / "+(nbTicks - tickId)+")).toInt")
+          //println("("+(sortedByWeight.length - remainingNodes) + "+" + Math.floor(remainingNodes / (nbTicks - tickId))+").toInt")
+          val tickIndex = ((sortedByWeight.length - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
+          //println("    - tickIndex: " + tickIndex+" sorted weight size: "+sortedByWeight.length)
 
           val t = sortedByWeight(tickIndex)
           maxValue = t._1
@@ -114,7 +132,6 @@ object Metrics {
           //println("    - maxValue: " + maxValue)
 
           // trouver l'index maximum qui donne t1
-
           sortedByWeight.zipWithIndex.foreach {
             case ((realWeight, nodeId), sortedIndex) =>
               if (realWeight <= maxValue) {
@@ -123,7 +140,7 @@ object Metrics {
           }
           //println("maxIndex: " + maxIndex)
           //println(" remainingNodes before: " + remainingNodes)
-          remainingNodes = g.nbNodes - maxIndex
+          remainingNodes = sortedByWeight.length - maxIndex
           //println(" remainingNodes after: " + remainingNodes)
           maxValue
         }
@@ -131,13 +148,14 @@ object Metrics {
   }
 
   def edgeWeightRange(g: Graph, cat:String, nbTicks: Int = 100): List[Double] = {
-    println("ERROR ERROR ERROR computing edgeWeightRange with wrong values")
+    //println("ERROR ERROR ERROR computing edgeWeightRange with wrong values")
     val sortedByWeight = g.edgeWeight.zipWithIndex.filter{
       case t: (Double, Int) =>
         val (sourceId, targetId) = g.edgeIndex(t._2)
         val (sourceCat, targetCat) = (g.category(sourceId), g.category(targetId))
         // TODO CHECK AND FILTER THE WEIGHT
-        cat.equalsIgnoreCase(g.category(  t._2))
+        // check if the source and target are the same category, and if this category must be kept
+        cat.equalsIgnoreCase(sourceCat) && cat.equalsIgnoreCase(targetCat)
     }.toList.sort {
       case (t1: (Double, Int), t2: (Double, Int)) =>
         (t1._1 < t2._1)
@@ -146,10 +164,11 @@ object Metrics {
     //sortedByWeight.foreach {
     //  case (weight, id) => println(" - "+weight)
     //}
-    if (g.nbEdges == 0) return List.empty[Double]
+
+    if (sortedByWeight.length == 0) return List.empty[Double]
     var maxIndex = 0
     var maxValue = 0.0
-    var remainingEdges = g.nbEdges
+    var remainingEdges = sortedByWeight.length
     //println(" remainingNodes: " + remainingNodes)
     ((0 until nbTicks).map {
       case tickId =>
@@ -157,8 +176,11 @@ object Metrics {
           sortedByWeight.last._1
         } else {
           //println("  " + tickId + ":")
-          val tickIndex = ((g.nbEdges - remainingEdges) + Math.floor(remainingEdges / (nbTicks - tickId))).toInt
-          //println("    - tickIndex: " + tickIndex)
+          //println("(("+sortedByWeight.length+" - "+remainingEdges+") + Math.floor("+remainingEdges+" / ("+nbTicks+" - "+tickId+"))).toInt")
+           //println("(("+(sortedByWeight.length - remainingEdges)+") + Math.floor("+remainingEdges+" / ("+(nbTicks - tickId)+"))).toInt")
+          //println("(("+(sortedByWeight.length - remainingEdges)+") + Math.floor("+remainingEdges / (nbTicks - tickId)+")).toInt")
+          val tickIndex = ((sortedByWeight.length - remainingEdges) + Math.floor(remainingEdges / (nbTicks - tickId))).toInt
+          //println("    - tickIndex: " + tickIndex+" compared to : "+sortedByWeight.length)
 
           val t = sortedByWeight(tickIndex)
           maxValue = t._1
@@ -175,7 +197,7 @@ object Metrics {
           }
           //println("maxIndex: " + maxIndex)
           //println(" remainingNodes before: " + remainingNodes)
-          remainingEdges = g.nbEdges - maxIndex
+          remainingEdges = sortedByWeight.length - maxIndex
           //println(" remainingNodes after: " + remainingNodes)
           maxValue
         }

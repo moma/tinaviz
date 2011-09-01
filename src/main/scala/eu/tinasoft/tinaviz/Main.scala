@@ -113,6 +113,14 @@ class Main extends TApplet with Client {
 
   // hack for client. TODO: put it in the Client's constructor
 
+   var doZoom: Symbol = 'none
+  var export: String = "none"
+  var quick = false
+
+  var nbVisibleNodes = 0
+  var nbVisibleEdges = 0
+  var brandingIcon = new PImage()
+  var counter = 0
 
   override def setup(): Unit = {
     val engine = PConstants.P2D
@@ -127,14 +135,14 @@ class Main extends TApplet with Client {
     setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
 
-    /*
-      logo = try {
-          getParameter("logo") match {
-            case logo => loadImage( logo )
+
+      brandingIcon = try {
+          session.applet.getParameter("brandingIcon") match {
+            case path => loadImage( path )
           }
        } catch {
             case e => new PImage()
-       } */
+       }
 
 
     //{
@@ -157,14 +165,7 @@ class Main extends TApplet with Client {
     )
   }
 
-  var doZoom: Symbol = 'none
-  var export: String = "none"
-  var quick = false
 
-  var nbVisibleNodes = 0
-  var nbVisibleEdges = 0
-  var logo = new PImage()
-  var counter = 0
 
   override def draw(): Unit = {
 
