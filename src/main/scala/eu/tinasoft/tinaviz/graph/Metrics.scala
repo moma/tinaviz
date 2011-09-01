@@ -91,10 +91,7 @@ object Metrics {
     val sortedByWeight = g.weight.zipWithIndex.filter{ case t: (Double, Int) => cat.equalsIgnoreCase(g.category(t._2))  }.toList.sort {
       case (t1: (Double, Int), t2: (Double, Int)) => (t1._1 < t2._1)
     }
-    //println("weights:")
-    //sortedByWeight.foreach {
-    //  case (weight, id) => println(" - "+weight)
-    //}
+
     if (sortedByWeight.length == 0) return List.empty[Double]
     var maxIndex = 0
     var maxValue = 0.0
@@ -105,31 +102,12 @@ object Metrics {
         if (tickId == nbTicks-1) {
           sortedByWeight.last._1
         } else {
-          //println("  " + tickId + ":")
-          /*
-((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
-((588 - 588) + Math.floor(588 / (100 - 0))).toInt
-(0 + Math.floor(remainingNodes / 100)).toInt
-(0+5.0).toInt
-    - tickIndex: 5 sorted weight size: 67
-
-((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
-((588 - 522) + Math.floor(522 / (100 - 1))).toInt
-(66 + Math.floor(remainingNodes / 99)).toInt
-(66+5.0).toInt
-    - tickIndex: 71 sorted weight size: 67
-           */
-          //println("((g.nbNodes - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt")
-          //println("(("+sortedByWeight.length+" - "+remainingNodes+") + Math.floor("+remainingNodes+" / ("+nbTicks+" - "+tickId+"))).toInt")
-          //println("("+(sortedByWeight.length - remainingNodes)+" + Math.floor("+remainingNodes+" / "+(nbTicks - tickId)+")).toInt")
-          //println("("+(sortedByWeight.length - remainingNodes) + "+" + Math.floor(remainingNodes / (nbTicks - tickId))+").toInt")
+          // tickIndex numero de la graduation
           val tickIndex = ((sortedByWeight.length - remainingNodes) + Math.floor(remainingNodes / (nbTicks - tickId))).toInt
           //println("    - tickIndex: " + tickIndex+" sorted weight size: "+sortedByWeight.length)
 
           val t = sortedByWeight(tickIndex)
           maxValue = t._1
-
-          //println("    - maxValue: " + maxValue)
 
           // trouver l'index maximum qui donne t1
           sortedByWeight.zipWithIndex.foreach {
