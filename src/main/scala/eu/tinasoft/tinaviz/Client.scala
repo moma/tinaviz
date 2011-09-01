@@ -142,8 +142,14 @@ trait Client {
     }
   }
   def get(key:String) : java.lang.Object = {
-    println("-> get("+key+")")
-    (session.server !? key).asInstanceOf[AnyRef]
+
+    var result = (session.server !? key).asInstanceOf[AnyRef] match {
+      case tuple2:(Any,Any) => "{_1:"+tuple2._1+",_2:"+tuple2._2+"}"
+      case tuple3:(Any,Any,Any) => "{_1:"+tuple3._1+",_2:"+tuple3._2+",_3:"+tuple3._3+"}"
+      case any:Any => any
+    }
+     println("-> get("+key+") ==> "+result)
+    result
   }
 
   /**
