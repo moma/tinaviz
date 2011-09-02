@@ -117,33 +117,6 @@ object Filters {
     g.remove(removeMe)
   }
 
-  /**
-   * Filter the Nodes weights
-   */
-  /*
-  def nodeWeight(g: Graph, ref: Graph): Set[Int] = {
-    if (g.nbNodes == 0) return Set.empty[Int]
-    val rangeA = Maths.map(
-      g.get[(Double, Double)]("filter.a.node.weight"),
-      (0.0, 1.0),
-      (ref.minANodeWeight, ref.maxANodeWeight))
-    val rangeB = Maths.map(
-      g.get[(Double, Double)]("filter.b.node.weight"),
-      (0.0, 1.0),
-      (ref.minBNodeWeight, ref.maxBNodeWeight))
-    var removeMe = Set.empty[Int]
-    g.weight.zipWithIndex.map {
-      case (weight, i) =>
-        val r = g.category(i) match {
-          case "Document" => rangeA
-          case "NGram" => rangeB
-        }
-        if (!(r._1 <= weight && weight <= r._2))
-          if (!g.selected(i)) removeMe += i
-    }
-    removeMe
-  }
-  */
 
   /**
    * Filter the Nodes weights
@@ -154,9 +127,9 @@ object Filters {
     val rangeB = g.get[(Double, Double)]("filter.b.edge.weight")
 
 
-    println("g.edgeAWeightRange:"+g.edgeAWeightRange)
+    //println("g.edgeAWeightRange:"+g.edgeAWeightRange)
 
-    println("ref.edgeAWeightRange:"+ref.edgeAWeightRange)
+    //println("ref.edgeAWeightRange:"+ref.edgeAWeightRange)
 
 
     val newLinks = g.links.zipWithIndex map {
