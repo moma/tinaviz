@@ -79,14 +79,14 @@ object Filters {
    */
   def nodeWeight2(g: Graph, ref: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    println("ref.nodeAWeightRange: "+ref.nodeAWeightRange);
-    println("ref.nodeBWeightRange: "+ref.nodeBWeightRange);
+    println("g.nodeAWeightRange: "+g.nodeAWeightRange);
+    println("g.nodeBWeightRange: "+g.nodeBWeightRange);
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map {
       case (weight, i) =>
         (g.category(i) match {
-          case "Document" => ref.nodeAWeightRange
-          case "NGram" => ref.nodeBWeightRange
+          case "Document" => g.nodeAWeightRange
+          case "NGram" => g.nodeBWeightRange
         }) match {
         case (minWeight, maxWeight) =>
           if (!(minWeight <= weight && weight <= maxWeight))
@@ -139,8 +139,8 @@ object Filters {
               true
             } else {
               (g.category(i) match {
-                case "Document" => ref.edgeAWeightRange
-                case "NGram" => ref.edgeBWeightRange
+                case "Document" => g.edgeAWeightRange
+                case "NGram" => g.edgeBWeightRange
               }) match {
                 case (minWeight, maxWeight) =>  (minWeight <= weight && weight <= maxWeight)
               }
