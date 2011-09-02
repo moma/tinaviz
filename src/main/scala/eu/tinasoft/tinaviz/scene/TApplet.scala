@@ -388,16 +388,27 @@ class TApplet extends PApplet with MouseWheelListener {
     //println("showSelectionCircle: "+radius)
     if (radius < 1) return
 
-    scale((1.0 / _camera.zoom).toFloat)
-    translate(-_camera.position._1.toFloat, -_camera.position._2.toFloat)
+
     stroke(0.0f, 1.0f, 0.0f, 0.5f)
     strokeWeight(1.0f)
     fill(.57f, 1.0f, 1.0f, 0.2f)
     drawDisk(mouseXY, radius)
-    translate(_camera.position._1.toFloat, _camera.position._2.toFloat)
-    scale(_camera.zoom.toFloat)
+
 
   }
+
+  def goToScreen() {
+    scale((1.0 / _camera.zoom).toFloat)
+    translate(-_camera.position._1.toFloat, -_camera.position._2.toFloat)
+
+  }
+  def goToScene() {
+
+     translate(_camera.position._1.toFloat, _camera.position._2.toFloat)
+     scale(_camera.zoom.toFloat)
+
+   }
+
 
   def mouseXY = (mouseX.toDouble, mouseY.toDouble)
 
