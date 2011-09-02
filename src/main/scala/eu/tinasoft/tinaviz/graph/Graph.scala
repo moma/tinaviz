@@ -96,10 +96,11 @@ object Graph {
     "filter.map.node.color.brightness" -> "weight",
     "filter.map.node.size" -> "weight",
     "filter.map.node.shape" -> "category",
-    "nodeAWeightRange" -> List.empty[Double],
-    "edgeAWeightRange" -> List.empty[Double],
-    "nodeBWeightRange" -> List.empty[Double],
-    "edgeBWeightRange" -> List.empty[Double],
+
+    "nodeAWeightRange" -> (0.0,1.0),
+    "edgeAWeightRange" -> (0.0,1.0),
+    "nodeBWeightRange" -> (0.0,1.0),
+    "edgeBWeightRange" -> (0.0,1.0),
 
     "outDegree" -> Array.empty[Int],
     "inDegree" -> Array.empty[Int],
@@ -267,7 +268,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   lazy val nodeAWeightRange = get[(Double,Double)]("nodeAWeightRange")
   lazy val edgeAWeightRange = get[(Double,Double)]("edgeAWeightRange")
-    lazy val nodeBWeightRange = get[(Double,Double)]("nodeBWeightRange")
+  lazy val nodeBWeightRange = get[(Double,Double)]("nodeBWeightRange")
   lazy val edgeBWeightRange = get[(Double,Double)]("edgeBWeightRange")
   /**
    * compute the edge position to screen
@@ -285,11 +286,12 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
 
   lazy val window = get[(Int, Int)]("window")
 
-     def _prepare1(r:Double, range: List[Double]) : Double = {
-        range((r * range.length.toDouble).toInt match { case i => if (i >= range.length) (range.length - 1) else i })
-     }
+     def _prepare1(r:Double, range: List[Double]) = range( (r * range.length.toDouble).toInt match { case i => if (i >= range.length) (range.length - 1) else i } )
+
       def _prepare2(r:(Double,Double), range:List[Double]) : (Double,Double) = {
-        (_prepare1(r._1, range), _prepare1(r._1, range))
+        val result = if (range.length > 0) (_prepare1(r._1, range), _prepare1(r._1, range)) else (0.0, 1.0)
+         println(" result: "+ result)
+        return result
      }
 
    def callbackNodeCountChanged = {
@@ -302,7 +304,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
     g = g + ("extremumsSelection" -> (Metrics extremumsSelection g))
     g = g + ("baryCenter" -> Metrics.baryCenter(g))
     g = g + ("selectionCenter" -> Metrics.selectionCenter(g))
-
+     println("recomputing nodeAWeightRange: _prepare2("+ g.get[(Double, Double)]("filter.a.node.weight") +","+ Metrics.nodeWeightRange(g, "Document") +");")
     g = g + ("nodeAWeightRange" -> _prepare2(g.get[(Double, Double)]("filter.a.node.weight"),Metrics.nodeWeightRange(g, "Document")))
     g = g + ("nodeBWeightRange" -> _prepare2(g.get[(Double, Double)]("filter.b.node.weight"),Metrics.nodeWeightRange(g, "NGram")))
 

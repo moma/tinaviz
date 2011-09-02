@@ -79,10 +79,8 @@ object Filters {
    */
   def nodeWeight2(g: Graph, ref: Graph): Graph = {
     if (g.nbNodes == 0) return g
-
-    // update the graphical interface
-    var (updatedA, updatedB) = (false, false)
-
+    println("ref.nodeAWeightRange: "+ref.nodeAWeightRange);
+    println("ref.nodeBWeightRange: "+ref.nodeBWeightRange);
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map {
       case (weight, i) =>

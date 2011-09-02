@@ -33,6 +33,7 @@ import tinaviz.layout._
 import actors._
 import Actor._
 import xml.dtd.ValidationException
+import math.Numeric.DoubleAsIfIntegral
 
 case class Step(val step: Symbol)
 
@@ -98,6 +99,21 @@ class Server (val session:Session) extends Actor {
         case ("selectByNeighbourPattern", pattern, category)    => session.workflow ! ("selectByNeighbourPattern", pattern, category)
         case ("highlightByPattern", pattern) => session.workflow ! "highlightByPattern"  -> pattern
 
+        case ('getAs,key:String,as:String) =>
+          reply(
+            as match {
+               case "Int" =>
+                session.pipeline.output.get[Int](key)
+               case "String" =>
+                session.pipeline.output.get[String](key)
+              case "Double" =>
+                session.pipeline.output.get[Double](key)
+              case "(Double,Double)" =>
+                session.pipeline.output.get[(Double,Double)](key)
+              case any:String =>
+                session.pipeline.output.elements(key)
+            }
+          )
         case ('getNodes,view,category) =>
           println("Server: client called getNodes("+view+", "+category+") -> replying..")
           reply(session.workflow !? ('getNodes,view,category))
@@ -110,7 +126,6 @@ class Server (val session:Session) extends Actor {
 
         case ("camera.mouse", kind, side, count, position) =>
           session.workflow ! ("camera.mouse", kind, side, count, position)
-
 
         case ('updated, key: String, value: Any, previous: Any) =>
           key match {
@@ -126,7 +141,8 @@ class Server (val session:Session) extends Actor {
 
             case any => session.workflow ! key -> value
           }
-        case key: String =>  reply(properties(key))
+        case key: String =>
+           reply(properties(key))
 
         case (key: String, pvalue: Any) =>
           var value = pvalue
