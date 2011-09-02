@@ -79,20 +79,40 @@ object Filters {
    */
   def nodeWeight2(g: Graph, ref: Graph): Graph = {
     if (g.nbNodes == 0) return g
-    println("g.nodeAWeightRange: "+g.nodeAWeightRange);
-    println("g.nodeBWeightRange: "+g.nodeBWeightRange);
+    val rangeA = g.get[(Double, Double)]("filter.a.node.weight")
+    val rangeB = g.get[(Double, Double)]("filter.b.node.weight")
+
+    //print("range a: "+(ref.minANodeWeight, ref.maxANodeWeight))
+    //print("range b: "+(ref.minBNodeWeight, ref.maxBNodeWeight))
+    //println("g.nodeWeightRange:"+g.nodeWeightRange)
+    //println("ref.nodeWeightRange:"+ref.nodeWeightRange)
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map {
       case (weight, i) =>
-        (g.category(i) match {
-          case "Document" => g.nodeAWeightRange
-          case "NGram" => g.nodeBWeightRange
-        }) match {
-        case (minWeight, maxWeight) =>
-          if (!(minWeight <= weight && weight <= maxWeight))
-            if (!g.selected(i))
-              removeMe += i
-      }
+        val (r,fn) = g.category(i) match {
+          case "Document" => (rangeA, ref.nodeAWeightRange)
+          case "NGram" => (rangeB, ref.nodeBWeightRange)
+        }
+        val ns = fn.size
+        val weightFrom = fn((r._1 * ns).toInt match {
+          case i => if (i >= ns)
+            (ns - 1)
+          else
+            i
+        }
+        )
+        val weightTo = fn((r._2 * ns).toInt match {
+          case i => if (i >= ns)
+            (ns - 1)
+          else
+            i
+        }
+        )
+
+        //print("  - "+g.label(i)+" ~ "+weight+"? "+((!(r._1 <= weight && weight <= r._2))))
+        if (!(weightFrom <= weight && weight <= weightTo))
+          if (!g.selected(i))
+            removeMe += i
     }
     g.remove(removeMe)
   }
@@ -130,6 +150,14 @@ object Filters {
    */
   def edgeWeight(g: Graph, ref: Graph): Graph = {
     if (g.nbNodes == 0) return g
+    val rangeA = g.get[(Double, Double)]("filter.a.edge.weight")
+    val rangeB = g.get[(Double, Double)]("filter.b.edge.weight")
+
+
+    println("g.edgeAWeightRange:"+g.edgeAWeightRange)
+
+    println("ref.edgeAWeightRange:"+ref.edgeAWeightRange)
+
 
     val newLinks = g.links.zipWithIndex map {
       case (links, i) =>
@@ -138,12 +166,34 @@ object Filters {
             if (!g.category(i).equalsIgnoreCase(g.category(j))) {
               true
             } else {
-              (g.category(i) match {
-                case "Document" => g.edgeAWeightRange
-                case "NGram" => g.edgeBWeightRange
-              }) match {
-                case (minWeight, maxWeight) =>  (minWeight <= weight && weight <= maxWeight)
+              //if (g.hasThisLink(j,i))
+              //  true // always keep mutual links
+              // else
+
+
+              val (r,fn) = g.category(i) match {
+                case "Document" => (rangeA,ref.edgeAWeightRange)
+                case "NGram" => (rangeB, ref.edgeBWeightRange)
               }
+              val es = fn.size
+              val weightFrom = fn((r._1 * es).toInt match {
+                case i => if (i >= es)
+                  (es - 1)
+                else
+                  i
+              }
+              )
+              val weightTo = fn((r._2 * es).toInt match {
+                case i => if (i >= es)
+                  (es - 1)
+                else
+                  i
+              }
+              )
+
+              (weightFrom <= weight && weight <= weightTo)
+
+
             }
         }
     }
