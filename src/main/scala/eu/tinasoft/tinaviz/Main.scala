@@ -552,11 +552,8 @@ class Main extends TApplet with Client {
     loadPixels()
     (0 until 25).map { case x => (0 until 20).map { case y =>
             val loc1 : Int = x + y*25
-            val loc2 : Int = x + (width*(height-32)) + y*width
-
-            // Test the brightness against the threshold
-            if (alpha(brandingIcon.pixels(loc1)) > 0.0)
-              pixels(loc2) = brandingIcon.pixels(loc1)  // else use pixels.update(loc, neValue)
+            val loc2 : Int = x + (width*(height-28)) + y*width
+            if (alpha(brandingIcon.pixels(loc1)) > 0.0) pixels(loc2) = brandingIcon.pixels(loc1)
     }}
 
 
@@ -594,8 +591,10 @@ class Main extends TApplet with Client {
                             position: (Double, Double)) {
     //println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
     resetIdle
+
     session.server ! ("camera.mouse", kind, side, count, position)
     session.server ! "window" -> (width, height)
+
   }
 
   /**

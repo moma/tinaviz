@@ -438,7 +438,14 @@ class TApplet extends PApplet with MouseWheelListener {
     session.server ! "camera.target" -> "none"
   }
 
-  override def mouseClicked = updateMouse('Click)
+  override def mouseClicked = {
+    if ((mouseY > height - 28) && (mouseX < 25)) {
+      link("http://sciencemapping.com", "_new")
+    } else {
+       updateMouse('Click)
+    }
+
+  }
 
   override def mouseMoved = updateMouse('Move)
 
