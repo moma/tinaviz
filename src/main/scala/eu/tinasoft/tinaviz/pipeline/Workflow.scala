@@ -298,7 +298,7 @@ class Workflow (val session:Session) extends Actor {
               //println("selection count, before: "+out.selection.size+" after: "+out2.selection.size)
               pipeline.setOutput(out2.callbackSelectionChanged)
               session.webpage ! "_callbackSelectionChanged" -> (pipeline.output.selectionAttributes, side match {
-                case 'Left => "left"
+                case 'Left => if (doubleClicked) "doubleLeft" else "left"
                 case 'Right => "right"
                 case any => "none"
               })
@@ -306,7 +306,11 @@ class Workflow (val session:Session) extends Actor {
               // check if we need to recompute the meso field
               if (doubleClicked) {
                 if (somethingIsSelected) {
-                    session.webpage ! "filter.view" -> "meso"
+                    //out2.currentView match {
+                      // case "macro" =>
+                         // obsolete (will give "error, filter has no "view" method" error)
+                         //session.webpage ! "filter.view" -> "meso"
+                    //}
 
                   } else {
                     // zoom?
