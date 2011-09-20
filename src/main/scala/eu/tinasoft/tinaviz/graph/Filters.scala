@@ -30,6 +30,7 @@ object Filters {
   def category(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
 
+    val FEATURE_RemoveSingleNodesInMesoView = false
     var removeMe = Set.empty[Int]
     val category = g.currentCategory
     g.currentView match {
@@ -53,13 +54,14 @@ object Filters {
               //println("removing "+g.label(i)+" because: !"+g.currentCategory+".equalsIgnoreCase("+g.category(i)+")=="+(!g.currentCategory.equalsIgnoreCase(g.category(i))))
               removeMe += i
             } else {
+
               var keepThat = false
               // we remove nodes not connected to the selection
               g.selection.foreach {
                 case j => if (g.hasAnyLink(i, j)) keepThat = true
               }
               if (!keepThat) {
-                removeMe += i
+                if (FEATURE_RemoveSingleNodesInMesoView) removeMe += i
               }
             }
           }
