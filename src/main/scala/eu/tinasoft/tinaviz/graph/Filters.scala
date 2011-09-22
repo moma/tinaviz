@@ -30,7 +30,7 @@ object Filters {
   def category(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
 
-    val FEATURE_RemoveSingleNodesInMesoView = false
+    val FEATURE_RemoveSingleNodesInMesoView = true
     var removeMe = Set.empty[Int]
     val category = g.currentCategory
     g.currentView match {

@@ -255,9 +255,9 @@ class Main extends TApplet with Client {
       // no background for PNG files (translucent)
       case any =>
         setBackground(g.currentView match {
-          case "macro" => new Color(0.0, 0.0, 1.0)
-          case "meso" => new Color(0.1416, 0.1, 1.0) // jaunâtre
-          case any => new Color(0.0, 0.0, 1.0)
+          case "macro" => new Color(0.0, 0.0, 1.0, 1.0)
+          case "meso" => new Color(0.1416, 0.1, 1.0, 1.0) // jaunâtre
+          case any => new Color(0.0, 0.0, 1.0, 1.0)
         })
     }
 
@@ -550,12 +550,13 @@ class Main extends TApplet with Client {
     goToScene()
     brandingIcon.loadPixels()
     loadPixels()
+    if (width > 30 && height > 30) {
     (0 until 25).map { case x => (0 until 20).map { case y =>
             val loc1 : Int = x + y*25
             val loc2 : Int = x + (width*(height-28)) + y*width
             if (alpha(brandingIcon.pixels(loc1)) > 0.0) pixels(loc2) = brandingIcon.pixels(loc1)
     }}
-
+    }
 
     updatePixels()
     //image(brandingIcon, width - 32, height - 40)

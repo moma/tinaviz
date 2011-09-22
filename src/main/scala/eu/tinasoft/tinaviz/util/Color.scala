@@ -22,6 +22,8 @@
 
 package eu.tinasoft.tinaviz.util
 
+import reflect.BooleanBeanProperty
+
 class Palette(val standard:Color,
               val dark:Color,
               val darker:Color,
@@ -115,13 +117,14 @@ object Color {
   
   // val samba = new Palette
   
-  def fromRGBTuple3(c:(Double,Double,Double)) : Color  = {
-    new Color(c._1,c._2,c._3)
+  def fromRGBTuple3(c:(Int,Int,Int)) : Color  = {
+    val hsb = java.awt.Color.RGBtoHSB(c._1,c._2,c._3, new Array[Float](3))
+    new Color(hsb(0),hsb(1),hsb(2))
   }
-  def fromRGBTuple4(c:(Double,Double,Double,Double)) : Color  = {
+  def fromRGBTuple4(c:(Int,Int,Int,Int)) : Color  = {
     new Color(c._1,c._2,c._3,c._4)
   }
-  def toRGBTuple3(c:Color) : (Double,Double,Double) = {
+  def toRGBTuple3(c:Color) : (Int,Int,Int) = {
     val d = new java.awt.Color( java.awt.Color.HSBtoRGB(c.h.toFloat,c.s.toFloat,c.b.toFloat))
     (d.getRed,d.getGreen,d.getBlue)
   }
@@ -133,38 +136,48 @@ object Color {
 class Color(val h:Double=1.0,
             val s:Double=1.0,
             val b:Double=1.0,
-            val a:Double=1.0) {
+            val a:Double=1.0,
+            val undef : Boolean = false) {
 
   def blend(c:Color) : Color = {
     new Color((h+c.h)/2,
               (s+c.s)/2,
               (b+c.b)/2,
-              (a+c.a)/2)
+              (a+c.a)/2,
+               undef || c.undef)
   }
   def hue(x:Double) : Color = {
-    new Color(x,s,b,a)
+    new Color(x,s,b,a,undef)
   }
   def saturation(x:Double) : Color = {
-    new Color(h,x,b,a)
+    new Color(h,x,b,a,undef)
   }
   def brightness(x:Double) : Color = {
-    new Color(h,s,x,a)
+    new Color(h,s,x,a,undef)
   }
   def saturateBy(x:Double) : Color = {
-    new Color(h,s*x,b,a)
+    new Color(h,s*x,b,a,undef)
   }
  def brightnessBy(x:Double) : Color = {
-    new Color(h,s,b*x,a)
+    new Color(h,s,b*x,a,undef)
+  }
+
+  def withUndef : Color = {
+    new Color(h,s,b,a,true)
   }
   
   def alpha(a:Double) : Color = {
-    new Color(h,s,b,a)
+    new Color(h,s,b,a,undef)
   }
   def alphaBy(f:Double) : Color = {
-    new Color(h,s,b,a*f)
+    new Color(h,s,b,a*f,undef)
   }
-  def toRGBTuple3 : (Double,Double,Double) = {
+  def toRGBTuple3 : (Int,Int,Int) = {
+    //println("h, s, b:"+(h,s,b))
     val c = new java.awt.Color( java.awt.Color.HSBtoRGB(h.toFloat,s.toFloat,b.toFloat))
-    (c.getRed,c.getGreen,c.getBlue)
+    //println("RGB: "+ (c.getRed.toInt,c.getGreen.toInt,c.getBlue.toInt))
+    //println("RGB Int: "+ (c.getRed.toInt,c.getGreen.toInt,c.getBlue.toInt))
+    (c.getRed.toInt,c.getGreen.toInt,c.getBlue.toInt)
   }
+
 }

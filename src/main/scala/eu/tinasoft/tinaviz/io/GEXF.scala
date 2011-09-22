@@ -208,23 +208,28 @@ class GEXF (val session:Session) extends Actor {
 
 
 
-      /*
+
        val color : Color = try {
-       (((n \\ "color") \ "@r" text).toInt,
-       ((n \\ "color") \ "@g" text).toInt,
-       ((n \\ "color") \ "@b" text).toInt)
+       val rgbTuple = (
+        ((n \\ "color") \ "@r" text).toInt,
+        ((n \\ "color") \ "@g" text).toInt,
+        ((n \\ "color") \ "@b" text).toInt)
+         println("rgbtuple: "+rgbTuple)
+         Color.fromRGBTuple3(rgbTuple)
        } catch {
-       case x => (0,0,0)
-       }*/
-      val color = new Color(Maths.random(0.0, 1.0),
-                            Maths.random(0.8, 1.0),
-                            Maths.random(0.8, 1.0))
+       case exception =>
+
+         new Color(0.0,0.0,0.0,0.0,true)
+       }
+      println("imported color: "+color.toRGBTuple3)
+
       g += (id, "uuid", uuid)
       g += (id, "label", label)
       g += (id, "renderedLabel", label)
       g += (id, "shortLabel", Functions.myLabelCurator(label, true))
       g += (id, "showLabel", false) // disabled by default
-      g += (id, "color", color)
+      g += (id, "color", color) // changed when mouse is over
+      g += (id, "originalColor", color) // never changed
       g += (id, "selected", false)
       g += (id, "highlighted", false)
       g += (id, "updateStatus", 'outdated ) // outdated, updating, updated, failure

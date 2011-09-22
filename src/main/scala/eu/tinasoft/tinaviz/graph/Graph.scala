@@ -66,6 +66,7 @@ object Graph {
     "showLabel" -> Array.empty[Boolean],
     "labelColor" -> Array.empty[Color],
     "color" -> Array.empty[Color],
+    "originalColor" -> Array.empty[Color],
     "selected" -> Array.empty[Boolean],
     "highlighted" -> Array.empty[Boolean],
     "updateStatus" -> Array.empty[Symbol], // outdated, updating, updated
@@ -162,6 +163,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val links = getArray[Map[Int, Double]]("links")
   lazy val position = getArray[(Double, Double)]("position")
   lazy val color = getArray[Color]("color")
+  lazy val originalColor = getArray[Color]("color")
   lazy val weight = getArray[Double]("weight")
   lazy val size = getArray[Double]("size")
   lazy val category = getArray[String]("category")
