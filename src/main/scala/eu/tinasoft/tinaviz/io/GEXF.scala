@@ -214,14 +214,14 @@ class GEXF (val session:Session) extends Actor {
         ((n \\ "color") \ "@r" text).toInt,
         ((n \\ "color") \ "@g" text).toInt,
         ((n \\ "color") \ "@b" text).toInt)
-         println("rgbtuple: "+rgbTuple)
+         //println("rgbtuple: "+rgbTuple)
          Color.fromRGBTuple3(rgbTuple)
        } catch {
        case exception =>
 
          new Color(0.0,0.0,0.0,0.0,true)
        }
-      println("imported color: "+color.toRGBTuple3)
+      //println("imported color: "+color.toRGBTuple3)
 
       g += (id, "uuid", uuid)
       g += (id, "label", label)

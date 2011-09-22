@@ -435,21 +435,14 @@ class Main extends TApplet with Client {
       val l1 = g.label(i)
       val r2 = g.size(j)
       val l2 = g.label(j)
-      val normalComparison = if (r1 > r2) true else (if (r1 < r2) false else (l1.compareTo(l2) < 0))
 
-      // if the node is highlighted or selected, and its neighbour is neither selected or highlighted: then greater!
-      if ((h1 && !h2 && !s2) || (!s1 && !h2 && !s2)) {
-        true
-      } else if ((h2 && !h1 && !s1) || (!s2 && !h1 && !s1)) {
-        false
-      } else {
-        normalComparison
-      }
+        if (h1 && !h2)              true
+        else (if (s1 && !s2 && !h2) true
+        else (if (r1 > r2)          true else (l1.compareTo(l2) < 0)))
     }
     val sortedLabelIDs = visibleNodes.map {
       _._2
     }.toList.sort(compareBySize).toArray
-
 
 
     if (g.pause || counter >= 25) {
@@ -480,7 +473,7 @@ class Main extends TApplet with Client {
               val h2 = setFontSize((r2 * getZoom).toInt, b2)
               val w2 = textWidth(l2) /// getZoom //
               //val whichIsSelected = false // we don't care. else, use: scene.graph.selected(j)
-              val whichIsSelected = b2 // g.selected(j)
+              val whichIsSelectedOrHighlighted = b2 // g.selected(j)
               val weTouchSomething = ((((np1._1 <= np2._1) && (np1._1 + w1 >= np2._1))
                 || ((np1._1 >= np2._1) && (np1._1 <= np2._1 + w2)))
                 && (((np1._2 <= np2._2) && (np1._2 + h1 >= np2._2))
@@ -496,7 +489,7 @@ class Main extends TApplet with Client {
               if (i == j) {
                 false
               } else if (weTouchSomething) {
-                if (whichIsSelected) true else whichIsLarger
+                if (g.highlighted(j)) true else (if (g.selected(j)) true else whichIsLarger)
               } else {
                 false
               }
@@ -504,7 +497,7 @@ class Main extends TApplet with Client {
           setFontSize((r1 * getZoom).toInt, b1)
           setColor(g.labelColor(i))
           // we can show the label if we are selected, or if we do not collide with a bigger one
-          if ((!weHaveACollision) || g.highlighted(i)) {
+          if ((!weHaveACollision) || g.selected(i) || g.highlighted(i)) {
             text(l1, np1._1, (np1._2 + (h1 / 2.0)).toInt)
             session.pipeline.setOutput(
               session.pipeline.output.set(i, "showLabel", true)
