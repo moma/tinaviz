@@ -178,7 +178,6 @@ object Filters {
 
   def weightToSize(g: Graph, ref: Graph): Graph = {
     if (g.nbNodes == 0) return g
-
     val sliderRange = (26.0, 60.0) //node size range
 
     // small adjustement ("hack") to fit sliders to data from TinasoftPytextminer

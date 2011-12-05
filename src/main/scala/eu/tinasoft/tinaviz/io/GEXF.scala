@@ -245,7 +245,6 @@ class GEXF (val session:Session) extends Actor {
       g += (id, "links", Map.empty[Int, Double])
 
       var keywords = List.empty[String]
-
       for (a <- (n \\ "attvalue")) {
 
           val at = attribute(a)

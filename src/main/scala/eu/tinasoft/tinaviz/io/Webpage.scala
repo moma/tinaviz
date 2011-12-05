@@ -51,7 +51,6 @@ class Webpage(val session: Session) extends Actor {
   }
 
   def act() {
-    val delay = 200 // set timeout delay
     this ! "_initCallback"
     loop {
       react {
@@ -63,7 +62,7 @@ class Webpage(val session: Session) extends Actor {
         case func: String =>
           //println("ASYNC window.call: " + jsContext + prefix + func + "")
           if (window != null) {
-            window.call("setTimeout", Array[Object](jsContext + prefix + func + "()", new java.lang.Integer(delay), new java.lang.Integer(0)))
+            window.call("setTimeout", Array[Object](jsContext + prefix + func + "()", new java.lang.Integer(0)))
           }
 
         case (func: String, (any1, any2)) =>
@@ -96,21 +95,17 @@ class Webpage(val session: Session) extends Actor {
           }
 
         case ('forceDownload, str: String) =>
-          val base64ified = "data:application/gexf;base64," + Base64.encode(str)
+          val base64ified = "data:application/xml;base64," + Base64.encode(str)
           window.call("open", Array[Object](base64ified, "_newtab", new java.lang.Integer(0)))
 
-        case ('cb, cbId:String, any) =>
-          val args = Array[Object](jsContext + prefix + "callCallback" + "('"+cbId+"', '" + replace(Json.build(any).toString) + "')", new java.lang.Integer(delay), new java.lang.Integer(0))
-          println("SYNC window.call: " + args + "")
-          if (window != null) {
-            window.call("setTimeout", args)
-          }
-
         case (func: String, any) =>
-          val args = Array[Object](jsContext + prefix + func + "('" + replace(Json.build(any).toString) + "')", new java.lang.Integer(delay), new java.lang.Integer(0))
-          println("SYNC window.call: " + args + "")
+          val args = Array[Object](
+            Json.build(any).toString,
+            new java.lang.Integer(0))
+          // println("SYNC window.call: " + jsContext + prefix + func + "(" + Json.build(any).toString + ")")
           if (window != null) {
-            window.call("setTimeout", args)
+            // _window.call(_subPrefix + _apiPrefix + func, args)
+            window.call("setTimeout", Array[Object](jsContext + prefix + func + "('" + replace(Json.build(any).toString) + "')", new java.lang.Integer(0)))
           }
         /*
         case (func:String,any) =>

@@ -125,7 +125,7 @@ class Main extends TApplet with Client {
   override def setup(): Unit = {
     val engine = PConstants.P2D
     size(1200, 800, engine)
-    frameRate(30)
+    frameRate(35)
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
@@ -215,7 +215,7 @@ class Main extends TApplet with Client {
         }
       } else {
         resetIdle
-        24
+        25
       }
     }
     frameRate(fps)
@@ -445,7 +445,7 @@ class Main extends TApplet with Client {
     }.toList.sort(compareBySize).toArray
 
 
-    if (g.pause || counter >= 22) {
+    if (g.pause || counter >= 25) {
       counter = 0
       sortedLabelIDs.foreach {
         case (i) =>
@@ -727,9 +727,11 @@ class Main extends TApplet with Client {
         //println("error")             || g.currentView.equalsIgnoreCase("macro")
         return
     }
-
+    //println("g.cameraTarget: " + g.cameraTarget)
+    //if (Maths.random < 0.9) {
     val (w, h) = (width.toDouble * 0.85, height.toDouble * 0.85) // 15% of margins
-
+    //println("xy min max: "+(g.xMin, g.xMax, g.yMin, g.yMax))
+    //println("target: "+g.cameraTarget)
     val centerOnSelection = (g.cameraTarget.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
     // spaghetti code
     val ratio = (((if (centerOnSelection) {
@@ -754,9 +756,11 @@ class Main extends TApplet with Client {
     translate.set(translate.x, translate.y + 30, 0)
 
     if (Maths.random < 0.1) updatePosition(translate) else updatePositionSilent(translate)
+    //println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio+" zoom: "+getZoom)
     if (g.selectionNeighbourhood.size != 1) {
       if (ratio != 0.0) if (Maths.random < 0.1) updateZoom(getZoom / ratio) else updateZoomSilent(getZoom / ratio)
     } else {
+      //println("updateZoomSilent(3.0)")
       if (Maths.random < 0.1) {
         updateZoom(3.0)
       } else {
@@ -764,6 +768,7 @@ class Main extends TApplet with Client {
       }
 
     }
+    //}
   }
 
 

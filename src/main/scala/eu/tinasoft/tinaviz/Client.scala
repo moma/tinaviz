@@ -24,8 +24,6 @@ package eu.tinasoft.tinaviz
 
 import actors._
 import Actor._
-import actors.Futures._
-
 import eu.tinasoft._
 import tinaviz.io.json.Json
 import tinaviz.io.Webpage
@@ -101,117 +99,51 @@ trait Client {
   /**
    * Set a tuple of size two (both elements must be of the same type)
    */
-    def sendTuple2(cbId : String, key:String, value1:java.lang.Object, value2:java.lang.Object, t:String) : Unit = {
+    def sendTuple2(key:String, value1:java.lang.Object, value2:java.lang.Object, t:String) : Unit = {
     println("-> sendTuple2(key:"+key+", value1:"+value1+", value2: "+value2+", t:"+t+")")
     t match {
        case "Int" =>
-
-       future {
-         session.webpage ! (cbId,
-           session.server !? (key -> (value1.toString.toInt, value2.toString.toInt))
-         )
-       }
-
+       session.server ! key -> (value1.toString.toInt, value2.toString.toInt)
        case "Float" =>
-                future {
-         session.webpage ! (cbId,
-       session.server !? key -> (value1.toString.toFloat, value2.toString.toFloat)
-           )
-                }
+       session.server ! key -> (value1.toString.toFloat, value2.toString.toFloat)
        case "Double" =>
-                future {
-         session.webpage ! (cbId,
-       session.server !? key -> (value1.toString.toDouble, value2.toString.toDouble)
-           )
-                }
+       session.server ! key -> (value1.toString.toDouble, value2.toString.toDouble)
        case "Boolean" =>
         //println("converting "+key+" : ("+value1+","+value2+") to Boolean")
-                future {
-         session.webpage ! (cbId,
-        session.server !? key -> (value1.toString.toBoolean,value2.toString.toBoolean)
-           )
-                }
-       case "String" =>
-                future {
-         session.webpage ! (cbId,
-           session.server !? key -> (value1.toString, value2.toString)
-           )
-                }
+        session.server ! key -> (value1.toString.toBoolean,value2.toString.toBoolean)
+       case "String" => session.server ! key -> (value1.toString, value2.toString)
        case "Json" =>
-                future {
-         session.webpage ! (cbId,
          val data = (Json.parse(value1.toString),Json.parse(value2.toString))
          //println("parsed Json to "+data)
-         session.server !? key -> data
-                  )
-                }
-       case x =>
-                future {
-         session.webpage ! (cbId,
-         session.server !? key -> (value1, value2)
-           )
-                }
+         session.server ! key -> data
+       case x => session.server ! key -> (value1, value2)
     }
   }
 
-  def send(cbId : String, key:String, value:java.lang.Object, t:String) : Unit = {
+  def send(key:String, value:java.lang.Object, t:String) : Unit = {
     println("-> send(key:"+key+", value:"+value+", t:"+t+")")
     //"[\"NGram::41a14ef0a30a812946b69d522e1570db9e4c0d5579753ba429e7291a9bdbc96c\",\"NGram::bbbf7a6412d6d3e8244ac1fda5e35a20037acee661288cb95b7b18cf469980aa\",\"NGram::bc020a35b7f9cb1382e7b534c68e3c531d849b119bf14f75ddead6cc45c3ccc1\"]"
     t match {
-       case "Int" =>
-                future {
-         session.webpage ! (cbId,
-       session.server !? key -> value.toString.toInt
-           )
-                }
-       case "Float" =>
-                future {
-         session.webpage ! (cbId,
-       session.server !? key -> value.toString.toFloat
-           )
-                }
-       case "Double" =>
-                future {
-         session.webpage ! (cbId,
-       session.server !? key -> value.toString.toDouble
-           )
-                }
+       case "Int" => 
+       session.server ! key -> value.toString.toInt
+       case "Float" => 
+       session.server ! key -> value.toString.toFloat
+       case "Double" => 
+       session.server ! key -> value.toString.toDouble
        case "Boolean" =>
         //println("converting "+key+" : "+value+" to Boolean")
-                future {
-         session.webpage ! (cbId,
-        session.server !? key -> value.toString.toBoolean
-           )
-                }
-       case "String" =>
-                future {
-         session.webpage ! (cbId,
-           session.server !? key -> value.toString
-           )
-                }
+        session.server ! key -> value.toString.toBoolean
+       case "String" => session.server ! key -> value.toString
        case "Json" =>
-                future {
-         session.webpage ! (cbId,
          val data = Json.parse(value.toString)
-                  )
          //println("parsed Json to "+data)
-         session.server !? key -> data
-                }
-       case x =>
-                future {
-         session.webpage ! (cbId,
-           session.server !? key -> value
-           )
-                }
+         session.server ! key -> data
+       case x => session.server ! key -> value
     }
   }
   def get(key:String) : java.lang.Object = {
     println("-> get("+key+")")
     (session.server !? key).asInstanceOf[AnyRef]
-  }
-
-   def cbGet(cbId:String, key:String) : java.lang.Object = {
-    session.server ! ('cbGet,cbId,key)
   }
 
   /**
