@@ -60,6 +60,7 @@ class GEXF (val session:Session) extends Actor {
             println("Connecting to " + url)
             val BUFFER_SIZE = 2048
             val conn = url.openConnection
+            conn.setConnectTimeout(0) // infinite
             val ins = conn.getInputStream
 
             reply(
