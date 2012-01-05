@@ -5,9 +5,6 @@
       <BSFConsoleSearchOptions />
     </option>
   </component>
-  <component name="DependencyValidationManager">
-    <option name="SKIP_IMPORT_STATEMENTS" value="false" />
-  </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
       <facet-type id="scala">

@@ -27,5 +27,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.8.1" level="project" />
   </component>
+  <component name="POM File Configuration" pomFile="" />
 </module>
 
