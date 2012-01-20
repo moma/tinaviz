@@ -471,9 +471,14 @@ class TApplet extends PApplet with MouseWheelListener {
 
   // detection system for user idle
   var _idle = 0
+  var _default_fps = 24
   def idle = _idle
+  def setDefaultFPS(fps:Int) {
+    _default_fps = fps
+  }
   def resetIdle : Int = {
     _idle = 0
+    frameRate(_default_fps)
     0
   }
   def increaseIdle : Int = {

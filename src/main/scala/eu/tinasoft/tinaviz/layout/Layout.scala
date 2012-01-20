@@ -1,6 +1,6 @@
 /************************************************************************
                                   Tinaviz
-*************************************************************************
+ *************************************************************************
  This application is part of the Tinasoft project: http://tinasoft.eu
  Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
 
@@ -18,7 +18,7 @@
 
  You should have received a copy of the GNU General Public License along
  with this program. If not, see <http://www.gnu.org/licenses/>.
-************************************************************************/
+ ************************************************************************/
 
 package eu.tinasoft.tinaviz.layout
 
@@ -34,28 +34,52 @@ import tinaviz.{Session, Main, Server}
 /**
  * Layout Actor
  */
-class Layout (val session:Session)  extends Actor {
+class Layout (val session:Session) extends Actor {
+
+  def now() = {
+    System.currentTimeMillis
+  }
 
   def act() {
+    val layoutEngine = new PhysicLayout(session)
+    var running = false
+     self ! 'start
 
-    this ! 'run
-     val layout = new PhysicLayout(session)
+   // loop {
+   //   react {
     while (true) {
-      receive {
-        case 'run =>
-          session.workflow ! ('setLayout,
-            layout.layout(
-              ((session.workflow !? 'getLayout) match {
-                case g: Graph =>
-                //println("Layout: got graph ("+g.nbNodes+")")
-                  g
-                case any =>
-                //println("Layout: empty graph..")
-                  new Graph
-              })
-            )) // warm the cache, so the visualization thread don't have to do it
+     receive {
+        case 'start  =>
+          if (!running) {
+            //println(" Layout: asked to start, and not already running, so..starting!")
+          running = true
+          self ! 'run
+          }
 
-          this ! 'run // run layout as fast as possible
+        case 'stop  =>
+          if (running) {
+           // println(" Layout: running, so stopping")
+            running = false
+          }
+
+        case 'run =>
+          if (running) {
+           // println("running layout")
+            val start = now()
+
+            val g = session.pipeline.output
+            //println("layouting the output")
+            val h = layoutEngine.layout(g)
+
+            val computingTime = now() - start
+
+            actor {
+              var waitTime = if (computingTime < (1000.0 / g.layoutSpeed)) ((1000.0 / g.layoutSpeed) - computingTime) else 0.0
+              Thread.sleep( waitTime.toInt )
+              session.workflow ! 'overwriteCoordinates -> h
+            }
+          }
+
         case 'exit =>
           exit()
       }

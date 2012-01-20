@@ -165,8 +165,7 @@ class PhysicLayout (val session:Session) {
     }
     var (ci, cj) = (0, 0)
 
-    if (g.pause) { Thread.sleep(1000); g }
-    else {
+
       g + ("position" -> (positionIndexSingle.map {
         case (nodePosition, i, s) =>
 
@@ -203,7 +202,7 @@ class PhysicLayout (val session:Session) {
             nodePosition
           }
       }))
-    }
+
 
   }
 
@@ -306,8 +305,7 @@ class PhysicLayout (val session:Session) {
     }
     var (ci, cj) = (0, 0)
 
-    if (g.pause) g
-    else {
+
       g + ("position" -> (positionIndexSingle map {
         case (nodePosition, i, s) =>
 
@@ -324,7 +322,7 @@ class PhysicLayout (val session:Session) {
 
             (x, y)
       }))
-    }
+
 
   }
 }

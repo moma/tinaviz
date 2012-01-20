@@ -35,15 +35,15 @@ import reflect.{BooleanBeanProperty, ValDef}
 
 class Webpage(val session: Session) extends Actor {
 
+  val CB_INIT = 0
+  val CB_IMPORTED = 1
+  val CB_CLICK = 2
+  val CB_VIEW = 3
+
   lazy val (connected, window, jsContext, prefix) : (Boolean, JSObject, String, String) = try {
     (true, JSObject.getWindow(session.applet), session.applet.getParameter("js_context"), "tinaviz.")
   } catch {
     case e => (false, null, "", "")
-  }
-
-  private def buttonStateCallback(attr: String, state: Boolean) = {
-    //callAndForget("_buttonStateCallback", "'" + attr + "'," +
-    //             (if (state) "true" else "false"))
   }
 
   def replace(str: String) = {
@@ -51,71 +51,21 @@ class Webpage(val session: Session) extends Actor {
   }
 
   def act() {
-    this ! "_initCallback"
-    loop {
-      react {
-        case 'exit =>
-          println("exiting browser")
-          exit()
+    val cblatency = 10 // decrease to make the application faster
+    this ! CB_INIT -> Map()
+    while (true) {
+      receive {
+        case 'exit => println("exiting browser"); exit()
 
-        // asynchronous call
-        case func: String =>
-          //println("ASYNC window.call: " + jsContext + prefix + func + "")
-          if (window != null) {
-            window.call("setTimeout", Array[Object](jsContext + prefix + func + "()", new java.lang.Integer(0)))
-          }
-
-        case (func: String, (any1, any2)) =>
-          if (window != null) {
-            //println("calling setTimeout(\"" + jsContext + prefix + func + "('" + replace(Json.build(any1).toString) + "','" + replace(Json.build(any2).toString) + "')\")")
-            window.call("setTimeout", Array[Object](jsContext + prefix + func + "('" + replace(Json.build(any1).toString) + "','" + replace(Json.build(any2).toString) + "')", new java.lang.Integer(0)))
-          }
-
-        case (func: String, (any1, any2, any3)) =>
-          val args = Array[Object](
-            Json.build(any1).toString,
-            Json.build(any2).toString,
-            Json.build(any3).toString,
-            new java.lang.Integer(0))
-          //println("SYNC window.call: " + jsContext + prefix + func + "(" + args + ")")
-          if (window != null) {
-            window.call(jsContext + prefix + func, args)
-          }
-
-        case (func: String, (any1, any2, any3, any4)) =>
-          val args = Array[Object](
-            Json.build(any1).toString,
-            Json.build(any2).toString,
-            Json.build(any3).toString,
-            Json.build(any4).toString,
-            new java.lang.Integer(0))
-          //println("SYNC window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
-          if (window != null) {
-            window.call(jsContext + prefix + func, args)
-          }
-
-        case ('forceDownload, str: String) =>
-          val base64ified = "data:application/xml;base64," + Base64.encode(str)
+        case ('download, str: String) =>
+          val base64ified = "data:application/gexf;base64," + Base64.encode(str)
           window.call("open", Array[Object](base64ified, "_newtab", new java.lang.Integer(0)))
 
-        case (func: String, any) =>
-          val args = Array[Object](
-            Json.build(any).toString,
-            new java.lang.Integer(0))
-          // println("SYNC window.call: " + jsContext + prefix + func + "(" + Json.build(any).toString + ")")
-          if (window != null) {
-            // _window.call(_subPrefix + _apiPrefix + func, args)
-            window.call("setTimeout", Array[Object](jsContext + prefix + func + "('" + replace(Json.build(any).toString) + "')", new java.lang.Integer(0)))
-          }
-        /*
-        case (func:String,any) =>
-        val json = Json.build(any).toString
-        val args = Array[Object] (Json.build(any).toString,new java.lang.Integer(0))
-        println("window.call: "+_subPrefix + _apiPrefix + func+"("+args+")")
-        if (_window!=null) {
-        _window.call(_subPrefix + _apiPrefix + func, args)
-        }
-        */
+        case (cb:Int, data:Map[String,Any]) =>
+          val args = Array[Object]("callCallback" + "('"+cb+"', '" + replace(Json.build(data).toString) + "')", new java.lang.Integer(cblatency), new java.lang.Integer(0))
+          //println("ASYNC/CB window.call: " + Json.build(data).toString + "")
+          if (window != null) window.call("setTimeout", args)
+
         case msg => println("Webpage: unknow msg: " + msg)
       }
     }

@@ -1,6 +1,6 @@
 /************************************************************************
                                   Tinaviz
-*************************************************************************
+ * ************************************************************************
  This application is part of the Tinasoft project: http://tinasoft.eu
  Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
 
@@ -18,7 +18,7 @@
 
  You should have received a copy of the GNU General Public License along
  with this program. If not, see <http://www.gnu.org/licenses/>.
-************************************************************************/
+ ************************************************************************/
 
 package eu.tinasoft.tinaviz.io
 
@@ -41,101 +41,109 @@ import reflect.ValDef
 
 //import java.io.{FileInputStream,FileOutputStream,IOException}
 //import java.util.zip.InflaterInputStream
+
 import java.util.zip.GZIPInputStream
 import java.io.BufferedInputStream
 
-class GEXF (val session:Session) extends Actor {
+class GEXF(val session: Session) extends Actor {
 
-   start
+  start
 
   def act() {
 
-      receive {
+    receive {
 
-        case 'exit =>
-          println("GEXF: exiting..")
-          exit()
+      case 'exit =>
+        println("GEXF: exiting..")
+        exit()
 
-        case (url: URL, defaults:Map[String,Any]) =>
-            println("Connecting to " + url)
-            val BUFFER_SIZE = 2048
-            val conn = url.openConnection
-            conn.setConnectTimeout(0) // infinite
-            val ins = conn.getInputStream
+      case (cb: Int, (url: URL, defaults: Map[String, Any])) =>
+        println("GEXF: Connecting to " + url)
+        val BUFFER_SIZE = 2048
+        val conn = url.openConnection
+        conn.setConnectTimeout(0) // infinite
+        val ins = conn.getInputStream
 
-            reply(
-              load((if (url.toString.endsWith(".gexf")||url.toString.endsWith(".xml")) {
-                 println("Reading raw graph stream, please wait..")
-                 XML.load(ins)
-              } else if (url.toString.endsWith(".zip")||url.toString.endsWith(".gz")||url.toString.endsWith(".tar.gz")) {
-               println("Reading gzipped graph stream, please wait..")
-                val ins2 = new BufferedInputStream(  // TO BE CLOSE
-                    new GZIPInputStream(
-                      ins,
-                      BUFFER_SIZE
-                    ),
-                    BUFFER_SIZE
-                )
-                try XML.load(ins2) finally ins2.close
-
-              } else {
-                XML.load(ins)
-              }),defaults
-            )
+        val content =  (if (url.toString.endsWith(".gexf") || url.toString.endsWith(".xml")) {
+          println("Reading raw graph stream, please wait..")
+          XML.load(ins)
+        } else if (url.toString.endsWith(".zip") || url.toString.endsWith(".gz") || url.toString.endsWith(".tar.gz")) {
+          println("Reading gzipped graph stream, please wait..")
+          val ins2 = new BufferedInputStream(// TO BE CLOSE
+            new GZIPInputStream(
+              ins,
+              BUFFER_SIZE
+            ),
+            BUFFER_SIZE
           )
+          try XML.load(ins2) finally ins2.close
 
-        case (str: String, defaults:Map[String,Any]) =>
-            println("Reading graph string, please wait..")
-            reply(load(XML.load(str), defaults))
+        } else {
+          XML.load(ins)
+        })
+       session.server ! cb -> 'graphDownloaded
+       load(cb, content, defaults)
+
+      case (cb : Int, str: String, defaults: Map[String, Any]) =>
+        println("Reading graph string, please wait..")
+        load(cb, XML.load(str), defaults)
 
 
-        case graph: Graph =>
-          val newColors = graph.nodeColor.map {
-            case (col) => col.toRGBTuple3
-          }
-          reply (
-            <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
-              <meta lastmodifieddate="1986-03-24">
-                <creator>tinaviz2</creator>
-                <description>Graph export</description>
-              </meta>
-              <graph type="static">
-                <attributes class="node" type="static">
+      case graph: Graph =>
+        val newColors = graph.nodeColor.map {
+          case (col) => col.toRGBTuple3
+        }
+        reply(
+          <gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz.xsd">
+            <meta lastmodifieddate="1986-03-24">
+              <creator>tinaviz2</creator>
+              <description>Graph export</description>
+            </meta>
+            <graph type="static">
+              <attributes class="node" type="static">
                   <attribute id="0" title="category" type="string"/>
-                </attributes>
-                <nodes>{
-                   for ((nodeUUID,nodeIndex) <- graph.uuid.zipWithIndex) yield
-                     <node id={nodeUUID} label={ graph.label(nodeIndex) }>
-                       { val (x,y) = graph.position(nodeIndex) match { case (x,y) => (x.toString, y.toString)  }
-                        <viz:position x={ x } y={ y } z="0.0" /> }
-                       { val (r,g,b) = newColors(nodeIndex) match { case (r,g,b) => (r.toInt.toString, g.toInt.toString, b.toInt.toString ) }
-                        <viz:color r={ r } g={ g } b={ b } /> }
-                        <viz:size value={ graph.size(nodeIndex).toString } />
-                        <attvalues>
-                          <attvalue id="0" value={ graph.category(nodeIndex) }/>
-                        </attvalues>
-                      </node>
-                  }</nodes>
-                <edges>{
-                   var edgeIndex = 0
-                   for ((links,nodeIndex) <- graph.links.zipWithIndex; (target, weight) <- links) yield {
-                     edgeIndex += 1
-                     //if (graph.hasThisLink(target,nodeIndex)) {
-                         //<edge id={ nodeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } type="undirected" weight={ weight.toString }> </edge>
-                     // } else {
-                     //if (nodeIndex < target) {
-                         <edge id={ edgeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } type="undirected" weight={ weight.toString }> </edge>
-                     //}
-                    }
-                  }</edges>
-              </graph>
-            </gexf>
-          )
-      }
+                  <attribute id="1" title="weight" type="double"/>
+              </attributes>
+              <nodes>
+                {for ((nodeUUID, nodeIndex) <- graph.uuid.zipWithIndex) yield
+                <node id={nodeUUID} label={graph.label(nodeIndex)}>
+                  {val (x, y, z) = graph.position(nodeIndex) match {
+                  case (x, y) => (x.toString, y.toString, (graph.category(nodeIndex) match {
+                    case "Document" => 0.0
+                    case  "NGram" => 200.0
+                    case other => 400.0
+                  }).toString())}
+                  <viz:position x={x} y={y} z={z}/>}{val (r, g, b) = newColors(nodeIndex) match {
+                  case (r, g, b) => (r.toInt.toString, g.toInt.toString, b.toInt.toString)
+                }
+                  <viz:color r={r} g={g} b={b}/>}<viz:size value={graph.size(nodeIndex).toString}/>
+                  <attvalues>
+                      <attvalue id="0" value={graph.category(nodeIndex)}/>
+                      <attvalue id="1" value={graph.weight(nodeIndex).toString()}/>
+                  </attvalues>
+                </node>}
+              </nodes>
+              <edges>
+                {var edgeIndex = 0
+              for ((links, nodeIndex) <- graph.links.zipWithIndex; (target, weight) <- links) yield {
+                edgeIndex += 1
+                //if (graph.hasThisLink(target,nodeIndex)) {
+                //<edge id={ nodeIndex.toString } source={ graph.uuid(nodeIndex) } target={ graph.uuid(target) } type="undirected" weight={ weight.toString }> </edge>
+                // } else {
+                //if (nodeIndex < target) {
+                <edge id={edgeIndex.toString} source={graph.uuid(nodeIndex)} target={graph.uuid(target)} type="undirected" weight={weight.toString}></edge>
+                //}
+              }}
+              </edges>
+            </graph>
+          </gexf>
+        )
+    }
   }
 
 
-  def load(root:Elem, defaultProperties:Map[String,Any] = Map.empty[String,Any]) = {
+  def load(cb:Int, root: Elem, defaultProperties: Map[String, Any] = Map.empty[String, Any]) = {
+
     var properties = Map(
       "url" -> ""
     )
@@ -145,8 +153,8 @@ class GEXF (val session:Session) extends Actor {
       (as \\ "@class" text) match {
         case "node" =>
           for (a <- (as \\ "attribute")) {
-            nodeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
-                                                   (a \ "@type" text) match {
+            nodeAttributes += (a \ "@id" text) ->((a \ "@title" text),
+              (a \ "@type" text) match {
                 case "float" => 1.0
                 case "double" => 1.0
                 case "integer" => 1
@@ -157,8 +165,8 @@ class GEXF (val session:Session) extends Actor {
           }
         case "edge" =>
           for (a <- (as \\ "attribute")) {
-            edgeAttributes += (a \ "@id" text) -> ((a \ "@title" text),
-                                                   (a \ "@type" text) match {
+            edgeAttributes += (a \ "@id" text) ->((a \ "@title" text),
+              (a \ "@type" text) match {
                 case "float" => 1.0
                 case "double" => 1.0
                 case "integer" => 1
@@ -170,30 +178,32 @@ class GEXF (val session:Session) extends Actor {
       }
     }
 
-    def title(s: String) = { s split(" ") map(_.capitalize) mkString(" ")  }
+    def title(s: String) = {
+      s split (" ") map (_.capitalize) mkString (" ")
+    }
 
 
     def attribute(e: xml.Node): (String, Any) = {
       val attr = nodeAttributes(e \ "@for" text)
       val value = (e \ "@value" text)
       (attr._1, attr._2 match {
-          case x: Double => value.toDouble
-          case x: Float => value.toDouble
-          case x: Int => value.toInt
-          case x: Boolean => value.toBoolean
-          case x: String => value.toString
-          case x => value
-        })
+        case x: Double => value.toDouble
+        case x: Float => value.toDouble
+        case x: Int => value.toInt
+        case x: Boolean => value.toBoolean
+        case x: String => value.toString
+        case x => value
+      })
 
     }
     var ei = 0
-    var g = new Graph( defaultProperties )
+    var g = new Graph(defaultProperties)
     var id = -1
     for (n <- (root \\ "node")) {
       id += 1
 
       val uuid = n \ "@id" text
-      val label =title( try {
+      val label = title(try {
         n \ "@label" text
       } catch {
         case x => "Node " + uuid
@@ -201,66 +211,84 @@ class GEXF (val session:Session) extends Actor {
 
 
 
-         val p = (n \\ "position")
-         //println("x: " +(p \ "@x" text)+" y:"+(p \ "@y" text))
+      val p = (n \\ "position")
+      //println("x: " +(p \ "@x" text)+" y:"+(p \ "@y" text))
 
-         val position = ((try { (p \ "@x" text) match { case "" => Maths.random(0, 200) case any => any.toDouble } } catch { case e => Maths.random(0, 200) }),
-                         try { (p \ "@y" text) match { case "" => Maths.random(0, 200) case any => any.toDouble } } catch { case e => Maths.random(0, 200) })
+      val position = ((try {
+        (p \ "@x" text) match {
+          case "" => Maths.random(0, 200)
+          case any => any.toDouble
+        }
+      } catch {
+        case e => Maths.random(0, 200)
+      }),
+        try {
+          (p \ "@y" text) match {
+            case "" => Maths.random(0, 200)
+            case any => any.toDouble
+          }
+        } catch {
+          case e => Maths.random(0, 200)
+        })
 
 
 
 
-       val color : Color = try {
-       val rgbTuple = (
-        ((n \\ "color") \ "@r" text).toInt,
-        ((n \\ "color") \ "@g" text).toInt,
-        ((n \\ "color") \ "@b" text).toInt)
-         //println("rgbtuple: "+rgbTuple)
-         Color.fromRGBTuple3(rgbTuple)
-       } catch {
-       case exception =>
+      val color: Color = try {
+        val rgbTuple = (
+          ((n \\ "color") \ "@r" text).toInt,
+          ((n \\ "color") \ "@g" text).toInt,
+          ((n \\ "color") \ "@b" text).toInt)
+        //println("rgbtuple: "+rgbTuple)
+        Color.fromRGBTuple3(rgbTuple)
+      } catch {
+        case exception =>
 
-         new Color(0.0,0.0,0.0,0.0,true)
-       }
+          new Color(0.0, 0.0, 0.0, 0.0, true)
+      }
       //println("imported color: "+color.toRGBTuple3)
 
-      g += (id, "uuid", uuid)
-      g += (id, "label", label)
-      g += (id, "renderedLabel", label)
-      g += (id, "shortLabel", Functions.myLabelCurator(label, true))
-      g += (id, "showLabel", false) // disabled by default
-      g += (id, "color", color) // changed when mouse is over
-      g += (id, "originalColor", color) // never changed
-      g += (id, "selected", false)
-      g += (id, "highlighted", false)
-      g += (id, "updateStatus", 'outdated ) // outdated, updating, updated, failure
-      g += (id, "saveSatatus", 'saved ) // saving, saved
+      g +=(id, "uuid", uuid)
+      g +=(id, "label", label)
+      g +=(id, "renderedLabel", label)
+      g +=(id, "shortLabel", Functions.myLabelCurator(label, true))
+      g +=(id, "showLabel", false) // disabled by default
+      g +=(id, "color", color) // changed when mouse is over
+      g +=(id, "originalColor", color) // never changed
+      g +=(id, "selected", false)
+      g +=(id, "highlighted", false)
+      g +=(id, "updateStatus", 'outdated) // outdated, updating, updated, failure
+      g +=(id, "saveSatatus", 'saved) // saving, saved
 
-      g += (id, "density", 1.0)
-      g += (id, "rate", 1)
-      g += (id, "size", 1.0)
-      g += (id, "weight", 1.0)
-      g += (id, "category", "Document")
-      g += (id, "content", " ")
-      g += (id, "position", position)
-      g += (id, "links", Map.empty[Int, Double])
+      g +=(id, "density", 1.0)
+      g +=(id, "rate", 1)
+      g +=(id, "size", 1.0)
+      g +=(id, "weight", 1.0)
+      g +=(id, "category", "Document")
+      g +=(id, "content", " ")
+      g +=(id, "position", position)
+      g +=(id, "links", Map.empty[Int, Double])
 
       var keywords = List.empty[String]
+
       for (a <- (n \\ "attvalue")) {
 
-          val at = attribute(a)
-             if (at._1.equalsIgnoreCase("keyword")) {
-                 keywords ::= (at._2 match { case s:String => s case a => ""})
-             } else {
-                 g += (id,at._1, at._2)
-            }
+        val at = attribute(a)
+        if (at._1.equalsIgnoreCase("keyword")) {
+          keywords ::= (at._2 match {
+            case s: String => s
+            case a => ""
+          })
+        } else {
+          g +=(id, at._1, at._2)
+        }
       }
-      g += (id, "content", g.content(id).replaceAll("\"","&quot;").replaceAll("'", "&#39;"))
+      g +=(id, "content", g.content(id).replaceAll("\"", "&quot;").replaceAll("'", "&#39;"))
       //println("added size "+g.getArray[Double]("weight")(id))
-      g += (id, "keywords", keywords.toList.toArray)
+      g +=(id, "keywords", keywords.toList.toArray)
 
       // send to the viz
-      ei = ei +1
+      ei = ei + 1
       if (ei >= 300) {
         ei = 0
         //stream(g)
@@ -272,21 +300,21 @@ class GEXF (val session:Session) extends Actor {
       val node1uuid = e \ "@source" text
       val node2uuid = e \ "@target" text
       val weight = ((e \ "@weight" text) match {
-          case "" => "0"
-          case s:String => s
-          case any => "0"
+        case "" => "0"
+        case s: String => s
+        case any => "0"
       }).toDouble
 
 
       val undirected = try {
 
-             (e \ "@type" text) match {
-                  case "undirected" => true
-                  case "directed" => false
-                  case any => false
-            }
+        (e \ "@type" text) match {
+          case "undirected" => true
+          case "directed" => false
+          case any => false
+        }
       } catch {
-         case e => false
+        case e => false
       }
 
 
@@ -297,32 +325,35 @@ class GEXF (val session:Session) extends Actor {
         val node2id = g.id(node2uuid)
 
         // add a link. will overwrite previous mutal links if applicable.
-        g += (node1id, "links", lnks(node1id) + (node2id -> weight))
+        g +=(node1id, "links", lnks(node1id) + (node2id -> weight))
 
         // add a mutual link. if a mutual link already exists, ignore.
-        if (!lnks.contains(node2id)) g += (node2id, "links", lnks(node2id) + (node1id -> weight))
+        if (!lnks.contains(node2id)) g +=(node2id, "links", lnks(node2id) + (node1id -> weight))
       }
-      ei = ei +1
+      ei = ei + 1
       if (ei >= 500) {
         ei = 0
         //stream(g)
       }
     }
-     stream(g)
-    'graphImported
+    stream(cb, g)
+    session.server ! cb -> 'graphLoaded
   }
 
-  def stream(g:Graph) {
+  def stream(cb: Int, g: Graph) {
     // we normalize the graph
     val (centerX, centerY) = Metrics.basicCenter(g)
-    val h = (g + ("position" -> (g.position map { case (x,y) => (x - centerX, y - centerY) })))
+    val h = (g + ("position" -> (g.position map {
+      case (x, y) => (x - centerX, y - centerY)
+    })))
     // compute some stats if the topology of network (level 1: nodes) has changed, and send it to the server
-    session.server !  h.callbackNodeCountChanged
+    session.server ! cb -> h.callbackNodeCountChanged // send to the server the new graph
   }
+
   /*
-   implicit def urlToString(url: java.net.URL): String = {
-   val b = new StringBuilder
-   Source.fromURL(url).foreach(b.append)
-   b.toString
-   }*/
+  implicit def urlToString(url: java.net.URL): String = {
+  val b = new StringBuilder
+  Source.fromURL(url).foreach(b.append)
+  b.toString
+  }*/
 }

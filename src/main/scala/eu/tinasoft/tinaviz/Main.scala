@@ -107,6 +107,7 @@ object Main extends TApplet with Client {
 
 class Main extends TApplet with Client {
 
+  val defaultFrameRate = 26
   val session = new Session(this)
   setTAppletSession(session) // hack for TApplet. TODO: put it in the TApplet's constructor
   setClientSession(session)
@@ -122,10 +123,40 @@ class Main extends TApplet with Client {
   var brandingIcon = new PImage()
   var counter = 0
 
+
+  override def init() {
+    println("LOW LEVEL --> Main.scala: calling super.init()")
+    super.init()
+    println("LOW LEVEL --> Main.scala: called super.init()")
+  }
+  override def start() {
+    println("LOW LEVEL --> Main.scala: calling super.start()")
+    super.start()
+    println("LOW LEVEL --> Main.scala: called super.start() ")
+  }
+
+
+  override def stop() {
+    println("LOW LVEL --> Main.scala stop() -> sending exit signal to all actors, then sleeping")
+    session.close
+    Thread.sleep(2000)
+    println("LOW LEVEL --> Main.scala: calling super.stop()")
+    super.stop()
+    println("LOW LEVEL --> Main.scala: called super.stop()")
+  }
+
+  override def destroy() {
+    println("Main.scala: calling super.destroy()")
+    super.destroy()
+    println("Main.scala: called super.destroy()")
+  }
+
   override def setup(): Unit = {
+    println("Main.scala: called setup()")
     val engine = PConstants.P2D
     size(1200, 800, engine)
-    frameRate(35)
+    frameRate(defaultFrameRate)
+    setDefaultFPS(defaultFrameRate)  // used by reset idle
     colorMode(PConstants.HSB, 1.0f)
     textMode(PConstants.SCREEN)
     rectMode(PConstants.CENTER)
@@ -135,7 +166,6 @@ class Main extends TApplet with Client {
     setDefault("pause", true)
     setDefault("selectionRadius", 10.0)
 
-
       brandingIcon = try {
           session.applet.getParameter("brandingIcon") match {
             case path => loadImage( path )
@@ -144,81 +174,67 @@ class Main extends TApplet with Client {
             case e => new PImage()
        }
 
-
-    //{
-    // new PImage (ImageIO.read(new URL("http://hostname.com/image.gif")))
-    //}
-
     addMouseWheelListener(this)
 
-    /* In the JDK's appletviewer, selecting the Restart menu item calls stop() and then start().
-     * Selecting the Reload menu item calls stop(), destroy(), and init(), in that order.
-     *  (Normally the byte codes will also be reloaded and the HTML file reread though Netscape has a problem with this.)
-     */
-
-    println("session start")
+    println("Main: session start")
     session.start
-
     if (!(session.webpage.connected)) session.server ! 'open -> new java.net.URL(
       "file:///Users/jbilcke/Checkouts/git/tina/tinasoft.desktop/static/tinaweb/default.gexf.gz"
       //"file:///home/jbilcke/Checkouts/git/TINA/tinasoft.desktop/static/tinaweb/default.gexf.gz"
     )
+
   }
 
+  def freeze {
+    //println("Energy-saving mode enabled")
+    session.layout ! 'stop
+    noLoop()
+  }
 
+  def unfreeze {
+    //println("Energy-saving mode disabled")
+    session.layout ! 'start
+    resetIdle
+    loop()
+  }
 
   override def draw(): Unit = {
 
-    // send some values
-    session.server ! "frameRate" -> frameRate.toInt
-    session.server ! "camera.zoom" -> getZoom
-
     val g = session.pipeline.output
-    //println("Main: pipeline.output.nbNodes: "+pipeline.output.nbNodes)
-    val debug = g.debug // getIfPossible[Boolean]("debug")
 
+    val debug = g.debug
     if (g.pause) smooth else if (nbVisibleEdges < 600) smooth else noSmooth
 
+    val fps = {
+      if (g.pause) {
+        increaseIdle
+        if (idle <= 15) {
+          defaultFrameRate
+        } else if (idle <= 20) {
+          21
+        } else if (idle <= 25) {
+          18
+        } else if (idle <= 30) {
+          14
+        } else if (idle <= 40) {
+          12
+        } else if (idle <= 50) {
+          10
+        } else {
+          8
+        }
+      } else {
+        resetIdle
+        defaultFrameRate
+      }
+    }
+    frameRate(fps)
 
     // if there are too many edges, we enable the stochastic edge drawing
     //val stochasticRendering = (g.nbEdges > 1500)
     //println("stoch: "+stochasticRendering)
     // if activity, then we reset
 
-
-    // if the graph has low layout activity, then reduce the FPS
-    /*val activity = g.activity match {
-      case a =>
-        // if paused, no need to refresh very often
-        if (g.pause) 0.0
-        // else if (mouseMoved) 1.0
-        else if (a < 0.10) 0.0
-        else 1.0
-    } */
-    val fps = {
-      if (g.pause) {
-        increaseIdle
-        if (idle <= 5) {
-          24
-        } else if (idle <= 10) {
-          20
-        } else if (idle <= 15) {
-          16
-        } else if (idle <= 20) {
-          12
-        } else if (idle <= 30) {
-          10
-        } else if (idle <= 40) {
-          8
-        } else {
-          5
-        }
-      } else {
-        resetIdle
-        25
-      }
-    }
-    frameRate(fps)
 
     export match {
       case "PDF" =>
@@ -266,7 +282,7 @@ class Main extends TApplet with Client {
       setColor(new Color(0.0, 0.0, 0.0))
       setFontSize(9, false)
       //text("" + frameRate.toInt + " img/sec", 10f, 13f)
-      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (fps: " + fps + " real:" + frameRate.toInt + ") zoom: " + getZoom, 10f, 13f)
+      text("drawing " + nbVisibleNodes + "/" + g.nbNodes + " nodes (" + g.nbSingles + " singles), " + nbVisibleEdges + "/" + g.nbEdges + " edges (fps:" + frameRate.toInt + ") zoom: " + getZoom, 10f, 13f)
     }
     setupCamera // TODO use an immutable Camera (this is the reason for the selection disk bug)
     setLod(32)
@@ -445,7 +461,7 @@ class Main extends TApplet with Client {
     }.toList.sort(compareBySize).toArray
 
 
-    if (g.pause || counter >= 25) {
+    if (g.pause || counter >= 22) {
       counter = 0
       sortedLabelIDs.foreach {
         case (i) =>
@@ -565,7 +581,7 @@ class Main extends TApplet with Client {
     //println("zoomUpdated("+value+")")
     resetIdle
     session.server ! "camera.zoom" -> value
-    session.server ! "window" -> (width, height)
+    //session.server ! "window" -> (width, height)
   }
 
   /**
@@ -576,7 +592,7 @@ class Main extends TApplet with Client {
     //println("positionUpdated("+value+")")
     resetIdle
     session.server ! "camera.position" -> value
-    session.server ! "window" -> (width, height)
+    //session.server ! "window" -> (width, height)
   }
 
   override def mouseUpdated(kind: Symbol,
@@ -585,9 +601,8 @@ class Main extends TApplet with Client {
                             position: (Double, Double)) {
     //println("mouseUpdated: camera.mouse, kind: "+kind+", side: "+side+", count: "+count+", position: "+position+"")
     resetIdle
-
     session.server ! ("camera.mouse", kind, side, count, position)
-    session.server ! "window" -> (width, height)
+    //session.server ! "window" -> (width, height)
 
   }
 
@@ -692,27 +707,6 @@ class Main extends TApplet with Client {
   }
 
 
-  override def start() {
-    super.start()
-    println("started..")
-    //Server ! "pause" -> 'toggle
-  }
-
-  /*
-  override def stop() {
-    super.stop()
-    println("stopped..")
-    //Server ! "pause" -> false
-  }*/
-
-  override def destroy() {
-    println("Main.scala: sending exit signal to Server")
-    session.close
-    Thread.sleep(2)
-    println("Main.scala: calling super.destroy()")
-    super.destroy()
-  }
-
 
   /**
    * Recenter
@@ -727,11 +721,9 @@ class Main extends TApplet with Client {
         //println("error")             || g.currentView.equalsIgnoreCase("macro")
         return
     }
-    //println("g.cameraTarget: " + g.cameraTarget)
-    //if (Maths.random < 0.9) {
+
     val (w, h) = (width.toDouble * 0.85, height.toDouble * 0.85) // 15% of margins
-    //println("xy min max: "+(g.xMin, g.xMax, g.yMin, g.yMax))
-    //println("target: "+g.cameraTarget)
+
     val centerOnSelection = (g.cameraTarget.equalsIgnoreCase("selection") && g.selectionNeighbourhood.size > 1)
     // spaghetti code
     val ratio = (((if (centerOnSelection) {
@@ -756,11 +748,9 @@ class Main extends TApplet with Client {
     translate.set(translate.x, translate.y + 30, 0)
 
     if (Maths.random < 0.1) updatePosition(translate) else updatePositionSilent(translate)
-    //println("centerOnSelect: "+centerOnSelection+" N: "+g.selectionNeighbourhood.size+" pos: "+pos+"  ratio: "+ratio+" zoom: "+getZoom)
     if (g.selectionNeighbourhood.size != 1) {
       if (ratio != 0.0) if (Maths.random < 0.1) updateZoom(getZoom / ratio) else updateZoomSilent(getZoom / ratio)
     } else {
-      //println("updateZoomSilent(3.0)")
       if (Maths.random < 0.1) {
         updateZoom(3.0)
       } else {
@@ -768,7 +758,6 @@ class Main extends TApplet with Client {
       }
 
     }
-    //}
   }
 
 

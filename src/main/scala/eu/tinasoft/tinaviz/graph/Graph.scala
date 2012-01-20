@@ -52,12 +52,14 @@ object Graph {
    */
   val defaults: Map[String, Any] = Map(
     "layout" -> "tinaforce", //"tinaforce",  // phyloforce
+    "layoutSpeed" -> 24.0,
     "activity" -> 100.0,
     "entropy" -> 0.95,
     "maxDrawedNodes" -> 10,
     "debug" -> false,
     "selectionRadius" -> 10.0,
     "pause" -> false,
+    // "freeze" -> false,
     //"logo" -> new PImage(),
     "uuid" -> Array.empty[String],
     "label" -> Array.empty[String],
@@ -181,6 +183,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val showLabel = getArray[Boolean]("showLabel")
   lazy val rate = getArray[Int]("rate")
   lazy val uuid = getArray[String]("uuid")
+  lazy val layoutSpeed = get[Double]("layoutSpeed")
   //lazy val logo = get[PImage]("logo")
 
   lazy val entropy = get[Double]("entropy")
@@ -198,6 +201,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val currentView = get[String]("filter.view")
   lazy val layout = get[String]("layout")
   lazy val pause = get[Boolean]("pause")
+ // lazy val freeze = get[Boolean]("freeze")
   lazy val debug = get[Boolean]("debug")
   lazy val selectionRadius = get[Double]("selectionRadius")
 
