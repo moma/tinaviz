@@ -203,7 +203,7 @@ class Main extends TApplet with Client {
     val g = session.pipeline.output
 
     val debug = g.debug
-    if (g.pause) smooth else if (nbVisibleEdges < 600) smooth else noSmooth
+    if (g.pause) smooth else if (nbVisibleEdges < g.antiAliasingThreshold) smooth else noSmooth
 
     val fps = {
       if (g.pause) {

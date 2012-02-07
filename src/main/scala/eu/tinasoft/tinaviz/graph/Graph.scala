@@ -58,6 +58,7 @@ object Graph {
     "maxDrawedNodes" -> 10,
     "debug" -> false,
     "selectionRadius" -> 10.0,
+    "antiAliasingThreshold" -> 1500,
     "pause" -> false,
     // "freeze" -> false,
     //"logo" -> new PImage(),
@@ -173,6 +174,7 @@ class Graph(val _elements: Map[String, Any] = Map[String, Any]()) {
   lazy val selected = getArray[Boolean]("selected")
   lazy val highlighted = getArray[Boolean]("highlighted")
   lazy val updateStatus = getArray[Symbol]("updateStatus")
+  lazy val antiAliasingThreshold = get[Int]("antiAliasingThreshold")
   // outdated, updating, updated
   lazy val saveStatus = getArray[Symbol]("saveStatus")
   // saving, saved
