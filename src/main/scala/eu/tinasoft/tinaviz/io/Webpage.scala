@@ -51,7 +51,7 @@ class Webpage(val session: Session) extends Actor {
   }
 
   def act() {
-    val cblatency = 10 // decrease to make the application faster
+    val cblatency = 1 // decrease this to make the application faster
     this ! CB_INIT -> Map()
     while (true) {
       receive {

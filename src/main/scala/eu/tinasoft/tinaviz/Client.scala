@@ -88,7 +88,7 @@ trait Client {
 
   def sendSetTuple2(cb: String, key: String, value1: java.lang.Object, value2: java.lang.Object, t: String) {
 
-    println("-> sendTuple2(key:" + key + ", value1:" + value1 + ", value2: " + value2 + ", t:" + t + ")")
+    // println("-> sendTuple2(key:" + key + ", value1:" + value1 + ", value2: " + value2 + ", t:" + t + ")")
 
     //"[\"NGram::41a14ef0a30a812946b69d522e1570db9e4c0d5579753ba429e7291a9bdbc96c\",\"NGram::bbbf7a6412d6d3e8244ac1fda5e35a20037acee661288cb95b7b18cf469980aa\",\"NGram::bc020a35b7f9cb1382e7b534c68e3c531d849b119bf14f75ddead6cc45c3ccc1\"]"
     session.server ! cb.toInt -> (key, t match {
@@ -105,7 +105,7 @@ trait Client {
 
   def sendSet(cb: String, key: String, value: java.lang.Object, t: String) {
 
-    println("-> send(key:" + key + ", value:" + value + ", t:" + t + ")")
+    //println("-> send(cb: "+cb+", key:" + key + ", value:" + value + ", t:" + t + ")")
     //"[\"NGram::41a14ef0a30a812946b69d522e1570db9e4c0d5579753ba429e7291a9bdbc96c\",\"NGram::bbbf7a6412d6d3e8244ac1fda5e35a20037acee661288cb95b7b18cf469980aa\",\"NGram::bc020a35b7f9cb1382e7b534c68e3c531d849b119bf14f75ddead6cc45c3ccc1\"]"
     session.server ! cb.toInt -> (key, t match {
       case "Int" => value.toString.toInt
@@ -120,7 +120,7 @@ trait Client {
 
 
   def sendGet(cb: String, key: String, t: String) {
-    println("-> sendGet(cbId: "+cb+", key: "+key+", t: "+t+")")
+    //println("-> sendGet(cbId: "+cb+", key: "+key+", t: "+t+")")
     session.server ! cb.toInt -> key
   }
 
