@@ -72,6 +72,7 @@ class Workflow(val session: Session) extends Actor {
           session.layout ! 'run
 
         case (cb: Int, something) =>
+          //println("case "+cb+", "+something)
           session.webpage ! cb -> (something match {
 
             case ("pause", true) =>
@@ -171,8 +172,10 @@ class Workflow(val session: Session) extends Actor {
             case ("select", uuid: String) =>
               val in = pipeline.input
               val out = pipeline.output
+              //println("SELECTING...")
               val out2 = if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
                 //pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
+                //println(".. NOTHING!")
                 in.clearSelection
                 out.clearSelection
               } else {
@@ -255,7 +258,7 @@ class Workflow(val session: Session) extends Actor {
 
             case (key: String, value) =>
 
-              println("Workflow: " + cb + " -> " + key + " -> " + value)
+              //println("Workflow: " + cb + " -> " + key + " -> " + value)
 
 
               pipeline.applyKey(key, value)
@@ -274,12 +277,12 @@ class Workflow(val session: Session) extends Actor {
               //var updateNeeded =
               key match {
                 case "filter.view" =>
-                  println("Workflow: received msg: \"" + key + "\"")
+                  //println("Workflow: received msg: \"" + key + "\"")
                   val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f, f), f), f)
                   val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
                   pipeline.setOutput(h)
                 case "filter.node.category" => // might impact the filters!
-                  println("Workflow: received msg: \"" + key + "\"")
+                  //println("Workflow: received msg: \"" + key + "\"")
                   var ff = Filters.nodeWeight2(f, f)
                   ff = Filters.edgeWeight(ff, f)
                   //println("fff: "+ff.uuid.size)
@@ -291,7 +294,7 @@ class Workflow(val session: Session) extends Actor {
                   pipeline.setOutput(h)
 
                 case "filter.a.node.weight" =>
-                  println("Workflow: received msg: \"" + key + "\"")
+                 // println("Workflow: received msg: \"" + key + "\"")
                   val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f, f), f), f)
                   val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
                   pipeline.setOutput(h)
@@ -300,24 +303,24 @@ class Workflow(val session: Session) extends Actor {
                   val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
                   pipeline.setOutput(h)
                 case "filter.b.node.weight" =>
-                  println("Workflow: received msg: \"" + key + "\"")
+                 // println("Workflow: received msg: \"" + key + "\"")
                   val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f, f), f), f)
                   val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
                   pipeline.setOutput(h)
                 case "filter.b.edge.weight" =>
-                  println("Workflow: received msg: \"" + key + "\"")
+                  //println("Workflow: received msg: \"" + key + "\"")
                   val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f, f), f), f)
                   val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
                   pipeline.setOutput(h)
 
                 case "filter.a.node.size" =>
-                  println("Workflow: received msg: \"" + key + "\"")
+                  //println("Workflow: received msg: \"" + key + "\"")
                   val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f, f), f), f)
                   val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
                   pipeline.setOutput(h)
 
                 case "filter.b.node.size" =>
-                  println("Workflow: received msg: \"" + key + "\"")
+                  //println("Workflow: received msg: \"" + key + "\"")
                   val g = Filters.weightToSize(Filters.edgeWeight(Filters.nodeWeight2(f, f), f), f)
                   val h = Filters.clean(Filters.category(g)).callbackNodeCountChanged
                   pipeline.setOutput(h)

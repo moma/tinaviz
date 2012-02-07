@@ -199,13 +199,18 @@ class Server(val session: Session) extends Actor {
       properties += key -> value
       //
       //reply(previous)
-      if (!previous.equals(value)) {
+      //println("setSome("+cb+", "+key+", "+pvalue+")")
+      //if (!previous.equals(value)) {
         if (cb != -1) {
+          // always force update
           self ! cb -> ('updated, key, value, previous)
         } else {
-          self ! ('updated, key, value, previous)
+          // but MAYBE, we really want to chang it.. we shouldn't get it from properties but rather the data store
+          if (!previous.equals(value)) {
+            self ! ('updated, key, value, previous)
+          }
         }
-      }
+      //}
     }
   }
 

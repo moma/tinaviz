@@ -745,13 +745,14 @@ class Main extends TApplet with Client {
     translate.sub(PVector.mult(new PVector(pos._1.toFloat, pos._2.toFloat), getZoom.toFloat))
 
     // FIXME ugly hack, seems a bugs from the browser when inserting the applet.. it is positionned in absolute coord?!
-    translate.set(translate.x, translate.y + 30, 0)
+    translate.set(translate.x, translate.y + 0, 0)
 
-    if (Maths.random < 0.1) updatePosition(translate) else updatePositionSilent(translate)
+    if (Maths.random < 0.05) updatePosition(translate) else updatePositionSilent(translate)
     if (g.selectionNeighbourhood.size != 1) {
-      if (ratio != 0.0) if (Maths.random < 0.1) updateZoom(getZoom / ratio) else updateZoomSilent(getZoom / ratio)
+      if (ratio != 0.0) if (Maths.random < 0.05) updateZoom(getZoom / ratio) else updateZoomSilent(getZoom / ratio)
     } else {
-      if (Maths.random < 0.1) {
+      if (Maths.random < 0.05) {
+        println("zoom changed event")
         updateZoom(3.0)
       } else {
         updateZoomSilent(3.0) // hack: we update the zoom but we do not trigger an event (the "zoom changed" event is reserved for actions induced by users)
