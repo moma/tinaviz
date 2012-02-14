@@ -58,9 +58,9 @@ class Webpage(val session: Session) extends Actor {
         case 'exit => println("exiting browser"); exit()
 
         case ('download, str: String) =>
-          println("sending file to the browser..")
-          val base64ified = "data:application/octet-stream;base64," + Base64.encode(str)
-          //val base64ified = "data:text/xml;subtype=\"gexf/1.2\";base64," + Base64.encode(str)
+          //println("sending file to the browser..")
+          //val base64ified = "data:application/octet-stream;base64," + Base64.encode(str)
+          val base64ified = "data:text/xml;subtype=\"gexf/1.2\";base64," + Base64.encode(str)
           window.call("open", Array[Object](base64ified, "_newtab", new java.lang.Integer(0)))
 
         case (cb:Int, data:Map[String,Any]) =>

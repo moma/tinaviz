@@ -256,6 +256,12 @@ class Workflow(val session: Session) extends Actor {
               self ! "filter.view" -> in.currentView // will automatically update the highlight section
               Map()
 
+              case ("export", "GEXF") => 
+                println("received a GEXF export query")
+                (new GEXF(session)) ! pipeline.output
+                Map()
+
+
             case (key: String, value) =>
 
               //println("Workflow: " + cb + " -> " + key + " -> " + value)
@@ -425,9 +431,13 @@ class Workflow(val session: Session) extends Actor {
           }
 
 
-        case ("export", "GEXF") => (new GEXF(session)) ! pipeline.output
+        case ("export", "GEXF") => 
+          //println("received a GEXF export query")
+          (new GEXF(session)) ! pipeline.output
+
         case x: scala.xml.Elem =>
-          session.webpage ! 'download -> Map("gexf" -> x.toString)
+          //println("received a GEXF from GEXF Exporter.. passing to the webpage")
+          session.webpage ! 'download -> x.toString
         //  new ExportGraphDialog(x.toString)
 
        // case (key: String, value: Any) =>
