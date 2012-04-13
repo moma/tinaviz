@@ -137,9 +137,9 @@ trait Client {
   }
 
   def selectByPattern(cb:String, pattern: String, patternMode: String): Unit = {
-
-    if (pattern == null || patternMode == null) {
       println("selectByPattern(" + pattern + ", " + patternMode + ")");
+    if (pattern == null || patternMode == null) {
+
       return;
     }
     // shutdown the "center on visualization" mode
@@ -152,9 +152,9 @@ trait Client {
 
 
   def selectByNeighbourPattern(cb:String,pattern: String, patternMode: String, category: String): Unit = {
-
+      println("selectByNeighbourPattern(" + pattern + ", " + patternMode + ", " + category + ")");
     if (pattern == null || patternMode == null) {
-      println("selectByNeighbourPattern(" + pattern + ", " + patternMode + ", " + category + ") null");
+
       return;
     }
     // shutdown the "center on visualization" mode
@@ -174,9 +174,9 @@ trait Client {
    */
 
   def highlightByPattern(cb:String, pattern: String, patternMode: String) {
-
-    if (pattern == null | patternMode == null) {
       println("highlightByPattern(" + pattern + ", " + patternMode + ")");
+    if (pattern == null | patternMode == null) {
+
       return;
     }
     // shutdown the "center on visualization" mode

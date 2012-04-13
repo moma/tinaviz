@@ -144,7 +144,7 @@ class Workflow(val session: Session) extends Actor {
               }.toList))
 
             case ("select", uuidList: List[String]) =>
-              // println("selecting nodes: '" + uuidList + "'")
+              println("selecting nodes: '" + uuidList + "'")
               val in = pipeline.input
               val out = pipeline.output
               val out2 = if (uuidList.size == 0) {
@@ -172,7 +172,7 @@ class Workflow(val session: Session) extends Actor {
             case ("select", uuid: String) =>
               val in = pipeline.input
               val out = pipeline.output
-              //println("SELECTING...")
+              println("SELECTING...")
               val out2 = if (uuid == null | (uuid.equals(" ") || uuid.isEmpty)) {
                 //pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
                 //println(".. NOTHING!")
@@ -200,6 +200,7 @@ class Workflow(val session: Session) extends Actor {
             case ("selectByPattern", pattern: String) =>
               val in = pipeline.input
               val out = pipeline.output
+              println("selectByPattern: "+pattern)
               pipeline.setOutput(
                 (if (pattern == null | (pattern.equals(" ") || pattern.isEmpty)) {
                   // pipeline.setCategoryCache(pipeline.categoryCache.clearSelection)
@@ -249,14 +250,15 @@ class Workflow(val session: Session) extends Actor {
             case ("highlightByPattern", pattern: String) =>
               val in = pipeline.input
               val out = pipeline.output
+              println("highlightByPattern: "+pattern)
               pipeline.setOutput(out + ("highlighted" -> out.label.map {
                 case label => if (pattern == null | pattern.isEmpty) false else (label.toLowerCase contains pattern.toLowerCase)
               }))
               //Webpage ! "_callbackSelectionChanged" -> "left"
               self ! "filter.view" -> in.currentView // will automatically update the highlight section
-              Map()
+              Map("selection" -> pipeline.output.selectionAttributes, "mouse" -> "left")
 
-              case ("export", "GEXF") => 
+            case ("export", "GEXF") => 
                 println("received a GEXF export query")
                 (new GEXF(session)) ! pipeline.output
                 Map()
