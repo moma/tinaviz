@@ -1,0 +1,2 @@
+cp target/tinaviz-2.0-SNAPSHOT-small.jar ~/Sites/tinaweb/js/tinaviz/tinaviz-2.0-SNAPSHOT.jar
+#cp target/tinaviz-2.0-SNAPSHOT-small.jar ../tinasoft.desktop/tinasoft/static/tinaweb/js/tinaviz/tinaviz-2.0-SNAPSHOT.jar

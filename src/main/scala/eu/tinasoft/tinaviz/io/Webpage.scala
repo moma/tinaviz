@@ -68,6 +68,11 @@ class Webpage(val session: Session) extends Actor {
           //println("ASYNC/CB window.call: " + Json.build(data).toString + "")
           if (window != null) window.call("setTimeout", args)
 
+        case (cb:Int, any:Any) =>
+          val args = Array[Object]("callCallback" + "('"+cb+"', '" + replace(any.toString) + "')", new java.lang.Integer(cblatency), new java.lang.Integer(0))
+          //println("ASYNC/CB window.call: " + any.toString + "")
+          if (window != null) window.call("setTimeout", args)
+
         case msg => println("Webpage: unknow msg: " + msg)
       }
     }

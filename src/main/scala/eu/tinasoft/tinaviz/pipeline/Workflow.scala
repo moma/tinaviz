@@ -75,13 +75,15 @@ class Workflow(val session: Session) extends Actor {
           //println("case "+cb+", "+something)
           session.webpage ! cb -> (something match {
 
-            case ("pause", true) =>
-              //println("Workflow: pause -> stopping layout")
-              session.layout ! 'stop
-
-            case ("false", true) =>
-              //println("Workflow: pause disabled -> starting layout")
-              session.layout ! 'start
+            case ("pause", enable:Boolean) =>
+              if (enable) {
+                println("Workflow: pause enabled -> stopping layout")
+                session.layout ! 'stop
+                } else {
+                println("Workflow: pause disabled -> starting layout")
+                session.layout ! 'start
+              }
+              Map("pause" -> enable)
 
             case ('getNodeAttributes, uuid: String) =>
               //println("Workflow: asked for 'getNodeAttributes (on INPUT GRAPH) of " + uuid)
