@@ -74,7 +74,7 @@ class PhysicLayout (val session:Session) {
     val maxLinkLength = 70 // 80     max distance between linked nodes
     val minLinkLength = 16 // 5      min distance between linked nodes
     val minDistance = 16 // 5      min distance between unlinked nodes (and thus clusters)
-
+    val globalRadiusForSingleNodes = 190.0 //  radius of circle where single nodes are placed
 
     var deltas = 0
 
@@ -178,8 +178,8 @@ class PhysicLayout (val session:Session) {
                 g.notSinglesCenter._2 + gDiameter * math.sin(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles))
             } else {
               // if we can't we will use an arbitrary, fixed-length
-              (g.notSinglesCenter._1 + 100.0 * math.cos(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles),
-                g.notSinglesCenter._2 + 100.0 * math.sin(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles))
+              (g.notSinglesCenter._1 + globalRadiusForSingleNodes * math.cos(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles),
+                g.notSinglesCenter._2 + globalRadiusForSingleNodes * math.sin(math.Pi / 2 + 2 * math.Pi * ci / g.nbSingles))
             }
           }
 
