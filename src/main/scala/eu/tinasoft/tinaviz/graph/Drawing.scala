@@ -114,11 +114,15 @@ object Drawing {
             val modeTo = if (g.selected(to)) 'selected else if (g.highlighted(to)) 'highlighted else if (g.selectionValid) 'unselected else 'default
 
             tmpColor ::= ((modeFrom, modeTo) match {
+              
               case ('selected, any) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98))) // previously: (0.86, 0.98)
-
-              // case (any, 'selected) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
               case ('highlighted, any) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
-              //case (any, 'highlighted) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
+              
+              // color mutual links
+              case (any, 'selected) => darkerColor.alpha(Maths.map(weight, extr, (0.86, 0.98)))
+              case (any, 'highlighted) => darkerColor.alpha(Maths.map(weight, extr, (0.60, 0.95)))
+              
+              // or else..
               case (any1, any2) =>
                 if (g.selectionValid) {
                   // unselected
