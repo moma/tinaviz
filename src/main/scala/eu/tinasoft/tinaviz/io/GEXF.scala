@@ -23,7 +23,6 @@
 package eu.tinasoft.tinaviz.io
 
 import eu.tinasoft._
-import tinaviz.{Server}
 import tinaviz.graph._
 import tinaviz.util.Color
 import tinaviz.util.Color._
@@ -39,17 +38,14 @@ import xml._
 import java.net.{URLConnection, URL, Authenticator, PasswordAuthentication}
 import reflect.ValDef
 
-//import java.io.{FileInputStream,FileOutputStream,IOException}
-//import java.util.zip.InflaterInputStream
-
 import java.util.zip.GZIPInputStream
 import java.io.BufferedInputStream
 
 object GEXF {
 
-  def open(str: String) = {
+  def openFile(str: String) = {
     println("Reading graph string, please wait..")
-    load(XML.load(str))
+    load(XML.loadFile(str))
 
   }
 
@@ -266,9 +262,11 @@ object GEXF {
               case other => 400.0
             }).toString())
           }
-            <viz:position x={x} y={y} z={z}/>}{val (r, g, b) = newColors(nodeIndex) match {
+            <viz:position x={x} y={y} z={z}/>}{
+            /*val (r, g, b) = newColors(nodeIndex) match {
             case (r, g, b) => (r.toInt.toString, g.toInt.toString, b.toInt.toString)
-          }
+          }*/
+            val (r,g,b) = ("255","255","255")
             <viz:color r={r} g={g} b={b}/>}<viz:size value={graph.size(nodeIndex).toString}/>
             <attvalues>
               <attvalue id="0" value={graph.category(nodeIndex)}/>

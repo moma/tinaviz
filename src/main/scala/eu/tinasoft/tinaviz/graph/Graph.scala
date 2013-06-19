@@ -27,7 +27,6 @@ import tinaviz.graph.Metrics._
 import tinaviz.util._
 import tinaviz.util.Color._
 import tinaviz.util.Vector
-import tinaviz.io.json.Base64
 import collection.mutable.LinkedList
 
 

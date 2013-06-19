@@ -22,18 +22,13 @@
 
 package eu.tinasoft.tinaviz.util
 
-import processing.core.PVector
 import math._
 
-object Vector {   
+object Vector {
   implicit def fromDouble (p:(Double,Double)) = new Vector(p._1, p._2)
   implicit def toDouble (v:Vector) = (v.x,v.y)
-  implicit def toPVector (v:Vector) = new PVector(v.x.toFloat,v.y.toFloat)
-  implicit def fromPVector (p:PVector) = new Vector(p.x.toDouble,p.y.toDouble)
-  //implicit def doubleToPVector(p:(Double,Double)) = new PVector(p._1.toFloat,p._2.toFloat)
-  //implicit def pVectorToDouble(p:PVector) = (p.x.toDouble,p.y.toDouble)
 
-  
+
   /**
    * Return the extremums for X (min,max) and Y (min,max)
    */
@@ -43,14 +38,14 @@ object Vector {
     var minY = Double.MaxValue
     var maxX = Double.MinValue
     var maxY = Double.MinValue
-    values.foreach { 
+    values.foreach {
       case n =>
         if (n._1 < minX) minX = n._1
         if (n._1 > maxX) maxX = n._1
         if (n._2 < minY) minX = n._2
         if (n._2 > maxY) maxX = n._2
     }
-    ((minX,maxX),(minY,maxY))  
+    ((minX,maxX),(minY,maxY))
   }
 
 }
@@ -69,14 +64,14 @@ case class Vector (val x:Double,val y:Double) {
   }
 
 
-  
+
 
   def sqroot(a:Double,b:Double) = {
     def e(d:Double) = if (d < 1.0) (10 * pow(10,abs(log10(d).toInt))).toInt else  1
     val c = max(e(a),e(b))
     sqrt(a*a*c*c + b*b*c*c) / c
   }
-  
+
   def isInRange(p: (Double,Double), radius:Double) = dist(p) <= (radius / 2.0)
 
   def attract(f:Double,e:(Double,Double)) : (Double,Double) = {
@@ -105,7 +100,7 @@ case class Vector (val x:Double,val y:Double) {
     //val ddy = if (dy > 0) (d * f) else (- d * f)
      (dx / (d * f), dy / (d * f))
   }
-  
+
    def repulse(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
@@ -120,16 +115,16 @@ case class Vector (val x:Double,val y:Double) {
     val dx = e._1 - x
     val dy = e._2 - y
     var d = sqrt(dx*dx+dy*dy) + 0.000001 //* 0.8
-    val f2 = 1./ d 
-   ((dx / d) * (f * f2), (dy / d) * (f * f2)) 
+    val f2 = 1.0 / d
+   ((dx / d) * (f * f2), (dy / d) * (f * f2))
   }
-  
+
   // stronger when closer
   def computeForceLimiter(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
     var d = sqrt(dx*dx+dy*dy) //* 0.8
-    val f2 = if (d!=0.0) 1./d else 0.
+    val f2 = if (d!=0.0) (1.0 / d) else 0.
     if (d!=0.0) ((dx / d) * (f * f2), (dy / d) * (f * f2)) else (dx * f * f2,dy * f * f2)
   }
 
@@ -139,7 +134,7 @@ case class Vector (val x:Double,val y:Double) {
      (if (ax > t._1) (if (ax < t._2) x else { if (x > 0) (l._2) else (-l._2) }) else { l._1 },
          if (ay > t._1) (if (ay < t._2) y else { if (y > 0) (l._2) else (-l._2) }) else { l._1 })
   }
-  
+
   /**************************************************/
     def _computeForce(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
@@ -148,7 +143,7 @@ case class Vector (val x:Double,val y:Double) {
     //println("  d: "+d)
     if (d > 0.1) ((dx / d) * f, (dy / d) * f) else (dx * f,dy * f)
   }
-  
+
    def _computeLessForce(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
@@ -165,23 +160,23 @@ case class Vector (val x:Double,val y:Double) {
     //println("  d: "+d)
     if (abs(d) > 0.001) ((dx / d) * f, (dy / d) * f) else (0.0,0.0)
   }
-  
-  
+
+
   // stronger when closer
   def _computeForceDeflector(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
     var d = sqrt(dx*dx+dy*dy) + 0.000001 //* 0.8
-    val f2 = 1./ d 
-   ((dx / d) * (f * f2), (dy / d) * (f * f2)) 
+    val f2 = 1.0 / d
+   ((dx / d) * (f * f2), (dy / d) * (f * f2))
   }
-  
+
   // stronger when closer
   def _computeForceLimiter(f:Double,e:(Double,Double)) : (Double,Double) = {
     val dx = e._1 - x
     val dy = e._2 - y
     var d = sqrt(dx*dx+dy*dy) //* 0.8
-    val f2 = if (d!=0.0) 1./d else 0.
+    val f2 = if (d!=0.0) (1.0  / d) else 0.
     if (d!=0.0) ((dx / d) * (f * f2), (dy / d) * (f * f2)) else (dx * f * f2,dy * f * f2)
   }
 }

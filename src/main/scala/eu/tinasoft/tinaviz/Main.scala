@@ -38,13 +38,9 @@ object Main {
     val iterations = 300
     val filepath = "test.gexf"
 
-    val source = scala.io.Source.fromFile(filepath)
-    val lines = source.mkString
-    source.close()
+    val graph = GEXF.openFile(filepath)
 
-    val graph = GEXF.open(lines)
-
-    println("computing social graph layout")
+    //println("computing social graph layout")
     val socialGraph = Filters.category(graph, "document")
     var i = 0
     var newSocialGraph = socialGraph
@@ -54,7 +50,7 @@ object Main {
       newSocialGraph = socialLayout.layout(newSocialGraph)
     }
 
-    println("computing semantic graph layout")
+    //println("computing semantic graph layout")
     val semanticGraph = Filters.category(graph, "semantic")
     var j = 0
     var newSemanticGraph = semanticGraph
@@ -65,7 +61,7 @@ object Main {
     }
 
     // merge coordinates
-    println("merging coordinates from both graphs")
+    //println("merging coordinates from both graphs")
 
     val newPositions = graph.position.zipWithIndex.map {
       case (elem, index) => {
@@ -85,6 +81,7 @@ object Main {
     val finalGraph = graph + ( "position" -> newPositions)
 
     val newGexf = GEXF.export(finalGraph)
+    println(newGexf)
   }
 
 }
