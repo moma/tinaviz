@@ -1,0 +1,1477 @@
+<?xml version="1.0" encoding="UTF-8"?><gexf xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gephi.org/gexf/viz" version="1.1"> <meta lastmodifieddate="20011-11-11">
+<description>Jean-Louis__Giavitto</description>
+ </meta>
+<graph type="static">
+<attributes class="node" type="static">
+ <attribute id="0" title="category" type="string">  </attribute>
+ <attribute id="1" title="occurrences" type="float">    </attribute>
+ <attribute id="2" title="content" type="string">    </attribute>
+ <attribute id="3" title="keywords" type="string">   </attribute>
+ <attribute id="4" title="weight" type="float">   </attribute>
+</attributes>
+<attributes class="edge" type="float">
+ <attribute id="5" title="cooc" type="float"> </attribute>
+ <attribute id="6" title="type" type="string"> </attribute>
+</attributes>
+<nodes>
+<node id="N::42" label="complex networks">
+<viz:color b="19" g="80"  r="244"/>
+<viz:position x="0.55"    y="0.23"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="54"/>
+<attvalue for="4" value="54"/>
+</attvalues></node>
+<node id="N::87" label="Unconventional programming language">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.26"    y="0.82"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::88" label="Spatial Computing">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.72"    y="0.23"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="2"/>
+<attvalue for="4" value="2"/>
+</attvalues></node>
+<node id="N::89" label="Amorphous Computing">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.88"    y="0.16"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::90" label="Synthetic Biology">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.51"    y="0.1"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="3"/>
+<attvalue for="4" value="3"/>
+</attvalues></node>
+<node id="N::91" label="Chemical Computing">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.01"    y="0.31"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::92" label="Programming languages for autonomic systems">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.87"    y="0.52"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::93" label="declarative language">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.25"    y="0.67"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::94" label="dynamical systems with a dynamical structure">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.17"    y="0.91"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::95" label="computer modeling in system biology">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.82"    y="0.62"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::96" label="music representation">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.95"    y="0.21"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::97" label="open score">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.14"    y="0.05"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::98" label="computer aided composition">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.32"    y="0.74"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::99" label="formal morphogenesis">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.88"    y="0.8"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::141" label="computational neuroscience">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.35"    y="0.1"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="11"/>
+<attvalue for="4" value="11"/>
+</attvalues></node>
+<node id="N::205" label="artificial life">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.33"    y="0.51"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="16"/>
+<attvalue for="4" value="16"/>
+</attvalues></node>
+<node id="N::206" label="biological development">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.32"    y="0.91"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::207" label="self assembly">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.13"    y="0.59"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="3"/>
+<attvalue for="4" value="3"/>
+</attvalues></node>
+<node id="N::208" label="pattern formation">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.75"    y="0.04"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="5"/>
+<attvalue for="4" value="5"/>
+</attvalues></node>
+<node id="N::209" label="evolutionary computation">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.14"    y="0"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="13"/>
+<attvalue for="4" value="13"/>
+</attvalues></node>
+<node id="N::210" label="large scale spiking neural networks">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.31"    y="0.26"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::211" label="categorization">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.78"    y="0.15"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::212" label="cognitive linguistics">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.83"    y="0.18"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::298" label="systems biology">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.09"    y="0.03"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="20"/>
+<attvalue for="4" value="20"/>
+</attvalues></node>
+<node id="N::724" label="biophysics">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.65"    y="1"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="8"/>
+<attvalue for="4" value="8"/>
+</attvalues></node>
+<node id="N::926" label="gene regulatory networks">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.21"    y="0.91"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="5"/>
+<attvalue for="4" value="5"/>
+</attvalues></node>
+<node id="N::960" label="nonlinear dynamics">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.97"    y="0.6"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="8"/>
+<attvalue for="4" value="8"/>
+</attvalues></node>
+<node id="N::996" label="control theory">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.34"    y="0.36"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::997" label="hybrid dynamical systems">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.15"    y="0.28"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::1009" label="Complex biological system analysis and design">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.38"    y="0.21"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::1010" label="Cell biology">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.73"    y="0.5"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::1011" label="Biological networks of interaction">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.4"    y="0.71"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::1012" label="genome layout">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.3"    y="0.05"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::1013" label="genome design">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.09"    y="0.54"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="N::1014" label="organization of the cell nucleus or nucleoid">
+<viz:color b="19" g="180"  r="244"/>
+<viz:position x="0.54"    y="0.04"  z="0" />
+<attvalues> <attvalue for="0" value="NGram"/>
+<attvalue for="1" value="1"/>
+<attvalue for="4" value="1"/>
+</attvalues></node>
+<node id="D::Jean-Louis__Giavitto" label="Dr. Jean-Louis  Giavitto">
+<viz:color b="78" g="193"  r="127"/>
+<viz:position x="0.3"    y="0.23"  z="0" />
+<attvalues> <attvalue for="0" value="Document"/>
+<attvalue for="1" value="12"/>
+<attvalue for="4" value="12"/>
+<attvalue for="2" value="&lt;img  src=http://main.csregistry.org/img/trackers/df4df279e45593c6c1e6bdb0e2022809 width=80px  style=float:left;margin:5px&gt;&lt;b&gt;Country: &lt;/b&gt;France&lt;/br&gt;&lt;b&gt;Position: &lt;/b&gt;Research Director&lt;/br&gt;&lt;b&gt;Affiliation: &lt;/b&gt;IRCAM  and  CNRS&lt;/br&gt;&lt;b&gt;Keywords: &lt;/b&gt;Unconventional programming language,  Spatial Computing,  Amorphous Computing,  Synthetic Biology,  Chemical Computing,  Programming languages for autonomic systems,  declarative language,  dynamical systems with a dynamical structure,  computer modeling in system biology,  music representation,  open score,  computer aided composition,  formal morphogenesis, .&lt;/br&gt;[ &lt;a href=http://repmus.ircam.fr/giavitto target=blank &gt; View homepage &lt;/a &gt;]&lt;br/&gt;"/>
+</attvalues></node>
+<node id="D::René__Doursat" label="Dr. habil. René  Doursat">
+<viz:color b="78" g="193"  r="127"/>
+<viz:position x="0.39"    y="0.86"  z="0" />
+<attvalues> <attvalue for="0" value="Document"/>
+<attvalue for="1" value="12"/>
+<attvalue for="4" value="12"/>
+<attvalue for="2" value="&lt;img  src=http://main.csregistry.org/img/trackers/a6fbd0acd445856b6e2f67414862d7dc width=80px  style=float:left;margin:5px&gt;&lt;b&gt;Country: &lt;/b&gt;France&lt;/br&gt;&lt;b&gt;Position: &lt;/b&gt;Researcher  and  Fmr. Director&lt;/br&gt;&lt;b&gt;Affiliation: &lt;/b&gt;Institut des Systèmes Complexes de Paris Ile-de-France,CNRS  and  Ecole Polytechnique, Paris&lt;/br&gt;&lt;b&gt;Keywords: &lt;/b&gt;artificial life,  biological development,  self assembly,  pattern formation,  spatial computing,  evolutionary computation,  computational neuroscience,  large scale spiking neural networks,  categorization,  cognitive linguistics, .&lt;/br&gt;[ &lt;a href=http://www.iscpif.fr/~doursat target=blank &gt; View homepage &lt;/a &gt;]&lt;br/&gt;"/>
+</attvalues></node>
+<node id="D::Mario__di_Bernardo" label="Prof. Mario  di Bernardo">
+<viz:color b="78" g="193"  r="127"/>
+<viz:position x="0.21"    y="0.08"  z="0" />
+<attvalues> <attvalue for="0" value="Document"/>
+<attvalue for="1" value="12"/>
+<attvalue for="4" value="12"/>
+<attvalue for="2" value="&lt;img src=http://communityexplorer.csregistry.org/img/0.png width=80px   style=float:left;margin:5px&gt;&lt;b&gt;Country: &lt;/b&gt;Italy&lt;/br&gt;&lt;b&gt;Position: &lt;/b&gt;Prof&lt;/br&gt;&lt;b&gt;Affiliation: &lt;/b&gt;University of Naples Federico II&lt;/br&gt;&lt;b&gt;Keywords: &lt;/b&gt;complex networks,  gene regulatory networks,  synthetic biology,  nonlinear dynamics,  control theory,  hybrid dynamical systems, .&lt;/br&gt;[ &lt;a href=http://wpage.unina.it/mdiberna target=blank &gt; View homepage &lt;/a &gt;]&lt;br/&gt;"/>
+</attvalues></node>
+<node id="D::François__Képès" label="Dr. François  Képès">
+<viz:color b="78" g="193"  r="127"/>
+<viz:position x="0.21"    y="0.12"  z="0" />
+<attvalues> <attvalue for="0" value="Document"/>
+<attvalue for="1" value="12"/>
+<attvalue for="4" value="12"/>
+<attvalue for="2" value="&lt;img src=http://communityexplorer.csregistry.org/img/1.png width=80px   style=float:left;margin:5px&gt;&lt;b&gt;Country: &lt;/b&gt;France&lt;/br&gt;&lt;b&gt;Position: &lt;/b&gt;DR&lt;/br&gt;&lt;b&gt;Affiliation: &lt;/b&gt;Genopole&lt;/br&gt;&lt;b&gt;Keywords: &lt;/b&gt;Systems Biology,  Synthetic Biology,  Complex biological system analysis and design,  Cell biology,  Biophysics,  Biological networks of interaction,  genome layout,  genome design,  organization of the cell nucleus or nucleoid, .&lt;/br&gt;[ &lt;a href=http://www.issb.genopole.fr/~kepes target=blank &gt; View homepage &lt;/a &gt;]&lt;br/&gt;"/>
+</attvalues></node>
+</nodes><edges>
+<edge id="1" source="D::Jean-Louis__Giavitto"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="2" source="D::Jean-Louis__Giavitto"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="3" source="D::Jean-Louis__Giavitto"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="4" source="D::Jean-Louis__Giavitto"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="5" source="D::Jean-Louis__Giavitto"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="6" source="D::Jean-Louis__Giavitto"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="7" source="D::Jean-Louis__Giavitto"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="8" source="D::Jean-Louis__Giavitto"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="9" source="D::Jean-Louis__Giavitto"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="10" source="D::Jean-Louis__Giavitto"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="11" source="D::Jean-Louis__Giavitto"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="12" source="D::Jean-Louis__Giavitto"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="13" source="D::Jean-Louis__Giavitto"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="14" source="D::René__Doursat"  target="N::205" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="15" source="D::René__Doursat"  target="N::206" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="16" source="D::René__Doursat"  target="N::207" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="17" source="D::René__Doursat"  target="N::208" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="18" source="D::René__Doursat"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="19" source="D::René__Doursat"  target="N::209" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="20" source="D::René__Doursat"  target="N::141" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="21" source="D::René__Doursat"  target="N::210" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="22" source="D::René__Doursat"  target="N::211" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="23" source="D::René__Doursat"  target="N::212" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="24" source="D::Mario__di_Bernardo"  target="N::42" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="25" source="D::Mario__di_Bernardo"  target="N::926" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="26" source="D::Mario__di_Bernardo"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="27" source="D::Mario__di_Bernardo"  target="N::960" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="28" source="D::Mario__di_Bernardo"  target="N::996" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="29" source="D::Mario__di_Bernardo"  target="N::997" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="30" source="D::François__Képès"  target="N::298" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="31" source="D::François__Képès"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="32" source="D::François__Képès"  target="N::1009" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="33" source="D::François__Képès"  target="N::1010" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="34" source="D::François__Képès"  target="N::724" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="35" source="D::François__Képès"  target="N::1011" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="36" source="D::François__Képès"  target="N::1012" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="37" source="D::François__Képès"  target="N::1013" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="38" source="D::François__Képès"  target="N::1014" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="bipartite"/></attvalues>
+</edge>
+<edge id="39" source="N::42"  target="N::926" weight="0.018518518518519">
+<attvalues> <attvalue for="5" value="0.018518518518519"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="40" source="N::42"  target="N::90" weight="0.018518518518519">
+<attvalues> <attvalue for="5" value="0.018518518518519"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="41" source="N::42"  target="N::960" weight="0.018518518518519">
+<attvalues> <attvalue for="5" value="0.018518518518519"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="42" source="N::42"  target="N::996" weight="0.018518518518519">
+<attvalues> <attvalue for="5" value="0.018518518518519"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="43" source="N::42"  target="N::997" weight="0.018518518518519">
+<attvalues> <attvalue for="5" value="0.018518518518519"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="44" source="N::87"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="45" source="N::87"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="46" source="N::87"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="47" source="N::87"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="48" source="N::87"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="49" source="N::87"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="50" source="N::87"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="51" source="N::87"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="52" source="N::87"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="53" source="N::87"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="54" source="N::87"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="55" source="N::87"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="56" source="N::88"  target="N::87" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="57" source="N::88"  target="N::89" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="58" source="N::88"  target="N::90" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="59" source="N::88"  target="N::91" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="60" source="N::88"  target="N::92" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="61" source="N::88"  target="N::93" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="62" source="N::88"  target="N::94" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="63" source="N::88"  target="N::95" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="64" source="N::88"  target="N::96" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="65" source="N::88"  target="N::97" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="66" source="N::88"  target="N::98" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="67" source="N::88"  target="N::99" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="68" source="N::88"  target="N::205" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="69" source="N::88"  target="N::206" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="70" source="N::88"  target="N::207" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="71" source="N::88"  target="N::208" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="72" source="N::88"  target="N::209" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="73" source="N::88"  target="N::141" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="74" source="N::88"  target="N::210" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="75" source="N::88"  target="N::211" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="76" source="N::88"  target="N::212" weight="0.5">
+<attvalues> <attvalue for="5" value="0.5"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="77" source="N::89"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="78" source="N::89"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="79" source="N::89"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="80" source="N::89"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="81" source="N::89"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="82" source="N::89"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="83" source="N::89"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="84" source="N::89"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="85" source="N::89"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="86" source="N::89"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="87" source="N::89"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="88" source="N::89"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="89" source="N::90"  target="N::87" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="90" source="N::90"  target="N::88" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="91" source="N::90"  target="N::89" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="92" source="N::90"  target="N::91" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="93" source="N::90"  target="N::92" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="94" source="N::90"  target="N::93" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="95" source="N::90"  target="N::94" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="96" source="N::90"  target="N::95" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="97" source="N::90"  target="N::96" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="98" source="N::90"  target="N::97" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="99" source="N::90"  target="N::98" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="100" source="N::90"  target="N::99" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="101" source="N::90"  target="N::42" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="102" source="N::90"  target="N::926" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="103" source="N::90"  target="N::960" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="104" source="N::90"  target="N::996" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="105" source="N::90"  target="N::997" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="106" source="N::90"  target="N::298" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="107" source="N::90"  target="N::1009" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="108" source="N::90"  target="N::1010" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="109" source="N::90"  target="N::724" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="110" source="N::90"  target="N::1011" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="111" source="N::90"  target="N::1012" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="112" source="N::90"  target="N::1013" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="113" source="N::90"  target="N::1014" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="114" source="N::91"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="115" source="N::91"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="116" source="N::91"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="117" source="N::91"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="118" source="N::91"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="119" source="N::91"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="120" source="N::91"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="121" source="N::91"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="122" source="N::91"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="123" source="N::91"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="124" source="N::91"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="125" source="N::91"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="126" source="N::92"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="127" source="N::92"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="128" source="N::92"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="129" source="N::92"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="130" source="N::92"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="131" source="N::92"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="132" source="N::92"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="133" source="N::92"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="134" source="N::92"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="135" source="N::92"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="136" source="N::92"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="137" source="N::92"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="138" source="N::93"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="139" source="N::93"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="140" source="N::93"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="141" source="N::93"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="142" source="N::93"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="143" source="N::93"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="144" source="N::93"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="145" source="N::93"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="146" source="N::93"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="147" source="N::93"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="148" source="N::93"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="149" source="N::93"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="150" source="N::94"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="151" source="N::94"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="152" source="N::94"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="153" source="N::94"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="154" source="N::94"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="155" source="N::94"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="156" source="N::94"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="157" source="N::94"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="158" source="N::94"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="159" source="N::94"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="160" source="N::94"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="161" source="N::94"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="162" source="N::95"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="163" source="N::95"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="164" source="N::95"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="165" source="N::95"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="166" source="N::95"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="167" source="N::95"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="168" source="N::95"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="169" source="N::95"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="170" source="N::95"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="171" source="N::95"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="172" source="N::95"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="173" source="N::95"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="174" source="N::96"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="175" source="N::96"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="176" source="N::96"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="177" source="N::96"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="178" source="N::96"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="179" source="N::96"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="180" source="N::96"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="181" source="N::96"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="182" source="N::96"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="183" source="N::96"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="184" source="N::96"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="185" source="N::96"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="186" source="N::97"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="187" source="N::97"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="188" source="N::97"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="189" source="N::97"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="190" source="N::97"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="191" source="N::97"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="192" source="N::97"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="193" source="N::97"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="194" source="N::97"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="195" source="N::97"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="196" source="N::97"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="197" source="N::97"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="198" source="N::98"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="199" source="N::98"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="200" source="N::98"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="201" source="N::98"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="202" source="N::98"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="203" source="N::98"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="204" source="N::98"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="205" source="N::98"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="206" source="N::98"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="207" source="N::98"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="208" source="N::98"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="209" source="N::98"  target="N::99" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="210" source="N::99"  target="N::87" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="211" source="N::99"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="212" source="N::99"  target="N::89" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="213" source="N::99"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="214" source="N::99"  target="N::91" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="215" source="N::99"  target="N::92" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="216" source="N::99"  target="N::93" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="217" source="N::99"  target="N::94" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="218" source="N::99"  target="N::95" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="219" source="N::99"  target="N::96" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="220" source="N::99"  target="N::97" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="221" source="N::99"  target="N::98" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="222" source="N::141"  target="N::205" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="223" source="N::141"  target="N::206" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="224" source="N::141"  target="N::207" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="225" source="N::141"  target="N::208" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="226" source="N::141"  target="N::88" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="227" source="N::141"  target="N::209" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="228" source="N::141"  target="N::210" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="229" source="N::141"  target="N::211" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="230" source="N::141"  target="N::212" weight="0.090909090909091">
+<attvalues> <attvalue for="5" value="0.090909090909091"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="231" source="N::205"  target="N::206" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="232" source="N::205"  target="N::207" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="233" source="N::205"  target="N::208" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="234" source="N::205"  target="N::88" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="235" source="N::205"  target="N::209" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="236" source="N::205"  target="N::141" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="237" source="N::205"  target="N::210" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="238" source="N::205"  target="N::211" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="239" source="N::205"  target="N::212" weight="0.0625">
+<attvalues> <attvalue for="5" value="0.0625"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="240" source="N::206"  target="N::205" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="241" source="N::206"  target="N::207" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="242" source="N::206"  target="N::208" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="243" source="N::206"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="244" source="N::206"  target="N::209" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="245" source="N::206"  target="N::141" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="246" source="N::206"  target="N::210" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="247" source="N::206"  target="N::211" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="248" source="N::206"  target="N::212" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="249" source="N::207"  target="N::205" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="250" source="N::207"  target="N::206" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="251" source="N::207"  target="N::208" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="252" source="N::207"  target="N::88" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="253" source="N::207"  target="N::209" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="254" source="N::207"  target="N::141" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="255" source="N::207"  target="N::210" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="256" source="N::207"  target="N::211" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="257" source="N::207"  target="N::212" weight="0.33333333333333">
+<attvalues> <attvalue for="5" value="0.33333333333333"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="258" source="N::208"  target="N::205" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="259" source="N::208"  target="N::206" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="260" source="N::208"  target="N::207" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="261" source="N::208"  target="N::88" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="262" source="N::208"  target="N::209" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="263" source="N::208"  target="N::141" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="264" source="N::208"  target="N::210" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="265" source="N::208"  target="N::211" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="266" source="N::208"  target="N::212" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="267" source="N::209"  target="N::205" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="268" source="N::209"  target="N::206" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="269" source="N::209"  target="N::207" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="270" source="N::209"  target="N::208" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="271" source="N::209"  target="N::88" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="272" source="N::209"  target="N::141" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="273" source="N::209"  target="N::210" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="274" source="N::209"  target="N::211" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="275" source="N::209"  target="N::212" weight="0.076923076923077">
+<attvalues> <attvalue for="5" value="0.076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="276" source="N::210"  target="N::205" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="277" source="N::210"  target="N::206" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="278" source="N::210"  target="N::207" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="279" source="N::210"  target="N::208" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="280" source="N::210"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="281" source="N::210"  target="N::209" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="282" source="N::210"  target="N::141" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="283" source="N::210"  target="N::211" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="284" source="N::210"  target="N::212" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="285" source="N::211"  target="N::205" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="286" source="N::211"  target="N::206" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="287" source="N::211"  target="N::207" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="288" source="N::211"  target="N::208" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="289" source="N::211"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="290" source="N::211"  target="N::209" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="291" source="N::211"  target="N::141" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="292" source="N::211"  target="N::210" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="293" source="N::211"  target="N::212" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="294" source="N::212"  target="N::205" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="295" source="N::212"  target="N::206" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="296" source="N::212"  target="N::207" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="297" source="N::212"  target="N::208" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="298" source="N::212"  target="N::88" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="299" source="N::212"  target="N::209" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="300" source="N::212"  target="N::141" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="301" source="N::212"  target="N::210" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="302" source="N::212"  target="N::211" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="303" source="N::298"  target="N::90" weight="0.05">
+<attvalues> <attvalue for="5" value="0.05"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="304" source="N::298"  target="N::1009" weight="0.05">
+<attvalues> <attvalue for="5" value="0.05"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="305" source="N::298"  target="N::1010" weight="0.05">
+<attvalues> <attvalue for="5" value="0.05"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="306" source="N::298"  target="N::724" weight="0.05">
+<attvalues> <attvalue for="5" value="0.05"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="307" source="N::298"  target="N::1011" weight="0.05">
+<attvalues> <attvalue for="5" value="0.05"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="308" source="N::298"  target="N::1012" weight="0.05">
+<attvalues> <attvalue for="5" value="0.05"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="309" source="N::298"  target="N::1013" weight="0.05">
+<attvalues> <attvalue for="5" value="0.05"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="310" source="N::298"  target="N::1014" weight="0.05">
+<attvalues> <attvalue for="5" value="0.05"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="311" source="N::724"  target="N::298" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="312" source="N::724"  target="N::90" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="313" source="N::724"  target="N::1009" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="314" source="N::724"  target="N::1010" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="315" source="N::724"  target="N::1011" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="316" source="N::724"  target="N::1012" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="317" source="N::724"  target="N::1013" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="318" source="N::724"  target="N::1014" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="319" source="N::926"  target="N::42" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="320" source="N::926"  target="N::90" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="321" source="N::926"  target="N::960" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="322" source="N::926"  target="N::996" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="323" source="N::926"  target="N::997" weight="0.2">
+<attvalues> <attvalue for="5" value="0.2"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="324" source="N::960"  target="N::42" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="325" source="N::960"  target="N::926" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="326" source="N::960"  target="N::90" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="327" source="N::960"  target="N::996" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="328" source="N::960"  target="N::997" weight="0.125">
+<attvalues> <attvalue for="5" value="0.125"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="329" source="N::996"  target="N::42" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="330" source="N::996"  target="N::926" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="331" source="N::996"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="332" source="N::996"  target="N::960" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="333" source="N::996"  target="N::997" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="334" source="N::997"  target="N::42" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="335" source="N::997"  target="N::926" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="336" source="N::997"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="337" source="N::997"  target="N::960" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="338" source="N::997"  target="N::996" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="339" source="N::1009"  target="N::298" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="340" source="N::1009"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="341" source="N::1009"  target="N::1010" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="342" source="N::1009"  target="N::724" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="343" source="N::1009"  target="N::1011" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="344" source="N::1009"  target="N::1012" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="345" source="N::1009"  target="N::1013" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="346" source="N::1009"  target="N::1014" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="347" source="N::1010"  target="N::298" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="348" source="N::1010"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="349" source="N::1010"  target="N::1009" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="350" source="N::1010"  target="N::724" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="351" source="N::1010"  target="N::1011" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="352" source="N::1010"  target="N::1012" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="353" source="N::1010"  target="N::1013" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="354" source="N::1010"  target="N::1014" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="355" source="N::1011"  target="N::298" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="356" source="N::1011"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="357" source="N::1011"  target="N::1009" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="358" source="N::1011"  target="N::1010" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="359" source="N::1011"  target="N::724" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="360" source="N::1011"  target="N::1012" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="361" source="N::1011"  target="N::1013" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="362" source="N::1011"  target="N::1014" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="363" source="N::1012"  target="N::298" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="364" source="N::1012"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="365" source="N::1012"  target="N::1009" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="366" source="N::1012"  target="N::1010" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="367" source="N::1012"  target="N::724" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="368" source="N::1012"  target="N::1011" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="369" source="N::1012"  target="N::1013" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="370" source="N::1012"  target="N::1014" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="371" source="N::1013"  target="N::298" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="372" source="N::1013"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="373" source="N::1013"  target="N::1009" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="374" source="N::1013"  target="N::1010" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="375" source="N::1013"  target="N::724" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="376" source="N::1013"  target="N::1011" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="377" source="N::1013"  target="N::1012" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="378" source="N::1013"  target="N::1014" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="379" source="N::1014"  target="N::298" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="380" source="N::1014"  target="N::90" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="381" source="N::1014"  target="N::1009" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="382" source="N::1014"  target="N::1010" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="383" source="N::1014"  target="N::724" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="384" source="N::1014"  target="N::1011" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="385" source="N::1014"  target="N::1012" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="386" source="N::1014"  target="N::1013" weight="1">
+<attvalues> <attvalue for="5" value="1"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="387" source="D::Jean-Louis__Giavitto"  target="D::René__Doursat" weight="0.0076923076923077">
+<attvalues> <attvalue for="5" value="0.0076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="388" source="D::Jean-Louis__Giavitto"  target="D::Mario__di_Bernardo" weight="0.012820512820513">
+<attvalues> <attvalue for="5" value="0.012820512820513"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="389" source="D::Jean-Louis__Giavitto"  target="D::François__Képès" weight="0.0085470085470085">
+<attvalues> <attvalue for="5" value="0.0085470085470085"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="390" source="D::René__Doursat"  target="D::Jean-Louis__Giavitto" weight="0.0076923076923077">
+<attvalues> <attvalue for="5" value="0.0076923076923077"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="391" source="D::Mario__di_Bernardo"  target="D::Jean-Louis__Giavitto" weight="0.012820512820513">
+<attvalues> <attvalue for="5" value="0.012820512820513"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="392" source="D::Mario__di_Bernardo"  target="D::François__Képès" weight="0.018518518518519">
+<attvalues> <attvalue for="5" value="0.018518518518519"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="393" source="D::François__Képès"  target="D::Jean-Louis__Giavitto" weight="0.0085470085470085">
+<attvalues> <attvalue for="5" value="0.0085470085470085"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+<edge id="394" source="D::François__Képès"  target="D::Mario__di_Bernardo" weight="0.018518518518519">
+<attvalues> <attvalue for="5" value="0.018518518518519"/><attvalue for="6" value="nodes2"/></attvalues>
+</edge>
+</edges></graph></gexf>

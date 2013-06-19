@@ -1,6 +1,6 @@
-/************************************************************************
+/** **********************************************************************
                                   Tinaviz
- *************************************************************************
+  * ************************************************************************
 This application is part of the Tinasoft project: http://tinasoft.eu
  Tinaviz main developer: julian.bilcke @ iscpif.fr  (twitter.com/flngr)
 
@@ -18,7 +18,7 @@ This application is part of the Tinasoft project: http://tinasoft.eu
 
  You should have received a copy of the GNU General Public License along
  with this program. If not, see <http://www.gnu.org/licenses/>.
- ************************************************************************/
+  * ***********************************************************************/
 
 package eu.tinasoft.tinaviz.graph
 
@@ -27,52 +27,15 @@ import reflect.ValDef
 
 object Filters {
 
-  def category(g: Graph): Graph = {
+  def category(g: Graph, category: String): Graph = {
     if (g.nbNodes == 0) return g
-
-    val FEATURE_RemoveSingleNodesInMesoView = true
     var removeMe = Set.empty[Int]
-    val category = g.currentCategory
-    g.currentView match {
-      case "macro" =>
-        g.category.zipWithIndex map {
-          case (cat, i) =>
-            //print(" "+g.label(i)+" ("+g.category(i)+"): ")
-            if (!category.equalsIgnoreCase(cat)) {
-              //println("REMOVING")
-              removeMe += i
-            } else {
-              //println("KEEPING")
-            }
-        }
-
-      case "meso" =>
-        g.selected.zipWithIndex foreach {
-          case (f, i) => if (!f) {
-            // remove the node which is not in our category
-            if (!g.currentCategory.equalsIgnoreCase(g.category(i))) {
-              //println("removing "+g.label(i)+" because: !"+g.currentCategory+".equalsIgnoreCase("+g.category(i)+")=="+(!g.currentCategory.equalsIgnoreCase(g.category(i))))
-              removeMe += i
-            } else {
-
-              var keepThat = false
-              // we remove nodes not connected to the selection
-              g.selection.foreach {
-                case j => if (g.hasAnyLink(i, j)) keepThat = true
-              }
-              if (!keepThat) {
-                if (FEATURE_RemoveSingleNodesInMesoView) removeMe += i
-              }
-            }
-          }
+    g.category.zipWithIndex map {
+      case (cat, i) =>
+        if (!category.equalsIgnoreCase(cat)) {
+          removeMe += i
         }
     }
-
-    // println("current graph has "+g.uuid.size+" nodes. curr category is "+g.currentCategory+". removed "+removeMe.size+" nodes ")
-    //removeMe.foreach{
-    //  case i => print(""+g.label(i)+" ("+g.category(i)+"), ")
-    //}
-
     clean(g.remove(removeMe))
   }
 
@@ -91,7 +54,7 @@ object Filters {
     var removeMe = Set.empty[Int]
     g.weight.zipWithIndex.map {
       case (weight, i) =>
-        val (r,fn) = g.category(i) match {
+        val (r, fn) = g.category(i) match {
           case "Document" => (rangeA, ref.nodeAWeightRange)
           case "NGram" => (rangeB, ref.nodeBWeightRange)
         }
@@ -146,8 +109,8 @@ object Filters {
               // else
 
 
-              val (r,fn) = g.category(i) match {
-                case "Document" => (rangeA,ref.edgeAWeightRange)
+              val (r, fn) = g.category(i) match {
+                case "Document" => (rangeA, ref.edgeAWeightRange)
                 case "NGram" => (rangeB, ref.edgeBWeightRange)
               }
               val es = fn.size
@@ -190,18 +153,18 @@ object Filters {
     val bminmaxweight = (ref.minBNodeWeight, ref.maxBNodeWeight) // NGram
     //println("applyWeightToSize: " + ratio)
     val newSize = g.weight.zipWithIndex map {
-      case (weight, i) =>
+        case (weight, i) =>
 
-        if (g.category(i) equalsIgnoreCase "Document") {
+          if (g.category(i) equalsIgnoreCase "Document") {
 
-          Maths.map(weight, aminmaxweight, sliderRange) * aratio
+            Maths.map(weight, aminmaxweight, sliderRange) * aratio
 
-        } else {
-          Maths.map(weight, bminmaxweight, sliderRange) * bratio
+          } else {
+            Maths.map(weight, bminmaxweight, sliderRange) * bratio
 
-        }
+          }
 
-    }
+      }
     g + ("size" -> newSize)
   }
 

@@ -15,13 +15,11 @@ import traer.physics._
 import tinaviz.util.Vector._
 import tinaviz.util.Maths
 import tinaviz.graph._
-import tinaviz.pipeline.Pipeline
 import actors.threadpool.AbstractCollection
-import eu.tinasoft.tinaviz.Session
 
 import scala.Math
 
-class PhysicLayout (val session:Session) {
+class PhysicLayout {
   val ps = new ParticleSystem(0f, 0.1f)
   //ps.setIntegrator( ParticleSystem.MODIFIED_EULER )
   //ps.setGravity( 1.3f )
@@ -65,8 +63,6 @@ class PhysicLayout (val session:Session) {
   def tinaforce(g: Graph): Graph = {
     if (g.nbNodes == 0) return g
 
-    val h = session.pipeline.categoryCache
-
     val GRAVITY = 200 // 200    g.get[Double]("layout.gravity") // stronger means faster!
     val REPULSION = 900 // 800    should be divided by the nb of edges? faster at the beggining, then slower?
     val DAMPING = 0.002 // 0.002  please, no greater than 0.05
@@ -87,11 +83,13 @@ class PhysicLayout (val session:Session) {
     //println("Layout: position.size: "+g.position.size)
     if (g.hashed != lastHash) {
       lastHash = g.hashed
+
+      g.
       ps.clear
       //println("hash changed, regenerating the particle system..")
 
-      val aMinMaxWeights = (h.minAEdgeWeight, h.maxAEdgeWeight)
-      val bMinMaxWeights = (h.minBEdgeWeight, h.maxBEdgeWeight)
+      val aMinMaxWeights = (g.minAEdgeWeight, g.maxAEdgeWeight)
+      val bMinMaxWeights = (g.minBEdgeWeight, g.maxBEdgeWeight)
       val aMinMaxNodeWeights = (g.minANodeWeight, g.maxANodeWeight)
       val bMinMaxNodeWeights = (g.minBNodeWeight, g.maxBNodeWeight)
 
@@ -209,10 +207,8 @@ class PhysicLayout (val session:Session) {
   /**
    * Compute the layout
    */
-  def phyloforce(g: Graph): Graph = {
+  def phyloforce(g: Graph) : Graph = {
     if (g.nbNodes == 0) return g
-
-    val h = session.pipeline.categoryCache
 
     val GRAVITY = 200 // 200    g.get[Double]("layout.gravity") // stronger means faster!
     val REPULSION = 1800 // 800    should be divided by the nb of edges? faster at the beggining, then slower?
@@ -234,8 +230,8 @@ class PhysicLayout (val session:Session) {
       ps.clear
       //println("hash changed, regenerating the particle system..")
 
-      val aMinMaxWeights = (h.minAEdgeWeight, h.maxAEdgeWeight)
-      val bMinMaxWeights = (h.minBEdgeWeight, h.maxBEdgeWeight)
+      val aMinMaxWeights = (g.minAEdgeWeight, g.maxAEdgeWeight)
+      val bMinMaxWeights = (g.minBEdgeWeight, g.maxBEdgeWeight)
       val aMinMaxNodeWeights = (g.minANodeWeight, g.maxANodeWeight)
       val bMinMaxNodeWeights = (g.minBNodeWeight, g.maxBNodeWeight)
 

@@ -293,7 +293,7 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>sign</goal>
+                            <!--<goal>sign</goal>-->
                         </goals>
                     </execution>
                 </executions>
