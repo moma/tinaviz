@@ -83,8 +83,6 @@ class PhysicLayout {
     //println("Layout: position.size: "+g.position.size)
     if (g.hashed != lastHash) {
       lastHash = g.hashed
-
-      g.
       ps.clear
       //println("hash changed, regenerating the particle system..")
 

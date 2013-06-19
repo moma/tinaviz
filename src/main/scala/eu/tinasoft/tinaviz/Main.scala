@@ -34,8 +34,15 @@ object Main {
    */
   def main(args: Array[String]): Unit = {
 
-    val graph = GEXF.open("<xml></xml>")
-    val iterations = 100
+
+    val iterations = 300
+    val filepath = "test.gexf"
+
+    val source = scala.io.Source.fromFile(filepath)
+    val lines = source.mkString
+    source.close()
+
+    val graph = GEXF.open(lines)
 
     println("computing social graph layout")
     val socialGraph = Filters.category(graph, "document")
@@ -59,7 +66,6 @@ object Main {
 
     // merge coordinates
     println("merging coordinates from both graphs")
-    var finalGraph = graph
 
     val newPositions = graph.position.zipWithIndex.map {
       case (elem, index) => {
